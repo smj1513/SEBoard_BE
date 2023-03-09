@@ -32,7 +32,7 @@ pipeline {
 							if(entry.value){
 								var = entry.key
 								withCredentials([[$class: 'UsernamePasswordMultiBinding',
-								credentialsId: 'docker-hub',
+								credentialsId: 'maanjong-docker-hub',
 								usernameVariable: 'DOCKER_USER_ID',
 								passwordVariable: 'DOCKER_USER_PASSWORD'
 								]]){
