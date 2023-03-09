@@ -1,0 +1,5 @@
+version: "3.0"
+services:
+  seboard:
+    build: ./seboard
+    container_name: seboard_builder
