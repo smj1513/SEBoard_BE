@@ -1,0 +1,42 @@
+package com.seproject.seboard.domain.service;
+
+import com.seproject.seboard.domain.model.Category;
+import com.seproject.seboard.domain.repository.CategoryRepository;
+import lombok.RequiredArgsConstructor;
+
+import java.util.Optional;
+
+//영호형의 가르침 1: 변하는 것과 변하지 않는 것을 구분하라!
+//생성, 조회 -> 완전 동일, 수정 , 삭제 -> 패스워드확인
+@RequiredArgsConstructor
+public class PostService {
+    //TODO: 프로퍼티로 빼야함
+    private static final Integer TITLE_MAX_SIZE = 50;
+    private static final Integer TITLE_MIN_SIZE = 4;
+    private static final Integer CONTENTS_MAX_SIZE = 1000;
+    private static final Integer CONTENTS_MIN_SIZE = 10;
+
+    private final CategoryRepository categoryRepository;
+
+
+    // 카테고리 아이디 유무
+    public boolean existCategory(Long categoryId){
+        Optional<Category> category = categoryRepository.findById(categoryId);
+
+        if(category.isEmpty()){
+            return false;
+        }
+
+        return true;
+    }
+
+    // 제목 최대 자리수
+    public boolean isValidTitle(String title) {
+        return TITLE_MIN_SIZE < title.length() && title.length() <= TITLE_MAX_SIZE ;
+    }
+
+    // 본문 최대 자리수
+    public boolean isValidContents(String contents) {
+        return CONTENTS_MIN_SIZE < contents.length() && contents.length() <= CONTENTS_MAX_SIZE ;
+    }
+}
