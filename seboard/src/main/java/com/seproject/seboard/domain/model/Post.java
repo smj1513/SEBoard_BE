@@ -16,5 +16,9 @@ public class Post {
     public boolean isSameAuthor(Author author){
         return this.author.equals(author);
     }
-
+    public void update(String title,String contents,Long categoryId) {
+        this.title = title;
+        this.contents = contents;
+        this.categoryId = categoryId;
+    }
 }

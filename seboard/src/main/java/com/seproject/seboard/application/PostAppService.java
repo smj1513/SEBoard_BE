@@ -89,6 +89,44 @@ public class PostAppService {
         postRepository.deleteById(postId);
     }
 
+    // 게시글 수정
+    public void updateNamedPost(String title,String contents,Long categoryId,Long postId,Long userId){
+        validatePost(title,contents,categoryId);
+
+        //게시물 및 요청자 id를 이용한 대상 조회
+        Post targetPost = findPostById(postId);
+        Member author = findMemberById(userId);
+
+        // 동일 인물인지 검사
+        boolean isAuthor = targetPost.isSameAuthor(author);
+        if(!isAuthor) {
+            throw new IllegalArgumentException();
+        }
+        // 게시글 업데이트
+        targetPost.update(title,contents,categoryId);
+    }
+
+    public void updateUnnamedPost(String title,String contents,Long categoryId,Long postId,Long userId,String password){
+        validatePost(title,contents,categoryId);
+
+        //게시물 및 요청자 id를 이용한 대상 조회
+        Post targetPost = findPostById(postId);
+        Anonymous author = findAnonymousById(userId);
+
+        // 동일 인물인지 검사
+        boolean isAuthor = targetPost.isSameAuthor(author);
+        if(!isAuthor) {
+            throw new IllegalArgumentException();
+        }
+
+        //비밀번호 검사
+        if(!author.checkPassword(password)) {
+            throw new IllegalArgumentException();
+        }
+
+        // 게시글 업데이트 -> 익명일때 비밀번호 수정도 필요한가?
+        targetPost.update(title,contents,categoryId);
+    }
     // 게시물을 찾고 존재하지 않으면 예외를 전달
     private Post findPostById(Long postId){
         Optional<Post> post = postRepository.findById(postId);
