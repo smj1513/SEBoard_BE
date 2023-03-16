@@ -1,13 +1,13 @@
 package com.seproject.seboard.domain.model;
 
 import com.seproject.seboard.domain.model.author.Author;
-import com.seproject.seboard.domain.model.author.Member;
-import lombok.experimental.SuperBuilder;
+import lombok.Builder;
 
-@SuperBuilder
+@Builder
 public class Post {
     private Long postId;
     private Long categoryId;
+    private BaseTime baseTime;
     private String title;
     private String contents;
     private int views;
