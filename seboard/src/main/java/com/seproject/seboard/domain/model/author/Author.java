@@ -1,9 +1,11 @@
 package com.seproject.seboard.domain.model.author;
 
+import lombok.Getter;
 import lombok.experimental.SuperBuilder;
 
 import java.util.Objects;
 
+@Getter
 @SuperBuilder
 public abstract class Author {
 
@@ -22,4 +24,6 @@ public abstract class Author {
     public int hashCode() {
         return Objects.hash(authorId);
     }
+
+    public abstract boolean isAnonymous();
 }
