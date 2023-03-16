@@ -1,15 +1,16 @@
-package com.seproject.seboard.domain.model.author;
+package com.seproject.seboard.domain.model;
 
+import lombok.Builder;
 import lombok.Getter;
-import lombok.experimental.SuperBuilder;
 
 import java.util.Objects;
 
 @Getter
-@SuperBuilder
-public abstract class Author {
-
-    private Long authorId;
+@Builder
+public class Author {
+    public final static String ANONYMOUS_LOGIN_ID = "anonymous";
+    private final Long authorId;
+    private final String loginId;
     private String name;
 
     @Override
@@ -25,5 +26,7 @@ public abstract class Author {
         return Objects.hash(authorId);
     }
 
-    public abstract boolean isAnonymous();
+    public boolean isAnonymous() {
+        return ANONYMOUS_LOGIN_ID.equals(loginId);
+    }
 }

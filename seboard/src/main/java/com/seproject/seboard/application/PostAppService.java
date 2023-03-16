@@ -1,15 +1,18 @@
 package com.seproject.seboard.application;
 
+import com.seproject.seboard.domain.model.Author;
+import com.seproject.seboard.domain.model.Category;
 import com.seproject.seboard.domain.model.Post;
-import com.seproject.seboard.domain.model.author.Anonymous;
-import com.seproject.seboard.domain.model.author.Author;
-import com.seproject.seboard.domain.model.author.Member;
-import com.seproject.seboard.domain.repository.AnonymousRepository;
-import com.seproject.seboard.domain.repository.MemberRepository;
+import com.seproject.seboard.domain.model.UnnamedPost;
+import com.seproject.seboard.domain.repository.AuthorRepository;
+import com.seproject.seboard.domain.repository.CategoryRepository;
 import com.seproject.seboard.domain.repository.PostRepository;
+import com.seproject.seboard.domain.repository.UnnamedPostRepository;
 import com.seproject.seboard.domain.service.PostService;
+import com.seproject.seboard.dto.PostDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
 
@@ -20,72 +23,107 @@ public class PostAppService {
     private final PostService postService;
 
     private final PostRepository postRepository;
-    // Repository 하위 타입 분할
-    private final AnonymousRepository anonymousRepository;
-    private final MemberRepository memberRepository;
+    private final UnnamedPostRepository unnamedPostRepository;
+    private final AuthorRepository authorRepository;
+    private final CategoryRepository categoryRepository;
 
+
+    @Transactional
     public void createUnnamedPost(String title, String contents, Long categoryId, String username, String password){
         validatePost(title,contents,categoryId);
-
-        Anonymous anonymous = Anonymous.builder()
+        Category category = findByIdOrThrow(categoryId,categoryRepository,"");
+        Author author = Author.builder()
                 .name(username)
+                .loginId(Author.ANONYMOUS_LOGIN_ID)
+                .build();
+
+        UnnamedPost post = UnnamedPost.builder()
+                .title(title)
+                .contents(contents)
+                .category(category)
+                .author(author)
                 .password(password)
                 .build();
 
-        anonymousRepository.save(anonymous);
-        Post post = Post.builder()
-                .title(title)
-                .contents(contents)
-                .categoryId(categoryId)
-                .author(anonymous)
-                .build();
-
-        postRepository.save(post);
+        authorRepository.save(author); //TODO : cascade 적용시 삭제 가능
+        unnamedPostRepository.save(post);
     }
 
     public void createNamedPost(String title, String contents, Long categoryId, Long userId){
         validatePost(title,contents,categoryId);
-        Member member = findByIdOrThrow(userId, memberRepository, "");
-
+        Author author = findByIdOrThrow(userId, authorRepository, "");
+        Category category = findByIdOrThrow(categoryId,categoryRepository,"");
         Post post = Post.builder()
                 .title(title)
                 .contents(contents)
-                .categoryId(categoryId)
-                .author(member) //멤버 등록
+                .category(category)
+                .author(author) //멤버 등록
                 .build();
 
         postRepository.save(post);
     }
+
+    //targetPost named
+        //사용자가 익명 -> editable : false
+        //사용자가 로그인
+            //작성자일 때 or 권한이 있을 때 -> editable : true
+            //작성자 아닐 때 -> editable : false
+
+    //targetPostrk unnamed
+        //사용자가 익명 -> editable : true
+        //사용자가 로그인 -> editable : false
+
+    public PostDTO.PostResponseDTO retrieveNamedPost(Long postId, Long userId){
+        Post targetPost = findByIdOrThrow(postId, postRepository, "");
+        Author requestUser = findByIdOrThrow(userId, authorRepository, "");
+        boolean isEditable = false;
+        boolean bookmarked = true;
+
+        if(!requestUser.isAnonymous()) {
+            if (targetPost.isWrittenBy(requestUser)) { // TODO : 권한이 있을 때 추가
+              isEditable = true;
+            }
+        }
+
+        return PostDTO.PostResponseDTO.toDTO(targetPost,isEditable,bookmarked);
+    }
+
+    public PostDTO.PostResponseDTO retrieveUnnamedPost(Long postId, Long userId){
+        UnnamedPost targetPost = findByIdOrThrow(postId, unnamedPostRepository, "");
+        Author requestUser = findByIdOrThrow(userId, authorRepository, "");
+        boolean isEditable = false;
+        boolean bookmarked = true;
+
+        if(requestUser.isAnonymous()) {
+            isEditable = true;
+        }
+
+        return PostDTO.PostResponseDTO.toDTO(targetPost,isEditable,bookmarked);
+    }
+
 
 
     public void deleteNamedPost(Long postId, Long userId ) {
         // 권한 체크 -> 메소드 보안 체크 가능함 : AOP로 처리
         // 시큐리티 클라우드 적용 방법 -> 게이트웨이에 적용 가능
         Post targetPost = findByIdOrThrow(postId, postRepository, "");
-        Member author = findByIdOrThrow(userId, memberRepository, "");
+        Author author = findByIdOrThrow(userId, authorRepository, "");
 
         //작성한 게시글의 작성자가 존재하지 않는 경우 TODO : message
-        if(!targetPost.isSameAuthor(author)) {
+        if(!targetPost.isWrittenBy(author)) {
             throw new IllegalArgumentException();
         }
 
         postRepository.deleteById(postId);
     }
 
-    public void deleteUnnamedPost(Long postId, Long userId, String password) {
+    public void deleteUnnamedPost(Long postId, String password) {
         // 권한 체크 -> 메소드 보안 체크 가능함 : AOP로 처리
         // 시큐리티 클라우드 적용 방법 -> 게이트웨이에 적용 가능
+        UnnamedPost targetPost = findByIdOrThrow(postId, unnamedPostRepository, "");
 
-
-        Post targetPost = findByIdOrThrow(postId, postRepository, "");
-        Anonymous author = findByIdOrThrow(userId, anonymousRepository, "");
-
-        //작성한 게시글의 작성자가 서로 다른 경우 TODO : message
-        if(!targetPost.isSameAuthor(author)) {
-            throw new IllegalArgumentException();
-        }
         // 비밀번호 확인
-        if(!author.checkPassword(password)) {
+        if(!targetPost.checkPassword(password)) {
             throw new IllegalArgumentException();
         }
 
@@ -98,37 +136,31 @@ public class PostAppService {
 
         //게시물 및 요청자 id를 이용한 대상 조회
         Post targetPost = findByIdOrThrow(postId, postRepository, "");
-        Member author = findByIdOrThrow(userId, memberRepository, "");
+        Author author = findByIdOrThrow(userId, authorRepository, "");
+        Category category = findByIdOrThrow(categoryId,categoryRepository,"");
 
         // 동일 인물인지 검사
-        boolean isAuthor = targetPost.isSameAuthor(author);
-        if(!isAuthor) {
+        if(!targetPost.isWrittenBy(author)) {
             throw new IllegalArgumentException();
         }
         // 게시글 업데이트
-        targetPost.update(title,contents,categoryId);
+        targetPost.update(title,contents,category);
     }
 
-    public void updateUnnamedPost(String title,String contents,Long categoryId,Long postId,Long userId,String password){
+    public void updateUnnamedPost(String title,String contents,Long categoryId,Long postId, String password){
         validatePost(title,contents,categoryId);
 
         //게시물 및 요청자 id를 이용한 대상 조회
-        Post targetPost = findByIdOrThrow(postId, postRepository, "");
-        Anonymous author = findByIdOrThrow(userId, anonymousRepository,"");
-
-        // 동일 인물인지 검사
-        boolean isAuthor = targetPost.isSameAuthor(author);
-        if(!isAuthor) {
-            throw new IllegalArgumentException();
-        }
+        UnnamedPost targetPost = findByIdOrThrow(postId, unnamedPostRepository, "");
+        Category category = findByIdOrThrow(categoryId,categoryRepository,"");
 
         //비밀번호 검사
-        if(!author.checkPassword(password)) {
+        if(!targetPost.checkPassword(password)) {
             throw new IllegalArgumentException();
         }
 
-        // 게시글 업데이트 -> 익명일때 비밀번호 수정도 필요한가?
-        targetPost.update(title,contents,categoryId);
+        // 게시글 업데이트 -> TODO : 익명일때 비밀번호 수정도 필요한가?
+        targetPost.update(title,contents,category);
     }
 
     private <T> T findByIdOrThrow(Long id, JpaRepository<T, Long> repo, String errorMsg){

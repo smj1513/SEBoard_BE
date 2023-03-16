@@ -1,31 +1,31 @@
 package com.seproject.seboard.domain.model;
 
-import com.seproject.seboard.domain.model.author.Author;
 import lombok.Builder;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 
 @Getter
-@Builder
+@SuperBuilder
 public class Post {
-    private Long postId;
-    private Long categoryId;
+    private final Long postId;
+    private Category category;
     private BaseTime baseTime;
     private String title;
     private String contents;
     private int views;
     private Author author;
 
-    public boolean isSameAuthor(Author author){
-        return this.author.equals(author);
-    }
-
-    public void update(String title,String contents,Long categoryId) {
+    public void update(String title,String contents,Category category) {
         this.title = title;
         this.contents = contents;
-        this.categoryId = categoryId;
+        this.category = category;
+    }
+
+    public boolean isWrittenBy(Author author) {
+        return author.equals(this.author);
     }
 
     public boolean isNamedPost(){
-        return author.isAnonymous();
+        return true;
     }
 }
