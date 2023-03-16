@@ -6,8 +6,6 @@ import lombok.RequiredArgsConstructor;
 
 import java.util.Optional;
 
-//영호형의 가르침 1: 변하는 것과 변하지 않는 것을 구분하라!
-//생성, 조회 -> 완전 동일, 수정 , 삭제 -> 패스워드확인
 @RequiredArgsConstructor
 public class PostService {
     //TODO: 프로퍼티로 빼야함
