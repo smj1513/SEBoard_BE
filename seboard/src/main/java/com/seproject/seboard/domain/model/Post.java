@@ -14,6 +14,7 @@ public class Post {
     private String contents;
     private int views;
     private Author author;
+    private boolean pined; //TODO: pined 검증 로직 필요
 
     public void update(String title,String contents,Category category) {
         this.title = title;

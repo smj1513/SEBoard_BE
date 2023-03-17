@@ -49,7 +49,7 @@ public class PostAppService {
         unnamedPostRepository.save(post);
     }
 
-    public void createNamedPost(String title, String contents, Long categoryId, Long userId){
+    public void createNamedPost(String title, String contents, Long categoryId, Long userId, boolean pined){
         validatePost(title,contents,categoryId);
         Author author = findByIdOrThrow(userId, authorRepository, "");
         Category category = findByIdOrThrow(categoryId,categoryRepository,"");
@@ -58,21 +58,13 @@ public class PostAppService {
                 .contents(contents)
                 .category(category)
                 .author(author) //멤버 등록
+                .pined(pined)
                 .build();
 
         postRepository.save(post);
     }
 
-    //targetPost named
-        //사용자가 익명 -> editable : false
-        //사용자가 로그인
-            //작성자일 때 or 권한이 있을 때 -> editable : true
-            //작성자 아닐 때 -> editable : false
-
-    //targetPostrk unnamed
-        //사용자가 익명 -> editable : true
-        //사용자가 로그인 -> editable : false
-
+    //TODO : 북마크 추가
     public PostDTO.PostResponseDTO retrieveNamedPost(Long postId, Long userId){
         Post targetPost = findByIdOrThrow(postId, postRepository, "");
         Author requestUser = findByIdOrThrow(userId, authorRepository, "");
