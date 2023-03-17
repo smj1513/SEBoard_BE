@@ -4,17 +4,16 @@ import com.seproject.seboard.domain.model.Author;
 import com.seproject.seboard.domain.model.Category;
 import com.seproject.seboard.domain.model.Post;
 import com.seproject.seboard.domain.model.UnnamedPost;
-import com.seproject.seboard.domain.repository.AuthorRepository;
-import com.seproject.seboard.domain.repository.CategoryRepository;
-import com.seproject.seboard.domain.repository.PostRepository;
-import com.seproject.seboard.domain.repository.UnnamedPostRepository;
+import com.seproject.seboard.domain.repository.*;
 import com.seproject.seboard.domain.service.PostService;
 import com.seproject.seboard.dto.PostDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class PostAppService {
@@ -26,6 +25,7 @@ public class PostAppService {
     private final UnnamedPostRepository unnamedPostRepository;
     private final AuthorRepository authorRepository;
     private final CategoryRepository categoryRepository;
+    private final CommentRepository commentRepository;
 
 
     @Transactional
@@ -49,7 +49,7 @@ public class PostAppService {
         unnamedPostRepository.save(post);
     }
 
-    public void createNamedPost(String title, String contents, Long categoryId, Long userId){
+    public void createNamedPost(String title, String contents, Long categoryId, Long userId, boolean pined){
         validatePost(title,contents,categoryId);
         Author author = findByIdOrThrow(userId, authorRepository, "");
         Category category = findByIdOrThrow(categoryId,categoryRepository,"");
@@ -58,21 +58,13 @@ public class PostAppService {
                 .contents(contents)
                 .category(category)
                 .author(author) //멤버 등록
+                .pined(pined)
                 .build();
 
         postRepository.save(post);
     }
 
-    //targetPost named
-        //사용자가 익명 -> editable : false
-        //사용자가 로그인
-            //작성자일 때 or 권한이 있을 때 -> editable : true
-            //작성자 아닐 때 -> editable : false
-
-    //targetPostrk unnamed
-        //사용자가 익명 -> editable : true
-        //사용자가 로그인 -> editable : false
-
+    //TODO : 북마크 추가
     public PostDTO.PostResponseDTO retrieveNamedPost(Long postId, Long userId){
         Post targetPost = findByIdOrThrow(postId, postRepository, "");
         Author requestUser = findByIdOrThrow(userId, authorRepository, "");
@@ -101,7 +93,15 @@ public class PostAppService {
         return PostDTO.PostResponseDTO.toDTO(targetPost,isEditable,bookmarked);
     }
 
-
+    //pined 된거 상위 5개 먼저, 그다음에 최신순
+    public List<PostDTO.PostListResponseDTO> retrievePostList(Long categoryId){
+        //TODO : paging 인자, Repository 분리?
+        //TODO : 추후 JPQL써서 개선, pined 구현 , categoryId 별로 정리
+        return postRepository.findAll().stream().map(post -> {
+            int commentSize = commentRepository.getCommentSizeByPostId(post.getPostId());
+            return PostDTO.PostListResponseDTO.toDTO(post,commentSize);
+        }).collect(Collectors.toList());
+    }
 
     public void deleteNamedPost(Long postId, Long userId ) {
         // 권한 체크 -> 메소드 보안 체크 가능함 : AOP로 처리
