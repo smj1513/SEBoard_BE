@@ -6,8 +6,12 @@ import lombok.Getter;
 @Getter
 @Builder
 public class Category {
-
     private Long categoryId;
-    private String mainCategory;
-    private String subCategory;
+    private Category superCategory;
+    private String name;
+
+    public void changeName(String name) {
+        //TODO : validation
+        this.name = name;
+    }
 }

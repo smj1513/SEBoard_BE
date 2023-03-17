@@ -13,8 +13,8 @@ public class CategoryDTO {
 
         public static CategoryResponseDTO toDTO(Category category) {
             return builder()
-                    .mainCategory(category.getMainCategory())
-                    .subCategory(category.getSubCategory())
+                    .mainCategory(category.getSuperCategory().getName())
+                    .subCategory(category.getName())
                     .build();
         }
 
