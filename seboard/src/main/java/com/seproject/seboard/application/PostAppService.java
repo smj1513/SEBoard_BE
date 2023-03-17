@@ -4,17 +4,16 @@ import com.seproject.seboard.domain.model.Author;
 import com.seproject.seboard.domain.model.Category;
 import com.seproject.seboard.domain.model.Post;
 import com.seproject.seboard.domain.model.UnnamedPost;
-import com.seproject.seboard.domain.repository.AuthorRepository;
-import com.seproject.seboard.domain.repository.CategoryRepository;
-import com.seproject.seboard.domain.repository.PostRepository;
-import com.seproject.seboard.domain.repository.UnnamedPostRepository;
+import com.seproject.seboard.domain.repository.*;
 import com.seproject.seboard.domain.service.PostService;
 import com.seproject.seboard.dto.PostDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 public class PostAppService {
@@ -26,6 +25,7 @@ public class PostAppService {
     private final UnnamedPostRepository unnamedPostRepository;
     private final AuthorRepository authorRepository;
     private final CategoryRepository categoryRepository;
+    private final CommentRepository commentRepository;
 
 
     @Transactional
@@ -93,7 +93,15 @@ public class PostAppService {
         return PostDTO.PostResponseDTO.toDTO(targetPost,isEditable,bookmarked);
     }
 
-
+    //pined 된거 상위 5개 먼저, 그다음에 최신순
+    public List<PostDTO.PostListResponseDTO> retrievePostList(Long categoryId){
+        //TODO : paging 인자, Repository 분리?
+        //TODO : 추후 JPQL써서 개선, pined 구현 , categoryId 별로 정리
+        return postRepository.findAll().stream().map(post -> {
+            int commentSize = commentRepository.getCommentSizeByPostId(post.getPostId());
+            return PostDTO.PostListResponseDTO.toDTO(post,commentSize);
+        }).collect(Collectors.toList());
+    }
 
     public void deleteNamedPost(Long postId, Long userId ) {
         // 권한 체크 -> 메소드 보안 체크 가능함 : AOP로 처리

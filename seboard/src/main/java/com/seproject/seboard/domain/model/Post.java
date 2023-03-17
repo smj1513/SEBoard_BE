@@ -29,4 +29,16 @@ public class Post {
     public boolean isNamedPost(){
         return true;
     }
+
+    public void pin() {
+        if(!isPined()) {
+            this.pined = true;
+        }
+    }
+
+    public void unPin() {
+        if(isPined()) {
+            this.pined = false;
+        }
+    }
 }
