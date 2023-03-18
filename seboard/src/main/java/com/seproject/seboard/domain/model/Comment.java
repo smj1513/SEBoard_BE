@@ -34,6 +34,25 @@ public class Comment implements Comparable<Comment> {
 
     @Override
     public int compareTo(Comment o) {
-        return o.compareTo(this);
+
+        Comment thisTarget = this;
+        Comment opposite = o;
+
+        boolean thisIsReply = isReply();
+        boolean targetIsReply = o.isReply();
+
+        if(thisIsReply) {
+            thisTarget = this.superComment;
+        }
+
+        if(targetIsReply) {
+            opposite = o.superComment;
+        }
+
+        if (thisIsReply && targetIsReply && thisTarget.equals(opposite)) {
+            return baseTime.getCreatedAt().compareTo(opposite.getBaseTime().getCreatedAt());
+        }
+
+        return thisTarget.baseTime.getCreatedAt().compareTo(opposite.getBaseTime().getCreatedAt());
     }
 }
