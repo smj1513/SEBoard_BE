@@ -13,6 +13,15 @@ import java.time.LocalDateTime;
 
 public class PostDTO {
 
+    @Builder
+    @Data
+    public static class PostRequestDTO{
+        private String title;
+        private String contents;
+        private Long categoryId;
+        private boolean pined;
+    }
+
     @Builder(access = AccessLevel.PRIVATE)
     @Data
     public static class PostListResponseDTO {
