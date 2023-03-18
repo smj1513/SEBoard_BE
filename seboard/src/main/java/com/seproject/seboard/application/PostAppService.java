@@ -26,7 +26,7 @@ public class PostAppService {
     private final AuthorRepository authorRepository;
     private final CategoryRepository categoryRepository;
     private final CommentRepository commentRepository;
-
+    private final BookmarkRepository bookmarkRepository;
 
     @Transactional
     public void createUnnamedPost(String title, String contents, Long categoryId, String username, String password){
@@ -64,12 +64,12 @@ public class PostAppService {
         postRepository.save(post);
     }
 
-    //TODO : 북마크 추가
+    //TODO : 북마크 추가 -> 추가 완료
     public PostDTO.PostResponseDTO retrieveNamedPost(Long postId, Long userId){
         Post targetPost = findByIdOrThrow(postId, postRepository, "");
         Author requestUser = findByIdOrThrow(userId, authorRepository, "");
         boolean isEditable = false;
-        boolean bookmarked = true;
+        boolean bookmarked = bookmarkRepository.existsByPostIdAndUserId(postId,userId);
 
         if(!requestUser.isAnonymous()) {
             if (targetPost.isWrittenBy(requestUser)) { // TODO : 권한이 있을 때 추가
@@ -84,7 +84,7 @@ public class PostAppService {
         UnnamedPost targetPost = findByIdOrThrow(postId, unnamedPostRepository, "");
         Author requestUser = findByIdOrThrow(userId, authorRepository, "");
         boolean isEditable = false;
-        boolean bookmarked = true;
+        boolean bookmarked = bookmarkRepository.existsByPostIdAndUserId(postId,userId);
 
         if(requestUser.isAnonymous()) {
             isEditable = true;
