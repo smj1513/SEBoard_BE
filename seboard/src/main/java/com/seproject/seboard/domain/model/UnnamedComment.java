@@ -10,4 +10,8 @@ public class UnnamedComment extends Comment {
     public boolean isNamed() {
         return false;
     }
+
+    public boolean checkPassword(String password) {
+        return this.password.equals(password);
+    }
 }
