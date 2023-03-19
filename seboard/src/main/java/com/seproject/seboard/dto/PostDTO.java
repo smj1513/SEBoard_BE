@@ -12,6 +12,33 @@ import java.time.LocalDateTime;
 
 
 public class PostDTO {
+    @Builder
+    @Data
+    public static class UnnamedPostUpdatingRequestDTO {
+        private String title;
+        private String contents;
+        private Long categoryId;
+        private AuthorDTO.AnonymousVerifyingDTO author;
+    }
+
+    @Builder
+    @Data
+    public static class UnnamedPostCreationRequestDTO {
+        private String title;
+        private String contents;
+        private Long categoryId;
+        private AuthorDTO.AnonymousCreationDTO author;
+    }
+
+
+    @Builder
+    @Data
+    public static class NamedPostRequestDTO {
+        private String title;
+        private String contents;
+        private Long categoryId;
+        private boolean pined;
+    }
 
     @Builder(access = AccessLevel.PRIVATE)
     @Data
