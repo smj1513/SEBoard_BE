@@ -1,9 +1,18 @@
 package com.seproject.seboard.dto;
 
 import com.seproject.seboard.domain.model.Category;
+import jdk.jfr.Unsigned;
 import lombok.Builder;
+import lombok.Data;
 
 public class CategoryDTO {
+
+    @Builder
+    @Data
+    public static class CategoryRequestDTO{
+        private Long superCategoryId;
+        private String name;
+    }
 
     @Builder
     public static class CategoryResponseDTO {
