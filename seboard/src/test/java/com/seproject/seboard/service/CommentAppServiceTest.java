@@ -4,8 +4,10 @@ import com.seproject.seboard.application.CommentAppService;
 import com.seproject.seboard.domain.model.Author;
 import com.seproject.seboard.domain.model.BaseTime;
 import com.seproject.seboard.domain.model.Comment;
+import com.seproject.seboard.domain.model.Post;
 import com.seproject.seboard.domain.repository.AuthorRepository;
 import com.seproject.seboard.domain.repository.CommentRepository;
+import com.seproject.seboard.domain.repository.PostRepository;
 import com.seproject.seboard.dto.CommentDTO;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
@@ -13,6 +15,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 
+import javax.swing.text.html.Option;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -27,6 +30,7 @@ public class CommentAppServiceTest {
 
     private CommentRepository commentRepository;
     private AuthorRepository authorRepository;
+    private PostRepository postRepository;
 
     private Author createAuthor(Long authorId,String loginId,String name) {
         return Author.builder()
@@ -58,6 +62,7 @@ public class CommentAppServiceTest {
     public void init() {
         commentRepository = mock(CommentRepository.class);
         authorRepository = mock(AuthorRepository.class);
+        postRepository = mock(PostRepository.class);
 
         Author firstAuthor = createAuthor(1L, "hong", "홍길동");
         Author secondAuthor = createAuthor(2L, "kim", "김민종");
@@ -96,5 +101,81 @@ public class CommentAppServiceTest {
             Assertions.assertThat(commentListResponseDTO.getReplies().size()).isEqualTo(ans.get(i));
         }
 
+    }
+
+    @Test
+    @DisplayName("답글 작성 테스트")
+    void writeNamedReplyTests() {
+        CommentAppService commentAppService = new CommentAppService(null,commentRepository,postRepository,authorRepository);
+
+        Long postId = 2L;
+        Post post = Post.builder()
+                        .postId(postId)
+                        .build();
+
+        Long superCommentId = 2L;
+        Comment superComment = Comment.builder()
+                        .commentId(superCommentId)
+                        .build();
+
+        Long taggedCommentId = 3L;
+        Comment taggedComment = Comment.builder()
+                .commentId(taggedCommentId)
+                .build();
+
+        Long userId = 4L;
+        Author author = Author.builder()
+                .authorId(userId)
+                .build();
+
+        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+        when(commentRepository.findById(superCommentId)).thenReturn(Optional.of(superComment));
+        when(commentRepository.findById(taggedCommentId)).thenReturn(Optional.of(taggedComment));
+        when(authorRepository.findById(userId)).thenReturn(Optional.of(author));
+
+        commentAppService.createNamedReply(userId,postId,superCommentId,taggedCommentId,"댓글 내용");
+    }
+
+    @Test
+    @DisplayName("답글 수정 테스트")
+    void updateNamedReplyTests() {
+        CommentAppService commentAppService = new CommentAppService(null,commentRepository,postRepository,authorRepository);
+
+        Long userId = 4L;
+        Author author = Author.builder()
+                .authorId(userId)
+                .build();
+
+        Long postId = 2L;
+        Post post = Post.builder()
+                .postId(postId)
+                .author(author)
+                .build();
+
+        Long superCommentId = 2L;
+        Comment superComment = Comment.builder()
+                .commentId(superCommentId)
+                .build();
+
+        Long replyId = 3L;
+        String newContents = "new Contents";
+
+        Comment reply = Comment.builder()
+                .commentId(replyId)
+                .contents("origin contents")
+                .superComment(superComment)
+                .tag(superComment)
+                .author(author)
+                .post(post)
+                .build();
+
+        when(commentRepository.findById(replyId)).thenReturn(Optional.of(reply));
+        when(authorRepository.findById(userId)).thenReturn(Optional.of(author));
+
+        Assertions.assertThat(reply.isWrittenBy(author)).isTrue();
+        Assertions.assertThat(reply.isNamed()).isTrue();
+        commentAppService.changeContentsOfNamed(replyId,userId,newContents);
+        String contents = reply.getContents();
+        Assertions.assertThat(contents).isEqualTo(newContents);
     }
 }
