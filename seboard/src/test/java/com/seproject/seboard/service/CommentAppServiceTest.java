@@ -264,4 +264,38 @@ public class CommentAppServiceTest {
 
         Assertions.assertEquals(unnamedComment.getContents(),originContents);
     }
+
+    @Test
+    @DisplayName("익명댓글 삭제 성공")
+    void deleteUnnamedCommentTest() {
+        Long userId = 4L;
+        Author author = createAuthor(userId,"loginId","Halland");
+        Long unnamedCommentId = 10L;
+        String password = "password";
+        String originContents = "origin contents";
+        UnnamedComment unnamedComment = createMockUnnamedComment(unnamedCommentId,originContents,2012,12,25,author,password);
+        CommentAppService commentAppService = new CommentAppService(unnamedCommentRepository, commentRepository, postRepository, authorRepository);
+
+        Assertions.assertDoesNotThrow(() -> {
+            commentAppService.deleteUnnamedComment(unnamedCommentId,password);
+        });
+
+    }
+
+    @Test
+    @DisplayName("비밀번호가 틀려서 익명 댓글 삭제 실패")
+    void deleteUnnamedCommentBadCredentialTest() {
+        Long userId = 4L;
+        Author author = createAuthor(userId,"loginId","Halland");
+        Long unnamedCommentId = 10L;
+        String password = "password";
+        String originContents = "origin contents";
+        UnnamedComment unnamedComment = createMockUnnamedComment(unnamedCommentId,originContents,2012,12,25,author,password);
+        CommentAppService commentAppService = new CommentAppService(unnamedCommentRepository, commentRepository, postRepository, authorRepository);
+
+        Assertions.assertThrows(IllegalArgumentException.class,() -> {
+            commentAppService.deleteUnnamedComment(unnamedCommentId,"incorrect password");
+        });
+
+    }
 }
