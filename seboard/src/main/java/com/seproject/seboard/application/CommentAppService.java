@@ -152,6 +152,7 @@ public class CommentAppService {
 
         if(comment.isNamed() && comment.isWrittenBy(requestUser)) {
             comment.change(contents);
+            return;
         }
         //작성자가 다른 경우, 또는 익명 게시글이 선택된 경우
         throw new IllegalArgumentException();
@@ -162,6 +163,7 @@ public class CommentAppService {
 
         if(unnamedComment.checkPassword(password)) {
             unnamedComment.change(contents);
+            return;
         }
 
         // 패스워드가 다른 경우
@@ -174,6 +176,7 @@ public class CommentAppService {
 
         if (comment.isWrittenBy(requestUser)) {
             commentRepository.delete(comment);
+            return;
         }
 
         // 작성자가 다른 경우
@@ -185,6 +188,7 @@ public class CommentAppService {
 
         if (unnamedComment.checkPassword(password)) {
             unnamedCommentRepository.delete(unnamedComment);
+            return;
         }
 
         // 패스워드가 다른 경우
