@@ -62,7 +62,7 @@ public class CommentAppServiceTest {
                 .baseTime(new BaseTime(LocalDateTime.of(year, month, day, 0, 0), null))
                 .password(password)
                 .build();
-        when(commentRepository.findById(commentId)).thenReturn(Optional.of(comment));
+        when(unnamedCommentRepository.findById(commentId)).thenReturn(Optional.of(comment));
         return comment;
     }
 
@@ -213,20 +213,55 @@ public class CommentAppServiceTest {
     @Test
     @DisplayName("답글 수정 테스트 - 익명 답글이 선택된 경우")
     void updateNamedReplyWhenUnnamedSelectedTests () {
-        CommentAppService commentAppService = new CommentAppService(null,commentRepository,postRepository,authorRepository);
+        CommentAppService commentAppService = new CommentAppService(null, commentRepository, postRepository, authorRepository);
         Long userId = 4L;
         Long replyId = 4L;
         String newContents = "new Contents";
 
-        Author author = createAuthor(userId,null,null);
+        Author author = createAuthor(userId, null, null);
 
-        UnnamedComment reply = createMockUnnamedComment(replyId,"it is reply",2012,1,13,null,"originPassword");
+        UnnamedComment reply = createMockUnnamedComment(replyId, "it is reply", 2012, 1, 13, null, "originPassword");
 
         when(commentRepository.findById(replyId)).thenReturn(Optional.of(reply));
 
         Assertions.assertFalse(reply.isNamed());
-        Assertions.assertThrows(IllegalArgumentException.class, () -> commentAppService.changeContentsOfNamed(replyId,userId,newContents));
+        Assertions.assertThrows(IllegalArgumentException.class, () -> commentAppService.changeContentsOfNamed(replyId, userId, newContents));
         String contents = reply.getContents();
-        Assertions.assertNotEquals(contents,newContents);
+        Assertions.assertNotEquals(contents, newContents);
+    }
+
+
+    @Test
+    @DisplayName("익명 작성자의 댓글 내용을 수정하는 테스트")
+    void changeContentsOfUnnamedTest() {
+        Long userId = 4L;
+        Author author = createAuthor(userId,"loginId","Halland");
+        Long unnamedCommentId = 10L;
+        String password = "password";
+        UnnamedComment unnamedComment = createMockUnnamedComment(unnamedCommentId,"origin contents",2012,12,25,author,password);
+        CommentAppService commentAppService = new CommentAppService(unnamedCommentRepository, commentRepository, postRepository, authorRepository);
+
+        String newContents = "new contents";
+        commentAppService.changeContentsOfUnnamed(unnamedCommentId,password,newContents);
+        Assertions.assertEquals(unnamedComment.getContents(),newContents);
+    }
+
+    @Test
+    @DisplayName("익명 작성자의 댓글 내용을 수정이 비밀번호가 틀려 실패하는 테스트")
+    void changeContentsOfUnnamedBadCredentialTest() {
+        Long userId = 4L;
+        Author author = createAuthor(userId,"loginId","Halland");
+        Long unnamedCommentId = 10L;
+        String password = "password";
+        String originContents = "origin contents";
+        UnnamedComment unnamedComment = createMockUnnamedComment(unnamedCommentId,originContents,2012,12,25,author,password);
+        CommentAppService commentAppService = new CommentAppService(unnamedCommentRepository, commentRepository, postRepository, authorRepository);
+
+        String newContents = "new contents";
+        Assertions.assertThrows(IllegalArgumentException.class,() -> {
+            commentAppService.changeContentsOfUnnamed(unnamedCommentId,"incorrect password",newContents);
+        });
+
+        Assertions.assertEquals(unnamedComment.getContents(),originContents);
     }
 }
