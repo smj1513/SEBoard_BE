@@ -1,10 +1,7 @@
 package com.seproject.seboard.service;
 
 import com.seproject.seboard.domain.model.*;
-import com.seproject.seboard.domain.repository.AuthorRepository;
-import com.seproject.seboard.domain.repository.CommentRepository;
-import com.seproject.seboard.domain.repository.PostRepository;
-import com.seproject.seboard.domain.repository.UnnamedCommentRepository;
+import com.seproject.seboard.domain.repository.*;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.TestInstance;
 
@@ -21,6 +18,20 @@ public class BaseAppServiceTest {
     protected UnnamedCommentRepository unnamedCommentRepository;
     protected AuthorRepository authorRepository;
     protected PostRepository postRepository;
+    protected UnnamedPostRepository unnamedPostRepository;
+    protected CategoryRepository categoryRepository;
+    protected BookmarkRepository bookmarkRepository;
+
+    @BeforeAll
+    public void init() {
+        commentRepository = mock(CommentRepository.class);
+        authorRepository = mock(AuthorRepository.class);
+        postRepository = mock(PostRepository.class);
+        unnamedCommentRepository = mock(UnnamedCommentRepository.class);
+        unnamedPostRepository = mock(UnnamedPostRepository.class);
+        categoryRepository = mock(CategoryRepository.class);
+        bookmarkRepository = mock(BookmarkRepository.class);
+    }
 
     protected Author createAuthor(Long authorId, String loginId, String name) {
         Author author = Author.builder()
@@ -84,11 +95,44 @@ public class BaseAppServiceTest {
         return post;
     }
 
-    @BeforeAll
-    public void init() {
-        commentRepository = mock(CommentRepository.class);
-        authorRepository = mock(AuthorRepository.class);
-        postRepository = mock(PostRepository.class);
-        unnamedCommentRepository = mock(UnnamedCommentRepository.class);
+    protected UnnamedPost createMockUnnamedPost(Long UnnamedPostId,Author author,Category category,String title, String contents,String password,boolean pined) {
+        UnnamedPost unnamedPost = UnnamedPost.builder()
+                .postId(UnnamedPostId)
+                .author(author)
+                .category(category)
+                .title(title)
+                .contents(contents)
+                .password(password)
+                .pined(pined)
+                .views(0)
+                .build();
+        when(unnamedPostRepository.findById(UnnamedPostId)).thenReturn(Optional.of(unnamedPost));
+
+        return unnamedPost;
+    }
+
+    protected Category createMockCategory(Long categoryId,Category superCategory,String name) {
+        Category category = Category.builder()
+                .categoryId(categoryId)
+                .superCategory(superCategory)
+                .name(name)
+                .build();
+
+        when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
+        return category;
+    }
+
+    protected Bookmark createMockUnnamedPost(Long bookmarkId,Long userId,Long postId) {
+
+        Bookmark bookmark = Bookmark.builder()
+                .bookmarkId(bookmarkId)
+                .userId(userId)
+                .postId(postId)
+                .build();
+
+        when(bookmarkRepository.existsByPostIdAndUserId(postId,userId)).thenReturn(true);
+        when(bookmarkRepository.findByPostIdAndUserId(postId,userId)).thenReturn(bookmark);
+
+        return bookmark;
     }
 }
