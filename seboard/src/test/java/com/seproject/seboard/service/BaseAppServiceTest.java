@@ -123,7 +123,7 @@ public class BaseAppServiceTest {
         return category;
     }
 
-    protected Bookmark createMockUnnamedPost(Long bookmarkId,Long userId,Long postId) {
+    protected Bookmark createMockBookmark(Long bookmarkId,Long userId,Long postId) {
 
         Bookmark bookmark = Bookmark.builder()
                 .bookmarkId(bookmarkId)
