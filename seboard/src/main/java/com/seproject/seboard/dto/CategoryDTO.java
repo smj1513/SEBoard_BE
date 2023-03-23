@@ -21,8 +21,9 @@ public class CategoryDTO {
         private String subCategory;
 
         public static CategoryResponseDTO toDTO(Category category) {
+            String mainCategory = category.getSuperCategory() == null ? null : category.getSuperCategory().getName();
             return builder()
-                    .mainCategory(category.getSuperCategory().getName())
+                    .mainCategory(mainCategory)
                     .subCategory(category.getName())
                     .build();
         }
