@@ -89,6 +89,7 @@ public class BaseAppServiceTest {
                 .contents(contents)
                 .pined(pined)
                 .views(0)
+                .baseTime(new BaseTime())
                 .build();
 
         when(postRepository.findById(postId)).thenReturn(Optional.of(post));
@@ -105,9 +106,9 @@ public class BaseAppServiceTest {
                 .password(password)
                 .pined(pined)
                 .views(0)
+                .baseTime(new BaseTime())
                 .build();
         when(unnamedPostRepository.findById(UnnamedPostId)).thenReturn(Optional.of(unnamedPost));
-
         return unnamedPost;
     }
 
