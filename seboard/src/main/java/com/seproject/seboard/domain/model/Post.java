@@ -1,35 +1,49 @@
 package com.seproject.seboard.domain.model;
 
-import lombok.Builder;
+import com.seproject.seboard.domain.model.exposeOptions.ExposeOption;
+import com.seproject.seboard.domain.model.user.User;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import javax.persistence.*;
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Entity
 @Getter
 @SuperBuilder
+@Table(name = "posts")
 public class Post {
-    private final Long postId;
-    private Category category;
-    private BaseTime baseTime;
+    @Id @GeneratedValue
+    private Long postId;
     private String title;
+
+    @Column(columnDefinition = "TEXT")
     private String contents;
     private int views;
-    private Author author;
     private boolean pined; //TODO: pined 검증 로직 필요
+    private BaseTime baseTime;
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
 
-    public void update(String title,String contents,Category category) {
-        this.title = title;
-        this.contents = contents;
-        this.category = category;
+    @ManyToOne
+    @JoinColumn(name = "author_id")
+    private User author;
+
+    @OneToOne
+    @JoinColumn(name = "expose_option_id")
+    private ExposeOption exposeOption;
+
+    public boolean isWrittenBy(User user) {
+        return user.equals(author);
     }
 
-    public boolean isWrittenBy(Author author) {
-        return author.equals(this.author);
+    public boolean isNamed() {
+        return !author.isAnonymous();
     }
-
-    public boolean isNamedPost(){
-        return true;
-    }
-
     public void pin() {
         if(!isPined()) {
             this.pined = true;
