@@ -1,12 +1,14 @@
-package com.seproject.seboard.domain.model;
+package com.seproject.seboard.domain.model.common;
 
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
+import javax.persistence.Embeddable;
 import java.time.LocalDateTime;
 
 
+@Embeddable
 @Getter
 @AllArgsConstructor
 public class BaseTime {
