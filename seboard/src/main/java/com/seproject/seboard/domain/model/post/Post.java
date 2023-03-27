@@ -1,5 +1,6 @@
-package com.seproject.seboard.domain.model;
+package com.seproject.seboard.domain.model.post;
 
+import com.seproject.seboard.domain.model.common.BaseTime;
 import com.seproject.seboard.domain.model.exposeOptions.ExposeOption;
 import com.seproject.seboard.domain.model.user.User;
 import lombok.AllArgsConstructor;

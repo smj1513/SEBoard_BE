@@ -1,4 +1,4 @@
-package com.seproject.seboard.domain.model;
+package com.seproject.seboard.domain.model.post;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
