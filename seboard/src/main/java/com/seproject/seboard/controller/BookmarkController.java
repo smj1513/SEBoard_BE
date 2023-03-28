@@ -1,29 +1,34 @@
 package com.seproject.seboard.controller;
 
-import com.seproject.seboard.application.BookmarkAppService;
-import com.seproject.seboard.dto.MessageDTO;
-import com.seproject.seboard.dto.MessageDTO.ResponseMessageDTO;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/posts/{postId}/bookmark")
 @AllArgsConstructor
 public class BookmarkController {
-    private final BookmarkAppService bookmarkAppService;
 
-    @ResponseStatus(HttpStatus.CREATED)
+    @Operation(summary = "게시글 즐겨찾기 등록",
+            description = "사용자가 게시글을 북마크 등록 요청",
+            tags = { "Bookmark Controller" })
     @PostMapping
-    public ResponseMessageDTO enrollBookmark(@PathVariable Long postId, Long userId){
-        bookmarkAppService.enrollBookmark(postId, userId);
-        return new ResponseMessageDTO("북마크가 등록되었습니다.");
+    public ResponseEntity<?> createBookmark(@PathVariable Long postId){
+        /**
+         * TODO : 존재하지 않는 postId
+         *          jwt
+         */
+        return new ResponseEntity<>(postId,HttpStatus.OK);
     }
 
-    @ResponseStatus(HttpStatus.OK)
     @DeleteMapping
-    public ResponseMessageDTO cancelBookmark(@PathVariable Long postId, Long userId){
-        bookmarkAppService.cancelBookmark(postId, userId);
-        return new ResponseMessageDTO(""); //TODO : message
+    public ResponseEntity<?> cancelBookmark(@PathVariable Long postId){
+        /**
+         * TODO : 존재하지 않는 postId
+         *          jwt
+         */
+        return new ResponseEntity<>(postId,HttpStatus.OK);
     }
 }
