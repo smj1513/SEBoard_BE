@@ -37,7 +37,7 @@ public class CategoryController {
     }
 
     @PutMapping("/{categoryId}")
-    public ResponseEntity<?> updateCategoryList(@PathVariable Long categoryId, @RequestBody UpdateCategoryRequest request) {
+    public ResponseEntity<?> updateCategory(@PathVariable Long categoryId, @RequestBody UpdateCategoryRequest request) {
 
         /**
          * TODO : jwt
@@ -49,8 +49,8 @@ public class CategoryController {
         return new ResponseEntity<>(request, HttpStatus.OK);
     }
 
-    @PutMapping("/{categoryId}")
-    public ResponseEntity<?> deleteCategoryList(@PathVariable Long categoryId) {
+    @DeleteMapping("/{categoryId}")
+    public ResponseEntity<?> deleteCategory(@PathVariable Long categoryId) {
 
         /**
          * TODO : jwt

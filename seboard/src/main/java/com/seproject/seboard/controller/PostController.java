@@ -166,7 +166,7 @@ public class PostController {
         return new ResponseEntity<>(password,HttpStatus.OK);
     }
 
-    @GetMapping("/{:postId}/comments")
+    @GetMapping("/{postId}/comments")
     public ResponseEntity<?> retrievePostComments(
             @PathVariable Long postId,
             @RequestParam Integer pageNum,
