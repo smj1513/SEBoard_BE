@@ -1,11 +1,8 @@
 package com.seproject.seboard.controller;
 
-import com.seproject.seboard.domain.model.post.Category;
-import com.seproject.seboard.dto.post.PostResponse;
-import com.seproject.seboard.dto.user.UserRequest;
+import com.seproject.seboard.dto.user.AnonymousRequest;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -126,7 +123,7 @@ public class PostController {
         String contents = request.getContents();
         List<MultipartFile> attachment = request.getAttachment();
         Long categoryId = request.getCategoryId();
-        UserRequest author = request.getAuthor();
+        AnonymousRequest author = request.getAuthor();
 
         /**
          * TODO : required 필드 확인
@@ -144,7 +141,7 @@ public class PostController {
         String contents = request.getContents();
         List<MultipartFile> attachment = request.getAttachment();
         Long categoryId = request.getCategoryId();
-        UserRequest author = request.getAuthor();
+        AnonymousRequest author = request.getAuthor();
 
         /**
          * TODO : required 필드 확인
@@ -169,7 +166,14 @@ public class PostController {
         return new ResponseEntity<>(password,HttpStatus.OK);
     }
 
-//    @GetMapping("/{:postId}/comments")
-//    public ResponseEntity<?> retrievePostComments(@PathVariable Long postId,)
+    @GetMapping("/{:postId}/comments")
+    public ResponseEntity<?> retrievePostComments(
+            @PathVariable Long postId,
+            @RequestParam Integer pageNum,
+            @RequestParam Integer perPage) {
+
+
+        return new ResponseEntity<>(postId,HttpStatus.OK);
+    }
 
 }

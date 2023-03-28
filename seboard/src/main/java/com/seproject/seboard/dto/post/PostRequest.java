@@ -1,6 +1,6 @@
 package com.seproject.seboard.dto.post;
 
-import com.seproject.seboard.dto.user.UserRequest;
+import com.seproject.seboard.dto.user.AnonymousRequest;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -45,7 +45,7 @@ public class PostRequest {
         private String contents;
         private List<MultipartFile> attachment;
         private Long categoryId;
-        private UserRequest author;
+        private AnonymousRequest author;
 
     }
 
@@ -55,7 +55,7 @@ public class PostRequest {
         private String contents;
         private List<MultipartFile> attachment;
         private Long categoryId;
-        private UserRequest author;
+        private AnonymousRequest author;
 
     }
 
