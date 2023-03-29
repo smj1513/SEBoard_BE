@@ -1,8 +1,10 @@
 package com.seproject.seboard.domain.service;
 
-import com.seproject.seboard.domain.repository.PostRepository;
+import com.seproject.seboard.domain.repository.post.PostRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.stereotype.Service;
 
+@Service
 @AllArgsConstructor
 public class CategoryService {
     private final PostRepository postRepository;

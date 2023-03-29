@@ -1,11 +1,13 @@
 package com.seproject.seboard.domain.service;
 
-import com.seproject.seboard.domain.model.Category;
-import com.seproject.seboard.domain.repository.CategoryRepository;
+import com.seproject.seboard.domain.model.post.Category;
+import com.seproject.seboard.domain.repository.post.CategoryRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
+@Service
 @RequiredArgsConstructor
 public class PostService {
     //TODO: 프로퍼티로 빼야함

@@ -1,23 +1,25 @@
 package com.seproject.seboard.application;
 
-import com.seproject.seboard.domain.model.Author;
-import com.seproject.seboard.domain.model.Post;
-import com.seproject.seboard.domain.repository.AuthorRepository;
-import com.seproject.seboard.domain.repository.PostRepository;
+import com.seproject.seboard.domain.model.user.User;
+import com.seproject.seboard.domain.model.post.Post;
+import com.seproject.seboard.domain.repository.user.UserRepository;
+import com.seproject.seboard.domain.repository.post.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.NoSuchElementException;
 
+@Service
 @RequiredArgsConstructor
 public class PostManageAppService {
 
     private final PostRepository postRepository;
-    private final AuthorRepository authorRepository;
+    private final UserRepository userRepository;
 
     public void enrollPin(Long userId, Long postId) {
 
-        Author requestUser = findByIdOrThrow(userId, authorRepository, "");
+        User requestUser = findByIdOrThrow(userId, userRepository, "");
         Post post = findByIdOrThrow(postId, postRepository, "");
 
         //TODO : 인가 처리
@@ -26,7 +28,7 @@ public class PostManageAppService {
 
     public void cancelPin(Long userId, Long postId) {
 
-        Author requestUser = findByIdOrThrow(userId, authorRepository, "");
+        User requestUser = findByIdOrThrow(userId, userRepository, "");
         Post post = findByIdOrThrow(postId, postRepository, "");
 
         //TODO : 인가 처리

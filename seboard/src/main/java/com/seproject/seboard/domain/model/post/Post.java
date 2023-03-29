@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
+import java.util.List;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -37,6 +38,9 @@ public class Post {
     @OneToOne
     @JoinColumn(name = "expose_option_id")
     private ExposeOption exposeOption;
+
+    @OneToMany
+    private List<Attachment> attachments;
 
     public boolean isWrittenBy(User user) {
         return user.equals(author);
