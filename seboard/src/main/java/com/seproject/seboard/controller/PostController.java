@@ -1,9 +1,15 @@
 package com.seproject.seboard.controller;
 
+import com.seproject.seboard.dto.PaginationResponse;
 import com.seproject.seboard.dto.user.AnonymousRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,7 +18,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.awt.print.Book;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static com.seproject.seboard.dto.post.PostRequest.*;
 import static com.seproject.seboard.dto.post.PostResponse.*;
@@ -24,14 +32,32 @@ import static com.seproject.seboard.dto.post.PostResponse.*;
 @AllArgsConstructor
 public class PostController {
 
-    @Parameter(name = "request", description = "조회하고자 하는 카테고리 pk, 페이지 번호, 페이지 당 게시물 개수를 가짐")
+    @Parameters(
+            {
+                    @Parameter(name = "categoryId", description = "조회하고자 하는 카테고리 pk"),
+                    @Parameter(name = "page", description = "페이지 번호"),
+                    @Parameter(name = "perPage", description = "페이지 당 게시글 개수")
+            }
+    )
     @Operation(summary = "게시글 목록 조회", description = "카테고리, 페이징 정보를 전달하여 게시글 목록 조회한다")
+    @ApiResponses({
+            @ApiResponse(content = @Content(schema = @Schema(implementation = RetrievePostListResponseElement.class)),responseCode = "200" , description = "조회 성공"),
+    })
     @GetMapping
-    public ResponseEntity<?> retrievePostList(@ModelAttribute RetrievePostListRequest request) {
-        Long categoryId = request.getCategoryId();
-        Integer page = request.getPage();
-        Integer perPage = request.getPerPage();
-        RetrievePostListResponse retrievePostListResponse = RetrievePostListResponse.toDTO(null, null);
+    public ResponseEntity<?> retrievePostList(
+            @RequestParam Long categoryId,
+            @RequestParam Integer page,
+            @RequestParam Integer perPage
+    ) {
+
+        List<RetrievePostListResponseElement> elements = List.of();
+        PaginationResponse paginationResponse = PaginationResponse.builder()
+                .currentPage(page)
+                .contentSize(20)
+                .perPage(10)
+                .lastPage(10)
+                .build();
+        RetrievePostListResponse retrievePostListResponse = RetrievePostListResponse.toDTO(elements, paginationResponse);
         /***
          *  TODO:  페이지 번호 0일때
          *          페이지 번호 MAX 이상
@@ -42,21 +68,32 @@ public class PostController {
 
     @Parameter(name = "postId", description = "상세 조회를 할 게시물의 pk")
     @Operation(summary = "게시글 상세 조회", description = "게시글을 클릭하면 게시글의 상세 내역을 조회한다")
+    @ApiResponses({
+            @ApiResponse(content = @Content(schema = @Schema(implementation = RetrievePostResponse.class)),responseCode = "200" , description = "조회 성공"),
+            @ApiResponse(content = @Content(schema = @Schema(implementation = NoSuchElementException.class)),responseCode = "404" , description = "해당 pk를 가진 게시물이 없음")
+    })
     @GetMapping("/{postId}")
-    public ResponseEntity<RetrievePostResponse> retrievePost(@PathVariable("postId") Long postId){
+    public ResponseEntity<?> retrievePost(@PathVariable("postId") Long postId){
 
         /***
          * TODO : jwt 추가
          *      없는 postId를 조회
          */
 
-        RetrievePostResponse retrievePostResponse = null;
+        try{
+            RetrievePostResponse retrievePostResponse = null;
 
-        return new ResponseEntity<>(retrievePostResponse,HttpStatus.OK);
+            return new ResponseEntity<>(retrievePostResponse,HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>(e,HttpStatus.NOT_FOUND);
+        }
     }
 
     @Parameter(name = "postId", description = "즐겨찾기 지정할 게시물의 pk")
     @Operation(summary = "게시글 북마크 지정", description = "사용자가 게시글을 즐겨찾기로 등록한다")
+    @ApiResponses({
+            @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)),responseCode = "200" , description = "북마크 성공"),
+    })
     @PostMapping("/{postId}/bookmark")
     public ResponseEntity<?> createBookmark(@PathVariable Long postId) {
 
@@ -71,6 +108,9 @@ public class PostController {
 
     @Parameter(name = "postId", description = "즐겨찾기 해제할 게시물의 pk")
     @Operation(summary = "게시글 북마크 해제", description = "사용자가 즐겨찾기한 게시물을 즐겨찾기 해제한다")
+    @ApiResponses({
+            @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)),responseCode = "200" , description = "북마크 해제 성공"),
+    })
     @DeleteMapping("/{postId}/bookmark")
     public ResponseEntity<?> deleteBookmark(@PathVariable Long postId) {
 
