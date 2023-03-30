@@ -1,40 +1,82 @@
 package com.seproject.seboard.controller;
 
-import com.seproject.seboard.application.CategoryAppService;
-import com.seproject.seboard.dto.CategoryDTO;
-import com.seproject.seboard.dto.MessageDTO.ResponseMessageDTO;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import static com.seproject.seboard.dto.post.CategoryRequest.*;
+
+@Tag(name = "카테고리 API", description = "카테고리(category) 관련 API")
 @RestController
 @RequestMapping("/category")
 @AllArgsConstructor
 public class CategoryController {
-    private final CategoryAppService categoryAppService;
 
-    @ResponseStatus(HttpStatus.CREATED)
+    @Parameter(name = "request", description = "상위 카테고리, 생성할 카테고리 이름 정보")
+    @Operation(summary = "하위 카테고리 생성", description = "소분류 카테고리를 생성한다")
     @PostMapping
-    public ResponseMessageDTO enrollCategory(@RequestBody CategoryDTO.CategoryRequestDTO dto, Long userId){
-        categoryAppService.createCategory(dto.getSuperCategoryId(), userId, dto.getName());
-        return new ResponseMessageDTO(""); //TODO : message
+    public ResponseEntity<?> createCategory(@RequestBody CreateCategoryRequest request) {
+
+        /**
+         * TODO : jwt
+         *         존재하지 않는 상위 카테고리
+         *         이미 존재하는 카테고리 이름
+         *         권한 없음
+         */
+
+        return new ResponseEntity<>(request, HttpStatus.OK);
     }
 
-    @ResponseStatus(HttpStatus.OK)
+    @Parameter(name = "categoryId", description = "대분류 카테고리 pk")
+    @Operation(summary = "하위 카테고리 조회", description = "대분류 카테고리 하위에 있는 모든 소분류 카테고리를 조회한다")
+    @GetMapping("/{categoryId}")
+    public ResponseEntity<?> retrieveCategoryList(@PathVariable Long categoryId) {
+
+        /**
+         * TODO :
+         *    존재하지 않는 대분류 카테고리
+         */
+
+        return new ResponseEntity<>(categoryId, HttpStatus.OK);
+    }
+
+    @Parameters(
+            {
+                    @Parameter(name = "categoryId", description = "수정할 카테고리 pk"),
+                    @Parameter(name = "request", description = "수정할 대분류 카테고리 pk, 카테고리 이름 정보")
+            }
+    )
+    @Operation(summary = "하위 카테고리 수정", description = "소분류 카테고리를 수정한다")
     @PutMapping("/{categoryId}")
-    public ResponseMessageDTO updateCategory(@RequestBody CategoryDTO.CategoryRequestDTO dto,
-                                             @PathVariable Long categoryId, Long userId){
-        categoryAppService.updateCategory(categoryId, userId, dto.getName());
-        return new ResponseMessageDTO(""); // TODO : message
+    public ResponseEntity<?> updateCategory(@PathVariable Long categoryId, @RequestBody UpdateCategoryRequest request) {
+
+        /**
+         * TODO : jwt
+         *    권한 없음
+         *    존재하지 않는 상위 카테고리
+         *    이미 존재하는 카테고리 이름
+         */
+
+        return new ResponseEntity<>(request, HttpStatus.OK);
     }
 
-    @ResponseStatus(HttpStatus.OK)
+    @Parameter(name = "categoryId", description = "삭제할 카테고리 pk")
+    @Operation(summary = "하위 카테고리 삭제", description = "소분류 카테고리를 삭제한다.")
     @DeleteMapping("/{categoryId}")
-    public ResponseMessageDTO removeCategory(@PathVariable Long categoryId, Long userId){
-        categoryAppService.removeCategory(categoryId, userId);
-        return new ResponseMessageDTO(""); // TODO : message
+    public ResponseEntity<?> deleteCategory(@PathVariable Long categoryId) {
+
+        /**
+         * TODO : jwt
+         *    권한 없음
+         *    대분류 삭제시 하위 카테고리 없어야함
+         */
+
+        return new ResponseEntity<>(categoryId, HttpStatus.OK);
     }
-
-
 
 }
