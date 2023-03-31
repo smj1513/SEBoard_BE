@@ -1,0 +1,26 @@
+server:
+  port: 8081
+
+
+spring:
+  servlet:
+    multipart:
+      enabled: true
+      location: /Users/manjong/
+      max-request-size: 30MB
+      max-file-size: 10MB
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    username: postgres
+    password: alswhd11
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+file:
+  dir:
+
