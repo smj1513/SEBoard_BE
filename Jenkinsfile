@@ -1,5 +1,5 @@
 def component = [
-		seboard: false,
+		seboard: true,
 ]
 
 pipeline {
