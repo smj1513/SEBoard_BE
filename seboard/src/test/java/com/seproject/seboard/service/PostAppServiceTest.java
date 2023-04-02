@@ -1,9 +1,5 @@
 package com.seproject.seboard.service;
 
-import com.seproject.seboard.application.PostAppService;
-import com.seproject.seboard.domain.service.PostService;
-import org.junit.jupiter.api.*;
-
 //import static org.mockito.Mockito.mock;
 //
 //@TestInstance(TestInstance.Lifecycle.PER_CLASS)

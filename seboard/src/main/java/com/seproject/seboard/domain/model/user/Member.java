@@ -19,4 +19,13 @@ public class Member extends BoardUser{
     private Account account;
 
 
+    @Override
+    public boolean isAnonymous() {
+        return false;
+    }
+
+    @Override
+    public boolean isOwnAccountId(Long accountId) {
+        return account.getAccountId().equals(accountId);
+    }
 }

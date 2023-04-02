@@ -14,5 +14,15 @@ import javax.persistence.Table;
 @Table(name="anonymous")
 public class Anonymous extends BoardUser {
     private String name;
-    private Long accountId;
+    private Long accountId; //TODO : 암호화
+
+    @Override
+    public boolean isAnonymous() {
+        return true;
+    }
+
+    @Override
+    public boolean isOwnAccountId(Long accountId) {
+        return this.accountId.equals(accountId);
+    }
 }
