@@ -1,7 +1,7 @@
 package com.seproject.seboard.dto.user;
 
+import com.seproject.seboard.domain.model.user.BoardUser;
 import com.seproject.seboard.domain.model.user.Member;
-import com.seproject.seboard.domain.model.user.User;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -14,7 +14,7 @@ public class UserResponse {
     private String name;
 
 
-    public static UserResponse toDTO(User user) {
+    public static UserResponse toDTO(BoardUser user) {
         String loginId =
                 user.isAnonymous() ? "Anonymous" : ((Member)user).getLoginId();
         return builder()

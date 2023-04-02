@@ -1,17 +1,8 @@
 package com.seproject.seboard.application;
 
 import com.seproject.seboard.domain.model.user.User;
-import com.seproject.seboard.domain.model.post.Category;
-import com.seproject.seboard.domain.repository.user.UserRepository;
-import com.seproject.seboard.domain.repository.post.CategoryRepository;
-import com.seproject.seboard.domain.service.CategoryService;
 import lombok.AllArgsConstructor;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 @Service
 @AllArgsConstructor

@@ -3,7 +3,7 @@ package com.seproject.seboard.domain.model.comment;
 import com.seproject.seboard.domain.model.common.BaseTime;
 import com.seproject.seboard.domain.model.post.Post;
 import com.seproject.seboard.domain.model.exposeOptions.ExposeOption;
-import com.seproject.seboard.domain.model.user.User;
+import com.seproject.seboard.domain.model.user.BoardUser;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,20 +33,20 @@ public class Comment {
     @JoinColumn(name = "post_id")
     private Post post;
     @OneToOne
-    @JoinColumn(name = "author_id")
-    private User author;
+    @JoinColumn(name = "board_user_id")
+    private BoardUser author;
 
     @OneToOne
     @JoinColumn(name="expose_option_id")
     private ExposeOption exposeOption;
 
-    public boolean isNamed() {
-        return !author.isAnonymous();
-    }
-
-    public boolean isWrittenBy(User user) {
-        return user.equals(this.author);
-    }
+//    public boolean isNamed() {
+//        return !author.isAnonymous();
+//    }
+//
+//    public boolean isWrittenBy(User user) {
+//        return user.equals(this.author);
+//    }
 
 //    @Override
 //    public int compareTo(Comment o) {

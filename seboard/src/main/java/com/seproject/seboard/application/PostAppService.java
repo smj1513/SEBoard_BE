@@ -1,22 +1,8 @@
 package com.seproject.seboard.application;
 
 import com.seproject.seboard.domain.model.user.User;
-import com.seproject.seboard.domain.model.post.Category;
-import com.seproject.seboard.domain.model.post.Post;
-import com.seproject.seboard.domain.repository.comment.CommentRepository;
-import com.seproject.seboard.domain.repository.post.BookmarkRepository;
-import com.seproject.seboard.domain.repository.post.CategoryRepository;
-import com.seproject.seboard.domain.repository.post.PostRepository;
-import com.seproject.seboard.domain.repository.user.UserRepository;
-import com.seproject.seboard.domain.service.PostService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

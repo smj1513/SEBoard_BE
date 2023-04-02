@@ -12,11 +12,7 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @Entity
 @Table(name="anonymous")
-public class Anonymous extends User {
-    private String password;
-
-    @Override
-    public boolean isAnonymous() {
-        return true;
-    }
+public class Anonymous extends BoardUser {
+    private String name;
+    private Long accountId;
 }

@@ -1,12 +1,12 @@
 package com.seproject.seboard.domain.model.user;
 
+import com.seproject.seboard.oauth2.model.Account;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Getter
 @NoArgsConstructor
@@ -14,12 +14,9 @@ import javax.persistence.Table;
 @SuperBuilder
 @Entity
 @Table(name="members")
-public class Member extends User{
+public class Member extends BoardUser{
+    @OneToOne
+    private Account account;
 
-    private String loginId;
 
-    @Override
-    public boolean isAnonymous() {
-        return false;
-    }
 }

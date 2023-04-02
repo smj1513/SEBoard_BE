@@ -1,16 +1,8 @@
 package com.seproject.seboard.application;
 
 import com.seproject.seboard.domain.model.user.User;
-import com.seproject.seboard.domain.model.post.Post;
-import com.seproject.seboard.domain.repository.user.UserRepository;
-import com.seproject.seboard.domain.repository.comment.CommentRepository;
-import com.seproject.seboard.domain.repository.post.PostRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor

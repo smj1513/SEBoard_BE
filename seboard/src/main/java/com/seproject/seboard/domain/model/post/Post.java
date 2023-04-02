@@ -2,7 +2,7 @@ package com.seproject.seboard.domain.model.post;
 
 import com.seproject.seboard.domain.model.common.BaseTime;
 import com.seproject.seboard.domain.model.exposeOptions.ExposeOption;
-import com.seproject.seboard.domain.model.user.User;
+import com.seproject.seboard.domain.model.user.BoardUser;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -32,8 +32,8 @@ public class Post {
     private Category category;
 
     @ManyToOne
-    @JoinColumn(name = "author_id")
-    private User author;
+    @JoinColumn(name = "board_user_id")
+    private BoardUser author;
 
     @OneToOne
     @JoinColumn(name = "expose_option_id")
@@ -42,22 +42,22 @@ public class Post {
     @OneToMany
     private List<Attachment> attachments;
 
-    public boolean isWrittenBy(User user) {
-        return user.equals(author);
-    }
-
-    public boolean isNamed() {
-        return !author.isAnonymous();
-    }
-    public void pin() {
-        if(!isPined()) {
-            this.pined = true;
-        }
-    }
-
-    public void unPin() {
-        if(isPined()) {
-            this.pined = false;
-        }
-    }
+//    public boolean isWrittenBy(User user) {
+//        return user.equals(author);
+//    }
+//
+//    public boolean isNamed() {
+//        return !author.isAnonymous();
+//    }
+//    public void pin() {
+//        if(!isPined()) {
+//            this.pined = true;
+//        }
+//    }
+//
+//    public void unPin() {
+//        if(isPined()) {
+//            this.pined = false;
+//        }
+//    }
 }
