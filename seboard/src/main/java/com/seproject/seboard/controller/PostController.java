@@ -1,5 +1,6 @@
 package com.seproject.seboard.controller;
 
+import com.seproject.seboard.dto.MessageResponse;
 import com.seproject.seboard.dto.PaginationResponse;
 import com.seproject.seboard.dto.user.AnonymousRequest;
 import io.swagger.v3.oas.annotations.Operation;
@@ -70,7 +71,7 @@ public class PostController {
     @Operation(summary = "게시글 상세 조회", description = "게시글을 클릭하면 게시글의 상세 내역을 조회한다")
     @ApiResponses({
             @ApiResponse(content = @Content(schema = @Schema(implementation = RetrievePostResponse.class)),responseCode = "200" , description = "조회 성공"),
-            @ApiResponse(content = @Content(schema = @Schema(implementation = NoSuchElementException.class)),responseCode = "404" , description = "해당 pk를 가진 게시물이 없음")
+            @ApiResponse(content = @Content(schema = @Schema(implementation = MessageResponse.class)),responseCode = "404" , description = "해당 pk를 가진 게시물이 없음")
     })
     @GetMapping("/{postId}")
     public ResponseEntity<?> retrievePost(@PathVariable("postId") Long postId){
@@ -80,19 +81,19 @@ public class PostController {
          *      없는 postId를 조회
          */
 
-        try{
+        try {
             RetrievePostResponse retrievePostResponse = null;
-
             return new ResponseEntity<>(retrievePostResponse,HttpStatus.OK);
         } catch (NoSuchElementException e) {
-            return new ResponseEntity<>(e,HttpStatus.NOT_FOUND);
+            MessageResponse response = MessageResponse.toDTO(e.getMessage());
+            return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
         }
     }
 
     @Parameter(name = "postId", description = "즐겨찾기 지정할 게시물의 pk")
     @Operation(summary = "게시글 북마크 지정", description = "사용자가 게시글을 즐겨찾기로 등록한다")
     @ApiResponses({
-            @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)),responseCode = "200" , description = "북마크 성공"),
+            @ApiResponse(content = @Content(schema = @Schema(implementation = MessageResponse.class)),responseCode = "200" , description = "북마크 성공"),
     })
     @PostMapping("/{postId}/bookmark")
     public ResponseEntity<?> createBookmark(@PathVariable Long postId) {
@@ -103,13 +104,13 @@ public class PostController {
          * TODO : 존재하지 않는 postId
          *  jwt가 없거나 유효하지 않는 경우
          */
-        return new ResponseEntity<>(postId,HttpStatus.OK);
+        return new ResponseEntity<>(MessageResponse.toDTO("북마크 등록 성공"),HttpStatus.OK);
     }
 
     @Parameter(name = "postId", description = "즐겨찾기 해제할 게시물의 pk")
     @Operation(summary = "게시글 북마크 해제", description = "사용자가 즐겨찾기한 게시물을 즐겨찾기 해제한다")
     @ApiResponses({
-            @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)),responseCode = "200" , description = "북마크 해제 성공"),
+            @ApiResponse(content = @Content(schema = @Schema(implementation = MessageResponse.class)),responseCode = "200" , description = "북마크 해제 성공"),
     })
     @DeleteMapping("/{postId}/bookmark")
     public ResponseEntity<?> deleteBookmark(@PathVariable Long postId) {
@@ -120,7 +121,7 @@ public class PostController {
          * TODO : 존재하지 않는 postId
          *  jwt가 없거나 유효하지 않는 경우
          */
-        return new ResponseEntity<>(postId,HttpStatus.OK);
+        return new ResponseEntity<>(MessageResponse.toDTO("북마크 해제 성공"),HttpStatus.OK);
     }
 
     @Parameter(name = "request", description = "게시물 생성에 필요한 제목, 본문 , 첨부파일, 카테고리 pk, 공지사항 여부 정보")
