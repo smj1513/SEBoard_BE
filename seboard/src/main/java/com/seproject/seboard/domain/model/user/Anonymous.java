@@ -1,6 +1,7 @@
 package com.seproject.seboard.domain.model.user;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 

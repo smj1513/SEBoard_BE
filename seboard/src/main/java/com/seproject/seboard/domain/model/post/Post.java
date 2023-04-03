@@ -1,7 +1,9 @@
 package com.seproject.seboard.domain.model.post;
 
+import com.seproject.seboard.domain.model.comment.Comment;
 import com.seproject.seboard.domain.model.common.BaseTime;
 import com.seproject.seboard.domain.model.exposeOptions.ExposeOption;
+import com.seproject.seboard.domain.model.user.Anonymous;
 import com.seproject.seboard.domain.model.user.BoardUser;
 import lombok.Builder;
 import lombok.Getter;
@@ -40,11 +42,11 @@ public class Post {
     private ExposeOption exposeOption;
     @OneToMany
     private List<Attachment> attachments;
-
+    private int anonymousCount;
 
     public Post(Long postId, String title, String contents, int views,
                 boolean pined, BaseTime baseTime, Category category,
-                BoardUser author, ExposeOption exposeOption, List<Attachment> attachments) {
+                BoardUser author, ExposeOption exposeOption, List<Attachment> attachments, int anonymousCount) {
         if(!isValidTitle(title)) {
             throw new IllegalArgumentException();
         }
@@ -63,6 +65,7 @@ public class Post {
         this.author = author;
         this.exposeOption = exposeOption;
         this.attachments = attachments;
+        this.anonymousCount = anonymousCount;
     }
 
     public boolean isNamed() {
@@ -71,6 +74,22 @@ public class Post {
 
     public boolean isWrittenBy(Long accountId) {
         return author.isOwnAccountId(accountId);
+    }
+
+    public Anonymous createAnonymous(Long accountId) {
+        return Anonymous.builder()
+                .name(String.format("익명%d", ++anonymousCount))
+                .accountId(accountId)
+                .build();
+    }
+
+    public Comment writeComment(String contents, BoardUser author){
+        return Comment.builder()
+                .contents(contents)
+                .baseTime(BaseTime.now())
+                .post(this)
+                .author(author)
+                .build();
     }
 
     public void changeTitle(String title) {

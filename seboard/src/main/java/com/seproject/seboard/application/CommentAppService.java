@@ -1,89 +1,91 @@
 package com.seproject.seboard.application;
 
-import com.seproject.seboard.domain.model.user.User;
+import com.seproject.seboard.domain.model.comment.Comment;
+import com.seproject.seboard.domain.model.comment.Reply;
+import com.seproject.seboard.domain.model.post.Post;
+import com.seproject.seboard.domain.model.user.Anonymous;
+import com.seproject.seboard.domain.model.user.Member;
+import com.seproject.seboard.domain.repository.comment.CommentRepository;
+import com.seproject.seboard.domain.repository.comment.ReplyRepository;
+import com.seproject.seboard.domain.repository.post.PostRepository;
+import com.seproject.seboard.domain.repository.user.AnonymousRepository;
+import com.seproject.seboard.domain.repository.user.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import static com.seproject.seboard.application.utils.AppServiceHelper.findByIdOrThrow;
 
 @Service
 @RequiredArgsConstructor
 public class CommentAppService {
-//
-//    private final CommentRepository commentRepository;
-//    private final PostRepository postRepository;
-//    private final UserRepository userRepository;
-//
-//    public void createNamedComment(Long userId, Long postId, String contents){
-//        User user = findByIdOrThrow(userId, userRepository, "");
-//        Post post = findByIdOrThrow(postId,postRepository,"");
-//
-//        AbstractComment abstractComment = AbstractComment.builder()
-//                .post(post)
-//                .user(user)
-//                .contents(contents)
-//                .build();
-//
-//        commentRepository.save(abstractComment);
-//    }
-//
-//    public void createUnnamedComment(Long postId, String contents,String username, String password){
-//        Post post = findByIdOrThrow(postId,postRepository,"");
-//
-//        User user = User.builder()
-//                .loginId(User.ANONYMOUS_LOGIN_ID)
-//                .name(username)
-//                .build();
-//
-//        UnnamedComment comment = UnnamedComment.builder()
-//                .post(post)
-//                .user(user)
-//                .contents(contents)
-//                .password(password)
-//                .build();
-//
-//        unnamedCommentRepository.save(comment);
-//    }
-//
-//    public void createNamedReply(Long userId, Long postId, Long commentId, Long taggedCommentId,String contents){
-//        Post post = findByIdOrThrow(postId,postRepository,"");
-//        AbstractComment superAbstractComment = findByIdOrThrow(commentId,commentRepository,"");
-//        AbstractComment taggedAbstractComment = findByIdOrThrow(taggedCommentId,commentRepository,"");
-//        User user = findByIdOrThrow(userId, userRepository,"");
-//
-//        AbstractComment reply = AbstractComment.builder()
-//                .post(post)
-//                .user(user)
-//                .superComment(superAbstractComment)
-//                .tag(taggedAbstractComment)
-//                .contents(contents)
-//                .build();
-//
-//        commentRepository.save(reply);
-//    }
-//
-//
-//    public void createUnnamedReply(Long postId, Long commentId,Long taggedCommentId, String contents,String username, String password){
-//        Post post = findByIdOrThrow(postId,postRepository,"");
-//
-//        User user = User.builder()
-//                .loginId(User.ANONYMOUS_LOGIN_ID)
-//                .name(username)
-//                .build();
-//
-//        AbstractComment superAbstractComment = findByIdOrThrow(commentId,commentRepository,"");
-//        AbstractComment taggedAbstractComment = findByIdOrThrow(taggedCommentId,commentRepository,"");
-//
-//        UnnamedComment unnamedComment = UnnamedComment.builder()
-//                .post(post)
-//                .user(user)
-//                .superComment(superAbstractComment)
-//                .tag(taggedAbstractComment)
-//                .contents(contents)
-//                .password(password)
-//                .build();
-//
-//        unnamedCommentRepository.save(unnamedComment);
-//    }
-//
+    private final CommentRepository commentRepository;
+    private final ReplyRepository replyRepository;
+    private final PostRepository postRepository;
+    private final MemberRepository memberRepository;
+    private final AnonymousRepository anonymousRepository;
+
+    public void writeNamedComment(Long accountId, Long postId, String contents) {
+        Post post = findByIdOrThrow(postId, postRepository, "");
+        Member member = memberRepository.findByAccountId(accountId);
+
+        if (member == null) {
+            //TODO : member 생성 로직 호출
+        }
+
+        //TODO : expose option 로직 추가
+        Comment comment = post.writeComment(contents, member);
+
+        commentRepository.save(comment);
+    }
+
+    @Transactional
+    public void writeUnnamedComment(Long accountId, Long postId, String contents) {
+        Post post = findByIdOrThrow(postId, postRepository, "");
+
+        //TODO : JPQL로 변경?
+        Anonymous author = getAnonymous(accountId, postId, post);
+
+        //TODO : expose option 로직 추가
+        Comment comment = post.writeComment(contents, author);
+
+        commentRepository.save(comment);
+    }
+
+
+    public void writeNamedReply(Long accountId, Long postId, Long commentId, Long taggedCommentId, String contents) {
+        Post post = findByIdOrThrow(postId, postRepository, "");
+
+        Member member = memberRepository.findByAccountId(accountId);
+        Comment superComment = findByIdOrThrow(commentId, commentRepository, "");
+        Comment taggedComment = findByIdOrThrow(taggedCommentId, commentRepository, "");
+
+        if (member == null) {
+            //TODO : member 생성 로직 호출
+        }
+
+        //TODO : expose option 로직 추가
+        Reply reply = superComment.writeReply(contents, taggedComment, member);
+
+        commentRepository.save(reply);
+    }
+
+
+    @Transactional
+    public void writeUnnamedReply(Long accountId, Long postId, Long commentId, Long taggedCommentId, String contents) {
+        Post post = findByIdOrThrow(postId, postRepository, "");
+        Comment superComment = findByIdOrThrow(commentId, commentRepository, "");
+        Comment taggedComment = findByIdOrThrow(taggedCommentId, commentRepository, "");
+
+        //TODO : JPQL로 변경?
+        Anonymous author = getAnonymous(accountId, postId, post);
+
+        //TODO : expose option 로직 추가
+        Reply reply = superComment.writeReply(contents, taggedComment, author);
+
+        replyRepository.save(reply);
+    }
+
 //    // Retrieve -> Comment만
 //    //TODO : void -> 변경필요
 //    public List<CommentDTO.CommentListResponseDTO> retrieveCommentList(Long postId,Long userId){
@@ -145,45 +147,57 @@ public class CommentAppService {
 //        throw new IllegalArgumentException();
 //    }
 //
-//    public void changeContentsOfUnnamed(Long commentId, String password, String contents){
-//        UnnamedComment unnamedComment = findByIdOrThrow(commentId,unnamedCommentRepository,"");
-//
-//        if(unnamedComment.checkPassword(password)) {
-//            unnamedComment.change(contents);
-//            return;
-//        }
-//
-//        // 패스워드가 다른 경우
-//        throw new IllegalArgumentException();
-//    }
-//
-//    public void deleteNamedComment(Long commentId, Long userId){
-//        AbstractComment abstractComment = findByIdOrThrow(commentId,commentRepository,"");
-//        User requestUser = findByIdOrThrow(userId, userRepository,"");
-//
-//        if (abstractComment.isWrittenBy(requestUser)) {
-//            commentRepository.delete(abstractComment);
-//            return;
-//        }
-//
-//        // 작성자가 다른 경우
-//        throw new IllegalArgumentException();
-//    }
-//
-//    public void deleteUnnamedComment(Long commentId, String password){
-//        UnnamedComment unnamedComment = findByIdOrThrow(commentId,unnamedCommentRepository,"");
-//
-//        if (unnamedComment.checkPassword(password)) {
-//            unnamedCommentRepository.delete(unnamedComment);
-//            return;
-//        }
-//
-//        // 패스워드가 다른 경우
-//        throw new IllegalArgumentException();
-//    }
-//
-//    private <T> T findByIdOrThrow(Long id, JpaRepository<T, Long> repo, String errorMsg){
-//        return repo.findById(id).orElseThrow(() -> new NoSuchElementException(errorMsg));
-//    }
+
+    public void editComment(String contents, Long commentId, Long accountId){
+        Comment comment = findByIdOrThrow(commentId, commentRepository, "");
+
+        if (!comment.isWrittenBy(accountId)) { //TODO : 관리자 권한의 경우 생각
+            throw new IllegalArgumentException();
+        }
+
+        //TODO : exposeOption 고려
+        comment.changeContents(contents);
+    }
+
+    public void removeComment(Long commentId, Long accountId) {
+        Comment comment = findByIdOrThrow(commentId, commentRepository, "");
+
+        if (!comment.isWrittenBy(accountId)) { //TODO : 관리자 권한의 경우 생각
+            throw new IllegalArgumentException();
+        }
+
+        comment.delete();
+    }
+
+    public void removeReply(Long replyId, Long accountId) {
+        Reply reply = findByIdOrThrow(replyId, replyRepository, "");
+
+        if (!reply.isWrittenBy(accountId)) { //TODO : 관리자 권한의 경우 생각
+            throw new IllegalArgumentException();
+        }
+
+        reply.delete();
+    }
+
+    private Anonymous getAnonymous(Long accountId, Long postId, Post post) {
+        Anonymous author = commentRepository.findByPostId(postId).stream()
+                .filter(comment -> comment.getAuthor().isAnonymous())
+                .map(comment -> (Anonymous) comment.getAuthor())
+                .filter(anonymous -> anonymous.isOwnAccountId(accountId))
+                .findFirst()
+                .orElseGet(() -> {
+                    return replyRepository.findByPostId(postId).stream()
+                            .filter(reply -> reply.getAuthor().isAnonymous())
+                            .map(reply -> (Anonymous) reply.getAuthor())
+                            .filter(anonymous -> anonymous.isOwnAccountId(accountId))
+                            .findFirst()
+                            .orElseGet(() -> {
+                                Anonymous createdAnonymous = post.createAnonymous(accountId);
+                                anonymousRepository.save(createdAnonymous);
+                                return createdAnonymous;
+                            });
+                });
+        return author;
+    }
 
 }

@@ -1,6 +1,5 @@
 package com.seproject.seboard.application;
 
-import com.seproject.seboard.application.utils.AppServiceHelper;
 import com.seproject.seboard.domain.model.common.BaseTime;
 import com.seproject.seboard.domain.model.post.Category;
 import com.seproject.seboard.domain.model.post.Post;
@@ -13,7 +12,6 @@ import com.seproject.seboard.domain.repository.user.AnonymousRepository;
 import com.seproject.seboard.domain.repository.user.BoardUserRepository;
 import com.seproject.seboard.domain.repository.user.MemberRepository;
 import com.seproject.seboard.oauth2.repository.AccountRepository;
-import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,7 +20,7 @@ import static com.seproject.seboard.application.utils.AppServiceHelper.*;
 
 @Service
 @RequiredArgsConstructor
-public class PostAppAppService {
+public class PostAppService {
     private final PostRepository postRepository;
     private final BoardUserRepository boardUserRepository;
     private final CategoryRepository categoryRepository;
@@ -43,6 +41,7 @@ public class PostAppAppService {
                 .accountId(accountId)
                 .build();
 
+        //TODO : expose option 로직 추가
         Post post = Post.builder()
                 .title(title)
                 .contents(contents)
@@ -63,6 +62,7 @@ public class PostAppAppService {
             //TODO : member 생성 로직 호출
         } else {
             Category category = findByIdOrThrow(categoryId, categoryRepository, "");
+            //TODO : expose option 로직 추가
             Post post = Post.builder()
                     .title(title)
                     .contents(contents)
@@ -76,22 +76,22 @@ public class PostAppAppService {
         }
     }
 
-    public PostDTO.PostResponseDTO findPost(Long postId, Long accountId){
-        Post post = findByIdOrThrow(postId, postRepository, "");
-        //TODO : member없을 때 로직 추가 필요
-        Member member = memberRepository.findByAccountId(accountId);
-
-        boolean isEditable = false;
-        boolean bookmarked = bookmarkRepository.existsByPostIdAndMemberId(postId, member.getBoardUserId());
-
-        if(post.isWrittenBy(accountId)){ //TODO : 권한 있을때 경우 추가
-            isEditable = true;
-        }
-
-        //TODO : 반환 객체 변경필요하지 않나?
-
-        return PostDTO.PostResponseDTO.toDTO(targetPost,isEditable,bookmarked);
-    }
+//    public PostDTO.PostResponseDTO findPost(Long postId, Long accountId){
+//        Post post = findByIdOrThrow(postId, postRepository, "");
+//        //TODO : member없을 때 로직 추가 필요
+//        Member member = memberRepository.findByAccountId(accountId);
+//
+//        boolean isEditable = false;
+//        boolean bookmarked = bookmarkRepository.existsByPostIdAndMemberId(postId, member.getBoardUserId());
+//
+//        if(post.isWrittenBy(accountId)){ //TODO : 권한 있을때 경우 추가
+//            isEditable = true;
+//        }
+//
+//        //TODO : 반환 객체 변경필요하지 않나?
+//
+//        return PostDTO.PostResponseDTO.toDTO(targetPost,isEditable,bookmarked);
+//    }
 
     public void findPostList(Long categoryId, int page, int size){
 //        //TODO : paging 인자, Repository 분리?
@@ -117,6 +117,7 @@ public class PostAppAppService {
         post.changePin(pined);
 
 
+        //TODO : expose option 로직 추가
         //TODO : 카테고리 변경 추가 필요
         Category category = findByIdOrThrow(categoryId, categoryRepository, "");
     }
