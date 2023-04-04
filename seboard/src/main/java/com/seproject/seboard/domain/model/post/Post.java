@@ -108,6 +108,10 @@ public class Post {
         this.contents = contents;
     }
 
+    public void changeCategory(Category category) {
+        this.category = category;
+    }
+
     public void changePin(boolean pinState) {
         this.pined = pinState;
     }
@@ -119,6 +123,7 @@ public class Post {
     public boolean isValidContents(String contents) {
         return CONTENTS_MIN_SIZE < contents.length() && contents.length() <= CONTENTS_MAX_SIZE;
     }
+
 
 //
 //    public boolean isNamed() {

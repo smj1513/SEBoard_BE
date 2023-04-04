@@ -116,10 +116,11 @@ public class PostAppService {
         post.changeContents(contents);
         post.changePin(pined);
 
-
         //TODO : expose option 로직 추가
-        //TODO : 카테고리 변경 추가 필요
+
+        //TODO : category 권한 체킹 필요
         Category category = findByIdOrThrow(categoryId, categoryRepository, "");
+        post.changeCategory(category);
     }
 
     public void removePost(Long postId, Long accountId){

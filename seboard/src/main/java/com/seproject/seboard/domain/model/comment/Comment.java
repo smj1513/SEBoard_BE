@@ -13,7 +13,6 @@ import javax.persistence.*;
 
 @Getter
 @SuperBuilder
-@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Inheritance(strategy = InheritanceType.JOINED)
@@ -120,4 +119,3 @@ public class Comment {
 //
 //        return thisTarget.baseTime.getCreatedAt().compareTo(opposite.getBaseTime().getCreatedAt());
 //    }
-}
