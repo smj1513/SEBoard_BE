@@ -1,41 +1,34 @@
 package com.seproject.seboard.application;
 
-import com.seproject.seboard.domain.model.user.User;
+import com.seproject.seboard.domain.model.user.BoardUser;
 import com.seproject.seboard.domain.model.post.Post;
-import com.seproject.seboard.domain.repository.user.UserRepository;
+import com.seproject.seboard.domain.repository.user.BoardUserRepository;
 import com.seproject.seboard.domain.repository.post.PostRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.NoSuchElementException;
+import static com.seproject.seboard.application.utils.AppServiceHelper.findByIdOrThrow;
 
 @Service
 @RequiredArgsConstructor
 public class PostManageAppService {
 
     private final PostRepository postRepository;
-    private final UserRepository userRepository;
+    private final BoardUserRepository boardUserRepository;
 
-    public void enrollPin(Long userId, Long postId) {
+    public void enrollPin(Long accountId, Long postId) {
+        BoardUser requestUser = findByIdOrThrow(accountId, boardUserRepository, "");
+        //TODO: 권한처리
 
-        User requestUser = findByIdOrThrow(userId, userRepository, "");
         Post post = findByIdOrThrow(postId, postRepository, "");
-
-        //TODO : 인가 처리
-        post.pin();
+        post.changePin(true);
     }
 
-    public void cancelPin(Long userId, Long postId) {
+    public void cancelPin(Long accountId, Long postId) {
+        BoardUser requestUser = findByIdOrThrow(accountId, boardUserRepository, "");
+        //TODO: 권한처리
 
-        User requestUser = findByIdOrThrow(userId, userRepository, "");
         Post post = findByIdOrThrow(postId, postRepository, "");
-
-        //TODO : 인가 처리
-        post.unPin();
-    }
-
-    private <T> T findByIdOrThrow(Long id, JpaRepository<T, Long> repo, String errorMsg){
-        return repo.findById(id).orElseThrow(() -> new NoSuchElementException(errorMsg));
+        post.changePin(false);
     }
 }
