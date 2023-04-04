@@ -22,8 +22,8 @@ public class Post {
     private static final Integer TITLE_MIN_SIZE = 4;
     private static final Integer CONTENTS_MAX_SIZE = 1000;
     private static final Integer CONTENTS_MIN_SIZE = 10;
-    @Id
-    @GeneratedValue
+    @Id @GeneratedValue
+    @Column(name = "post_id")
     private Long postId;
     private String title;
     @Column(columnDefinition = "TEXT")

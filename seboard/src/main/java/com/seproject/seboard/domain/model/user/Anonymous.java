@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
 import javax.persistence.Entity;
+import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
 @SuperBuilder
@@ -13,6 +14,7 @@ import javax.persistence.Table;
 @AllArgsConstructor
 @Entity
 @Table(name="anonymous")
+@PrimaryKeyJoinColumn(name="anonymous_id")
 public class Anonymous extends BoardUser {
     private String name;
     private Long accountId; //TODO : 암호화

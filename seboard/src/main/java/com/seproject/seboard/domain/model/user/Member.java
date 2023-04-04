@@ -14,6 +14,7 @@ import javax.persistence.*;
 @SuperBuilder
 @Entity
 @Table(name="members")
+@PrimaryKeyJoinColumn(name="member_id")
 public class Member extends BoardUser{
     @OneToOne
     private Account account;

@@ -16,7 +16,7 @@ public class UserResponse {
 
     public static UserResponse toDTO(BoardUser user) {
         String loginId =
-                user.isAnonymous() ? "Anonymous" : ((Member)user).getLoginId();
+                user.isAnonymous() ? "Anonymous" : ((Member)user).getAccount().getLoginId();
         return builder()
                 .loginId(loginId)
                 .name(user.getName())
