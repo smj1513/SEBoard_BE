@@ -1,4 +1,4 @@
-package com.seproject.seboard.oauth2;
+package com.seproject.seboard.oauth2.utils;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;

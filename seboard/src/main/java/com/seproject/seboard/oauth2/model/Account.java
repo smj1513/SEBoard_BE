@@ -2,6 +2,7 @@ package com.seproject.seboard.oauth2.model;
 
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.util.List;
@@ -24,6 +25,7 @@ public class Account {
     private String password;
     private String provider;
     private String email;
+    private String profile;
 
     @ManyToMany
     @JoinTable(

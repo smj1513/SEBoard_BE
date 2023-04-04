@@ -2,14 +2,18 @@ package com.seproject.seboard.oauth2;
 
 import com.seproject.seboard.oauth2.service.CustomOAuth2UserService;
 import com.seproject.seboard.oauth2.service.CustomOidcUserService;
+import com.seproject.seboard.oauth2.utils.CustomAuthorityMapper;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+
+import javax.servlet.http.HttpSession;
 
 @AllArgsConstructor
 @EnableWebSecurity
@@ -21,7 +25,7 @@ public class OAuth2ClientConfig {
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
 
-        return web -> web.ignoring().antMatchers("/static/**");
+        return web -> web.ignoring().antMatchers("/static/**").antMatchers("/error");
     }
 
     @Bean
@@ -32,9 +36,28 @@ public class OAuth2ClientConfig {
                 .antMatchers("/api/oidc").access("hasAnyRole('SCOPE_openid')")
                 .anyRequest().authenticated();
 
+        http.formLogin().loginPage("/login").loginProcessingUrl("/loginProc").permitAll();
         http.oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(customOAuth2UserService)
                 .oidcUserService(customOidcUserService)));
-        http.logout().logoutSuccessUrl("/");
+        http.exceptionHandling()
+                .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")) // OK
+                .accessDeniedHandler((request,response,exception) -> { // TODO : 상세하게 분기
+                    System.out.println(exception.getMessage());
+                    response.sendError(HttpStatus.FORBIDDEN.value());
+                    response.sendRedirect("/denied");
+                });
+
+        http.logout()
+                .logoutUrl("/logout")
+                .addLogoutHandler((request,response,authentication) ->{
+                    HttpSession session = request.getSession();
+                    session.invalidate();
+                })
+                .logoutSuccessHandler((request,response,authentication) -> {
+                    response.setStatus(HttpStatus.OK.value());
+                    //response.sendRedirect("/login");
+                })
+                .deleteCookies("remember-me");
 
         return http.build();
     }
