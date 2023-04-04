@@ -15,8 +15,7 @@ public class BaseTime {
     private final LocalDateTime createdAt;
     private final LocalDateTime modifiedAt;
 
-    public BaseTime() {
-        createdAt = LocalDateTime.now();
-        modifiedAt = LocalDateTime.now();
+    public static BaseTime now(){
+        return new BaseTime(LocalDateTime.now(), LocalDateTime.now());
     }
 }
