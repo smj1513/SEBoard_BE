@@ -25,9 +25,9 @@ public class OAuth2Utils {
     }
 
     public static Attributes getOtherAttributes(OAuth2User oAuth2User, String subAttributesKey,String otherAttributesKey) {
-        oAuth2User.getAttributes().forEach((key,value) -> {
-            System.out.println(key + ":" + value);
-        });
+//        oAuth2User.getAttributes().forEach((key,value) -> {
+//            System.out.println(key + ":" + value);
+//        });
         Map<String,Object> sub = oAuth2User.getAttribute(subAttributesKey);
         return Attributes.builder()
                 .mainAttributes(oAuth2User.getAttributes())

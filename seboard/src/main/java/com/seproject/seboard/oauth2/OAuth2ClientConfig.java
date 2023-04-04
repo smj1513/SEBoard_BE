@@ -31,33 +31,34 @@ public class OAuth2ClientConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/").permitAll()
+//                .antMatchers("/").permitAll()
+                .antMatchers("/login").permitAll()
                 .antMatchers("/api/user").access("hasAnyRole('SCOPE_profile','SCOPE_email')")
                 .antMatchers("/api/oidc").access("hasAnyRole('SCOPE_openid')")
                 .anyRequest().authenticated();
 
-        http.formLogin().loginPage("/login").loginProcessingUrl("/loginProc").permitAll();
+//        http.formLogin().loginPage("/login").loginProcessingUrl("/loginProc").permitAll();
         http.oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfoEndpointConfig -> userInfoEndpointConfig.userService(customOAuth2UserService)
                 .oidcUserService(customOidcUserService)));
-        http.exceptionHandling()
-                .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")) // OK
-                .accessDeniedHandler((request,response,exception) -> { // TODO : 상세하게 분기
-                    System.out.println(exception.getMessage());
-                    response.sendError(HttpStatus.FORBIDDEN.value());
-                    response.sendRedirect("/denied");
-                });
-
-        http.logout()
-                .logoutUrl("/logout")
-                .addLogoutHandler((request,response,authentication) ->{
-                    HttpSession session = request.getSession();
-                    session.invalidate();
-                })
-                .logoutSuccessHandler((request,response,authentication) -> {
-                    response.setStatus(HttpStatus.OK.value());
-                    //response.sendRedirect("/login");
-                })
-                .deleteCookies("remember-me");
+//        http.exceptionHandling()
+//                .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")); // OK
+//                .accessDeniedHandler((request,response,exception) -> { // TODO : 상세하게 분기
+//                    System.out.println(exception.getMessage());
+//                    response.sendError(HttpStatus.FORBIDDEN.value());
+//                    response.sendRedirect("/denied");
+//                });
+//
+//        http.logout()
+//                .logoutUrl("/logout")
+//                .addLogoutHandler((request,response,authentication) ->{
+//                    HttpSession session = request.getSession();
+//                    session.invalidate();
+//                })
+//                .logoutSuccessHandler((request,response,authentication) -> {
+//                    response.setStatus(HttpStatus.OK.value());
+//                    //response.sendRedirect("/login");
+//                })
+//                .deleteCookies("remember-me");
 
         return http.build();
     }

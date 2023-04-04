@@ -18,7 +18,7 @@ public class NaverUser extends OAuth2ProviderUser
 
     @Override
     public String getUsername() {
-        System.out.println((String)getAttributes().get("name "));
+//        System.out.println((String)getAttributes().get("name "));
         return (String)getAttributes().get("name"); //email?
     }
 

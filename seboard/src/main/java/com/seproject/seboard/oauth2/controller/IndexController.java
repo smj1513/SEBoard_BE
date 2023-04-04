@@ -2,24 +2,22 @@ package com.seproject.seboard.oauth2.controller;
 
 import com.seproject.seboard.oauth2.model.PrincipalUser;
 import com.seproject.seboard.oauth2.utils.OAuth2Utils;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
-import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.Map;
 
-@Controller
+@Slf4j
+@RestController
 public class IndexController {
 
     @GetMapping("/")
-    public String index(Model model, Authentication authentication, @AuthenticationPrincipal PrincipalUser principalUser) {
+    public ResponseEntity<?> index(Authentication authentication, @AuthenticationPrincipal PrincipalUser principalUser) {
 
         if(authentication != null) {
             String userName;
@@ -32,12 +30,10 @@ public class IndexController {
                 profile = "none";
                 userName = principalUser.getProviderUser().getUsername();
             }
-            model.addAttribute("user",userName);
-            model.addAttribute("provider",principalUser.getProviderUser().getProvider());
-            model.addAttribute("profile",profile);
-        }
 
-        return "index";
+        }
+        log.info("{}",authentication);
+        return new ResponseEntity<>(principalUser.getProviderUser(),HttpStatus.OK);
 
     }
 }
