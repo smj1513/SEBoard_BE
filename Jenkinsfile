@@ -18,9 +18,7 @@ pipeline {
 						stage ("${entry.key} Build"){
 							if(entry.value){
 								var = entry.key
-								sh "cd ${entry.key}"
-								sh "docker build -t maanjong/se-dev:${entry.key} ."
-								sh "cd .."
+								sh "docker build -t maanjong/se-dev:${entry.key} ${entry.key}"
 							}	
 						}
 					}
