@@ -4,5 +4,3 @@ services:
     build: .
     image: maanjong/se-dev:nginx
     container_name: nginx
-    networks:
-      - my-network
