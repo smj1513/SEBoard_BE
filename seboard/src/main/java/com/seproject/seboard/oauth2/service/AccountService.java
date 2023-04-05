@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import javax.transaction.NotSupportedException;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -27,7 +28,7 @@ public class AccountService {
                 .filter(authority -> authority.getAuthority().startsWith("ROLE_"))
                 .map(authority -> {
                     Optional<Role> role = roleRepository.findByName(authority.getAuthority());
-                    return role.orElseGet(() -> new Role(authority.getAuthority()));
+                    return role.orElseThrow(IllegalArgumentException::new);
                 })
                 .collect(Collectors.toList());
 
@@ -39,6 +40,7 @@ public class AccountService {
                 .username(providerUser.getUsername())
                 .password(providerUser.getPassword())
                 .email(providerUser.getEmail())
+                .profile(providerUser.getPicture())
                 .authorities(authorities)
                 .build();
 

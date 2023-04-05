@@ -1,5 +1,6 @@
-package com.seproject.seboard.oauth2.model;
+package com.seproject.seboard.oauth2.model.social;
 
+import com.seproject.seboard.oauth2.model.ProviderUser;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
@@ -22,10 +23,10 @@ public abstract class OAuth2ProviderUser implements ProviderUser {
         this.attributes = oAuth2User.getAttributes();
     }
 
-    public OAuth2ProviderUser(Object attributes, OAuth2User oAuth2User, ClientRegistration registration) {
+    public OAuth2ProviderUser(Map<String,Object> attributes, OAuth2User oAuth2User, ClientRegistration registration) {
         this.oAuth2User = oAuth2User;
         this.registration = registration;
-        this.attributes = (Map<String,Object>)attributes;
+        this.attributes = attributes;
     }
 
     @Override
@@ -55,5 +56,8 @@ public abstract class OAuth2ProviderUser implements ProviderUser {
         return attributes;
     }
 
-
+    @Override
+    public OAuth2User getOAuth2User() {
+        return oAuth2User;
+    }
 }

@@ -1,0 +1,26 @@
+version: "3"
+services:
+  postgresql:
+    image: postgres:14.1
+    container_name: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+#      POSTGRES_DB: se
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "password"
+    networks:
+      - my-network
+  seboard:
+    build: .
+    container_name: seboard
+    ports:
+      - "8888:8888"
+    networks:
+      - my-network
+  nginx:
+    build: ./nginx
+    container_name: nginx
+    networks:
+      - my-network

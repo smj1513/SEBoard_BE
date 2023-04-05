@@ -1,10 +1,10 @@
 package com.seproject.seboard.oauth2.service;
 
-import com.seproject.seboard.oauth2.model.OAuth2ProviderUser;
+import com.seproject.seboard.oauth2.converters.DelegationProviderUserConverter;
+import com.seproject.seboard.oauth2.converters.ProviderUserRequest;
+import com.seproject.seboard.oauth2.model.PrincipalUser;
+import com.seproject.seboard.oauth2.model.ProviderUser;
 import com.seproject.seboard.oauth2.repository.AccountRepository;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
@@ -19,8 +19,10 @@ import org.springframework.stereotype.Service;
 public class CustomOAuth2UserService extends AbstractOAuth2UserService implements OAuth2UserService<OAuth2UserRequest,OAuth2User> {
 
 
-    public CustomOAuth2UserService(AccountRepository accountRepository, AccountService accountService) {
-        super(accountRepository, accountService);
+    public CustomOAuth2UserService(AccountRepository accountRepository,
+                                   AccountService accountService,
+                                   DelegationProviderUserConverter providerUserConverter) {
+        super(accountRepository, accountService, providerUserConverter);
     }
 
     @Override
@@ -31,10 +33,12 @@ public class CustomOAuth2UserService extends AbstractOAuth2UserService implement
 
         OAuth2User oAuth2User = oAuth2UserService.loadUser(userRequest); // 인가 서버와 통신하여 사용자 정보를 조회 -> OAuth2User 타입 객체에 사용자 정보를 저장
 
-        OAuth2ProviderUser OAuth2ProviderUser = super.providerUser(clientRegistration, oAuth2User); // 조회한 사용자 정보와 레지스트레이션 정보를 이용하여 provider에 맞는 account 객체로 생성
+        ProviderUserRequest providerUserRequest = new ProviderUserRequest(clientRegistration,oAuth2User);
+
+        ProviderUser OAuth2ProviderUser = super.providerUser(providerUserRequest); // 조회한 사용자 정보와 레지스트레이션 정보를 이용하여 provider에 맞는 account 객체로 생성
         //회원가입 로직
         super.register(OAuth2ProviderUser,userRequest);
 
-        return oAuth2User;
+        return new PrincipalUser(OAuth2ProviderUser);
     }
 }
