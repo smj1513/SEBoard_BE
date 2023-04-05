@@ -19,7 +19,7 @@ pipeline {
 							if(entry.value){
 								var = entry.key
 								sh "cd ${entry.key}"
-								sh "docker compose up --build"
+								sh "docker build -t maanjong/se-dev:${entry.key} ."
 								sh "cd .."
 							}	
 						}
