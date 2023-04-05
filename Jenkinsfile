@@ -32,13 +32,13 @@ pipeline {
 						stage ("${entry.key} Push"){
 							if(entry.value){
 								var = entry.key
-								withCredentials([[$class: 'UsernamePasswordMultiBinding',
-								credentialsId: 'maanjong-docker-hub',
-								usernameVariable: 'DOCKER_USER_ID',
-								passwordVariable: 'DOCKER_USER_PASSWORD'
-								]]){
-								sh "echo ${DOCKER_USER_ID} ${DOCKER_USER_PASSWORD}"
-								sh "docker login --username=${DOCKER_USER_ID} --password=${DOCKER_USER_PASSWORD}"
+// 								withCredentials([[$class: 'UsernamePasswordMultiBinding',
+// 								credentialsId: 'maanjong-docker-hub',
+// 								usernameVariable: 'DOCKER_USER_ID',
+// 								passwordVariable: 'DOCKER_USER_PASSWORD'
+// 								]]){
+// 								sh "echo ${DOCKER_USER_ID} ${DOCKER_USER_PASSWORD}"
+// 								sh "docker login --username=${DOCKER_USER_ID} --password=${DOCKER_USER_PASSWORD}"
 								sh "docker push maanjong/se-dev:${entry.key}"
 								}
 							}
