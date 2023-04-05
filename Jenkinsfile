@@ -46,5 +46,11 @@ pipeline {
 				}
 			}	
 		}
+		stage("execute") {
+            steps {
+                sh "cd seboard"
+                sh "docker compose up -d"
+            }
+        }
 	}
 }
