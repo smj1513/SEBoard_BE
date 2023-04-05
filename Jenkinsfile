@@ -53,7 +53,6 @@ pipeline {
 		}
 		stage("Execute") {
             steps {
-                sh "cd seboard"
                 sh "docker compose up -d"
             }
         }
