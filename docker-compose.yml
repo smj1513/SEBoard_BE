@@ -16,7 +16,7 @@ services:
     image: maanjong/se-dev:seboard
     container_name: seboard
     ports:
-      - "8080:8888"
+      - "8080:8080"
     networks:
       - my-network
   nginx:
