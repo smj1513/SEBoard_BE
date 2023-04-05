@@ -3,3 +3,6 @@ services:
   seboard:
     build: ./seboard
     container_name: seboard_builder
+  nginx:
+    build: ./seboard/nginx
+    container_name: nginx_contatiner
