@@ -1,8 +1,26 @@
-version: "3.0"
+version: "3"
 services:
+  postgresql:
+    image: postgres:latest
+    container_name: postgres
+    restart: always
+    ports:
+      - "5432:5432"
+    environment:
+#      POSTGRES_DB: se
+      POSTGRES_USER: "postgres"
+      POSTGRES_PASSWORD: "password"
+    networks:
+      - my-network
   seboard:
-    build: ./seboard
-    container_name: seboard_builder
+    image: maanjong/se-dev:seboard
+    container_name: seboard
+    ports:
+      - "8080:8888"
+    networks:
+      - my-network
   nginx:
-    build: ./seboard/nginx
-    container_name: nginx_contatiner
+    image: maanjong/se-dev:nginx
+    container_name: nginx
+    networks:
+      - my-network
