@@ -4,20 +4,4 @@ services:
     build: .
     image: maanjong/se-dev:seboard
     container_name: seboard
-    ports:
-      - "8888:8888"
-    networks:
-      - my-network
-#  postgresql:
-#    image: postgres:latest
-#    container_name: postgres
-#    restart: always
-#    ports:
-#      - "5432:5432"
-#    environment:
-##      POSTGRES_DB: se
-##      POSTGRES_USER: "postgres"
-#      POSTGRES_PASSWORD: "password"
-#    networks:
-#      - my-network
 

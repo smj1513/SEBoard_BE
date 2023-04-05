@@ -24,3 +24,7 @@ services:
     container_name: nginx
     networks:
       - my-network
+
+networks:
+  my-network:
+    driver: bridge
