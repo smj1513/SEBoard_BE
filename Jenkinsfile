@@ -1,5 +1,6 @@
 def component = [
 		seboard: true,
+		nginx: true
 ]
 
 pipeline {
@@ -17,7 +18,9 @@ pipeline {
 						stage ("${entry.key} Build"){
 							if(entry.value){
 								var = entry.key
-								sh "docker compose build ${var.toLowerCase()}"
+								sh "cd ${entry.key}"
+								sh "docker compose up --build"
+								sh "cd .."
 							}	
 						}
 					}
@@ -36,9 +39,8 @@ pipeline {
 								usernameVariable: 'DOCKER_USER_ID',
 								passwordVariable: 'DOCKER_USER_PASSWORD'
 								]]){
-								sh "docker tag seboard_pipeline_${var.toLowerCase()}:latest ${DOCKER_USER_ID}/seboard_pipeline_${var.toLowerCase()}:${BUILD_NUMBER}"
 								sh "docker login -u ${DOCKER_USER_ID} -p ${DOCKER_USER_PASSWORD}"
-								sh "docker push ${DOCKER_USER_ID}/seboard_pipeline_${var.toLowerCase()}:${BUILD_NUMBER}"
+								sh "docker push maanjong/se-dev:${entry.key}"
 								}
 							}
 						}
@@ -46,11 +48,12 @@ pipeline {
 				}
 			}	
 		}
-		stage("execute") {
+		stage("Execute") {
             steps {
                 sh "cd seboard"
                 sh "docker compose up -d"
             }
         }
 	}
+
 }
