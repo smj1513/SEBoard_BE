@@ -13,10 +13,7 @@ public class DelegationProviderUserConverter implements ProviderUserConverter<Pr
 
     public DelegationProviderUserConverter() {
         this.converters = List.of(new UserDetailsProviderUserConverter(),
-                new GoogleProviderUserConverter(),
-                new NaverProviderUserConverter(),
-                new KakaoProviderUserConverter(),
-                new KakaoOidcProviderUserConverter());
+                new KakaoProviderUserConverter());
     }
 
     @Override
