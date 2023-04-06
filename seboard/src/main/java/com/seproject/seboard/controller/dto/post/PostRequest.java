@@ -1,6 +1,6 @@
-package com.seproject.seboard.dto.post;
+package com.seproject.seboard.controller.dto.post;
 
-import com.seproject.seboard.dto.user.AnonymousRequest;
+import com.seproject.seboard.controller.dto.user.AnonymousRequest;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;

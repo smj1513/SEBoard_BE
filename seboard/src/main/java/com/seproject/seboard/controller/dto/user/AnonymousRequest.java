@@ -1,4 +1,4 @@
-package com.seproject.seboard.dto.user;
+package com.seproject.seboard.controller.dto.user;
 
 import lombok.Data;
 

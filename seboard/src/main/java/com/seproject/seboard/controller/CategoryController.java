@@ -1,5 +1,8 @@
 package com.seproject.seboard.controller;
 
+import com.seproject.seboard.controller.dto.post.CategoryRequest;
+import com.seproject.seboard.controller.dto.post.CategoryRequest.CreateCategoryRequest;
+import com.seproject.seboard.controller.dto.post.CategoryRequest.UpdateCategoryRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -8,8 +11,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import static com.seproject.seboard.dto.post.CategoryRequest.*;
 
 @Tag(name = "카테고리 API", description = "카테고리(category) 관련 API")
 @RestController
