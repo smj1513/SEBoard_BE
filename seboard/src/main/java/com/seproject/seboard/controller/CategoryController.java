@@ -9,8 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.seproject.seboard.dto.post.CategoryRequest.*;
-
 @Tag(name = "카테고리 API", description = "카테고리(category) 관련 API")
 @RestController
 @RequestMapping("/category")

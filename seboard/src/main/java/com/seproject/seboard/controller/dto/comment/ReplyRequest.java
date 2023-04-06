@@ -1,7 +1,7 @@
-package com.seproject.seboard.dto.comment;
+package com.seproject.seboard.controller.dto.comment;
 
-import com.seproject.seboard.dto.user.AnonymousRequest;
-import com.seproject.seboard.dto.user.TagAuthorRequest;
+import com.seproject.seboard.controller.dto.user.AnonymousRequest;
+import com.seproject.seboard.controller.dto.user.TagAuthorRequest;
 import lombok.Data;
 
 public class ReplyRequest {

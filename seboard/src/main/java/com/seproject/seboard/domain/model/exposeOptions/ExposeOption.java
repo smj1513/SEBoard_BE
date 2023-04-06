@@ -1,12 +1,14 @@
 package com.seproject.seboard.domain.model.exposeOptions;
 
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
-@NoArgsConstructor
-@AllArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @DiscriminatorColumn
 @Inheritance(strategy= InheritanceType.JOINED)
 @Entity
@@ -14,8 +16,21 @@ import javax.persistence.*;
 public abstract class ExposeOption {
 
     @Id @GeneratedValue
-    private Long id;
+    protected Long id;
 
     @Enumerated(EnumType.STRING)
-    private ExposeState exposeState;
+    protected ExposeState exposeState;
+
+    public static ExposeOption of(ExposeState state, String password){
+        switch (state){
+            case PUBLIC:
+                return new Public();
+            case KUMOH:
+                return new Kumoh();
+            case PRIVACY:
+                return new Privacy(password);
+            default:
+                throw new IllegalArgumentException("Invalid ExposeState");
+        }
+    }
 }

@@ -1,4 +1,4 @@
-package com.seproject.seboard.dto.user;
+package com.seproject.seboard.controller.dto.user;
 
 import com.seproject.seboard.domain.model.user.BoardUser;
 import com.seproject.seboard.domain.model.user.Member;

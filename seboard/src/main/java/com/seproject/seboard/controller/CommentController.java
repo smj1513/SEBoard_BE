@@ -1,6 +1,6 @@
 package com.seproject.seboard.controller;
 
-import com.seproject.seboard.dto.user.AnonymousRequest;
+import com.seproject.seboard.controller.dto.user.AnonymousRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -9,8 +9,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import static com.seproject.seboard.dto.comment.CommentRequest.*;
 
 @AllArgsConstructor
 @Tag(name = "댓글 API", description = "댓글(comments) 관련 API")

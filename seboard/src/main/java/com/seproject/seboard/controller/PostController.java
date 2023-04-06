@@ -1,12 +1,11 @@
 package com.seproject.seboard.controller;
 
-import com.seproject.seboard.dto.MessageResponse;
-import com.seproject.seboard.dto.PaginationResponse;
-import com.seproject.seboard.dto.user.AnonymousRequest;
+import com.seproject.seboard.controller.dto.MessageResponse;
+import com.seproject.seboard.controller.dto.PaginationResponse;
+import com.seproject.seboard.controller.dto.user.AnonymousRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -19,12 +18,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.awt.print.Book;
 import java.util.List;
 import java.util.NoSuchElementException;
-
-import static com.seproject.seboard.dto.post.PostRequest.*;
-import static com.seproject.seboard.dto.post.PostResponse.*;
 
 @Slf4j
 @Tag(name = "게시글 API", description = "게시글(posts) 관련 API")

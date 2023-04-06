@@ -9,8 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import static com.seproject.seboard.dto.comment.ReplyRequest.*;
-
 @Tag(name = "답글 API", description = "답글(reply) 관련 API")
 @AllArgsConstructor
 @RequestMapping("/reply")

@@ -1,9 +1,9 @@
-package com.seproject.seboard.dto.post;
+package com.seproject.seboard.controller.dto.post;
 
+import com.seproject.seboard.controller.dto.PaginationResponse;
 import com.seproject.seboard.domain.model.common.BaseTime;
 import com.seproject.seboard.domain.model.post.Post;
-import com.seproject.seboard.dto.PaginationResponse;
-import com.seproject.seboard.dto.user.UserResponse;
+import com.seproject.seboard.controller.dto.user.UserResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -11,7 +11,6 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Map;
 
 public class PostResponse {
 

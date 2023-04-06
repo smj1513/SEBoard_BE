@@ -3,6 +3,8 @@ package com.seproject.seboard.domain.model.post;
 import com.seproject.seboard.domain.model.comment.Comment;
 import com.seproject.seboard.domain.model.common.BaseTime;
 import com.seproject.seboard.domain.model.exposeOptions.ExposeOption;
+import com.seproject.seboard.domain.model.exposeOptions.ExposeState;
+import com.seproject.seboard.domain.model.exposeOptions.Public;
 import com.seproject.seboard.domain.model.user.Anonymous;
 import com.seproject.seboard.domain.model.user.BoardUser;
 import lombok.Builder;
@@ -39,7 +41,8 @@ public class Post {
     private BoardUser author;
     @OneToOne
     @JoinColumn(name = "expose_option_id")
-    private ExposeOption exposeOption;
+    @Builder.Default
+    private ExposeOption exposeOption = new Public();
     @OneToMany
     private List<Attachment> attachments;
     private int anonymousCount;
@@ -108,6 +111,10 @@ public class Post {
         this.contents = contents;
     }
 
+    public void changeExposeOption(ExposeOption exposeOption) {
+        this.exposeOption = exposeOption;
+    }
+
     public void changeCategory(Category category) {
         this.category = category;
     }
@@ -124,9 +131,4 @@ public class Post {
         return CONTENTS_MIN_SIZE < contents.length() && contents.length() <= CONTENTS_MAX_SIZE;
     }
 
-
-//
-//    public boolean isNamed() {
-//        return !author.isAnonymous();
-//    }
 }

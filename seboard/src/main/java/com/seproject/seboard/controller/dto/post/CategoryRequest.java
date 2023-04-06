@@ -1,4 +1,4 @@
-package com.seproject.seboard.dto.post;
+package com.seproject.seboard.controller.dto.post;
 
 import lombok.Data;
 
