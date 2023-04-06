@@ -2,6 +2,14 @@ package com.seproject.seboard.controller;
 
 import com.seproject.seboard.controller.dto.MessageResponse;
 import com.seproject.seboard.controller.dto.PaginationResponse;
+import com.seproject.seboard.controller.dto.post.PostRequest;
+import com.seproject.seboard.controller.dto.post.PostRequest.CreateNamedPostRequest;
+import com.seproject.seboard.controller.dto.post.PostRequest.CreateUnnamedPostRequest;
+import com.seproject.seboard.controller.dto.post.PostRequest.UpdateNamedPostRequest;
+import com.seproject.seboard.controller.dto.post.PostResponse;
+import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostListResponse;
+import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostListResponseElement;
+import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostResponse;
 import com.seproject.seboard.controller.dto.user.AnonymousRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

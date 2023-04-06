@@ -1,5 +1,9 @@
 package com.seproject.seboard.controller;
 
+import com.seproject.seboard.controller.dto.comment.CommentRequest;
+import com.seproject.seboard.controller.dto.comment.CommentRequest.CreateNamedCommentRequest;
+import com.seproject.seboard.controller.dto.comment.CommentRequest.CreateUnnamedCommentRequest;
+import com.seproject.seboard.controller.dto.comment.CommentRequest.UpdateUnnamedCommentRequest;
 import com.seproject.seboard.controller.dto.user.AnonymousRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;

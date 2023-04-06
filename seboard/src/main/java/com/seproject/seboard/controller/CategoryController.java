@@ -1,5 +1,8 @@
 package com.seproject.seboard.controller;
 
+import com.seproject.seboard.controller.dto.post.CategoryRequest;
+import com.seproject.seboard.controller.dto.post.CategoryRequest.CreateCategoryRequest;
+import com.seproject.seboard.controller.dto.post.CategoryRequest.UpdateCategoryRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
