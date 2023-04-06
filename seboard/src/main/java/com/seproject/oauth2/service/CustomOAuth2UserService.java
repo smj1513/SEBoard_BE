@@ -1,15 +1,10 @@
 package com.seproject.oauth2.service;
 
-<<<<<<< HEAD:seboard/src/main/java/com/seproject/seboard/oauth2/service/CustomOAuth2UserService.java
 import com.seproject.oauth2.converters.DelegationProviderUserConverter;
 import com.seproject.oauth2.converters.ProviderUserRequest;
-import com.seproject.seboard.oauth2.model.PrincipalUser;
-import com.seproject.seboard.oauth2.model.ProviderUser;
-import com.seproject.seboard.oauth2.repository.AccountRepository;
-=======
+import com.seproject.oauth2.model.PrincipalUser;
+import com.seproject.oauth2.model.ProviderUser;
 import com.seproject.oauth2.repository.AccountRepository;
-import com.seproject.oauth2.model.OAuth2ProviderUser;
->>>>>>> chore/mergeTask:seboard/src/main/java/com/seproject/oauth2/service/CustomOAuth2UserService.java
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
