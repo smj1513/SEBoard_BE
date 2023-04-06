@@ -1,6 +1,6 @@
-package com.seproject.seboard.oauth2.repository;
+package com.seproject.oauth2.repository;
 
-import com.seproject.seboard.oauth2.model.Account;
+import com.seproject.oauth2.model.Account;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 

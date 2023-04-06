@@ -1,7 +1,7 @@
-package com.seproject.seboard.oauth2.service;
+package com.seproject.oauth2.service;
 
-import com.seproject.seboard.oauth2.model.OAuth2ProviderUser;
-import com.seproject.seboard.oauth2.repository.AccountRepository;
+import com.seproject.oauth2.repository.AccountRepository;
+import com.seproject.oauth2.model.OAuth2ProviderUser;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserRequest;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;

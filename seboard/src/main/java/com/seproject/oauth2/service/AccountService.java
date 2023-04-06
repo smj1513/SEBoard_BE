@@ -1,17 +1,16 @@
-package com.seproject.seboard.oauth2.service;
+package com.seproject.oauth2.service;
 
-import com.seproject.seboard.oauth2.model.Account;
-import com.seproject.seboard.oauth2.model.ProviderUser;
-import com.seproject.seboard.oauth2.model.Role;
-import com.seproject.seboard.oauth2.repository.AccountRepository;
-import com.seproject.seboard.oauth2.repository.RoleRepository;
+import com.seproject.oauth2.repository.AccountRepository;
+import com.seproject.oauth2.repository.RoleRepository;
+import com.seproject.oauth2.model.Account;
+import com.seproject.oauth2.model.ProviderUser;
+import com.seproject.oauth2.model.Role;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
 @Slf4j

@@ -1,7 +1,6 @@
-package com.seproject.seboard.oauth2.model;
+package com.seproject.oauth2.model;
 
 import lombok.*;
-import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 import java.util.List;
@@ -10,7 +9,6 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-
 @Entity
 @Table(name = "accounts"
         ,uniqueConstraints = {@UniqueConstraint(name="Account's loginId is unique",columnNames="loginId")})

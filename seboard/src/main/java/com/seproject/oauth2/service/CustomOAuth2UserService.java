@@ -1,10 +1,7 @@
-package com.seproject.seboard.oauth2.service;
+package com.seproject.oauth2.service;
 
-import com.seproject.seboard.oauth2.model.OAuth2ProviderUser;
-import com.seproject.seboard.oauth2.repository.AccountRepository;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import com.seproject.oauth2.repository.AccountRepository;
+import com.seproject.oauth2.model.OAuth2ProviderUser;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;

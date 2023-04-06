@@ -1,7 +1,7 @@
-package com.seproject.seboard.oauth2.service;
+package com.seproject.oauth2.service;
 
-import com.seproject.seboard.oauth2.model.*;
-import com.seproject.seboard.oauth2.repository.AccountRepository;
+import com.seproject.oauth2.model.*;
+import com.seproject.oauth2.repository.AccountRepository;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

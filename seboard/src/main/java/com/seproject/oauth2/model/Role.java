@@ -1,4 +1,4 @@
-package com.seproject.seboard.oauth2.model;
+package com.seproject.oauth2.model;
 
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;

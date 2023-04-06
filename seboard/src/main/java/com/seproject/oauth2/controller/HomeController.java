@@ -1,4 +1,4 @@
-package com.seproject.seboard.oauth2.controller;
+package com.seproject.oauth2.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;

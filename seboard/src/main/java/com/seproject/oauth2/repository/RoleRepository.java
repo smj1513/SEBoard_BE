@@ -1,6 +1,6 @@
-package com.seproject.seboard.oauth2.repository;
+package com.seproject.oauth2.repository;
 
-import com.seproject.seboard.oauth2.model.Role;
+import com.seproject.oauth2.model.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

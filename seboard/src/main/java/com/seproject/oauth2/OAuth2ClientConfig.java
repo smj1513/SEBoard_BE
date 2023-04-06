@@ -1,9 +1,8 @@
-package com.seproject.seboard.oauth2;
+package com.seproject.oauth2;
 
-import com.seproject.seboard.oauth2.service.CustomOAuth2UserService;
-import com.seproject.seboard.oauth2.service.CustomOidcUserService;
+import com.seproject.oauth2.service.CustomOAuth2UserService;
+import com.seproject.oauth2.service.CustomOidcUserService;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
