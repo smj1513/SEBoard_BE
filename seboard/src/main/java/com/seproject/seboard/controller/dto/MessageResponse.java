@@ -9,7 +9,7 @@ import lombok.Data;
 public class MessageResponse {
     private String message;
 
-    public static MessageResponse toDTO(String message) {
+    public static MessageResponse of(String message) {
         return builder()
                 .message(message)
                 .build();
