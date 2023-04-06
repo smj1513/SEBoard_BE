@@ -1,6 +1,9 @@
 package com.seproject.seboard.controller.dto.post;
 
+import com.seproject.seboard.application.dto.post.PostCommand;
+import com.seproject.seboard.application.dto.post.PostCommand.PostWriteCommand;
 import com.seproject.seboard.controller.dto.user.AnonymousRequest;
+import com.seproject.seboard.domain.model.exposeOptions.ExposeState;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -20,13 +23,25 @@ public class PostRequest {
     }
 
     @Data
-    public static class CreateNamedPostRequest {
+    public static class CreatePostRequest {
         private String title;
         private String contents;
         private List<MultipartFile> attachment;
         private Long categoryId;
         private boolean pined;
+        private ExposeOptionRequest exposeOption;
 
+        public PostWriteCommand toCommand(Long accountId) {
+            return PostWriteCommand.builder()
+                    .title(title)
+                    .contents(getContents())
+                    .categoryId(categoryId)
+                    .pined(pined)
+                    .accountId(accountId)
+                    .exposeState(ExposeState.valueOf(exposeOption.getName()))
+                    .privatePassword(exposeOption.getPassword())
+                    .build();
+        }
     }
 
     @Data

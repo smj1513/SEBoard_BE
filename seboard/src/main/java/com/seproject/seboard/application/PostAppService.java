@@ -1,6 +1,5 @@
 package com.seproject.seboard.application;
 
-import com.seproject.seboard.application.dto.post.PostCommand;
 import com.seproject.seboard.application.dto.post.PostCommand.PostEditCommand;
 import com.seproject.seboard.application.dto.post.PostCommand.PostRemoveCommand;
 import com.seproject.seboard.application.dto.post.PostCommand.PostWriteCommand;
@@ -16,7 +15,7 @@ import com.seproject.seboard.domain.repository.post.PostRepository;
 import com.seproject.seboard.domain.repository.user.AnonymousRepository;
 import com.seproject.seboard.domain.repository.user.BoardUserRepository;
 import com.seproject.seboard.domain.repository.user.MemberRepository;
-import com.seproject.seboard.oauth2.repository.AccountRepository;
+import com.seproject.oauth2.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -36,8 +35,16 @@ public class PostAppService {
 //    private final CommentRepository commentRepository;
     private final BookmarkRepository bookmarkRepository;
 
+    public void writePost(PostWriteCommand command){
+        if(command.isAnonymous()){
+            writeUnnamedPost(command);
+        }else{
+            writeNamedPost(command);
+        }
+    }
+
     @Transactional
-    public void writeUnnamedPost(PostWriteCommand command) { //accID는 체킹되었다고 가정
+    protected void writeUnnamedPost(PostWriteCommand command) { //accID는 체킹되었다고 가정
         Category category = findByIdOrThrow(command.getCategoryId(), categoryRepository, "");
 
         Anonymous anonymous = Anonymous.builder()
@@ -61,7 +68,7 @@ public class PostAppService {
         postRepository.save(post);
     }
 
-    public void writeNamedPost(PostWriteCommand command) {
+    protected void writeNamedPost(PostWriteCommand command) {
         Member member = memberRepository.findByAccountId(command.getAccountId());
 
         if (member == null) {

@@ -1,13 +1,13 @@
-package com.seproject.seboard;
+package com.seproject;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class SeboardApplication {
+public class SeProjectApplication {
 
     public static void main(String[] args) {
-        SpringApplication.run(SeboardApplication.class, args);
+        SpringApplication.run(SeProjectApplication.class, args);
     }
 
 }

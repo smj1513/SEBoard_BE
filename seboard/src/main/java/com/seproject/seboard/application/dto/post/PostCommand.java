@@ -15,6 +15,7 @@ public class PostCommand {
         private boolean pined;
         private ExposeState exposeState;
         private String privatePassword;
+        private boolean anonymous;
     }
 
     @Data
