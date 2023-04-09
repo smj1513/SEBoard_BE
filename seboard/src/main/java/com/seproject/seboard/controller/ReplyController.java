@@ -1,5 +1,9 @@
 package com.seproject.seboard.controller;
 
+import com.seproject.seboard.controller.dto.comment.ReplyRequest;
+import com.seproject.seboard.controller.dto.comment.ReplyRequest.CreateNamedReplyRequest;
+import com.seproject.seboard.controller.dto.comment.ReplyRequest.CreateUnnamedReplyRequest;
+import com.seproject.seboard.controller.dto.comment.ReplyRequest.UpdateUnnamedReplyRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -8,8 +12,6 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import static com.seproject.seboard.dto.comment.ReplyRequest.*;
 
 @Tag(name = "답글 API", description = "답글(reply) 관련 API")
 @AllArgsConstructor

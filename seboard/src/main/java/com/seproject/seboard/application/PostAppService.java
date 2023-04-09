@@ -1,6 +1,10 @@
 package com.seproject.seboard.application;
 
+import com.seproject.seboard.application.dto.post.PostCommand.PostEditCommand;
+import com.seproject.seboard.application.dto.post.PostCommand.PostRemoveCommand;
+import com.seproject.seboard.application.dto.post.PostCommand.PostWriteCommand;
 import com.seproject.seboard.domain.model.common.BaseTime;
+import com.seproject.seboard.domain.model.exposeOptions.*;
 import com.seproject.seboard.domain.model.post.Category;
 import com.seproject.seboard.domain.model.post.Post;
 import com.seproject.seboard.domain.model.user.Anonymous;
@@ -11,7 +15,7 @@ import com.seproject.seboard.domain.repository.post.PostRepository;
 import com.seproject.seboard.domain.repository.user.AnonymousRepository;
 import com.seproject.seboard.domain.repository.user.BoardUserRepository;
 import com.seproject.seboard.domain.repository.user.MemberRepository;
-import com.seproject.seboard.oauth2.repository.AccountRepository;
+import com.seproject.oauth2.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -31,45 +35,54 @@ public class PostAppService {
 //    private final CommentRepository commentRepository;
     private final BookmarkRepository bookmarkRepository;
 
-    //
+    public void writePost(PostWriteCommand command){
+        if(command.isAnonymous()){
+            writeUnnamedPost(command);
+        }else{
+            writeNamedPost(command);
+        }
+    }
+
     @Transactional
-    public void writeUnnamedPost(String title, String contents, Long categoryId, boolean pined, Long accountId) { //accID는 체킹되었다고 가정
-        Category category = findByIdOrThrow(categoryId, categoryRepository, "");
+    protected void writeUnnamedPost(PostWriteCommand command) { //accID는 체킹되었다고 가정
+        Category category = findByIdOrThrow(command.getCategoryId(), categoryRepository, "");
 
         Anonymous anonymous = Anonymous.builder()
                 .name("익명") //TODO : 익명 이름 다양하게?
-                .accountId(accountId)
+                .accountId(command.getAccountId())
                 .build();
 
-        //TODO : expose option 로직 추가
+        //TODO : attachment 로직 추가
         Post post = Post.builder()
-                .title(title)
-                .contents(contents)
+                .title(command.getTitle())
+                .contents(command.getContents())
                 .category(category)
                 .author(anonymous)
                 .baseTime(BaseTime.now())
-                .pined(pined)
+                .pined(command.isPined())
+                //TODO : 좀더 유연하게 변경?
+                .exposeOption(ExposeOption.of(command.getExposeState(), command.getPrivatePassword()))
                 .build();
 
         anonymousRepository.save(anonymous);
         postRepository.save(post);
     }
 
-    public void writeNamedPost(String title, String contents, Long categoryId, boolean pined, Long accountId) {
-        Member member = memberRepository.findByAccountId(accountId);
+    protected void writeNamedPost(PostWriteCommand command) {
+        Member member = memberRepository.findByAccountId(command.getAccountId());
 
         if (member == null) {
             //TODO : member 생성 로직 호출
         } else {
-            Category category = findByIdOrThrow(categoryId, categoryRepository, "");
-            //TODO : expose option 로직 추가
+            Category category = findByIdOrThrow(command.getCategoryId(), categoryRepository, "");
             Post post = Post.builder()
-                    .title(title)
-                    .contents(contents)
+                    .title(command.getTitle())
+                    .contents(command.getContents())
                     .category(category)
                     .author(member)
                     .baseTime(BaseTime.now())
-                    .pined(pined)
+                    .pined(command.isPined())
+                    .exposeOption(ExposeOption.of(command.getExposeState(), command.getPrivatePassword()))
                     .build();
 
             postRepository.save(post);
@@ -105,62 +118,30 @@ public class PostAppService {
     public void findPinedPostList(Long categoryId){
     }
 
-    public void editPost(String title, String contents, Long categoryId, Long postId, boolean pined, Long accountId) {
-        Post post = findByIdOrThrow(postId, postRepository, "");
+    public void editPost(PostEditCommand command) {
+        Post post = findByIdOrThrow(command.getPostId(), postRepository, "");
 
-        if(!post.isWrittenBy(accountId)){
+        if(!post.isWrittenBy(command.getAccountId())){
             throw new IllegalArgumentException();
         }
 
-        post.changeTitle(title);
-        post.changeContents(contents);
-        post.changePin(pined);
-
-        //TODO : expose option 로직 추가
+        post.changeTitle(command.getTitle());
+        post.changeContents(command.getTitle());
+        post.changePin(command.isPined());
+        post.changeExposeOption(ExposeOption.of(command.getExposeState(), command.getPrivatePassword()));
 
         //TODO : category 권한 체킹 필요
-        Category category = findByIdOrThrow(categoryId, categoryRepository, "");
+        Category category = findByIdOrThrow(command.getCategoryId(), categoryRepository, "");
         post.changeCategory(category);
     }
 
-    public void removePost(Long postId, Long accountId){
-        Post post = findByIdOrThrow(postId, postRepository, "");
+    public void removePost(PostRemoveCommand command) {
+        Post post = findByIdOrThrow(command.getPostId(), postRepository, "");
 
-        if(!post.isWrittenBy(accountId)){ // TODO : 관리자 삭제 경우 추가해야함
+        if(!post.isWrittenBy(command.getAccountId())){ // TODO : 관리자 삭제 경우 추가해야함
             throw new IllegalArgumentException();
         }
 
-        postRepository.deleteById(postId);
+        postRepository.deleteById(command.getPostId());
     }
-
-//
-//    public void deleteNamedPost(Long postId, Long userId ) {
-//        // 권한 체크 -> 메소드 보안 체크 가능함 : AOP로 처리
-//        // 시큐리티 클라우드 적용 방법 -> 게이트웨이에 적용 가능
-//        Post targetPost = findByIdOrThrow(postId, postRepository, "");
-//        User user = findByIdOrThrow(userId, userRepository, "");
-//
-//        //작성한 게시글의 작성자가 존재하지 않는 경우 TODO : message
-//        if(!targetPost.isWrittenBy(user)) {
-//            throw new IllegalArgumentException();
-//        }
-//
-//        postRepository.deleteById(postId);
-//    }
-//
-//    public void deleteUnnamedPost(Long postId, String password) {
-//        // 권한 체크 -> 메소드 보안 체크 가능함 : AOP로 처리
-//        // 시큐리티 클라우드 적용 방법 -> 게이트웨이에 적용 가능
-//        UnnamedPost targetPost = findByIdOrThrow(postId, unnamedPostRepository, "");
-//
-//        // 비밀번호 확인
-//        if(!targetPost.checkPassword(password)) {
-//            throw new IllegalArgumentException();
-//        }
-//
-//        postRepository.deleteById(postId);
-//    }
-//
-
-
 }

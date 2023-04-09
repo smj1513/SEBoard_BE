@@ -1,12 +1,18 @@
 package com.seproject.seboard.controller;
 
-import com.seproject.seboard.dto.MessageResponse;
-import com.seproject.seboard.dto.PaginationResponse;
-import com.seproject.seboard.dto.user.AnonymousRequest;
+import com.seproject.seboard.application.PostAppService;
+import com.seproject.seboard.controller.dto.MessageResponse;
+import com.seproject.seboard.controller.dto.PaginationResponse;
+import com.seproject.seboard.controller.dto.post.PostRequest.CreatePostRequest;
+import com.seproject.seboard.controller.dto.post.PostRequest.CreateUnnamedPostRequest;
+import com.seproject.seboard.controller.dto.post.PostRequest.UpdateNamedPostRequest;
+import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostListResponse;
+import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostListResponseElement;
+import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostResponse;
+import com.seproject.seboard.controller.dto.user.AnonymousRequest;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -19,12 +25,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.awt.print.Book;
 import java.util.List;
 import java.util.NoSuchElementException;
-
-import static com.seproject.seboard.dto.post.PostRequest.*;
-import static com.seproject.seboard.dto.post.PostResponse.*;
 
 @Slf4j
 @Tag(name = "게시글 API", description = "게시글(posts) 관련 API")
@@ -32,6 +34,7 @@ import static com.seproject.seboard.dto.post.PostResponse.*;
 @RequestMapping("/posts")
 @AllArgsConstructor
 public class PostController {
+    private final PostAppService postAppService;
 
     @Parameters(
             {
@@ -85,7 +88,7 @@ public class PostController {
             RetrievePostResponse retrievePostResponse = null;
             return new ResponseEntity<>(retrievePostResponse,HttpStatus.OK);
         } catch (NoSuchElementException e) {
-            MessageResponse response = MessageResponse.toDTO(e.getMessage());
+            MessageResponse response = MessageResponse.of(e.getMessage());
             return new ResponseEntity<>(response,HttpStatus.NOT_FOUND);
         }
     }
@@ -104,7 +107,7 @@ public class PostController {
          * TODO : 존재하지 않는 postId
          *  jwt가 없거나 유효하지 않는 경우
          */
-        return new ResponseEntity<>(MessageResponse.toDTO("북마크 등록 성공"),HttpStatus.OK);
+        return new ResponseEntity<>(MessageResponse.of("북마크 등록 성공"),HttpStatus.OK);
     }
 
     @Parameter(name = "postId", description = "즐겨찾기 해제할 게시물의 pk")
@@ -121,29 +124,20 @@ public class PostController {
          * TODO : 존재하지 않는 postId
          *  jwt가 없거나 유효하지 않는 경우
          */
-        return new ResponseEntity<>(MessageResponse.toDTO("북마크 해제 성공"),HttpStatus.OK);
+        return new ResponseEntity<>(MessageResponse.of("북마크 해제 성공"),HttpStatus.OK);
     }
 
-    @Parameter(name = "request", description = "게시물 생성에 필요한 제목, 본문 , 첨부파일, 카테고리 pk, 공지사항 여부 정보")
-    @Operation(summary = "Named 게시글 작성", description = "사용자는 실명으로 게시글을 작성한다")
-    @PostMapping("/named")
-    public ResponseEntity<?> createNamedPost(@RequestBody CreateNamedPostRequest request) { //TODO : 첨부파일 필드 추가
-         String title = request.getTitle();
-         String contents = request.getContents();
-         List<MultipartFile> attachment = request.getAttachment();
-         Long categoryId = request.getCategoryId();
-         boolean pined = request.isPined();
+    @Parameter(name = "request", description = "게시물 생성에 필요한 제목, 본문, 공개여부, 익명 여부, 첨부파일, 카테고리 pk, 상단 고정 여부 정보")
+    @Operation(summary = "게시글 작성", description = "사용자는 실명으로 게시글을 작성한다")
+    @PostMapping
+    public ResponseEntity<?> createPost(@RequestBody CreatePostRequest request) { //TODO : accountId 어떻게?
+        Long accountId = null;
 
-        /**
-         * TODO : required 필드 null 체크
-         *    공지 작성 권한 처리
-         *    존재하지 않는 categoryId
-         *    제목 또는 본문이 비어있거나 길이 초과
-         */
+        postAppService.writePost(request.toCommand(accountId));
 
-        return new ResponseEntity<>(request,HttpStatus.OK);
+        //TODO : 실패시, 예외상황 추가 필요
+        return new ResponseEntity<>(MessageResponse.of("작성 성공"), HttpStatus.OK);
     }
-
 
     @Parameters(
         {
@@ -180,25 +174,6 @@ public class PostController {
          */
 
         return new ResponseEntity<>(postId,HttpStatus.OK);
-    }
-
-    @Parameter(name = "request", description = "익명 게시물 생성에 필요한 제목, 본문 , 첨부파일, 카테고리 pk, 익명 작성자 정보")
-    @Operation(summary = "Unnamed 게시글 작성", description = "사용자는 익명으로 게시물을 작성한다.")
-    @PostMapping("/unnamed")
-    public ResponseEntity<?> createUnnamedPost(@RequestBody CreateUnnamedPostRequest request) { //TODO : 첨부파일 필드 추가
-        String title = request.getTitle();
-        String contents = request.getContents();
-        List<MultipartFile> attachment = request.getAttachment();
-        Long categoryId = request.getCategoryId();
-        AnonymousRequest author = request.getAuthor();
-
-        /**
-         * TODO : required 필드 확인
-         *    존재하지 않는 categoryId
-         *    제목 또는 본문이 비어있거나 길이 초과
-         */
-
-        return new ResponseEntity<>(request,HttpStatus.OK);
     }
 
     @Parameters(
