@@ -1,12 +1,16 @@
 package com.seproject.seboard.application;
 
+import com.seproject.seboard.application.dto.comment.CommentCommand;
+import com.seproject.seboard.application.dto.comment.CommentCommand.CommentEditCommand;
 import com.seproject.seboard.application.dto.comment.CommentCommand.CommentListFindCommand;
+import com.seproject.seboard.application.dto.comment.CommentCommand.CommentWriteCommand;
 import com.seproject.seboard.controller.dto.PaginationResponse;
 import com.seproject.seboard.controller.dto.comment.CommentResponse.CommentListElement;
 import com.seproject.seboard.controller.dto.comment.CommentResponse.CommentListResponse;
 import com.seproject.seboard.controller.dto.comment.ReplyResponse;
 import com.seproject.seboard.domain.model.comment.Comment;
 import com.seproject.seboard.domain.model.comment.Reply;
+import com.seproject.seboard.domain.model.exposeOptions.ExposeOption;
 import com.seproject.seboard.domain.model.post.Post;
 import com.seproject.seboard.domain.model.user.Anonymous;
 import com.seproject.seboard.domain.model.user.Member;
@@ -37,29 +41,37 @@ public class CommentAppService {
     private final MemberRepository memberRepository;
     private final AnonymousRepository anonymousRepository;
 
-    public void writeNamedComment(Long accountId, Long postId, String contents) {
-        Post post = findByIdOrThrow(postId, postRepository, "");
-        Member member = memberRepository.findByAccountId(accountId);
+    public void writeComment(CommentWriteCommand command){
+        if(command.isAnonymous()){
+            writeUnnamedComment(command);
+        }else{
+            writeNamedComment(command);
+        }
+    }
+    protected void writeNamedComment(CommentWriteCommand command) {
+        Post post = findByIdOrThrow(command.getPostId(), postRepository, "");
+        Member member = memberRepository.findByAccountId(command.getAccountId());
 
         if (member == null) {
             //TODO : member 생성 로직 호출
         }
 
         //TODO : expose option 로직 추가
-        Comment comment = post.writeComment(contents, member);
+        Comment comment = post.writeComment(command.getContents(), member, ExposeOption.of(command.getExposeState(), command.getExposePassword()));
 
         commentRepository.save(comment);
     }
 
+
     @Transactional
-    public void writeUnnamedComment(Long accountId, Long postId, String contents) {
-        Post post = findByIdOrThrow(postId, postRepository, "");
+    protected void writeUnnamedComment(CommentWriteCommand command) {
+        Post post = findByIdOrThrow(command.getPostId(), postRepository, "");
 
         //TODO : JPQL로 변경?
-        Anonymous author = getAnonymous(accountId, postId, post);
+        Anonymous author = getAnonymous(command.getAccountId(), command.getPostId(), post);
 
         //TODO : expose option 로직 추가
-        Comment comment = post.writeComment(contents, author);
+        Comment comment = post.writeComment(command.getContents(), author, ExposeOption.of(command.getExposeState(), command.getExposePassword()));
 
         commentRepository.save(comment);
     }
@@ -123,15 +135,15 @@ public class CommentAppService {
         return CommentListResponse.toDto(commentDtoList, paginationResponse);
     }
 
-    public void editComment(String contents, Long commentId, Long accountId){
-        Comment comment = findByIdOrThrow(commentId, commentRepository, "");
+    public void editComment(CommentEditCommand command) {
+        Comment comment = findByIdOrThrow(command.getCommentId(), commentRepository, "");
 
-        if (!comment.isWrittenBy(accountId)) { //TODO : 관리자 권한의 경우 생각
+        if (!comment.isWrittenBy(command.getAccountId())) { //TODO : 관리자 권한의 경우 생각
             throw new IllegalArgumentException();
         }
 
-        //TODO : exposeOption 고려
-        comment.changeContents(contents);
+        comment.changeContents(comment.getContents());
+        comment.changeExposeOption(ExposeOption.of(command.getExposeState(), command.getExposePassword()));
     }
 
     public void removeComment(Long commentId, Long accountId) {

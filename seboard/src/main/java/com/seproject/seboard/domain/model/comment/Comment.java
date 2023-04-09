@@ -79,6 +79,10 @@ public class Comment {
         this.contents = contents;
     }
 
+    public void changeExposeOption(ExposeOption exposeOption) {
+        this.exposeOption = exposeOption;
+    }
+
     private boolean isValidateContents(String contents) {
         return CONTENTS_MIN_SIZE < contents.length() && contents.length() <= CONTENTS_MAX_SIZE;
     }
@@ -86,6 +90,7 @@ public class Comment {
     public void delete() {
         this.isDeleted = true;
     }
+
 }
 
 //    public boolean isNamed() {

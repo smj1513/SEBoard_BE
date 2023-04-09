@@ -2,7 +2,6 @@ package com.seproject.seboard.application;
 
 import com.seproject.seboard.application.dto.post.PostCommand.PostEditCommand;
 import com.seproject.seboard.application.dto.post.PostCommand.PostListFindCommand;
-import com.seproject.seboard.application.dto.post.PostCommand.PostRemoveCommand;
 import com.seproject.seboard.application.dto.post.PostCommand.PostWriteCommand;
 import com.seproject.seboard.controller.dto.PaginationResponse;
 import com.seproject.seboard.domain.model.common.BaseTime;
