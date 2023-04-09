@@ -57,12 +57,13 @@ public class Comment {
         this.exposeOption = exposeOption;
     }
 
-    public Reply writeReply(String contents, Comment taggedComment, BoardUser author) {
+    public Reply writeReply(String contents, Comment taggedComment, BoardUser author, ExposeOption exposeOption){
         return Reply.builder()
                 .contents(contents)
                 .author(author)
                 .tag(taggedComment)
                 .baseTime(BaseTime.now())
+                .exposeOption(exposeOption)
                 .superComment(this)
                 .build();
     }
@@ -79,6 +80,10 @@ public class Comment {
         this.contents = contents;
     }
 
+    public void changeExposeOption(ExposeOption exposeOption) {
+        this.exposeOption = exposeOption;
+    }
+
     private boolean isValidateContents(String contents) {
         return CONTENTS_MIN_SIZE < contents.length() && contents.length() <= CONTENTS_MAX_SIZE;
     }
@@ -86,6 +91,7 @@ public class Comment {
     public void delete() {
         this.isDeleted = true;
     }
+
 }
 
 //    public boolean isNamed() {

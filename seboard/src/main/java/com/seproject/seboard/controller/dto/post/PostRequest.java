@@ -11,6 +11,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
+import static com.seproject.seboard.application.dto.post.PostCommand.*;
+
 public class PostRequest {
 
     @Data
@@ -30,6 +32,7 @@ public class PostRequest {
         private Long categoryId;
         private boolean pined;
         private ExposeOptionRequest exposeOption;
+        private boolean isAnonymous;
 
         public PostWriteCommand toCommand(Long accountId) {
             return PostWriteCommand.builder()
@@ -40,6 +43,7 @@ public class PostRequest {
                     .accountId(accountId)
                     .exposeState(ExposeState.valueOf(exposeOption.getName()))
                     .privatePassword(exposeOption.getPassword())
+                    .anonymous(isAnonymous)
                     .build();
         }
     }
@@ -51,7 +55,20 @@ public class PostRequest {
         private List<MultipartFile> attachment;
         private Long categoryId;
         private boolean pined;
+        private ExposeOptionRequest exposeOption;
 
+        public PostEditCommand toCommand(Long postId, Long accountId) {
+            return PostEditCommand.builder()
+                    .postId(postId)
+                    .title(title)
+                    .contents(getContents())
+                    .categoryId(categoryId)
+                    .pined(pined)
+                    .accountId(accountId)
+                    .exposeState(ExposeState.valueOf(exposeOption.getName()))
+                    .privatePassword(exposeOption.getPassword())
+                    .build();
+        }
     }
 
     @Data

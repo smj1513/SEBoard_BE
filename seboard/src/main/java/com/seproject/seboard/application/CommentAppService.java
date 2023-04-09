@@ -1,11 +1,26 @@
 package com.seproject.seboard.application;
 
+import com.seproject.seboard.application.dto.comment.CommentCommand;
+import com.seproject.seboard.application.dto.comment.CommentCommand.CommentEditCommand;
+import com.seproject.seboard.application.dto.comment.CommentCommand.CommentListFindCommand;
+import com.seproject.seboard.application.dto.comment.CommentCommand.CommentWriteCommand;
+import com.seproject.seboard.application.dto.comment.ReplyCommand;
+import com.seproject.seboard.application.dto.comment.ReplyCommand.ReplyEditCommand;
+import com.seproject.seboard.application.dto.comment.ReplyCommand.ReplyWriteCommand;
+import com.seproject.seboard.controller.dto.PaginationResponse;
+import com.seproject.seboard.controller.dto.comment.CommentResponse.CommentListElement;
+import com.seproject.seboard.controller.dto.comment.CommentResponse.CommentListResponse;
+import com.seproject.seboard.controller.dto.comment.ReplyResponse;
 import com.seproject.seboard.domain.model.comment.Comment;
 import com.seproject.seboard.domain.model.comment.Reply;
+import com.seproject.seboard.domain.model.exposeOptions.ExposeOption;
 import com.seproject.seboard.domain.model.post.Post;
 import com.seproject.seboard.domain.model.user.Anonymous;
 import com.seproject.seboard.domain.model.user.Member;
+import com.seproject.seboard.domain.repository.Page;
+import com.seproject.seboard.domain.repository.PagingInfo;
 import com.seproject.seboard.domain.repository.comment.CommentRepository;
+import com.seproject.seboard.domain.repository.comment.CommentSearchRepository;
 import com.seproject.seboard.domain.repository.comment.ReplyRepository;
 import com.seproject.seboard.domain.repository.post.PostRepository;
 import com.seproject.seboard.domain.repository.user.AnonymousRepository;
@@ -14,149 +29,140 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static com.seproject.seboard.application.utils.AppServiceHelper.findByIdOrThrow;
 
 @Service
 @RequiredArgsConstructor
 public class CommentAppService {
     private final CommentRepository commentRepository;
+    private final CommentSearchRepository commentSearchRepository;
     private final ReplyRepository replyRepository;
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
     private final AnonymousRepository anonymousRepository;
 
-    public void writeNamedComment(Long accountId, Long postId, String contents) {
-        Post post = findByIdOrThrow(postId, postRepository, "");
-        Member member = memberRepository.findByAccountId(accountId);
+    public void writeComment(CommentWriteCommand command){
+        if(command.isAnonymous()){
+            writeUnnamedComment(command);
+        }else{
+            writeNamedComment(command);
+        }
+    }
+    protected void writeNamedComment(CommentWriteCommand command) {
+        Post post = findByIdOrThrow(command.getPostId(), postRepository, "");
+        Member member = memberRepository.findByAccountId(command.getAccountId());
 
         if (member == null) {
             //TODO : member 생성 로직 호출
         }
 
         //TODO : expose option 로직 추가
-        Comment comment = post.writeComment(contents, member);
+        Comment comment = post.writeComment(command.getContents(), member, ExposeOption.of(command.getExposeState(), command.getExposePassword()));
 
         commentRepository.save(comment);
     }
+
 
     @Transactional
-    public void writeUnnamedComment(Long accountId, Long postId, String contents) {
-        Post post = findByIdOrThrow(postId, postRepository, "");
+    protected void writeUnnamedComment(CommentWriteCommand command) {
+        Post post = findByIdOrThrow(command.getPostId(), postRepository, "");
 
         //TODO : JPQL로 변경?
-        Anonymous author = getAnonymous(accountId, postId, post);
+        Anonymous author = getAnonymous(command.getAccountId(), command.getPostId(), post);
 
         //TODO : expose option 로직 추가
-        Comment comment = post.writeComment(contents, author);
+        Comment comment = post.writeComment(command.getContents(), author, ExposeOption.of(command.getExposeState(), command.getExposePassword()));
 
         commentRepository.save(comment);
     }
 
+    public void writeReply(ReplyWriteCommand command){
+        if(command.isAnonymous()){
+            writeUnnamedReply(command);
+        }else{
+            writeNamedReply(command);
+        }
+    }
 
-    public void writeNamedReply(Long accountId, Long postId, Long commentId, Long taggedCommentId, String contents) {
-        Post post = findByIdOrThrow(postId, postRepository, "");
+    protected void writeNamedReply(ReplyWriteCommand command) {
+        Post post = findByIdOrThrow(command.getPostId(), postRepository, "");
 
-        Member member = memberRepository.findByAccountId(accountId);
-        Comment superComment = findByIdOrThrow(commentId, commentRepository, "");
-        Comment taggedComment = findByIdOrThrow(taggedCommentId, commentRepository, "");
+        Member member = memberRepository.findByAccountId(command.getAccountId());
+        Comment superComment = findByIdOrThrow(command.getSuperCommentId(), commentRepository, "");
+        Comment taggedComment = findByIdOrThrow(command.getTagCommentId(), commentRepository, "");
 
         if (member == null) {
             //TODO : member 생성 로직 호출
         }
 
-        //TODO : expose option 로직 추가
-        Reply reply = superComment.writeReply(contents, taggedComment, member);
+        Reply reply = superComment.writeReply(command.getContents(), taggedComment, member, ExposeOption.of(command.getExposeState(), command.getExposePassword()));
 
         commentRepository.save(reply);
     }
 
 
     @Transactional
-    public void writeUnnamedReply(Long accountId, Long postId, Long commentId, Long taggedCommentId, String contents) {
-        Post post = findByIdOrThrow(postId, postRepository, "");
-        Comment superComment = findByIdOrThrow(commentId, commentRepository, "");
-        Comment taggedComment = findByIdOrThrow(taggedCommentId, commentRepository, "");
+    protected void writeUnnamedReply(ReplyWriteCommand command) {
+        Post post = findByIdOrThrow(command.getPostId(), postRepository, "");
+        Comment superComment = findByIdOrThrow(command.getSuperCommentId(), commentRepository, "");
+        Comment taggedComment = findByIdOrThrow(command.getTagCommentId(), commentRepository, "");
 
         //TODO : JPQL로 변경?
-        Anonymous author = getAnonymous(accountId, postId, post);
+        Anonymous author = getAnonymous(command.getAccountId(), command.getPostId(), post);
 
-        //TODO : expose option 로직 추가
-        Reply reply = superComment.writeReply(contents, taggedComment, author);
+        Reply reply = superComment.writeReply(command.getContents(), taggedComment, author, ExposeOption.of(command.getExposeState(), command.getExposePassword()));
 
         replyRepository.save(reply);
     }
 
-//    // Retrieve -> Comment만
-//    //TODO : void -> 변경필요
-//    public List<CommentDTO.CommentListResponseDTO> retrieveCommentList(Long postId,Long userId){
-//        //TODO : pagination 고려
-//
-//        User requestUser = findByIdOrThrow(userId, userRepository,"");
-//
-//        //TODO : JPQL 최적화 고려,
-//        // 정렬 방법 -> superComment 생성 시간순으로 정렬 -> 자신의 생성 시간순으로 정렬
-//        // 이렇게 하면 댓글 -> 답글 , 댓글 -> 답글 순으로 정렬 가능, 방법은 JPQL 만들고 결정해야할듯
-//        List<AbstractComment> abstractComments = commentRepository.findByPostId(postId);
-//        Collections.sort(abstractComments);
-//
-//        List<CommentDTO.CommentListResponseDTO> result = new ArrayList<>();
-//
-//        for (int i = 0; i < abstractComments.size();) {
-//            AbstractComment superAbstractComment = abstractComments.get(i);
-//            List<AbstractComment> replies = new ArrayList<>();
-//            i++;
-//            for (; i < abstractComments.size(); i++) {
-//                AbstractComment reply = abstractComments.get(i);
-//                if(reply.isReply()) replies.add(reply);
-//                else break;
-//            }
-//
-//            List<ReplyDTO.ReplyResponseDTO> repliesDTO = replies.stream().map(reply -> {
-//                boolean isEditable = reply.isWrittenBy(requestUser);
-//                return ReplyDTO.ReplyResponseDTO.toDTO(reply,isEditable);
-//            }).collect(Collectors.toList());
-//            boolean isEditable = superAbstractComment.isWrittenBy(requestUser);
-//            CommentDTO.CommentListResponseDTO commentDTO = CommentDTO.CommentListResponseDTO.toDTO(superAbstractComment,isEditable,repliesDTO);
-//            result.add(commentDTO);
-//        }
-//
-//        return result;
-//
-//        /*
-//        return comments.stream().map(comment -> {
-//            boolean isEditable = comment.isWrittenBy(requestUser);
-//            List<Comment> replies = commentRepository.findRepliesBySuperCommentId(comment.getSuperComment().getCommentId());
-//            List<ReplyDTO.ReplyResponseDTO> replyResponseDTOS = replies.stream().map(reply -> {
-//                boolean isEditableReply = reply.isWrittenBy(requestUser);
-//                return ReplyDTO.ReplyResponseDTO.toDTO(reply, isEditableReply);
-//            }).collect(Collectors.toList());
-//            return CommentDTO.CommentListResponseDTO.toDTO(comment,isEditable,replyResponseDTOS);
-//        }).collect(Collectors.toList());
-//        */
-//    }
-//
-//    public void changeContentsOfNamed(Long commentId, Long userId, String contents){
-//        AbstractComment abstractComment = findByIdOrThrow(commentId,commentRepository,"");
-//        User requestUser = findByIdOrThrow(userId, userRepository,"");
-//
-//        if(abstractComment.isNamed() && abstractComment.isWrittenBy(requestUser)) {
-//            abstractComment.change(contents);
-//            return;
-//        }
-//        //작성자가 다른 경우, 또는 익명 게시글이 선택된 경우
-//        throw new IllegalArgumentException();
-//    }
-//
+    public CommentListResponse retrieveCommentList(CommentListFindCommand command) {
+        Page<Comment> commentPage = commentSearchRepository.findCommentByPostId(command.getPostId(), new PagingInfo(command.getPage(), command.getPerPage()));
 
-    public void editComment(String contents, Long commentId, Long accountId){
-        Comment comment = findByIdOrThrow(commentId, commentRepository, "");
+        List<CommentListElement> commentDtoList = commentPage.getData().stream()
+                .map(comment -> {
+                            List<ReplyResponse> subComments = commentSearchRepository.findReplyByCommentId(comment.getCommentId())
+                                    .stream()
+                                    .map(
+                                            reply -> ReplyResponse.toDto(reply, reply.isWrittenBy(command.getAccountId()))
+                                    ).collect(Collectors.toList());
 
-        if (!comment.isWrittenBy(accountId)) { //TODO : 관리자 권한의 경우 생각
+                    return CommentListElement.toDto(comment, comment.isWrittenBy(command.getAccountId()), subComments);
+                })
+                .collect(Collectors.toList());
+
+        PaginationResponse paginationResponse = PaginationResponse.builder()
+                .currentPage(commentPage.getCurPage())
+                .contentSize(commentPage.getTotalSize())
+                .perPage(commentPage.getPerPage())
+                .lastPage(commentPage.getLastPage())
+                .build();
+
+        return CommentListResponse.toDto(commentDtoList, paginationResponse);
+    }
+
+    public void editComment(CommentEditCommand command) {
+        Comment comment = findByIdOrThrow(command.getCommentId(), commentRepository, "");
+
+        if (!comment.isWrittenBy(command.getAccountId())) { //TODO : 관리자 권한의 경우 생각
             throw new IllegalArgumentException();
         }
 
-        //TODO : exposeOption 고려
-        comment.changeContents(contents);
+        comment.changeContents(comment.getContents());
+        comment.changeExposeOption(ExposeOption.of(command.getExposeState(), command.getExposePassword()));
+    }
+
+    public void editReply(ReplyEditCommand command) {
+        Reply reply = findByIdOrThrow(command.getReplyId(), replyRepository, "");
+
+        if (!reply.isWrittenBy(command.getAccountId())) { //TODO : 관리자 권한의 경우 생각
+            throw new IllegalArgumentException();
+        }
+
+        reply.changeContents(command.getContents());
+        reply.changeExposeOption(ExposeOption.of(command.getExposeState(), command.getExposePassword()));
     }
 
     public void removeComment(Long commentId, Long accountId) {

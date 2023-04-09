@@ -33,8 +33,9 @@ public class PostCommand {
 
     @Data
     @Builder
-    public static class PostRemoveCommand{
-        private Long postId;
-        private Long accountId;
+    public static class PostListFindCommand {
+        private Long categoryId;
+        private int page;
+        private int size;
     }
 }

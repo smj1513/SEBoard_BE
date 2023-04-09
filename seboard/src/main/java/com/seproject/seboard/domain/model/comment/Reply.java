@@ -2,6 +2,7 @@ package com.seproject.seboard.domain.model.comment;
 
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
@@ -9,6 +10,7 @@ import javax.persistence.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
 @Entity
 @Table(name = "replies")
 @SuperBuilder

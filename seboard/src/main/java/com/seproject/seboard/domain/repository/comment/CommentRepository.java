@@ -12,7 +12,7 @@ import java.util.List;
 public interface CommentRepository extends JpaRepository<Comment,Long> {
 
     @Query("select count(comment) from Comment comment where comment.post.postId = :postId")
-    int getCommentSizeByPostId(Long postId);
+    int countCommentsByPostId(Long postId);
 
     @Query("select comment from Comment comment where comment.post.postId = :postId")
     List<Comment> findByPostId(@Param("postId") Long postId);

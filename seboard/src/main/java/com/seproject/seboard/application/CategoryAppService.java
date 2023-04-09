@@ -3,6 +3,7 @@ package com.seproject.seboard.application;
 import com.seproject.seboard.domain.model.post.Category;
 import com.seproject.seboard.domain.repository.post.CategoryRepository;
 import com.seproject.seboard.domain.repository.post.PostRepository;
+import com.seproject.seboard.domain.repository.post.PostSearchRepository;
 import com.seproject.seboard.domain.service.CategoryService;
 import com.seproject.oauth2.model.Account;
 import com.seproject.oauth2.repository.AccountRepository;
@@ -18,6 +19,7 @@ public class CategoryAppService {
     private final CategoryRepository categoryRepository;
     private final AccountRepository accountRepository;
     private final PostRepository postRepository;
+    private final PostSearchRepository postSearchRepository;
 
     public void createCategory(Long superCategoryId, Long accountId, String name){
         Account requestAccount = findByIdOrThrow(accountId, accountRepository, "");
