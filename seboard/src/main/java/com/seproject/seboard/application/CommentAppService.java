@@ -4,6 +4,9 @@ import com.seproject.seboard.application.dto.comment.CommentCommand;
 import com.seproject.seboard.application.dto.comment.CommentCommand.CommentEditCommand;
 import com.seproject.seboard.application.dto.comment.CommentCommand.CommentListFindCommand;
 import com.seproject.seboard.application.dto.comment.CommentCommand.CommentWriteCommand;
+import com.seproject.seboard.application.dto.comment.ReplyCommand;
+import com.seproject.seboard.application.dto.comment.ReplyCommand.ReplyEditCommand;
+import com.seproject.seboard.application.dto.comment.ReplyCommand.ReplyWriteCommand;
 import com.seproject.seboard.controller.dto.PaginationResponse;
 import com.seproject.seboard.controller.dto.comment.CommentResponse.CommentListElement;
 import com.seproject.seboard.controller.dto.comment.CommentResponse.CommentListResponse;
@@ -76,36 +79,41 @@ public class CommentAppService {
         commentRepository.save(comment);
     }
 
+    public void writeReply(ReplyWriteCommand command){
+        if(command.isAnonymous()){
+            writeUnnamedReply(command);
+        }else{
+            writeNamedReply(command);
+        }
+    }
 
-    public void writeNamedReply(Long accountId, Long postId, Long commentId, Long taggedCommentId, String contents) {
-        Post post = findByIdOrThrow(postId, postRepository, "");
+    protected void writeNamedReply(ReplyWriteCommand command) {
+        Post post = findByIdOrThrow(command.getPostId(), postRepository, "");
 
-        Member member = memberRepository.findByAccountId(accountId);
-        Comment superComment = findByIdOrThrow(commentId, commentRepository, "");
-        Comment taggedComment = findByIdOrThrow(taggedCommentId, commentRepository, "");
+        Member member = memberRepository.findByAccountId(command.getAccountId());
+        Comment superComment = findByIdOrThrow(command.getSuperCommentId(), commentRepository, "");
+        Comment taggedComment = findByIdOrThrow(command.getTagCommentId(), commentRepository, "");
 
         if (member == null) {
             //TODO : member 생성 로직 호출
         }
 
-        //TODO : expose option 로직 추가
-        Reply reply = superComment.writeReply(contents, taggedComment, member);
+        Reply reply = superComment.writeReply(command.getContents(), taggedComment, member, ExposeOption.of(command.getExposeState(), command.getExposePassword()));
 
         commentRepository.save(reply);
     }
 
 
     @Transactional
-    public void writeUnnamedReply(Long accountId, Long postId, Long commentId, Long taggedCommentId, String contents) {
-        Post post = findByIdOrThrow(postId, postRepository, "");
-        Comment superComment = findByIdOrThrow(commentId, commentRepository, "");
-        Comment taggedComment = findByIdOrThrow(taggedCommentId, commentRepository, "");
+    protected void writeUnnamedReply(ReplyWriteCommand command) {
+        Post post = findByIdOrThrow(command.getPostId(), postRepository, "");
+        Comment superComment = findByIdOrThrow(command.getSuperCommentId(), commentRepository, "");
+        Comment taggedComment = findByIdOrThrow(command.getTagCommentId(), commentRepository, "");
 
         //TODO : JPQL로 변경?
-        Anonymous author = getAnonymous(accountId, postId, post);
+        Anonymous author = getAnonymous(command.getAccountId(), command.getPostId(), post);
 
-        //TODO : expose option 로직 추가
-        Reply reply = superComment.writeReply(contents, taggedComment, author);
+        Reply reply = superComment.writeReply(command.getContents(), taggedComment, author, ExposeOption.of(command.getExposeState(), command.getExposePassword()));
 
         replyRepository.save(reply);
     }
@@ -144,6 +152,17 @@ public class CommentAppService {
 
         comment.changeContents(comment.getContents());
         comment.changeExposeOption(ExposeOption.of(command.getExposeState(), command.getExposePassword()));
+    }
+
+    public void editReply(ReplyEditCommand command) {
+        Reply reply = findByIdOrThrow(command.getReplyId(), replyRepository, "");
+
+        if (!reply.isWrittenBy(command.getAccountId())) { //TODO : 관리자 권한의 경우 생각
+            throw new IllegalArgumentException();
+        }
+
+        reply.changeContents(command.getContents());
+        reply.changeExposeOption(ExposeOption.of(command.getExposeState(), command.getExposePassword()));
     }
 
     public void removeComment(Long commentId, Long accountId) {

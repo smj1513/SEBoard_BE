@@ -57,12 +57,13 @@ public class Comment {
         this.exposeOption = exposeOption;
     }
 
-    public Reply writeReply(String contents, Comment taggedComment, BoardUser author) {
+    public Reply writeReply(String contents, Comment taggedComment, BoardUser author, ExposeOption exposeOption){
         return Reply.builder()
                 .contents(contents)
                 .author(author)
                 .tag(taggedComment)
                 .baseTime(BaseTime.now())
+                .exposeOption(exposeOption)
                 .superComment(this)
                 .build();
     }
