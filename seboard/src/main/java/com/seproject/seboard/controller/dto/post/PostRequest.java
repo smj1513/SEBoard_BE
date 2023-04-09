@@ -30,6 +30,7 @@ public class PostRequest {
         private Long categoryId;
         private boolean pined;
         private ExposeOptionRequest exposeOption;
+        private boolean isAnonymous;
 
         public PostWriteCommand toCommand(Long accountId) {
             return PostWriteCommand.builder()
@@ -40,6 +41,7 @@ public class PostRequest {
                     .accountId(accountId)
                     .exposeState(ExposeState.valueOf(exposeOption.getName()))
                     .privatePassword(exposeOption.getPassword())
+                    .anonymous(isAnonymous)
                     .build();
         }
     }
