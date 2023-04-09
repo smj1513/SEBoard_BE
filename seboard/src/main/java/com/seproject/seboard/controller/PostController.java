@@ -1,6 +1,8 @@
 package com.seproject.seboard.controller;
 
+import com.seproject.seboard.application.CommentAppService;
 import com.seproject.seboard.application.PostAppService;
+import com.seproject.seboard.application.dto.comment.CommentCommand;
 import com.seproject.seboard.application.dto.post.PostCommand.PostListFindCommand;
 import com.seproject.seboard.controller.dto.MessageResponse;
 import com.seproject.seboard.controller.dto.post.PostRequest.CreatePostRequest;
@@ -28,6 +30,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import static com.seproject.seboard.application.dto.comment.CommentCommand.*;
 import static com.seproject.seboard.controller.dto.post.PostResponse.*;
 
 @Slf4j
@@ -37,6 +40,7 @@ import static com.seproject.seboard.controller.dto.post.PostResponse.*;
 @AllArgsConstructor
 public class PostController {
     private final PostAppService postAppService;
+    private final CommentAppService commentAppService;
 
     @Parameters(
             {
@@ -255,7 +259,7 @@ public class PostController {
     @Parameters(
             {
                     @Parameter(name = "postId", description = "댓글 조회할 게시물 pk"),
-                    @Parameter(name = "pageNum", description = "페이지 번호"),
+                    @Parameter(name = "page", description = "페이지 번호"),
                     @Parameter(name = "perPage", description = "페이지 당 댓글 개수")
             }
     )
@@ -263,9 +267,19 @@ public class PostController {
     @GetMapping("/{postId}/comments")
     public ResponseEntity<?> retrievePostComments(
             @PathVariable Long postId,
-            @RequestParam Integer pageNum,
-            @RequestParam Integer perPage) {
+            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "25") Integer perPage) {
 
+        Long accountId = 1L; //TODO : jwt에서 추출
+
+        commentAppService.retrieveCommentList(
+                CommentCommand.CommentListFindCommand.builder()
+                        .postId(postId)
+                        .page(page)
+                        .perPage(perPage)
+                        .accountId(accountId)
+                        .build()
+        );
 
         return new ResponseEntity<>(postId, HttpStatus.OK);
     }

@@ -1,11 +1,19 @@
 package com.seproject.seboard.application;
 
+import com.seproject.seboard.application.dto.comment.CommentCommand.CommentListFindCommand;
+import com.seproject.seboard.controller.dto.PaginationResponse;
+import com.seproject.seboard.controller.dto.comment.CommentResponse.CommentListElement;
+import com.seproject.seboard.controller.dto.comment.CommentResponse.CommentListResponse;
+import com.seproject.seboard.controller.dto.comment.ReplyResponse;
 import com.seproject.seboard.domain.model.comment.Comment;
 import com.seproject.seboard.domain.model.comment.Reply;
 import com.seproject.seboard.domain.model.post.Post;
 import com.seproject.seboard.domain.model.user.Anonymous;
 import com.seproject.seboard.domain.model.user.Member;
+import com.seproject.seboard.domain.repository.Page;
+import com.seproject.seboard.domain.repository.PagingInfo;
 import com.seproject.seboard.domain.repository.comment.CommentRepository;
+import com.seproject.seboard.domain.repository.comment.CommentSearchRepository;
 import com.seproject.seboard.domain.repository.comment.ReplyRepository;
 import com.seproject.seboard.domain.repository.post.PostRepository;
 import com.seproject.seboard.domain.repository.user.AnonymousRepository;
@@ -14,12 +22,16 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static com.seproject.seboard.application.utils.AppServiceHelper.findByIdOrThrow;
 
 @Service
 @RequiredArgsConstructor
 public class CommentAppService {
     private final CommentRepository commentRepository;
+    private final CommentSearchRepository commentSearchRepository;
     private final ReplyRepository replyRepository;
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
@@ -86,67 +98,30 @@ public class CommentAppService {
         replyRepository.save(reply);
     }
 
-//    // Retrieve -> Comment만
-//    //TODO : void -> 변경필요
-//    public List<CommentDTO.CommentListResponseDTO> retrieveCommentList(Long postId,Long userId){
-//        //TODO : pagination 고려
-//
-//        User requestUser = findByIdOrThrow(userId, userRepository,"");
-//
-//        //TODO : JPQL 최적화 고려,
-//        // 정렬 방법 -> superComment 생성 시간순으로 정렬 -> 자신의 생성 시간순으로 정렬
-//        // 이렇게 하면 댓글 -> 답글 , 댓글 -> 답글 순으로 정렬 가능, 방법은 JPQL 만들고 결정해야할듯
-//        List<AbstractComment> abstractComments = commentRepository.findByPostId(postId);
-//        Collections.sort(abstractComments);
-//
-//        List<CommentDTO.CommentListResponseDTO> result = new ArrayList<>();
-//
-//        for (int i = 0; i < abstractComments.size();) {
-//            AbstractComment superAbstractComment = abstractComments.get(i);
-//            List<AbstractComment> replies = new ArrayList<>();
-//            i++;
-//            for (; i < abstractComments.size(); i++) {
-//                AbstractComment reply = abstractComments.get(i);
-//                if(reply.isReply()) replies.add(reply);
-//                else break;
-//            }
-//
-//            List<ReplyDTO.ReplyResponseDTO> repliesDTO = replies.stream().map(reply -> {
-//                boolean isEditable = reply.isWrittenBy(requestUser);
-//                return ReplyDTO.ReplyResponseDTO.toDTO(reply,isEditable);
-//            }).collect(Collectors.toList());
-//            boolean isEditable = superAbstractComment.isWrittenBy(requestUser);
-//            CommentDTO.CommentListResponseDTO commentDTO = CommentDTO.CommentListResponseDTO.toDTO(superAbstractComment,isEditable,repliesDTO);
-//            result.add(commentDTO);
-//        }
-//
-//        return result;
-//
-//        /*
-//        return comments.stream().map(comment -> {
-//            boolean isEditable = comment.isWrittenBy(requestUser);
-//            List<Comment> replies = commentRepository.findRepliesBySuperCommentId(comment.getSuperComment().getCommentId());
-//            List<ReplyDTO.ReplyResponseDTO> replyResponseDTOS = replies.stream().map(reply -> {
-//                boolean isEditableReply = reply.isWrittenBy(requestUser);
-//                return ReplyDTO.ReplyResponseDTO.toDTO(reply, isEditableReply);
-//            }).collect(Collectors.toList());
-//            return CommentDTO.CommentListResponseDTO.toDTO(comment,isEditable,replyResponseDTOS);
-//        }).collect(Collectors.toList());
-//        */
-//    }
-//
-//    public void changeContentsOfNamed(Long commentId, Long userId, String contents){
-//        AbstractComment abstractComment = findByIdOrThrow(commentId,commentRepository,"");
-//        User requestUser = findByIdOrThrow(userId, userRepository,"");
-//
-//        if(abstractComment.isNamed() && abstractComment.isWrittenBy(requestUser)) {
-//            abstractComment.change(contents);
-//            return;
-//        }
-//        //작성자가 다른 경우, 또는 익명 게시글이 선택된 경우
-//        throw new IllegalArgumentException();
-//    }
-//
+    public CommentListResponse retrieveCommentList(CommentListFindCommand command) {
+        Page<Comment> commentPage = commentSearchRepository.findCommentByPostId(command.getPostId(), new PagingInfo(command.getPage(), command.getPerPage()));
+
+        List<CommentListElement> commentDtoList = commentPage.getData().stream()
+                .map(comment -> {
+                            List<ReplyResponse> subComments = commentSearchRepository.findReplyByCommentId(comment.getCommentId())
+                                    .stream()
+                                    .map(
+                                            reply -> ReplyResponse.toDto(reply, reply.isWrittenBy(command.getAccountId()))
+                                    ).collect(Collectors.toList());
+
+                    return CommentListElement.toDto(comment, comment.isWrittenBy(command.getAccountId()), subComments);
+                })
+                .collect(Collectors.toList());
+
+        PaginationResponse paginationResponse = PaginationResponse.builder()
+                .currentPage(commentPage.getCurPage())
+                .contentSize(commentPage.getTotalSize())
+                .perPage(commentPage.getPerPage())
+                .lastPage(commentPage.getLastPage())
+                .build();
+
+        return CommentListResponse.toDto(commentDtoList, paginationResponse);
+    }
 
     public void editComment(String contents, Long commentId, Long accountId){
         Comment comment = findByIdOrThrow(commentId, commentRepository, "");
