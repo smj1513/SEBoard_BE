@@ -37,4 +37,12 @@ public class PostCommand {
         private Long postId;
         private Long accountId;
     }
+
+    @Data
+    @Builder
+    public static class PostListFindCommand {
+        private Long categoryId;
+        private int page;
+        private int size;
+    }
 }

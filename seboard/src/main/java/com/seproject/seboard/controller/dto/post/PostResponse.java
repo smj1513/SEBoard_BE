@@ -50,11 +50,25 @@ public class PostResponse {
 
     @Data
     @Builder(access = AccessLevel.PRIVATE)
+    public static class RetrievePinedPostListResponse{
+        private RetrievePostListResponse pined;
+        private RetrievePostListResponse normal;
+
+        public static RetrievePinedPostListResponse toDTO(RetrievePostListResponse pined, RetrievePostListResponse normal){
+            return builder()
+                    .pined(pined)
+                    .normal(normal)
+                    .build();
+        }
+    }
+
+    @Data
+    @Builder(access = AccessLevel.PRIVATE)
     public static class RetrievePostListResponse {
         private PaginationResponse paginationInfo;
         private List<RetrievePostListResponseElement> posts;
 
-        public static RetrievePostListResponse toDTO(List<RetrievePostListResponseElement> posts,PaginationResponse paginationInfo) {
+        public static RetrievePostListResponse toDTO(List<RetrievePostListResponseElement> posts, PaginationResponse paginationInfo) {
 
             return builder()
                     .paginationInfo(paginationInfo)
@@ -74,15 +88,12 @@ public class PostResponse {
         private Integer views;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
-        @Schema(description = "첨부파일을 가진 게시물인지")
-        private boolean hasAttachment;
-        @Schema(description = "댓글 개수")
-        private Integer commentSize;
-        @Schema(description = "공지설정 여부")
-        private boolean pined;
+        private boolean isEditable;
+        private boolean isBookmarked;
+        //TODO : attachment
 
 
-        public static RetrievePostResponse toDTO(Post post,int commentSize) {
+        public static RetrievePostResponse toDTO(Post post, boolean isEditable, boolean isBookmarked) {
             CategoryResponse categoryResponse = CategoryResponse.toDTO(post.getCategory());
             UserResponse user = UserResponse.toDTO(post.getAuthor());
             BaseTime baseTime = post.getBaseTime();
@@ -94,9 +105,8 @@ public class PostResponse {
                     .views(post.getViews())
                     .createdAt(baseTime.getCreatedAt())
                     .modifiedAt(baseTime.getModifiedAt())
-                    .hasAttachment(post.getAttachments() != null)
-                    .commentSize(commentSize)
-                    .pined(post.isPined())
+                    .isEditable(isEditable)
+                    .isBookmarked(isBookmarked)
                     .build();
         }
 

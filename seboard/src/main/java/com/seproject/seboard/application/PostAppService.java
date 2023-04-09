@@ -1,17 +1,23 @@
 package com.seproject.seboard.application;
 
 import com.seproject.seboard.application.dto.post.PostCommand.PostEditCommand;
+import com.seproject.seboard.application.dto.post.PostCommand.PostListFindCommand;
 import com.seproject.seboard.application.dto.post.PostCommand.PostRemoveCommand;
 import com.seproject.seboard.application.dto.post.PostCommand.PostWriteCommand;
+import com.seproject.seboard.controller.dto.PaginationResponse;
 import com.seproject.seboard.domain.model.common.BaseTime;
 import com.seproject.seboard.domain.model.exposeOptions.*;
 import com.seproject.seboard.domain.model.post.Category;
 import com.seproject.seboard.domain.model.post.Post;
 import com.seproject.seboard.domain.model.user.Anonymous;
 import com.seproject.seboard.domain.model.user.Member;
+import com.seproject.seboard.domain.repository.Page;
+import com.seproject.seboard.domain.repository.PagingInfo;
+import com.seproject.seboard.domain.repository.comment.CommentRepository;
 import com.seproject.seboard.domain.repository.post.BookmarkRepository;
 import com.seproject.seboard.domain.repository.post.CategoryRepository;
 import com.seproject.seboard.domain.repository.post.PostRepository;
+import com.seproject.seboard.domain.repository.post.PostSearchRepository;
 import com.seproject.seboard.domain.repository.user.AnonymousRepository;
 import com.seproject.seboard.domain.repository.user.BoardUserRepository;
 import com.seproject.seboard.domain.repository.user.MemberRepository;
@@ -20,19 +26,24 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 import static com.seproject.seboard.application.utils.AppServiceHelper.*;
+import static com.seproject.seboard.controller.dto.post.PostResponse.*;
 
 @Service
 @RequiredArgsConstructor
 public class PostAppService {
     private final PostRepository postRepository;
+    private final PostSearchRepository postSearchRepository;
     private final BoardUserRepository boardUserRepository;
     private final CategoryRepository categoryRepository;
     private final AnonymousRepository anonymousRepository;
     private final MemberRepository memberRepository;
     private final AccountRepository accountRepository;
 
-//    private final CommentRepository commentRepository;
+    private final CommentRepository commentRepository;
     private final BookmarkRepository bookmarkRepository;
 
     public void writePost(PostWriteCommand command){
@@ -89,33 +100,48 @@ public class PostAppService {
         }
     }
 
-//    public PostDTO.PostResponseDTO findPost(Long postId, Long accountId){
-//        Post post = findByIdOrThrow(postId, postRepository, "");
-//        //TODO : member없을 때 로직 추가 필요
-//        Member member = memberRepository.findByAccountId(accountId);
-//
-//        boolean isEditable = false;
-//        boolean bookmarked = bookmarkRepository.existsByPostIdAndMemberId(postId, member.getBoardUserId());
-//
-//        if(post.isWrittenBy(accountId)){ //TODO : 권한 있을때 경우 추가
-//            isEditable = true;
-//        }
-//
-//        //TODO : 반환 객체 변경필요하지 않나?
-//
-//        return PostDTO.PostResponseDTO.toDTO(targetPost,isEditable,bookmarked);
-//    }
+    public RetrievePostResponse findPost(Long postId, Long accountId){
+        Post post = findByIdOrThrow(postId, postRepository, ""); //TODO : postSearchRepository로 변경?
+        //TODO : member없을 때 로직 추가 필요
+        //TODO : 관리자 권한일 때 editable 로직 추가필요
+        boolean isEditable = false;
+        boolean isBookmarked = false;
 
-    public void findPostList(Long categoryId, int page, int size){
-//        //TODO : paging 인자, Repository 분리?
-//        //TODO : 추후 JPQL써서 개선, categoryId 별로 정리
-//        return postRepository.findAll().stream().map(post -> {
-//            int commentSize = commentRepository.getCommentSizeByPostId(post.getPostId());
-//            return PostDTO.PostListResponseDTO.toDTO(post,commentSize);
-//        }).collect(Collectors.toList());
+        if(accountId!=null){
+            Member member = memberRepository.findByAccountId(accountId);
+
+            isEditable = post.isWrittenBy(accountId);
+            isBookmarked = bookmarkRepository.existsByPostIdAndMemberId(postId, member.getBoardUserId());
+        }
+
+        return RetrievePostResponse.toDTO(post, isEditable, isBookmarked);
     }
 
-    public void findPinedPostList(Long categoryId){
+    //TODO : paging 처리해야함
+    public RetrievePostListResponse findPostList(PostListFindCommand command, boolean pinedOption){
+        Page<Post> postPage = null;
+
+        if(pinedOption){
+            postPage = postSearchRepository.findPinedPostByCategoryId(command.getCategoryId(), new PagingInfo(command.getPage(), command.getSize()));
+        }else{
+            postPage = postSearchRepository.findByCategoryId(command.getCategoryId(), new PagingInfo(command.getPage(), command.getSize()));
+        }
+
+        List<RetrievePostListResponseElement> postDtoList = postPage.getData()
+            .stream()
+            .map(post -> {
+                int commentSize = commentRepository.countCommentsByPostId(post.getPostId());
+                return RetrievePostListResponseElement.toDTO(post, commentSize);
+            }).collect(Collectors.toList());
+
+        PaginationResponse paginationResponse = PaginationResponse.builder()
+                .currentPage(postPage.getCurPage())
+                .contentSize(postPage.getTotalSize())
+                .perPage(postPage.getPerPage())
+                .lastPage(postPage.getLastPage())
+                .build();
+
+        return RetrievePostListResponse.toDTO(postDtoList, paginationResponse);
     }
 
     public void editPost(PostEditCommand command) {
