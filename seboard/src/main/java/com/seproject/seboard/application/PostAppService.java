@@ -161,13 +161,13 @@ public class PostAppService {
         post.changeCategory(category);
     }
 
-    public void removePost(PostRemoveCommand command) {
-        Post post = findByIdOrThrow(command.getPostId(), postRepository, "");
+    public void removePost(Long postId, Long accountId) {
+        Post post = findByIdOrThrow(postId, postRepository, "");
 
-        if(!post.isWrittenBy(command.getAccountId())){ // TODO : 관리자 삭제 경우 추가해야함
+        if(!post.isWrittenBy(accountId)){ // TODO : 관리자 삭제 경우 추가해야함
             throw new IllegalArgumentException();
         }
 
-        postRepository.deleteById(command.getPostId());
+        postRepository.deleteById(postId);
     }
 }

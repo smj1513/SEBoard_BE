@@ -3,6 +3,7 @@ package com.seproject.seboard.controller;
 import com.seproject.seboard.application.CommentAppService;
 import com.seproject.seboard.application.PostAppService;
 import com.seproject.seboard.application.dto.comment.CommentCommand;
+import com.seproject.seboard.application.dto.post.PostCommand;
 import com.seproject.seboard.application.dto.post.PostCommand.PostListFindCommand;
 import com.seproject.seboard.controller.dto.MessageResponse;
 import com.seproject.seboard.controller.dto.post.PostRequest.CreatePostRequest;
@@ -127,6 +128,57 @@ public class PostController {
         }
     }
 
+    @Parameter(name = "request", description = "게시물 생성에 필요한 제목, 본문, 공개여부, 익명 여부, 첨부파일, 카테고리 pk, 상단 고정 여부 정보")
+    @Operation(summary = "게시글 작성", description = "사용자는 실명으로 게시글을 작성한다")
+    @PostMapping
+    public ResponseEntity<?> createPost(@RequestBody CreatePostRequest request) { //TODO : accountId 어떻게?
+        Long accountId = null;
+
+        postAppService.writePost(request.toCommand(accountId));
+
+        //TODO : 실패시, 예외상황 추가 필요
+        return new ResponseEntity<>(MessageResponse.of("작성 성공"), HttpStatus.OK);
+    }
+
+    @Parameters(
+            {
+                    @Parameter(name = "postId", description = "수정할 게시글 pk"),
+                    @Parameter(name = "request", description = "게시물 수정에 필요한 제목, 본문 , 첨부파일, 카테고리 pk, 공지사항 여부 정보")
+            }
+    )
+    @Operation(summary = "게시글 수정", description = "사용자는 본인이 실명으로 작성한 게시물을 수정한다")
+    @PutMapping("/{postId}")
+    public ResponseEntity<?> updatePost(@PathVariable Long postId, @RequestBody UpdateNamedPostRequest request) { //TODO : 첨부파일 필드 추가
+        Long accountId = 1L; //TODO : accountId 어떻게?
+
+        /**
+         * TODO : required 필드 null 체크
+         *    권한 처리
+         *    존재하지 않는 categoryId
+         *    제목 또는 본문이 비어있거나 길이 초과
+         */
+        postAppService.editPost(
+                request.toCommand(postId, accountId)
+        );
+
+        return new ResponseEntity<>(MessageResponse.of(""), HttpStatus.OK);
+    }
+
+    @Parameter(name = "postId", description = "삭제할 게시글의 pk")
+    @Operation(summary = "게시글 삭제", description = "사용자는 본인이 실명으로 작성한 게시물을 삭제한다")
+    @DeleteMapping("/named/{postId}")
+    public ResponseEntity<?> deletePost(@PathVariable Long postId) {
+        /**
+         * TODO : jwt 확인
+         *    권한 처리
+         */
+        Long accountId = 1L; //TODO : accountId 어떻게?
+
+        postAppService.removePost(postId, accountId);
+
+        return new ResponseEntity<>(MessageResponse.of(""), HttpStatus.OK);
+    }
+
     @Parameter(name = "postId", description = "즐겨찾기 지정할 게시물의 pk")
     @Operation(summary = "게시글 북마크 지정", description = "사용자가 게시글을 즐겨찾기로 등록한다")
     @ApiResponses({
@@ -159,101 +211,6 @@ public class PostController {
          *  jwt가 없거나 유효하지 않는 경우
          */
         return new ResponseEntity<>(MessageResponse.of("북마크 해제 성공"), HttpStatus.OK);
-    }
-
-    @Parameter(name = "request", description = "게시물 생성에 필요한 제목, 본문, 공개여부, 익명 여부, 첨부파일, 카테고리 pk, 상단 고정 여부 정보")
-    @Operation(summary = "게시글 작성", description = "사용자는 실명으로 게시글을 작성한다")
-    @PostMapping
-    public ResponseEntity<?> createPost(@RequestBody CreatePostRequest request) { //TODO : accountId 어떻게?
-        Long accountId = null;
-
-        postAppService.writePost(request.toCommand(accountId));
-
-        //TODO : 실패시, 예외상황 추가 필요
-        return new ResponseEntity<>(MessageResponse.of("작성 성공"), HttpStatus.OK);
-    }
-
-    @Parameters(
-            {
-                    @Parameter(name = "postId", description = "수정할 게시글 pk"),
-                    @Parameter(name = "request", description = "게시물 수정에 필요한 제목, 본문 , 첨부파일, 카테고리 pk, 공지사항 여부 정보")
-            }
-    )
-    @Operation(summary = "Named 게시글 수정", description = "사용자는 본인이 실명으로 작성한 게시물을 수정한다")
-    @PutMapping("/named/{postId}")
-    public ResponseEntity<?> updateNamedPost(@PathVariable Long postId, @RequestBody UpdateNamedPostRequest request) { //TODO : 첨부파일 필드 추가
-        String title = request.getTitle();
-        String contents = request.getContents();
-        List<MultipartFile> attachment = request.getAttachment();
-        Long categoryId = request.getCategoryId();
-        boolean pined = request.isPined();
-
-        /**
-         * TODO : required 필드 null 체크
-         *    권한 처리
-         *    존재하지 않는 categoryId
-         *    제목 또는 본문이 비어있거나 길이 초과
-         */
-
-        return new ResponseEntity<>(request, HttpStatus.OK);
-    }
-
-    @Parameter(name = "postId", description = "삭제할 게시글의 pk")
-    @Operation(summary = "Named 게시글 삭제", description = "사용자는 본인이 실명으로 작성한 게시물을 삭제한다")
-    @DeleteMapping("/named/{postId}")
-    public ResponseEntity<?> deleteNamedPost(@PathVariable Long postId) {
-        /**
-         * TODO : jwt 확인
-         *    권한 처리
-         */
-
-        return new ResponseEntity<>(postId, HttpStatus.OK);
-    }
-
-    @Parameters(
-            {
-                    @Parameter(name = "postId", description = "수정할 게시물 pk"),
-                    @Parameter(name = "request", description = "익명 게시물 수정에 필요한 제목, 본문 , 첨부파일, 카테고리 pk, 익명 작성자 정보")
-            }
-    )
-    @Operation(summary = "Unnamed 게시글 수정", description = "사용자가 익명으로 작성한 게시물을 수정한다")
-    @PutMapping("/unnamed/{postId}")
-    public ResponseEntity<?> updateUnnamedPost(@PathVariable Long postId, @RequestBody CreateUnnamedPostRequest request) { //TODO : 첨부파일 필드 추가
-
-        String title = request.getTitle();
-        String contents = request.getContents();
-        List<MultipartFile> attachment = request.getAttachment();
-        Long categoryId = request.getCategoryId();
-        AnonymousRequest author = request.getAuthor();
-
-        /**
-         * TODO : required 필드 확인
-         *      존재하지 않는 익명 게시글
-         *      비밀번호가 다름
-         *      존재하지 않는 postId
-         *      존재하지 않는 categoryId
-         *      제목 또는 본문이 비어있거나 길이 초과
-         */
-
-        return new ResponseEntity<>(request, HttpStatus.OK);
-    }
-
-    @Parameters(
-            {
-                    @Parameter(name = "postId", description = "삭제할 게시물 pk"),
-                    @Parameter(name = "password", description = "익명 게시물 수정에 필요한 제목, 본문 , 첨부파일, 카테고리 pk, 익명 작성자 정보")
-            }
-    )
-    @Operation(summary = "Unnamed 게시글 삭제", description = "사용자가 익명으로 작성한 게시물을 삭제한다")
-    @DeleteMapping("/unnamed/{postId}")
-    public ResponseEntity<?> deleteUnnamedPost(@PathVariable Long postId, @RequestBody String password) {
-
-        /**
-         * TODO : 비밀번호 틀림
-         *    존재하지 않는 게시글
-         */
-
-        return new ResponseEntity<>(password, HttpStatus.OK);
     }
 
     @Parameters(
