@@ -19,7 +19,7 @@ public class KakaoOidcUser extends OAuth2ProviderUser
 
     @Override
     public String getId() {
-        return String.valueOf(getAttributes().get("id"));
+        return String.valueOf(getAttributes().get("sub"));
     }
 
     @Override
@@ -30,6 +30,6 @@ public class KakaoOidcUser extends OAuth2ProviderUser
     @Override
     public String getPicture() {
 
-        return (String)getAttributes().get("profile_image_url");
+        return (String)getAttributes().get("picture");
     }
 }
