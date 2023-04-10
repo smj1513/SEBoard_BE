@@ -72,7 +72,7 @@ public class PostSearchJpaRepository implements PostSearchRepository {
     }
 
     @Override
-    public Page<Post> findByTitleAndContent(String query, PagingInfo pagingInfo) {
+    public Page<Post> findByTitleOrContent(String query, PagingInfo pagingInfo) {
         List<Post> data = em.createQuery("select p from Post p where p.title like %:title% or p.contents like %:content%", Post.class)
                 .setParameter("title", query)
                 .setParameter("content", query)
@@ -85,4 +85,35 @@ public class PostSearchJpaRepository implements PostSearchRepository {
 
         return new Page<>(pagingInfo.getCurPage(), pagingInfo.getPerPage(), count, data);
     }
+
+    @Override
+    public Page<Post> findByAuthorName(String authorName, PagingInfo pagingInfo) {
+        List<Post> data = em.createQuery("select p from Post p where p.author.name like %:authorName%", Post.class)
+                .setParameter("authorName", authorName)
+                .getResultList();
+
+        int count = em.createQuery("select count(p) from Post p where p.author.name like %:authorName%", Long.class)
+                .setParameter("authorName", authorName)
+                .getSingleResult().intValue();
+
+        return new Page<>(pagingInfo.getCurPage(), pagingInfo.getPerPage(), count, data);
+    }
+
+    @Override
+    public Page<Post> findByAllOptions(String searchQuery, PagingInfo pagingInfo) {
+        List<Post> data = em.createQuery("select p from Post p where p.title like %:title% or p.contents like %:content% or p.author.name like %:authorName%", Post.class)
+                .setParameter("title", searchQuery)
+                .setParameter("content", searchQuery)
+                .setParameter("authorName", searchQuery)
+                .getResultList();
+
+        int count = em.createQuery("select count(p) from Post p where p.title like %:title% or p.contents like %:content% or p.author.name like %:authorName%", Long.class)
+                .setParameter("title", searchQuery)
+                .setParameter("content", searchQuery)
+                .setParameter("authorName", searchQuery)
+                .getSingleResult().intValue();
+
+        return new Page<>(pagingInfo.getCurPage(), pagingInfo.getPerPage(), count, data);
+    }
+
 }
