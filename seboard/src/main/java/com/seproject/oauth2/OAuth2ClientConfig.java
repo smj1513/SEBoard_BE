@@ -8,19 +8,15 @@ import com.seproject.oauth2.service.OAuth2LoginService;
 import com.seproject.oauth2.service.CustomOidcUserService;
 import com.seproject.oauth2.utils.CustomAuthorityMapper;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
-import org.springframework.security.config.annotation.web.configurers.oauth2.server.resource.OAuth2ResourceServerConfigurer;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.oauth2.core.user.OAuth2User;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationProvider;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
@@ -50,10 +46,11 @@ public class OAuth2ClientConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.authorizeRequests()
+                .antMatchers("/login").permitAll()
+                .antMatchers("/api/user").access("hasAnyRole('SCOPE_profile','SCOPE_email')")
                 .anyRequest().permitAll();
 
-        http.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt);
-//        http.formLogin().loginPage("/login").loginProcessingUrl("/loginProc").permitAll();
+        http.formLogin().loginPage("/login").loginProcessingUrl("/loginProc").permitAll();
         http.oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfoEndpointConfig ->
                 userInfoEndpointConfig.userService(customOAuth2UserService)
                 .oidcUserService(customOidcUserService))
