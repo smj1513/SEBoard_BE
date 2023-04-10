@@ -14,7 +14,7 @@ import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 import org.springframework.stereotype.Service;
 
 @Service
-public class CustomOidcUserService extends AbstractOAuth2UserService implements OAuth2UserService<OidcUserRequest, OidcUser> {
+public class CustomOidcUserService extends AbstractOAuth2LoginService implements OAuth2UserService<OidcUserRequest, OidcUser> {
 
 
     public CustomOidcUserService(AccountRepository accountRepository,

@@ -37,9 +37,35 @@ public class AccountService {
                 .loginId(providerUser.getProvider() + "_" +providerUser.getId())
                 .provider(providerUser.getProvider())
                 .username(providerUser.getUsername())
+                .nickname(providerUser.getUsername())
                 .password(providerUser.getPassword())
                 .email(providerUser.getEmail())
                 .profile(providerUser.getPicture())
+                .authorities(authorities)
+                .build();
+
+        accountRepository.save(account);
+    }
+
+    public void registerWithNickname(String registrationId, ProviderUser providerUser,String nickname) {
+        List<Role> authorities = providerUser.getAuthorities().stream()
+                .filter(authority -> authority.getAuthority().startsWith("ROLE_"))
+                .map(authority -> {
+                    Optional<Role> role = roleRepository.findByName(authority.getAuthority());
+                    return role.orElseThrow(IllegalArgumentException::new);
+                })
+                .collect(Collectors.toList());
+
+
+        Account account = Account.builder()
+                .registrationId(registrationId)
+                .loginId(providerUser.getProvider() + "_" +providerUser.getId())
+                .provider(providerUser.getProvider())
+                .username(providerUser.getUsername())
+                .password(providerUser.getPassword())
+                .email(providerUser.getEmail())
+                .profile(providerUser.getPicture())
+                .nickname(nickname)
                 .authorities(authorities)
                 .build();
 

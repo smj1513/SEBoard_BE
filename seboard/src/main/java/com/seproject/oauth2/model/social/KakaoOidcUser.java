@@ -12,7 +12,6 @@ public class KakaoOidcUser extends OAuth2ProviderUser
         super(attributes.getMainAttributes(),oAuth2User, registration);
     }
 
-
     @Override
     public String getEmail() {
         return (String)getAttributes().get("email");
@@ -20,17 +19,17 @@ public class KakaoOidcUser extends OAuth2ProviderUser
 
     @Override
     public String getId() {
-        return String.valueOf(getAttributes().get("sub"));
+        return String.valueOf(getAttributes().get("id"));
     }
 
     @Override
     public String getUsername() {
-        return (String)getAttributes().get("username"); //email?
+        return (String)getAttributes().get("nickname"); //email?
     }
 
     @Override
     public String getPicture() {
 
-        return (String)getAttributes().get("picture");
+        return (String)getAttributes().get("profile_image_url");
     }
 }

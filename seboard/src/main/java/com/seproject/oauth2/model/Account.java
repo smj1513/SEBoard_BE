@@ -19,6 +19,7 @@ public class Account {
     private String loginId;
     private String registrationId;
     private String username;
+    private String nickname;
     private String password;
     private String provider;
     private String email;

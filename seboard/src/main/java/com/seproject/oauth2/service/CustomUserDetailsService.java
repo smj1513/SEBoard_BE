@@ -18,7 +18,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class CustomUserDetailsService extends AbstractOAuth2UserService implements UserDetailsService {
+public class CustomUserDetailsService extends AbstractOAuth2LoginService implements UserDetailsService {
 
     @Autowired
     private RoleRepository roleRepository;
