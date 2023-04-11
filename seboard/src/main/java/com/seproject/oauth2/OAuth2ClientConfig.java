@@ -81,7 +81,8 @@ public class OAuth2ClientConfig {
                 .logoutSuccessHandler(oidcLogoutSuccessHandler())
                 .invalidateHttpSession(true)
                 .clearAuthentication(true)
-                .deleteCookies("JSESSIONID");
+                .deleteCookies("JSESSIONID")
+                .deleteCookies("remember-me");
 
 
 //        http.exceptionHandling()
@@ -99,7 +100,7 @@ public class OAuth2ClientConfig {
 
     private OidcClientInitiatedLogoutSuccessHandler oidcLogoutSuccessHandler() {
         OidcClientInitiatedLogoutSuccessHandler successHandler = new OidcClientInitiatedLogoutSuccessHandler(clientRegistrationRepository);
-        successHandler.setPostLogoutRedirectUri("http://localhost:8081/login");
+        successHandler.setPostLogoutRedirectUri("http://localhost:8080/login");
         return successHandler;
     }
 
