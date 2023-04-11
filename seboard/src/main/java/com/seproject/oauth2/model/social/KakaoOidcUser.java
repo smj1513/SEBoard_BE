@@ -1,15 +1,27 @@
 package com.seproject.oauth2.model.social;
 
-import com.seproject.oauth2.model.Attributes;
-import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.core.oidc.OidcIdToken;
+import org.springframework.security.oauth2.core.oidc.OidcUserInfo;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
-import java.util.Map;
+import java.util.*;
 
-public class KakaoOidcUser extends OAuth2ProviderUser
+public class KakaoOidcUser implements OidcUser
+
 {
-    public KakaoOidcUser(Attributes attributes, OAuth2User oAuth2User, ClientRegistration registration) {
-        super(attributes.getMainAttributes(),oAuth2User, registration);
+    private Map<String, Object> attributes;
+    private Map<String, Object> claims;
+    private OidcUserInfo oidcUserInfo;
+    private OidcIdToken oidcIdToken;
+    private List<? extends GrantedAuthority> authorities;
+
+    public KakaoOidcUser(OidcUser oidcUser) {
+        this.attributes = oidcUser.getAttributes();
+        this.claims = oidcUser.getClaims();
+        this.authorities = Collections.unmodifiableList(new ArrayList<>(oidcUser.getAuthorities()));
+        this.oidcUserInfo = oidcUser.getUserInfo();
+        this.oidcIdToken = oidcUser.getIdToken();
     }
 
     @Override
@@ -18,18 +30,44 @@ public class KakaoOidcUser extends OAuth2ProviderUser
     }
 
     @Override
-    public String getId() {
-        return String.valueOf(getAttributes().get("sub"));
-    }
-
-    @Override
-    public String getUsername() {
-        return (String)getAttributes().get("nickname"); //email?
+    public String getName() {
+        return (String)getAttributes().get("nickname");
     }
 
     @Override
     public String getPicture() {
-
         return (String)getAttributes().get("picture");
     }
+
+    @Override
+    public Map<String, Object> getAttributes() {
+        return attributes;
+    }
+
+    @Override
+    public List<? extends GrantedAuthority> getAuthorities() {
+        return authorities;
+    }
+
+
+    @Override
+    public Map<String, Object> getClaims() {
+        return claims;
+    }
+
+    @Override
+    public OidcUserInfo getUserInfo() {
+        return oidcUserInfo;
+    }
+
+    @Override
+    public OidcIdToken getIdToken() {
+        return oidcIdToken;
+    }
+
+    public String getProvider() {
+        return "kakao";
+    }
+
+    public String getId() {return (String)getAttributes().get("sub");}
 }

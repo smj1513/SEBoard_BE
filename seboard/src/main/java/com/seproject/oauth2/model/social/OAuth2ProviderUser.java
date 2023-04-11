@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-public abstract class OAuth2ProviderUser implements ProviderUser {
+public abstract class OAuth2ProviderUser implements ProviderUser,OAuth2User {
 
     private OAuth2User oAuth2User;
     private ClientRegistration registration;
@@ -51,12 +51,12 @@ public abstract class OAuth2ProviderUser implements ProviderUser {
                 .collect(Collectors.toList());
     }
 
-    @Override
+
     public Map<String, Object> getAttributes() {
         return attributes;
     }
 
-    @Override
+
     public OAuth2User getOAuth2User() {
         return oAuth2User;
     }

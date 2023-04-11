@@ -22,7 +22,7 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final RoleRepository roleRepository;
 
-    public void register(String registrationId, ProviderUser providerUser) {
+    public void register(ProviderUser providerUser) {
         List<Role> authorities = providerUser.getAuthorities().stream()
                 .filter(authority -> authority.getAuthority().startsWith("ROLE_"))
                 .map(authority -> {
@@ -33,7 +33,6 @@ public class AccountService {
 
 
         Account account = Account.builder()
-                .registrationId(registrationId)
                 .loginId(providerUser.getProvider() + "_" +providerUser.getId())
                 .provider(providerUser.getProvider())
                 .username(providerUser.getUsername())
@@ -58,7 +57,6 @@ public class AccountService {
 
 
         Account account = Account.builder()
-                .registrationId(registrationId)
                 .loginId(providerUser.getProvider() + "_" +providerUser.getId())
                 .provider(providerUser.getProvider())
                 .username(providerUser.getUsername())

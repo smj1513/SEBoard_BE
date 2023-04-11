@@ -1,8 +1,9 @@
 package com.seproject.oauth2.controller;
 
 import com.seproject.oauth2.application.LogoutAppService;
-import com.seproject.oauth2.model.PrincipalUser;
-import com.seproject.oauth2.service.OAuth2LoginService;
+import com.seproject.oauth2.model.ProviderUser;
+import com.seproject.oauth2.service.AccountService;
+import com.seproject.oauth2.service.CustomOidcUserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,9 +15,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import static com.seproject.oauth2.controller.dto.RegisterDTO.*;
 
 @AllArgsConstructor
@@ -24,17 +22,17 @@ import static com.seproject.oauth2.controller.dto.RegisterDTO.*;
 public class AccountController {
 
     private final LogoutAppService logoutAppService;
-    private final OAuth2LoginService oAuth2LoginService;
+    private final AccountService accountService;
 
     @PostMapping("/register/oauth2")
-    public ResponseEntity<?> registerUserWithOAuth(@AuthenticationPrincipal PrincipalUser principalUser, @RequestBody OAuth2RegisterRequest oAuth2RegisterRequest) {
+    public ResponseEntity<?> registerUserWithOAuth(@AuthenticationPrincipal ProviderUser providerUser, @RequestBody OAuth2RegisterRequest oAuth2RegisterRequest) {
 
-        if(principalUser == null) {
+        if(providerUser == null) {
             return new ResponseEntity<>("회원 정보가 없어 접근 불가능",HttpStatus.BAD_REQUEST);
         }
 
         try{
-            oAuth2LoginService.registerUser(principalUser.getProviderUser(),oAuth2RegisterRequest.getNickname());
+            accountService.registerWithNickname(providerUser.getProvider(),providerUser,oAuth2RegisterRequest.getNickname());
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e,HttpStatus.BAD_REQUEST);
         }

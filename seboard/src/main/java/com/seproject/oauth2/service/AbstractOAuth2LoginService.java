@@ -1,8 +1,5 @@
 package com.seproject.oauth2.service;
 
-import com.seproject.oauth2.converters.DelegationProviderUserConverter;
-import com.seproject.oauth2.converters.ProviderUserRequest;
-import com.seproject.oauth2.service.AccountService;
 import lombok.AllArgsConstructor;
 import com.seproject.oauth2.model.*;
 import com.seproject.oauth2.repository.AccountRepository;
@@ -19,17 +16,12 @@ public abstract class AbstractOAuth2LoginService {
 
     protected AccountRepository accountRepository;
     protected AccountService accountService;
-    protected DelegationProviderUserConverter providerUserConverter;
-
-    protected ProviderUser providerUser(ProviderUserRequest providerUserRequest) {
-        return providerUserConverter.convert(providerUserRequest);
-    }
 
     protected void register(ProviderUser providerUser, OAuth2UserRequest userRequest) {
         Account account = accountRepository.findByLoginId(providerUser.getProvider() + "_" + providerUser.getId());
 
         if(account == null) {
-            accountService.register(userRequest.getClientRegistration().getRegistrationId(),providerUser);
+            accountService.register(providerUser);
         }
     }
 }

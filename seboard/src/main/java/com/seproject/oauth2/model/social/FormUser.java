@@ -55,13 +55,4 @@ public class FormUser implements ProviderUser {
         return authorities;
     }
 
-    @Override
-    public Map<String, Object> getAttributes() {
-        return null;
-    }
-
-    @Override
-    public OAuth2User getOAuth2User() {
-        return null;
-    }
 }

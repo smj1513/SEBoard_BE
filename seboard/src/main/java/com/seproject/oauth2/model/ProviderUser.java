@@ -15,7 +15,5 @@ public interface ProviderUser {
     String getPicture();
     String getProvider();
     List<? extends GrantedAuthority> getAuthorities();
-    Map<String, Object> getAttributes();
 
-    OAuth2User getOAuth2User();
 }

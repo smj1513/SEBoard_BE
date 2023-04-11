@@ -1,13 +1,10 @@
 package com.seproject.oauth2.service;
 
 import com.seproject.oauth2.model.Account;
-import com.seproject.oauth2.model.PrincipalUser;
 import com.seproject.oauth2.model.ProviderUser;
 import com.seproject.oauth2.model.Role;
 import com.seproject.oauth2.repository.AccountRepository;
 import com.seproject.oauth2.repository.RoleRepository;
-import com.seproject.oauth2.converters.DelegationProviderUserConverter;
-import com.seproject.oauth2.converters.ProviderUserRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -22,8 +19,8 @@ public class CustomUserDetailsService extends AbstractOAuth2LoginService impleme
 
     @Autowired
     private RoleRepository roleRepository;
-    public CustomUserDetailsService(AccountRepository accountRepository, AccountService accountService, DelegationProviderUserConverter providerUserConverter) {
-        super(accountRepository, accountService, providerUserConverter);
+    public CustomUserDetailsService(AccountRepository accountRepository, AccountService accountService) {
+        super(accountRepository, accountService);
     }
 
     @Override
@@ -32,18 +29,9 @@ public class CustomUserDetailsService extends AbstractOAuth2LoginService impleme
         Optional<Role> roleUser = roleRepository.findByName("ROLE_USER");
 
         if(account == null) {
-            account = Account.builder()
-                    .accountId(123L)
-                    .username("user")
-                    .password("{noop}1234")
-                    .authorities(List.of(roleUser.get()))
-                    .email("alswhd1113@gmail.com")
-                    .build();
+            throw new UsernameNotFoundException("존재하지 않는 사용자");
         }
 
-        ProviderUserRequest request = new ProviderUserRequest(account);
-        ProviderUser providerUser = providerUser(request);
-
-        return new PrincipalUser(providerUser);
+        return account;
     }
 }
