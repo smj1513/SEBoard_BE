@@ -1,19 +1,21 @@
 package com.seproject.oauth2.controller;
 
 import com.seproject.oauth2.application.LogoutAppService;
-import com.seproject.oauth2.model.ProviderUser;
+import com.seproject.oauth2.controller.command.OAuthAccountCommand;
+import com.seproject.oauth2.model.social.KakaoOidcUser;
 import com.seproject.oauth2.service.AccountService;
-import com.seproject.oauth2.service.CustomOidcUserService;
+import com.seproject.oauth2.utils.JwtDecoder;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import javax.servlet.http.HttpServletRequest;
 
 import static com.seproject.oauth2.controller.dto.RegisterDTO.*;
 
@@ -21,18 +23,27 @@ import static com.seproject.oauth2.controller.dto.RegisterDTO.*;
 @Controller
 public class AccountController {
 
+    private final JwtDecoder jwtDecoder;
     private final LogoutAppService logoutAppService;
     private final AccountService accountService;
 
-    @PostMapping("/register/oauth2")
-    public ResponseEntity<?> registerUserWithOAuth(@AuthenticationPrincipal ProviderUser providerUser, @RequestBody OAuth2RegisterRequest oAuth2RegisterRequest) {
+    @PostMapping("/account/oauth")
+    public ResponseEntity<?> registerUserWithOAuth(HttpServletRequest request,@RequestBody OAuth2RegisterRequest oAuth2RegisterRequest) {
 
-        if(providerUser == null) {
-            return new ResponseEntity<>("회원 정보가 없어 접근 불가능",HttpStatus.BAD_REQUEST);
-        }
+        String token = request.getHeader("Authorization");
+
+        if(token == null) throw new IllegalArgumentException("인증 정보가 없음");
 
         try{
-            accountService.registerWithNickname(providerUser.getProvider(),providerUser,oAuth2RegisterRequest.getNickname());
+            OAuthAccountCommand accountCommand = OAuthAccountCommand.builder()
+                    .id(jwtDecoder.getLoginId(token))
+                    .provider(jwtDecoder.getProvider(token))
+                    .email(jwtDecoder.getEmail(token))
+                    .profile(jwtDecoder.getProfile(token))
+                    .nickname(oAuth2RegisterRequest.getNickname())
+                    .name(oAuth2RegisterRequest.getName())
+                    .build();
+            accountService.register(accountCommand);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e,HttpStatus.BAD_REQUEST);
         }
@@ -40,7 +51,13 @@ public class AccountController {
         return new ResponseEntity<>("회원가입 완료",HttpStatus.OK);
     }
 
-    @GetMapping("/logoutProc")
+    @PostMapping("/account/form")
+    public ResponseEntity<?> registerUserWithForm() {
+
+        return new ResponseEntity<>("회원가입 완료",HttpStatus.OK);
+    }
+
+    @GetMapping("/logoutProc") //미해결
     public ResponseEntity<?> logout(Authentication authentication) {
         System.out.println("----호출----");
         if(authentication == null) {

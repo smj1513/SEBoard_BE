@@ -6,7 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import java.util.List;
 
-@Data
+@Getter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
@@ -32,6 +32,9 @@ public class Account implements UserDetails {
             inverseJoinColumns={@JoinColumn(name="role_id", referencedColumnName="roleId")})
     private List<Role> authorities;
 
+    public void updateProfile(String profile) {
+        this.profile = profile;
+    }
     @Override
     public boolean isAccountNonExpired() {
         return true;

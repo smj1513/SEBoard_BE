@@ -1,17 +1,18 @@
 package com.seproject.oauth2.service;
 
+import com.seproject.oauth2.controller.command.OAuthAccountCommand;
+import com.seproject.oauth2.model.social.AbstractOidcUser;
 import com.seproject.oauth2.repository.AccountRepository;
 import com.seproject.oauth2.repository.RoleRepository;
 import com.seproject.oauth2.model.Account;
-import com.seproject.oauth2.model.ProviderUser;
 import com.seproject.oauth2.model.Role;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
-import javax.transaction.NotSupportedException;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -22,52 +23,30 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final RoleRepository roleRepository;
 
-    public void register(ProviderUser providerUser) {
-        List<Role> authorities = providerUser.getAuthorities().stream()
-                .filter(authority -> authority.getAuthority().startsWith("ROLE_"))
-                .map(authority -> {
-                    Optional<Role> role = roleRepository.findByName(authority.getAuthority());
-                    return role.orElseThrow(IllegalArgumentException::new);
-                })
-                .collect(Collectors.toList());
+    public boolean isExist(String loginId){
+        return accountRepository.existsByLoginId(loginId);
+    }
 
+    public void register(OAuthAccountCommand accountCommand) {
+        Optional<Role> roleUser = roleRepository.findByName("ROLE_USER");
+        List<Role> authorities = List.of(roleUser.get());
 
         Account account = Account.builder()
-                .loginId(providerUser.getProvider() + "_" +providerUser.getId())
-                .provider(providerUser.getProvider())
-                .username(providerUser.getUsername())
-                .nickname(providerUser.getUsername())
-                .password(providerUser.getPassword())
-                .email(providerUser.getEmail())
-                .profile(providerUser.getPicture())
+                .loginId(accountCommand.getProvider() + "_" +accountCommand.getId())
+                .provider(accountCommand.getProvider())
+                .username(accountCommand.getName())
+                .nickname(accountCommand.getNickname())
+                .password(UUID.randomUUID().toString())
+                .email(accountCommand.getEmail())
+                .profile(accountCommand.getProfile())
                 .authorities(authorities)
                 .build();
 
         accountRepository.save(account);
     }
 
-    public void registerWithNickname(String registrationId, ProviderUser providerUser,String nickname) {
-        List<Role> authorities = providerUser.getAuthorities().stream()
-                .filter(authority -> authority.getAuthority().startsWith("ROLE_"))
-                .map(authority -> {
-                    Optional<Role> role = roleRepository.findByName(authority.getAuthority());
-                    return role.orElseThrow(IllegalArgumentException::new);
-                })
-                .collect(Collectors.toList());
-
-
-        Account account = Account.builder()
-                .loginId(providerUser.getProvider() + "_" +providerUser.getId())
-                .provider(providerUser.getProvider())
-                .username(providerUser.getUsername())
-                .password(providerUser.getPassword())
-                .email(providerUser.getEmail())
-                .profile(providerUser.getPicture())
-                .nickname(nickname)
-                .authorities(authorities)
-                .build();
-
-        accountRepository.save(account);
+    public Account findAccountById(String loginId) {
+        return accountRepository.findByLoginId(loginId);
     }
 
 }

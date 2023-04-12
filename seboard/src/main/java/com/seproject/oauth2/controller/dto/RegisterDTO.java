@@ -10,6 +10,7 @@ public class RegisterDTO {
     @Builder
     public static class OAuth2RegisterRequest {
         private String nickname;
+        private String name;
     }
 
 }
