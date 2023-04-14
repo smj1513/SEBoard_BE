@@ -25,7 +25,7 @@ public class Account implements UserDetails {
     private String email;
     private String profile;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name="authorities",
             joinColumns={@JoinColumn(name="account_id", referencedColumnName="accountId")},

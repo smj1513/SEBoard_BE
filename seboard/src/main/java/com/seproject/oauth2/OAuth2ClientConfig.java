@@ -1,19 +1,23 @@
 package com.seproject.oauth2;
 
+import com.seproject.oauth2.model.Account;
 import com.seproject.oauth2.service.CustomOidcUserService;
-import com.seproject.oauth2.utils.OidcAuthenticationSuccessHandler;
-import com.seproject.oauth2.utils.CustomAuthorityMapper;
+import com.seproject.oauth2.utils.*;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
 
+
+@Slf4j
 @AllArgsConstructor
 @EnableWebSecurity
 public class OAuth2ClientConfig {
@@ -21,6 +25,8 @@ public class OAuth2ClientConfig {
     private ClientRegistrationRepository clientRegistrationRepository;
     private final CustomOidcUserService customOidcUserService;
     private final OidcAuthenticationSuccessHandler oidcAuthenticationSuccessHandler;
+    private final FormLoginAuthenticationSuccessHandler formLoginAuthenticationSuccessHandler;
+    private final FormLoginFailureHandler formLoginFailureHandler;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -33,14 +39,22 @@ public class OAuth2ClientConfig {
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests()
                 .antMatchers("/").permitAll()
-                .antMatchers("/login").permitAll()
+                .antMatchers("/index").permitAll()
                 .anyRequest().permitAll();
 
-        http.formLogin().loginPage("/login").loginProcessingUrl("/loginProc").permitAll();
+        http.formLogin()
+                .usernameParameter("username")
+                .passwordParameter("password")
+                .loginPage("/formLogin")
+                .successHandler(formLoginAuthenticationSuccessHandler)
+                .failureHandler(formLoginFailureHandler)
+                .permitAll();
+
         http.oauth2Login(oauth2 -> oauth2.userInfoEndpoint(userInfoEndpointConfig ->
                 userInfoEndpointConfig.oidcUserService(customOidcUserService))
                 .successHandler(oidcAuthenticationSuccessHandler));
 
+        //formlogin과 oauth2의 통합 로그아웃 처리가 필요
         http.logout()
                 .logoutSuccessHandler(oidcLogoutSuccessHandler())
                 .invalidateHttpSession(true)
@@ -62,6 +76,10 @@ public class OAuth2ClientConfig {
         OidcClientInitiatedLogoutSuccessHandler successHandler = new OidcClientInitiatedLogoutSuccessHandler(clientRegistrationRepository);
         successHandler.setPostLogoutRedirectUri("http://localhost:8080/login");
         return successHandler;
+    }
+    @Bean
+    public BCryptPasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 
     @Bean
