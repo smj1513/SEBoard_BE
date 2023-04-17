@@ -11,12 +11,13 @@ import java.util.List;
 @AllArgsConstructor
 @Builder
 @Entity
-@Table(name = "accounts"
-        ,uniqueConstraints = {@UniqueConstraint(name="Account's loginId is unique",columnNames="loginId")})
+@Table(name = "accounts")
 public class Account implements UserDetails {
 
     @Id @GeneratedValue
     private Long accountId;
+
+    @Column(name = "login_id",unique = true)
     private String loginId;
     private String username;
     private String nickname;
