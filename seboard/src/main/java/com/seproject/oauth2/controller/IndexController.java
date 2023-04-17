@@ -1,6 +1,7 @@
 package com.seproject.oauth2.controller;
 
 import com.seproject.oauth2.utils.jwt.JwtDecoder;
+import com.seproject.oauth2.utils.jwt.annotation.JWT;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -56,6 +57,7 @@ public class IndexController {
                 "</html>";
     }
 
+    @JWT
     @PostMapping("/index")
     public ResponseEntity<?> jwtDecode(HttpServletRequest request){
         String jwt = request.getHeader("Authorization");
@@ -71,7 +73,6 @@ public class IndexController {
         result.put("email" ,email);
         result.put("profile" ,profile);
         result.put("authorities" ,authorities);
-        System.out.println(jwt);
         return new ResponseEntity<>(result,HttpStatus.OK);
     }
 }

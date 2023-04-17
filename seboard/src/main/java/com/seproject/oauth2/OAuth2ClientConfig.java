@@ -88,4 +88,5 @@ public class OAuth2ClientConfig {
     public GrantedAuthoritiesMapper customAuthorityMapper() {
         return new CustomAuthorityMapper();
     }
+
 }

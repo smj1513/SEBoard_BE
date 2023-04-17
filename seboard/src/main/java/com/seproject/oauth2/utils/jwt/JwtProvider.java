@@ -19,22 +19,18 @@ import java.util.Date;
 import java.util.stream.Collectors;
 
 @Slf4j
-@Component
 public class JwtProvider {
 
-    @Autowired
     private AccountService accountService;
     private final int expirationTime; // 10일 (1/1000초)
     private final String tokenPrefix;
     private final String secret;
 
-    public JwtProvider(@Value("${jwt.secret}") String secret,
-                       @Value("${jwt.expiration_time}") int expirationTime,
-                       @Value("${jwt.token_prefix}") String tokenPrefix
-                       ) {
-        this.secret = secret;
-        this.tokenPrefix = tokenPrefix;
+    public JwtProvider(AccountService accountService, int expirationTime, String tokenPrefix, String secret) {
+        this.accountService = accountService;
         this.expirationTime = expirationTime;
+        this.tokenPrefix = tokenPrefix;
+        this.secret = secret;
     }
 
     private AbstractOidcUser parseUser(OAuth2User oAuth2User) {
