@@ -1,8 +1,10 @@
 package com.seproject.oauth2;
 
-import com.seproject.oauth2.model.Account;
 import com.seproject.oauth2.service.CustomOidcUserService;
 import com.seproject.oauth2.utils.*;
+import com.seproject.oauth2.utils.handler.FormLoginAuthenticationSuccessHandler;
+import com.seproject.oauth2.utils.handler.FormLoginFailureHandler;
+import com.seproject.oauth2.utils.handler.OidcAuthenticationSuccessHandler;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;

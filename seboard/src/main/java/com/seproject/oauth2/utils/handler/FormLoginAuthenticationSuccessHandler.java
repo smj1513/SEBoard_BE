@@ -1,6 +1,7 @@
-package com.seproject.oauth2.utils;
+package com.seproject.oauth2.utils.handler;
 
 import com.seproject.oauth2.model.Account;
+import com.seproject.oauth2.utils.jwt.JwtProvider;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;

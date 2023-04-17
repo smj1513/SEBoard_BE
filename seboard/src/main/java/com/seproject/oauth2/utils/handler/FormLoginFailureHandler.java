@@ -1,4 +1,4 @@
-package com.seproject.oauth2.utils;
+package com.seproject.oauth2.utils.handler;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;

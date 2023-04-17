@@ -1,4 +1,4 @@
-package com.seproject.oauth2.utils;
+package com.seproject.oauth2.utils.jwt;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

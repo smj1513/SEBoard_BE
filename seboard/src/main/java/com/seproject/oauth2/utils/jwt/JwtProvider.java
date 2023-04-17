@@ -1,4 +1,4 @@
-package com.seproject.oauth2.utils;
+package com.seproject.oauth2.utils.jwt;
 
 import com.seproject.oauth2.model.Account;
 import com.seproject.oauth2.model.social.AbstractOidcUser;

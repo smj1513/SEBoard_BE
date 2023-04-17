@@ -1,12 +1,11 @@
 package com.seproject.oauth2.controller;
 
-import com.seproject.oauth2.utils.JwtDecoder;
+import com.seproject.oauth2.utils.jwt.JwtDecoder;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.HashMap;

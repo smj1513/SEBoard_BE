@@ -1,7 +1,7 @@
-package com.seproject.oauth2.utils;
+package com.seproject.oauth2.utils.handler;
 
 import com.seproject.oauth2.model.Account;
-import com.seproject.oauth2.service.AccountService;
+import com.seproject.oauth2.utils.jwt.JwtProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;

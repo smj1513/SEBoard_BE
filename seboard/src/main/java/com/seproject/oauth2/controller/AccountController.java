@@ -2,9 +2,8 @@ package com.seproject.oauth2.controller;
 
 import com.seproject.oauth2.application.LogoutAppService;
 import com.seproject.oauth2.controller.command.OAuthAccountCommand;
-import com.seproject.oauth2.model.social.KakaoOidcUser;
 import com.seproject.oauth2.service.AccountService;
-import com.seproject.oauth2.utils.JwtDecoder;
+import com.seproject.oauth2.utils.jwt.JwtDecoder;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
