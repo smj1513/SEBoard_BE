@@ -49,7 +49,7 @@ public class IndexController {
                 "                <button>로그인</button>\n" +
                 "            </form>\n" +
                 "        <a href=\"/oauth2/authorization/kakao\" >\n" +
-                "            <img src=\"kakao_login_medium_narrow.png\"\n" +
+                "            <img src=\"resources/templates/kakao_login_medium_narrow.png\"\n" +
                 "                 alt=\"kakao\">\n" +
                 "        </a>\n" +
                 "\n" +
@@ -74,5 +74,12 @@ public class IndexController {
         result.put("profile" ,profile);
         result.put("authorities" ,authorities);
         return new ResponseEntity<>(result,HttpStatus.OK);
+    }
+
+
+    @JWT
+    @GetMapping("/admin")
+    public ResponseEntity<?> admin(HttpServletRequest request){
+        return new ResponseEntity<>("admin",HttpStatus.OK);
     }
 }

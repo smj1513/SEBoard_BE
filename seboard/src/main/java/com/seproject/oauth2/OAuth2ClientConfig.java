@@ -1,10 +1,13 @@
 package com.seproject.oauth2;
 
+import com.seproject.oauth2.repository.AuthorizationMetaDataRepository;
 import com.seproject.oauth2.service.CustomOidcUserService;
 import com.seproject.oauth2.utils.*;
 import com.seproject.oauth2.utils.handler.FormLoginAuthenticationSuccessHandler;
 import com.seproject.oauth2.utils.handler.FormLoginFailureHandler;
 import com.seproject.oauth2.utils.handler.OidcAuthenticationSuccessHandler;
+import com.seproject.oauth2.utils.jwt.JwtDecoder;
+import com.seproject.oauth2.utils.jwt.JwtFilter;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
@@ -17,6 +20,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
 @Slf4j
@@ -29,6 +33,9 @@ public class OAuth2ClientConfig {
     private final OidcAuthenticationSuccessHandler oidcAuthenticationSuccessHandler;
     private final FormLoginAuthenticationSuccessHandler formLoginAuthenticationSuccessHandler;
     private final FormLoginFailureHandler formLoginFailureHandler;
+
+    private AuthorizationMetaDataRepository authorizationMetaDataRepository;
+    private JwtDecoder jwtDecoder;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -71,6 +78,8 @@ public class OAuth2ClientConfig {
 //                    response.sendError(HttpStatus.FORBIDDEN.value());
 //                    response.sendRedirect("/denied");
 //                });
+
+        http.addFilterBefore(new JwtFilter(authorizationMetaDataRepository,jwtDecoder), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
