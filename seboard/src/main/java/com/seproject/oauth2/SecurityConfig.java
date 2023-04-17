@@ -26,7 +26,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @Slf4j
 @AllArgsConstructor
 @EnableWebSecurity
-public class OAuth2ClientConfig {
+public class SecurityConfig {
 
     private ClientRegistrationRepository clientRegistrationRepository;
     private final CustomOidcUserService customOidcUserService;
@@ -45,6 +45,7 @@ public class OAuth2ClientConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf().disable();
+        http.cors().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests()
                 .antMatchers("/").permitAll()
