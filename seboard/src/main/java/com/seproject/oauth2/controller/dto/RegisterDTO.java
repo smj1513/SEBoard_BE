@@ -13,4 +13,16 @@ public class RegisterDTO {
         private String name;
     }
 
+
+    @Data
+    @Builder
+    public static class FormRegisterRequest {
+
+        private String id;
+        private String password;
+
+        private String nickname;
+        private String name;
+    }
+
 }

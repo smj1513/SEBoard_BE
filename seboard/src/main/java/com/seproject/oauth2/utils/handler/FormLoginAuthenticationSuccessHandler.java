@@ -1,6 +1,5 @@
 package com.seproject.oauth2.utils.handler;
 
-import com.seproject.oauth2.model.Account;
 import com.seproject.oauth2.utils.jwt.JwtProvider;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -23,9 +22,9 @@ public class FormLoginAuthenticationSuccessHandler implements AuthenticationSucc
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse
     response, Authentication authentication) throws IOException, ServletException {
         UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication;
-        Account account = (Account)token.getPrincipal();
 
-        String jwt = jwtProvider.createJWT(account);
+
+        String jwt = jwtProvider.createJWT(token);
         String refreshToken = jwtProvider.createRefreshToken();
 
         response.setHeader("Authorization",jwt);
