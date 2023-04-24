@@ -11,6 +11,8 @@ import com.seproject.oauth2.utils.jwt.JwtFilter;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -72,14 +74,6 @@ public class SecurityConfig {
                 .deleteCookies("JSESSIONID")
                 .deleteCookies("remember-me");
 
-//        http.exceptionHandling()
-//                .authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login")); // OK
-//                .accessDeniedHandler((request,response,exception) -> { // TODO : 상세하게 분기
-//                    System.out.println(exception.getMessage());
-//                    response.sendError(HttpStatus.FORBIDDEN.value());
-//                    response.sendRedirect("/denied");
-//                });
-
         http.addFilterBefore(new JwtFilter(authorizationMetaDataRepository,jwtDecoder), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
@@ -99,4 +93,8 @@ public class SecurityConfig {
         return new CustomAuthorityMapper();
     }
 
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+        return authenticationConfiguration.getAuthenticationManager();
+    }
 }
