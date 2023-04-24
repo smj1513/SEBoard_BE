@@ -36,12 +36,9 @@ import static com.seproject.seboard.controller.dto.post.PostResponse.*;
 public class PostAppService {
     private final PostRepository postRepository;
     private final PostSearchRepository postSearchRepository;
-    private final BoardUserRepository boardUserRepository;
     private final CategoryRepository categoryRepository;
     private final AnonymousRepository anonymousRepository;
     private final MemberRepository memberRepository;
-    private final AccountRepository accountRepository;
-
     private final CommentRepository commentRepository;
     private final BookmarkRepository bookmarkRepository;
 

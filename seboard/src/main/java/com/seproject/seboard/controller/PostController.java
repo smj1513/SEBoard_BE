@@ -166,7 +166,7 @@ public class PostController {
 
     @Parameter(name = "postId", description = "삭제할 게시글의 pk")
     @Operation(summary = "게시글 삭제", description = "사용자는 본인이 실명으로 작성한 게시물을 삭제한다")
-    @DeleteMapping("/named/{postId}")
+    @DeleteMapping("/{postId}")
     public ResponseEntity<?> deletePost(@PathVariable Long postId) {
         /**
          * TODO : jwt 확인
@@ -177,40 +177,6 @@ public class PostController {
         postAppService.removePost(postId, accountId);
 
         return new ResponseEntity<>(MessageResponse.of(""), HttpStatus.OK);
-    }
-
-    @Parameter(name = "postId", description = "즐겨찾기 지정할 게시물의 pk")
-    @Operation(summary = "게시글 북마크 지정", description = "사용자가 게시글을 즐겨찾기로 등록한다")
-    @ApiResponses({
-            @ApiResponse(content = @Content(schema = @Schema(implementation = MessageResponse.class)), responseCode = "200", description = "북마크 성공"),
-    })
-    @PostMapping("/{postId}/bookmark")
-    public ResponseEntity<?> createBookmark(@PathVariable Long postId) {
-
-        // JWT에서 사용자 정보 추출
-
-        /**
-         * TODO : 존재하지 않는 postId
-         *  jwt가 없거나 유효하지 않는 경우
-         */
-        return new ResponseEntity<>(MessageResponse.of("북마크 등록 성공"), HttpStatus.OK);
-    }
-
-    @Parameter(name = "postId", description = "즐겨찾기 해제할 게시물의 pk")
-    @Operation(summary = "게시글 북마크 해제", description = "사용자가 즐겨찾기한 게시물을 즐겨찾기 해제한다")
-    @ApiResponses({
-            @ApiResponse(content = @Content(schema = @Schema(implementation = MessageResponse.class)), responseCode = "200", description = "북마크 해제 성공"),
-    })
-    @DeleteMapping("/{postId}/bookmark")
-    public ResponseEntity<?> deleteBookmark(@PathVariable Long postId) {
-
-        // JWT에서 사용자 정보 추출
-
-        /**
-         * TODO : 존재하지 않는 postId
-         *  jwt가 없거나 유효하지 않는 경우
-         */
-        return new ResponseEntity<>(MessageResponse.of("북마크 해제 성공"), HttpStatus.OK);
     }
 
     @Parameters(

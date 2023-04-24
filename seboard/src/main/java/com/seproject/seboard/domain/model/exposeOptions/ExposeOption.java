@@ -16,7 +16,7 @@ import javax.persistence.*;
 public abstract class ExposeOption {
 
     @Id @GeneratedValue
-    protected Long id;
+    protected Long exposeOptionId;
 
     @Enumerated(EnumType.STRING)
     protected ExposeState exposeState;

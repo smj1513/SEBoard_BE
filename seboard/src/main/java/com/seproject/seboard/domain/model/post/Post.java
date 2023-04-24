@@ -129,7 +129,7 @@ public class Post {
         return TITLE_MIN_SIZE < title.length() && title.length() <= TITLE_MAX_SIZE;
     }
 
-    public boolean isValidContents(String contents) {
+    private boolean isValidContents(String contents) {
         return CONTENTS_MIN_SIZE < contents.length() && contents.length() <= CONTENTS_MAX_SIZE;
     }
 

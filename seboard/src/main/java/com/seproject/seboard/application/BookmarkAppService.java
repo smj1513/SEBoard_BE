@@ -19,7 +19,6 @@ import static com.seproject.seboard.application.utils.AppServiceHelper.findByIdO
 public class BookmarkAppService {
     private final BookmarkRepository bookmarkRepository;
     private final PostRepository postRepository;
-    private final CommentRepository commentRepository;
     private final MemberRepository memberRepository;
 
     public void enrollBookmark(Long postId, Long accountId) {

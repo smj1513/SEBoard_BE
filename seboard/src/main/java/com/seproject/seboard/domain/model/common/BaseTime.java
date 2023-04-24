@@ -3,6 +3,7 @@ package com.seproject.seboard.domain.model.common;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.Embeddable;
 import java.time.LocalDateTime;
