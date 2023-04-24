@@ -43,7 +43,7 @@ pipeline {
 // 								]]){
 // 								sh "echo ${DOCKER_USER_ID} ${DOCKER_USER_PASSWORD}"
 // 								sh "docker login --username=${DOCKER_USER_ID} --password=${DOCKER_USER_PASSWORD}"
-								sh "docker push maanjong/se-dev:${entry.key}"
+// 								sh "docker push maanjong/se-dev:${entry.key}"
 //								}
 							}
 						}

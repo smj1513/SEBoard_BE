@@ -16,9 +16,6 @@ public class Role implements GrantedAuthority {
     @Column(nullable=false, unique=true)
     private String name;
 
-//    @ManyToMany(mappedBy = "authorities",fetch = FetchType.LAZY)
-//    private List<Account> accounts;
-
     public Role(String name) {
         this.name = name;
     }

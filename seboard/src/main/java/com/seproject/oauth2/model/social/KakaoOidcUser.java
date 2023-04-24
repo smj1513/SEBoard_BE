@@ -1,17 +1,20 @@
 package com.seproject.oauth2.model.social;
 
-import com.seproject.oauth2.model.Attributes;
 import org.springframework.security.oauth2.client.registration.ClientRegistration;
-import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.oauth2.core.oidc.user.OidcUser;
 
-import java.util.Map;
-
-public class KakaoOidcUser extends OAuth2ProviderUser
+public class KakaoOidcUser extends AbstractOidcUser
 {
-    public KakaoOidcUser(Attributes attributes, OAuth2User oAuth2User, ClientRegistration registration) {
-        super(attributes.getMainAttributes(),oAuth2User, registration);
+    public KakaoOidcUser(OidcUser oidcUser, ClientRegistration registration) {
+        super(oidcUser,registration);
     }
 
+    @Override
+    public String getId() {return (String)getAttributes().get("sub");}
+    @Override
+    public String getProvider() {
+        return "kakao";
+    }
 
     @Override
     public String getEmail() {
@@ -19,18 +22,17 @@ public class KakaoOidcUser extends OAuth2ProviderUser
     }
 
     @Override
-    public String getId() {
-        return String.valueOf(getAttributes().get("sub"));
+    public String getName() {
+        return (String)getAttributes().get("nickname");
     }
 
     @Override
-    public String getUsername() {
-        return (String)getAttributes().get("username"); //email?
-    }
-
-    @Override
-    public String getPicture() {
-
+    public String getProfile() {
         return (String)getAttributes().get("picture");
     }
+
+
+
+
+
 }
