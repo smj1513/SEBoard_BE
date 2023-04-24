@@ -18,6 +18,8 @@ pipeline {
 			sh "cp /var/jenkins_home/workspace/seboard-pipeline/application.yml /var/jenkins_home/workspace/seboard-pipeline/seboard/src/main/resources"
 			sh "cp /var/jenkins_home/workspace/seboard-pipeline/application-security.yml /var/jenkins_home/workspace/seboard-pipeline/seboard/src/main/resources"
 			sh "cp /var/jenkins_home/workspace/seboard-pipeline/application-db.yml /var/jenkins_home/workspace/seboard-pipeline/seboard/src/main/resources"
+			sh "cp /var/jenkins_home/workspace/seboard-pipeline/application-email.yml /var/jenkins_home/workspace/seboard-pipeline/seboard/src/main/resources"
+
 					component.each{ entry ->
 						stage ("${entry.key} Build"){
 							if(entry.value){
