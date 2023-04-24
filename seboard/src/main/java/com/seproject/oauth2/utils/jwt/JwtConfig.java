@@ -1,17 +1,12 @@
 package com.seproject.oauth2.utils.jwt;
 
-import com.seproject.oauth2.service.AccountService;
 import com.seproject.oauth2.utils.jwt.aspect.JwtAspect;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class JwtConfig {
-
-    @Autowired
-    private AccountService accountService;
 
     @Value("${jwt.secret}")
     private String secret;
@@ -29,7 +24,7 @@ public class JwtConfig {
 
     @Bean
     public JwtProvider jwtProvider() {
-        return new JwtProvider(accountService, expirationTime,tokenPrefix,secret);
+        return new JwtProvider(expirationTime,tokenPrefix,secret);
     }
 
     @Bean

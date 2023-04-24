@@ -1,6 +1,7 @@
 package com.seproject.oauth2.utils.handler;
 
 import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
@@ -16,6 +17,14 @@ public class FormLoginFailureHandler implements AuthenticationFailureHandler {
     public void onAuthenticationFailure(HttpServletRequest request,
             HttpServletResponse response,
             AuthenticationException exception) throws IOException, ServletException {
-        response.sendError(HttpStatus.BAD_REQUEST.value());
+
+        if(exception instanceof BadCredentialsException) {
+            response.addHeader("message",exception.getMessage());
+            response.sendError(HttpStatus.UNAUTHORIZED.value());
+        } else {
+            response.sendError(HttpStatus.BAD_REQUEST.value());
+        }
+
+
     }
 }
