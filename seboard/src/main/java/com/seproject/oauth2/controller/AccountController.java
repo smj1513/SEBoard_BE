@@ -8,6 +8,14 @@ import com.seproject.oauth2.controller.dto.EmailConfirmRequestDTO;
 import com.seproject.oauth2.service.AccountService;
 import com.seproject.oauth2.service.EmailService;
 import com.seproject.oauth2.utils.jwt.JwtDecoder;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +32,7 @@ import java.util.NoSuchElementException;
 
 import static com.seproject.oauth2.controller.dto.RegisterDTO.*;
 
+@Tag(name = "계정 시스템 API", description = "계정(Account) 관련 API")
 @AllArgsConstructor
 @Controller
 public class AccountController {
@@ -33,6 +42,19 @@ public class AccountController {
     private final AccountService accountService;
     private final EmailService emailService;
 
+
+    @Parameters(
+            {
+                    @Parameter(name = "Authorization", description = "OAuth 회원가입 버튼을 누르면 전달되는 JWT를 헤더에 넣어서 전달한다."),
+                    @Parameter(name = "nickname", description = "oauth 회원가입 추가 정보 중 닉네임"),
+                    @Parameter(name = "name", description = "oauth 회원가입 추가 정보 중 닉네임")
+            }
+    )
+    @Operation(summary = "OAuth 회원가입", description = "소셜 로그인 사용시 추가 정보를 입력하여 회원가입을 요청한다.")
+    @ApiResponses({
+            @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "200", description = "회원가입 성공 시 메세지 전달"),
+            @ApiResponse(content = @Content(schema = @Schema(implementation = IllegalArgumentException.class)), responseCode = "400", description = "전달 항목이 비었거나 유효하지 않은경우"),
+    })
     @PostMapping("/account/oauth")
     public ResponseEntity<?> registerUserWithOAuth(HttpServletRequest request,@RequestBody OAuth2RegisterRequest oAuth2RegisterRequest) {
 
@@ -57,6 +79,19 @@ public class AccountController {
         return new ResponseEntity<>("회원가입 완료",HttpStatus.OK);
     }
 
+    @Parameters(
+            {
+                    @Parameter(name = "id", description = "인증한 금오 이메일을 전달한다."),
+                    @Parameter(name = "password", description = "계정에 사용될 비밀번호를 전달한다."),
+                    @Parameter(name = "nickname", description = "닉네임(활동명)을 입력한다."),
+                    @Parameter(name = "name", description = "실명을 입력한다.")
+            }
+    )
+    @Operation(summary = "Form 회원가입", description = "이메일 인증을 완료한 사용자는 회원가입 요청을 진행한다.")
+    @ApiResponses({
+            @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "200", description = "회원가입 성공 시 메세지 전달"),
+            @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "400", description = "인증되지 않은 이메일을 전달"),
+    })
     @PostMapping("/account/form")
     public ResponseEntity<?> registerUserWithForm(@RequestBody FormRegisterRequest formRegisterRequest) {
 
@@ -76,17 +111,42 @@ public class AccountController {
         return new ResponseEntity<>("인증되지 않은 이메일입니다.",HttpStatus.BAD_REQUEST);
     }
 
+    @Parameters(
+            {
+                    @Parameter(name = "email", description = "인증번호를 받을 금오 이메일을 전달한다.")
+            }
+    )
+    @Operation(summary = "이메일 인증 요청", description = "회원가입을 위하여 금오 이메일 인증을 진행한다.")
+    @ApiResponses({
+            @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "200", description = "이메일 전송 성공"),
+            @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "400", description = "잘못된 이메일 형식"),
+            @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "400", description = "이미 가입된 아이디가 존재함"),
+    })
     @PostMapping("/email/auth")
     public ResponseEntity<?> sendEmail(@RequestBody EmailAuthenticationRequest request) {
-
-        if(accountService.isExist(request.getEmail())) {
+        String email = request.getEmail();
+        if(!email.matches("\\w+@kumoh.ac.kr")){
+            return new ResponseEntity<>("잘못된 이메일 형식입니다.",HttpStatus.BAD_REQUEST);
+        }
+        if(accountService.isExist(email)) {
             return new ResponseEntity<>("이미 인증된 이메일입니다." , HttpStatus.BAD_REQUEST);
         }
 
-        emailService.send(request.getEmail());
+        emailService.send(email);
         return new ResponseEntity<>("입력한 이메일로 인증 코드를 전송했습니다.",HttpStatus.OK);
     }
 
+    @Parameters(
+            {
+                    @Parameter(name = "email", description = "인증번호를 받은 금오 이메일"),
+                    @Parameter(name = "authToken", description = "인증번호를 입력한다")
+            }
+    )
+    @Operation(summary = "이메일 인증 확인", description = "회원가입을 진행하기 위해 전송한 인증 코드와 이메일이 유효한지 확인한다.")
+    @ApiResponses({
+            @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "200", description = "이메일 인증 성공"),
+            @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "404", description = "일치하는 정보가 없음"),
+    })
     @PostMapping("/email/confirm")
     public ResponseEntity<?> confirmAuthCode(@RequestBody EmailConfirmRequestDTO emailConfirmDTO) {
         try {
@@ -98,6 +158,7 @@ public class AccountController {
         }
     }
 
+    @Operation(summary = "로그아웃", description = "미해결 상태")
     @GetMapping("/logoutProc") //미해결
     public ResponseEntity<?> logout(Authentication authentication) {
         System.out.println("----호출----");
