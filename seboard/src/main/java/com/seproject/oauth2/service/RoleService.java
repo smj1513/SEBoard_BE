@@ -29,4 +29,14 @@ public class RoleService {
         return RetrieveAllRoleResponse.toDTO(roles,total,nowPage,perPage);
     }
 
+    public CreateRoleResponse createRole(String roleName) {
+        if(roleRepository.existsByName(roleName)){
+            throw new IllegalArgumentException("이미 존재하는 권한");
+        }
+
+        Role role = new Role(roleName);
+        Role savedRole = roleRepository.save(role);
+        return CreateRoleResponse.toDTO(savedRole);
+    }
+
 }

@@ -48,4 +48,25 @@ public class RoleDTO {
                     .build();
         }
     }
+
+
+    @Data
+    public static class CreateRoleRequest {
+        private String name;
+    }
+
+    @Builder
+    @Data
+    public static class CreateRoleResponse {
+        private Long roleId;
+        private String name;
+
+        public static CreateRoleResponse toDTO(Role role) {
+            return builder()
+                    .roleId(role.getId())
+                    .name(role.getAuthority())
+                    .build();
+        }
+
+    }
 }

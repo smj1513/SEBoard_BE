@@ -13,9 +13,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -61,12 +59,12 @@ public class AdminRoleController {
 
     @Operation(summary = "권한 생성", description = "새로운 권한을 추가한다.")
     @ApiResponses({
-            @ApiResponse(content = @Content(schema = @Schema(implementation = AccountDTO.RetrieveAllAccountResponse.class)), responseCode = "200", description = "권한 목록 조회 성공"),
-            @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "400", description = "잘못된 페이징 정보")
+            @ApiResponse(content = @Content(schema = @Schema(implementation = CreateRoleResponse.class)), responseCode = "200", description = "권한 생성 성공"),
+            @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "400", description = "이미 존재하는 권한 이름")
     })
 //    @JWT
-    @GetMapping("/roles")
-    public ResponseEntity<?> createRole(HttpServletRequest request, @RequestBody RetrieveAllRoleRequest retrieveRoleRequest) {
+    @PostMapping("/roles")
+    public ResponseEntity<?> createRole(HttpServletRequest request, @RequestBody CreateRoleRequest createRoleRequest) {
 //        String jwt = request.getHeader("Authorization");
 //        List<String> authorities = jwtDecoder.getAuthorities(jwt);
 //
@@ -74,18 +72,14 @@ public class AdminRoleController {
 //            return new ResponseEntity<>("접근 권한이 없습니다.",HttpStatus.NOT_ACCEPTABLE);
 //        }
 
-        int page = retrieveRoleRequest.getPage();
-        int perPage = retrieveRoleRequest.getPerPage();
-        page = Math.max(page-1,0);
-        perPage = Math.max(perPage,1);
-
         try{
-            RetrieveAllRoleResponse roleResponse = roleService.findAll(page, perPage);
-            return new ResponseEntity<>(roleResponse, HttpStatus.OK);
+            CreateRoleResponse createRoleResponse = roleService.createRole(createRoleRequest.getName());
+            return new ResponseEntity<>(createRoleResponse, HttpStatus.OK);
         } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>("페이지 번호가 잘못되었습니다.",HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>("이미 존재하는 권한 이름입니다.",HttpStatus.BAD_REQUEST);
         }
 
     }
+
 
 }
