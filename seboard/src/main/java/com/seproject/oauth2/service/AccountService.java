@@ -137,4 +137,12 @@ public class AccountService {
         return UpdateAccountResponse.toDTO(account.update(updateAccount));
     }
 
+    public DeleteAccountResponse deleteAccount(Long accountId) {
+
+        Account account = accountRepository.findById(accountId).orElseThrow();
+        accountRepository.delete(account);
+
+        return DeleteAccountResponse.toDTO(account);
+    }
+
 }

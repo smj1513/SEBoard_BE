@@ -116,4 +116,23 @@ public class AdminController {
         }
 
     }
+
+    //    @JWT
+    @DeleteMapping("/accounts")
+    public ResponseEntity<?> deleteAccount(HttpServletRequest request,@RequestBody DeleteAccountRequest deleteAccountRequest) {
+//        String jwt = request.getHeader("Authorization");
+//        List<String> authorities = jwtDecoder.getAuthorities(jwt);
+//
+//        if(!authorities.contains("ROLE_ADMIN")) {
+//            return new ResponseEntity<>("접근 권한이 없습니다.",HttpStatus.NOT_ACCEPTABLE);
+//        }
+
+        try{
+            DeleteAccountResponse deleteAccount = accountService.deleteAccount(deleteAccountRequest.getAccountId());
+            return new ResponseEntity<>(deleteAccount,HttpStatus.OK);
+        }  catch (NoSuchElementException e) {
+            return new ResponseEntity<>("해당 계정을 찾을수 없습니다.",HttpStatus.BAD_REQUEST);
+        }
+
+    }
 }

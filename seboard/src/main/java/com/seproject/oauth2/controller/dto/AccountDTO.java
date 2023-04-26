@@ -134,5 +134,32 @@ public class AccountDTO {
         }
     }
 
+    @Data
+    public static class DeleteAccountRequest{
+        private Long accountId;
+    }
+
+    @Builder(access = AccessLevel.PRIVATE)
+    @Data
+    public static class DeleteAccountResponse{
+        private String id;
+        private String email;
+        private String name;
+        private String nickname;
+        private String profile;
+        private List<Role> authorities;
+
+        public static DeleteAccountResponse toDTO(Account account){
+            return builder()
+                    .id(account.getLoginId())
+                    .email(account.getEmail())
+                    .name(account.getUsername())
+                    .nickname(account.getNickname())
+                    .authorities(account.getAuthorities())
+                    .profile(account.getProfile())
+                    .build();
+        }
+    }
+
 
 }
