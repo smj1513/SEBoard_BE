@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -85,6 +86,30 @@ public class AccountService {
         int nowPage = all.getNumber();
 
         return RetrieveAllAccountResponse.toDTO(total,nowPage+1,perPage,accounts);
+    }
+
+    public CreateAccountResponse createAccount(CreateAccountRequest request) {
+
+        List<String> requestAuthorities = request.getAuthorities();
+        List<Role> authorities = roleRepository.findByNameIn(requestAuthorities);
+
+        if(authorities.size() != requestAuthorities.size()) {
+            throw new IllegalArgumentException("존재하지 않는 권한을 요청하였습니다.");
+        }
+
+        Account account = Account.builder()
+                .loginId(request.getId())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .email(request.getEmail())
+                .profile("none")
+                .nickname(request.getNickname())
+                .username(request.getName())
+                .provider("se")
+                .authorities(authorities)
+                .build();
+
+        Account savedAccount = accountRepository.save(account);
+        return CreateAccountResponse.toDTO(savedAccount);
     }
 
 }

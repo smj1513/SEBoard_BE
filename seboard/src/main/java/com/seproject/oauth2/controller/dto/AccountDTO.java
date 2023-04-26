@@ -2,11 +2,11 @@ package com.seproject.oauth2.controller.dto;
 
 import com.seproject.oauth2.model.Account;
 import com.seproject.oauth2.model.Role;
+import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -19,7 +19,7 @@ public class AccountDTO {
     }
 
 
-    @Builder
+    @Builder(access = AccessLevel.PRIVATE)
     @Data
     public static class RetrieveAllAccountResponse {
         private int total;
@@ -40,7 +40,7 @@ public class AccountDTO {
         }
 
     }
-    @Builder
+    @Builder(access = AccessLevel.PRIVATE)
     @Data
     public static class RetrieveAccountResponse {
         private Long accountId;
@@ -63,4 +63,38 @@ public class AccountDTO {
         }
 
     }
+
+
+    @Data
+    public static class CreateAccountRequest{
+        private String id;
+        private String password;
+        private String email;
+        private String name;
+        private String nickname;
+        private List<String> authorities;
+
+    }
+
+    @Builder(access = AccessLevel.PRIVATE)
+    @Data
+    public static class CreateAccountResponse{
+        private String id;
+        private String email;
+        private String name;
+        private String nickname;
+        private List<Role> authorities;
+
+        public static CreateAccountResponse toDTO(Account account){
+            return builder()
+                    .id(account.getLoginId())
+                    .email(account.getEmail())
+                    .name(account.getUsername())
+                    .nickname(account.getNickname())
+                    .authorities(account.getAuthorities())
+                    .build();
+        }
+    }
+
+
 }
