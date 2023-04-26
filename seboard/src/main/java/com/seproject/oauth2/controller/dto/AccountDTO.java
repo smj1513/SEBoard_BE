@@ -72,6 +72,7 @@ public class AccountDTO {
         private String email;
         private String name;
         private String nickname;
+        private String profile;
         private List<String> authorities;
 
     }
@@ -83,6 +84,7 @@ public class AccountDTO {
         private String email;
         private String name;
         private String nickname;
+        private String profile;
         private List<Role> authorities;
 
         public static CreateAccountResponse toDTO(Account account){
@@ -91,7 +93,43 @@ public class AccountDTO {
                     .email(account.getEmail())
                     .name(account.getUsername())
                     .nickname(account.getNickname())
+                    .profile(account.getProfile())
                     .authorities(account.getAuthorities())
+                    .build();
+        }
+    }
+
+    @Data
+    public static class UpdateAccountRequest{
+        private Long accountId;
+        private String id;
+        private String password;
+        private String email;
+        private String profile;
+        private String name;
+        private String nickname;
+        private List<String> authorities;
+
+    }
+
+    @Builder(access = AccessLevel.PRIVATE)
+    @Data
+    public static class UpdateAccountResponse{
+        private String id;
+        private String email;
+        private String name;
+        private String nickname;
+        private String profile;
+        private List<Role> authorities;
+
+        public static UpdateAccountResponse toDTO(Account account){
+            return builder()
+                    .id(account.getLoginId())
+                    .email(account.getEmail())
+                    .name(account.getUsername())
+                    .nickname(account.getNickname())
+                    .authorities(account.getAuthorities())
+                    .profile(account.getProfile())
                     .build();
         }
     }

@@ -9,13 +9,11 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 import static com.seproject.oauth2.controller.dto.AccountDTO.*;
 
@@ -70,6 +68,32 @@ public class AdminController {
        } catch (IllegalArgumentException e) {
            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
        }
+
+    }
+
+    //    @JWT
+    @PutMapping("/accounts")
+    public ResponseEntity<?> updateAccount(HttpServletRequest request,@RequestBody UpdateAccountRequest updateAccountRequest) {
+//        String jwt = request.getHeader("Authorization");
+//        List<String> authorities = jwtDecoder.getAuthorities(jwt);
+//
+//        if(!authorities.contains("ROLE_ADMIN")) {
+//            return new ResponseEntity<>("접근 권한이 없습니다.",HttpStatus.NOT_ACCEPTABLE);
+//        }
+
+        String email = updateAccountRequest.getEmail();
+        if(!email.matches("\\w+@\\w+\\.\\w+(\\.\\w+)?")) {
+            return new ResponseEntity<>("이메일 형식이 맞지 않습니다." , HttpStatus.BAD_REQUEST);
+        }
+
+        try{
+            UpdateAccountResponse updateAccount = accountService.updateAccount(updateAccountRequest);
+            return new ResponseEntity<>(updateAccount,HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>("해당 계정을 찾을수 없습니다.",HttpStatus.BAD_REQUEST);
+        }
 
     }
 }

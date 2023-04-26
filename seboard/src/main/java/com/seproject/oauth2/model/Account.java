@@ -51,8 +51,16 @@ public class Account implements UserDetails {
         this.createdAt = LocalDateTime.now();
     }
 
-    public void updateProfile(String profile) {
-        this.profile = profile;
+    public Account update(Account account) {
+        loginId = account.loginId;
+        password = account.password;
+        username = account.username;
+        nickname = account.nickname;
+        email = account.email;
+        profile = account.profile;
+        authorities = account.authorities;
+
+        return this;
     }
     @Override
     public boolean isAccountNonExpired() {

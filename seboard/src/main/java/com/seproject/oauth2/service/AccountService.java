@@ -88,28 +88,48 @@ public class AccountService {
         return RetrieveAllAccountResponse.toDTO(total,nowPage+1,perPage,accounts);
     }
 
-    public CreateAccountResponse createAccount(CreateAccountRequest request) {
+    private List<Role> convertAuthorities(List<String> authorities) {
+        List<Role> convertedAuthorities = roleRepository.findByNameIn(authorities);
 
-        List<String> requestAuthorities = request.getAuthorities();
-        List<Role> authorities = roleRepository.findByNameIn(requestAuthorities);
-
-        if(authorities.size() != requestAuthorities.size()) {
+        if(authorities.size() != convertedAuthorities.size()) {
             throw new IllegalArgumentException("존재하지 않는 권한을 요청하였습니다.");
         }
+
+        return convertedAuthorities;
+    }
+
+    public CreateAccountResponse createAccount(CreateAccountRequest request) {
 
         Account account = Account.builder()
                 .loginId(request.getId())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .email(request.getEmail())
-                .profile("none")
+                .profile(request.getProfile())
                 .nickname(request.getNickname())
                 .username(request.getName())
                 .provider("se")
-                .authorities(authorities)
+                .authorities(convertAuthorities(request.getAuthorities()))
                 .build();
 
         Account savedAccount = accountRepository.save(account);
         return CreateAccountResponse.toDTO(savedAccount);
+    }
+
+    public UpdateAccountResponse updateAccount(UpdateAccountRequest request) {
+
+        Account account = accountRepository.findById(request.getAccountId()).orElseThrow();
+
+        Account updateAccount = Account.builder()
+                .loginId(request.getId())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .email(request.getEmail())
+                .profile(request.getProfile())
+                .nickname(request.getNickname())
+                .username(request.getName())
+                .authorities(convertAuthorities(request.getAuthorities()))
+                .build();
+
+        return UpdateAccountResponse.toDTO(account.update(updateAccount));
     }
 
 }
