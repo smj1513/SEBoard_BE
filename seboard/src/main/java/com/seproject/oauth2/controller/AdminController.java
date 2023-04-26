@@ -49,6 +49,26 @@ public class AdminController {
     }
 
     //    @JWT
+    @GetMapping("/accounts/{accountId}")
+    public ResponseEntity<?> retrieveAllAccount(HttpServletRequest request,@PathVariable Long accountId) {
+//        String jwt = request.getHeader("Authorization");
+//        List<String> authorities = jwtDecoder.getAuthorities(jwt);
+//
+//        if(!authorities.contains("ROLE_ADMIN")) {
+//            return new ResponseEntity<>("접근 권한이 없습니다.",HttpStatus.NOT_ACCEPTABLE);
+//        }
+
+        try{
+            return new ResponseEntity<>(accountService.findAccount(accountId), HttpStatus.OK);
+        } catch (IllegalArgumentException e) {
+            return new ResponseEntity<>("페이지 번호가 잘못되었습니다.",HttpStatus.BAD_REQUEST);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>("해당 유저를 찾을수 없습니다.",HttpStatus.NOT_FOUND);
+        }
+
+    }
+
+    //    @JWT
     @PostMapping("/accounts")
     public ResponseEntity<?> createAccountByAdmin(HttpServletRequest request,@RequestBody CreateAccountRequest createAccountRequest) {
 //        String jwt = request.getHeader("Authorization");

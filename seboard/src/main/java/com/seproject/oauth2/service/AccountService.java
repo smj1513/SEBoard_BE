@@ -88,6 +88,11 @@ public class AccountService {
         return RetrieveAllAccountResponse.toDTO(total,nowPage+1,perPage,accounts);
     }
 
+    public RetrieveAccountResponse findAccount(Long accountId) {
+        Account account = accountRepository.findById(accountId).orElseThrow();
+        return RetrieveAccountResponse.toDTO(account);
+    }
+
     private List<Role> convertAuthorities(List<String> authorities) {
         List<Role> convertedAuthorities = roleRepository.findByNameIn(authorities);
 
