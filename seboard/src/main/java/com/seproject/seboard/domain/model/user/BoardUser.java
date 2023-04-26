@@ -23,4 +23,6 @@ public abstract class BoardUser {
     public abstract boolean isAnonymous();
 
     public abstract boolean isOwnAccountId(Long accountId);
+
+    public abstract String getLoginId();
 }

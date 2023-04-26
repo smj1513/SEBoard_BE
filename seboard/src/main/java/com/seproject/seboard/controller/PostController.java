@@ -2,17 +2,15 @@ package com.seproject.seboard.controller;
 
 import com.seproject.seboard.application.CommentAppService;
 import com.seproject.seboard.application.PostAppService;
+import com.seproject.seboard.application.PostSearchAppService;
 import com.seproject.seboard.application.dto.comment.CommentCommand;
-import com.seproject.seboard.application.dto.post.PostCommand;
 import com.seproject.seboard.application.dto.post.PostCommand.PostListFindCommand;
 import com.seproject.seboard.controller.dto.MessageResponse;
 import com.seproject.seboard.controller.dto.post.PostRequest.CreatePostRequest;
-import com.seproject.seboard.controller.dto.post.PostRequest.CreateUnnamedPostRequest;
 import com.seproject.seboard.controller.dto.post.PostRequest.UpdateNamedPostRequest;
 import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostListResponse;
 import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostListResponseElement;
-import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostResponse;
-import com.seproject.seboard.controller.dto.user.AnonymousRequest;
+import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostDetailResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -26,12 +24,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 
-import static com.seproject.seboard.application.dto.comment.CommentCommand.*;
 import static com.seproject.seboard.controller.dto.post.PostResponse.*;
 
 @Slf4j
@@ -41,6 +38,7 @@ import static com.seproject.seboard.controller.dto.post.PostResponse.*;
 @AllArgsConstructor
 public class PostController {
     private final PostAppService postAppService;
+    private final PostSearchAppService postSearchAppService;
     private final CommentAppService commentAppService;
 
     @Parameters(
@@ -107,7 +105,7 @@ public class PostController {
     @Parameter(name = "postId", description = "상세 조회를 할 게시물의 pk")
     @Operation(summary = "게시글 상세 조회", description = "게시글을 클릭하면 게시글의 상세 내역을 조회한다")
     @ApiResponses({
-            @ApiResponse(content = @Content(schema = @Schema(implementation = RetrievePostResponse.class)), responseCode = "200", description = "조회 성공"),
+            @ApiResponse(content = @Content(schema = @Schema(implementation = RetrievePostDetailResponse.class)), responseCode = "200", description = "조회 성공"),
             @ApiResponse(content = @Content(schema = @Schema(implementation = MessageResponse.class)), responseCode = "404", description = "해당 pk를 가진 게시물이 없음")
     })
     @GetMapping("/{postId}")
@@ -120,8 +118,8 @@ public class PostController {
          */
 
         try {
-            RetrievePostResponse retrievePostResponse = postAppService.findPost(postId, accountId);
-            return new ResponseEntity<>(retrievePostResponse, HttpStatus.OK);
+            RetrievePostDetailResponse postDetailRes = postSearchAppService.findPostDetail(postId, accountId);
+            return new ResponseEntity<>(postDetailRes, HttpStatus.OK);
         } catch (NoSuchElementException e) {
             MessageResponse response = MessageResponse.of(e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);

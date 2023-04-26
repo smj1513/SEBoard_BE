@@ -28,7 +28,7 @@ public class PostRequest {
     public static class CreatePostRequest {
         private String title;
         private String contents;
-        private List<MultipartFile> attachment;
+//        private List<MultipartFile> attachment;
         private Long categoryId;
         private boolean pined;
         private ExposeOptionRequest exposeOption;
@@ -52,7 +52,7 @@ public class PostRequest {
     public static class UpdateNamedPostRequest {
         private String title;
         private String contents;
-        private List<MultipartFile> attachment;
+//        private List<MultipartFile> attachment;
         private Long categoryId;
         private boolean pined;
         private ExposeOptionRequest exposeOption;

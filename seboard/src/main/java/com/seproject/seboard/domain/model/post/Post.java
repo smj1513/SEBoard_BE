@@ -43,13 +43,13 @@ public class Post {
     @JoinColumn(name = "expose_option_id")
     @Builder.Default
     private ExposeOption exposeOption = new Public();
-    @OneToMany
-    private List<Attachment> attachments;
+//    @OneToMany
+//    private List<Attachment> attachments;
     private int anonymousCount;
 
     public Post(Long postId, String title, String contents, int views,
                 boolean pined, BaseTime baseTime, Category category,
-                BoardUser author, ExposeOption exposeOption, List<Attachment> attachments, int anonymousCount) {
+                BoardUser author, ExposeOption exposeOption, /* List<Attachment> attachments */ int anonymousCount) {
         if(!isValidTitle(title)) {
             throw new IllegalArgumentException();
         }
@@ -67,7 +67,7 @@ public class Post {
         this.category = category;
         this.author = author;
         this.exposeOption = exposeOption;
-        this.attachments = attachments;
+//        this.attachments = attachments;
         this.anonymousCount = anonymousCount;
     }
 

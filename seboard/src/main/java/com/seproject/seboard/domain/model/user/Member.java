@@ -29,4 +29,9 @@ public class Member extends BoardUser{
     public boolean isOwnAccountId(Long accountId) {
         return account.getAccountId().equals(accountId);
     }
+
+    @Override
+    public String getLoginId() {
+        return account.getLoginId();
+    }
 }

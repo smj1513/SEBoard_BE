@@ -27,4 +27,9 @@ public class Anonymous extends BoardUser {
     public boolean isOwnAccountId(Long accountId) {
         return this.accountId.equals(accountId);
     }
+
+    @Override
+    public String getLoginId() {
+        return null;
+    }
 }

@@ -10,8 +10,6 @@ import com.seproject.seboard.domain.model.post.Category;
 import com.seproject.seboard.domain.model.post.Post;
 import com.seproject.seboard.domain.model.user.Anonymous;
 import com.seproject.seboard.domain.model.user.Member;
-import com.seproject.seboard.domain.repository.Page;
-import com.seproject.seboard.domain.repository.PagingInfo;
 import com.seproject.seboard.domain.repository.comment.CommentRepository;
 import com.seproject.seboard.domain.repository.post.BookmarkRepository;
 import com.seproject.seboard.domain.repository.post.CategoryRepository;
@@ -22,6 +20,9 @@ import com.seproject.seboard.domain.repository.user.BoardUserRepository;
 import com.seproject.seboard.domain.repository.user.MemberRepository;
 import com.seproject.oauth2.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -96,48 +97,31 @@ public class PostAppService {
         }
     }
 
-    public RetrievePostResponse findPost(Long postId, Long accountId){
-        Post post = findByIdOrThrow(postId, postRepository, ""); //TODO : postSearchRepository로 변경?
-        //TODO : member없을 때 로직 추가 필요
-        //TODO : 관리자 권한일 때 editable 로직 추가필요
-        boolean isEditable = false;
-        boolean isBookmarked = false;
-
-        if(accountId!=null){
-            Member member = memberRepository.findByAccountId(accountId);
-
-            isEditable = post.isWrittenBy(accountId);
-            isBookmarked = bookmarkRepository.existsByPostIdAndMemberId(postId, member.getBoardUserId());
-        }
-
-        return RetrievePostResponse.toDTO(post, isEditable, isBookmarked);
-    }
-
     //TODO : paging 처리해야함
     public RetrievePostListResponse findPostList(PostListFindCommand command, boolean pinedOption){
-        Page<Post> postPage = null;
-
-        if(pinedOption){
-            postPage = postSearchRepository.findPinedPostByCategoryId(command.getCategoryId(), new PagingInfo(command.getPage(), command.getSize()));
-        }else{
-            postPage = postSearchRepository.findByCategoryId(command.getCategoryId(), new PagingInfo(command.getPage(), command.getSize()));
-        }
-
-        List<RetrievePostListResponseElement> postDtoList = postPage.getData()
-            .stream()
-            .map(post -> {
-                int commentSize = commentRepository.countCommentsByPostId(post.getPostId());
-                return RetrievePostListResponseElement.toDTO(post, commentSize);
-            }).collect(Collectors.toList());
-
-        PaginationResponse paginationResponse = PaginationResponse.builder()
-                .currentPage(postPage.getCurPage())
-                .contentSize(postPage.getTotalSize())
-                .perPage(postPage.getPerPage())
-                .lastPage(postPage.getLastPage())
-                .build();
-
-        return RetrievePostListResponse.toDTO(postDtoList, paginationResponse);
+//        Page<Post> postPage = null;
+//
+//        if(pinedOption){
+//            postPage = postSearchRepository.findPinedPostByCategoryId(command.getCategoryId(), PageRequest.of(command.getPage(), command.getSize()));
+//        }else{
+//            postPage = postSearchRepository.findByCategoryId(command.getCategoryId(), PageRequest.of(command.getPage(), command.getSize())));
+//        }
+//
+//        List<RetrievePostListResponseElement> postDtoList = postPage .stream()
+//            .map(post -> {
+//                int commentSize = commentRepository.countCommentsByPostId(post.getPostId());
+//                return RetrievePostListResponseElement.toDTO(post, commentSize);
+//            }).collect(Collectors.toList());
+//
+//        PaginationResponse paginationResponse = PaginationResponse.builder()
+//                .currentPage(postPage.getCurPage())
+//                .contentSize(postPage.getTotalSize())
+//                .perPage(postPage.getPerPage())
+//                .lastPage(postPage.getLastPage())
+//                .build();
+//
+//        return RetrievePostListResponse.toDTO(postDtoList, paginationResponse);
+        return null;
     }
 
     public void editPost(PostEditCommand command) {
