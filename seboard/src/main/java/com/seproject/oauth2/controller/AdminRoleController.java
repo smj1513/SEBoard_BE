@@ -17,6 +17,8 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 
+import java.util.NoSuchElementException;
+
 import static com.seproject.oauth2.controller.dto.RoleDTO.*;
 
 @Tag(name = "권한 관리 API", description = "관리자 시스템의 권한 관리 API")
@@ -81,5 +83,29 @@ public class AdminRoleController {
 
     }
 
+    @Operation(summary = "권한 삭제", description = "권한을 삭제한다.")
+    @ApiResponses({
+            @ApiResponse(content = @Content(schema = @Schema(implementation = CreateRoleResponse.class)), responseCode = "200", description = "권한 삭제 성공"),
+            @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "403", description = "기본 권한은 삭제 불가능"),
+            @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "400", description = "존재하지 않는 권한"),
+    })
+//    @JWT
+    @DeleteMapping("/roles")
+    public ResponseEntity<?> deleteRole(HttpServletRequest request, @RequestBody DeleteRoleRequest deleteRoleRequest) {
+//        String jwt = request.getHeader("Authorization");
+//        List<String> authorities = jwtDecoder.getAuthorities(jwt);
+//
+//        if(!authorities.contains("ROLE_ADMIN")) {
+//            return new ResponseEntity<>("접근 권한이 없습니다.",HttpStatus.NOT_ACCEPTABLE);
+//        }
+
+        try{
+            DeleteRoleResponse deleteRoleResponse = roleService.deleteRole(deleteRoleRequest.getRoleId());
+            return new ResponseEntity<>(deleteRoleResponse, HttpStatus.OK);
+        } catch (NoSuchElementException e) {
+            return new ResponseEntity<>("존재하지 않는 권한입니다.",HttpStatus.BAD_REQUEST);
+        }
+
+    }
 
 }

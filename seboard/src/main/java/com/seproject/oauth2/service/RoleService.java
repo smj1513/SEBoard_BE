@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.seproject.oauth2.controller.dto.RoleDTO.*;
 
@@ -37,6 +38,14 @@ public class RoleService {
         Role role = new Role(roleName);
         Role savedRole = roleRepository.save(role);
         return CreateRoleResponse.toDTO(savedRole);
+    }
+
+    public DeleteRoleResponse deleteRole(Long roleId) {
+
+        Role role = roleRepository.findById(roleId).orElseThrow();
+        roleRepository.delete(role);
+
+        return DeleteRoleResponse.toDTO(role);
     }
 
 }

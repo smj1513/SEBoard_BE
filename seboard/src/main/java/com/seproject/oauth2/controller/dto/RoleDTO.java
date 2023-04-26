@@ -69,4 +69,24 @@ public class RoleDTO {
         }
 
     }
+
+    @Data
+    public static class DeleteRoleRequest {
+        private Long roleId;
+    }
+
+    @Builder
+    @Data
+    public static class DeleteRoleResponse {
+        private Long roleId;
+        private String name;
+
+        public static DeleteRoleResponse toDTO(Role role) {
+            return builder()
+                    .roleId(role.getId())
+                    .name(role.getAuthority())
+                    .build();
+        }
+
+    }
 }
