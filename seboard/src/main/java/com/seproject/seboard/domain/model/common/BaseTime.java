@@ -11,6 +11,7 @@ import java.time.LocalDateTime;
 
 @Embeddable
 @Getter
+@NoArgsConstructor
 @AllArgsConstructor
 @NoArgsConstructor
 public class BaseTime {

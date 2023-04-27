@@ -8,12 +8,10 @@ import java.util.List;
 
 public class JwtDecoder {
 
-    private final String tokenPrefix;
     private final String secret;
 
-    public JwtDecoder(String secret,String tokenPrefix) {
+    public JwtDecoder(String secret) {
         this.secret = secret;
-        this.tokenPrefix = tokenPrefix;
     }
 
     public String getLoginId(String token){
@@ -30,7 +28,7 @@ public class JwtDecoder {
                 .parseClaimsJws(token)
                 .getBody();
 
-        return (String)claims.getOrDefault("email",null);
+        return (String)claims.getOrDefault(JWTProperties.EMAIL,null);
     }
 
     public String getProvider(String token){
@@ -39,7 +37,7 @@ public class JwtDecoder {
                 .parseClaimsJws(token)
                 .getBody();
 
-        return (String)claims.getOrDefault("provider",null);
+        return (String)claims.getOrDefault(JWTProperties.PROVIDER,null);
     }
 
     public String getProfile(String token){
@@ -48,7 +46,7 @@ public class JwtDecoder {
                 .parseClaimsJws(token)
                 .getBody();
 
-        return (String)claims.getOrDefault("profile",null);
+        return (String)claims.getOrDefault(JWTProperties.PROFILE,null);
     }
 
     public List<String> getAuthorities(String token){
@@ -56,6 +54,6 @@ public class JwtDecoder {
                 .setSigningKey(secret)
                 .parseClaimsJws(token)
                 .getBody();
-        return (List<String>) claims.getOrDefault("authorities",new ArrayList<>());
+        return (List<String>) claims.getOrDefault(JWTProperties.AUTHORITIES,new ArrayList<>());
     }
 }

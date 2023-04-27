@@ -1,5 +1,7 @@
 package com.seproject.oauth2.utils.handler;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.seproject.oauth2.controller.dto.LoginResponseDTO;
 import com.seproject.oauth2.model.social.KakaoOidcUser;
 import com.seproject.oauth2.repository.AccountRepository;
 import com.seproject.oauth2.utils.jwt.JwtProvider;
@@ -22,11 +24,13 @@ public class OidcAuthenticationSuccessHandler implements AuthenticationSuccessHa
 
     private final JwtProvider jwtProvider;
     private final AccountRepository accountRepository;
+    private final ObjectMapper objectMapper;
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         String jwt;
         OAuth2AuthenticationToken token = (OAuth2AuthenticationToken)authentication;
         KakaoOidcUser oidcUser = (KakaoOidcUser) token.getPrincipal();
+
         if(accountRepository.existsByLoginId("kakao_"+oidcUser.getId())) {
             jwt = jwtProvider.createJWT(new UsernamePasswordAuthenticationToken(oidcUser.getName(), UUID.randomUUID(),oidcUser.getAuthorities()));
         } else {
@@ -34,7 +38,18 @@ public class OidcAuthenticationSuccessHandler implements AuthenticationSuccessHa
         }
 
         String refreshToken = jwtProvider.createRefreshToken();
-        response.addHeader("Authorization",jwt);
-        response.addHeader("refreshToken",refreshToken);
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+
+        LoginResponseDTO responseDTO = LoginResponseDTO.builder()
+                .accessToken(jwt)
+                .refreshToken(refreshToken)
+                .build();
+
+        String result = objectMapper.writeValueAsString(responseDTO);
+        response.getWriter().write(result);
+//        response.addHeader("Authorization",jwt);
+//        response.addHeader("refreshToken",refreshToken);
     }
 }

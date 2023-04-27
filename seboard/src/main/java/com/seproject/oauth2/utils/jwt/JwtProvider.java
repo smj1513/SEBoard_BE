@@ -47,15 +47,15 @@ public class JwtProvider {
 //        }
 
         String jwt = Jwts.builder()
-                .setHeaderParam("type", "temporalToken")
-                .setHeaderParam("alg", "HS256")
+                .setHeaderParam(JWTProperties.TYPE, JWTProperties.TEMPORAL_TOKEN)
+                .setHeaderParam(JWTProperties.ALGORITHM, JWTProperties.HS256)
                 .setSubject(oidcUser.getProvider() + "_" + oidcUser.getId())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-                .claim("provider",oidcUser.getProvider())
-                .claim("id",oidcUser.getId())
-                .claim("email",oidcUser.getEmail())
-                .claim("profile",oidcUser.getProfile())
+                .claim(JWTProperties.PROVIDER,oidcUser.getProvider())
+                .claim(JWTProperties.ID,oidcUser.getId())
+                .claim(JWTProperties.EMAIL,oidcUser.getEmail())
+                .claim(JWTProperties.PROFILE,oidcUser.getProfile())
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
 
@@ -65,8 +65,8 @@ public class JwtProvider {
 
     public String createRefreshToken() {
         String refreshToken = Jwts.builder()
-                .setHeaderParam("type", "refreshToken")
-                .setHeaderParam("alg", "HS256")
+                .setHeaderParam(JWTProperties.TYPE, JWTProperties.REFRESH_TOKEN)
+                .setHeaderParam(JWTProperties.ALGORITHM, JWTProperties.HS256)
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(SignatureAlgorithm.HS256, secret)
@@ -80,12 +80,12 @@ public class JwtProvider {
     public String createJWT(UsernamePasswordAuthenticationToken token) {
 
         String jwt = Jwts.builder()
-                .setHeaderParam("type", "accessToken")
-                .setHeaderParam("alg", "HS256")
+                .setHeaderParam(JWTProperties.TYPE, JWTProperties.ACCESS_TOKEN)
+                .setHeaderParam(JWTProperties.ALGORITHM, JWTProperties.HS256)
                 .setSubject(token.getPrincipal().toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-                .claim("authorities", token.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
+                .claim(JWTProperties.AUTHORITIES, token.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
         return tokenPrefix + " " + jwt;

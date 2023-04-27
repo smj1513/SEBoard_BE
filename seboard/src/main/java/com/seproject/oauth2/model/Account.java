@@ -4,12 +4,11 @@ import lombok.*;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 @Entity
 @Table(name = "accounts")
 public class Account implements UserDetails {
@@ -33,8 +32,35 @@ public class Account implements UserDetails {
             inverseJoinColumns={@JoinColumn(name="role_id", referencedColumnName="roleId")})
     private List<Role> authorities;
 
-    public void updateProfile(String profile) {
+    private LocalDateTime createdAt;
+
+    @Builder
+    public Account(Long accountId, String loginId,
+                   String username, String nickname,
+                   String password, String provider,
+                   String email, String profile, List<Role> authorities, LocalDateTime createdAt) {
+        this.accountId = accountId;
+        this.loginId = loginId;
+        this.username = username;
+        this.nickname = nickname;
+        this.password = password;
+        this.provider = provider;
+        this.email = email;
         this.profile = profile;
+        this.authorities = authorities;
+        this.createdAt = LocalDateTime.now();
+    }
+
+    public Account update(Account account) {
+        loginId = account.loginId;
+        password = account.password;
+        username = account.username;
+        nickname = account.nickname;
+        email = account.email;
+        profile = account.profile;
+        authorities = account.authorities;
+
+        return this;
     }
     @Override
     public boolean isAccountNonExpired() {

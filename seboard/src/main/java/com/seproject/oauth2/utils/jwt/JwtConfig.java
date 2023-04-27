@@ -19,7 +19,7 @@ public class JwtConfig {
 
     @Bean
     public JwtDecoder jwtDecoder() {
-        return new JwtDecoder(secret,tokenPrefix);
+        return new JwtDecoder(secret);
     }
 
     @Bean
