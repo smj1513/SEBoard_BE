@@ -1,6 +1,7 @@
 package com.seproject.error.handler;
 
 import com.seproject.error.Error;
+import com.seproject.error.exception.InvalidPaginationException;
 import com.seproject.error.exception.PasswordIncorrectException;
 import com.seproject.error.exception.TokenValidateException;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,11 @@ public class AuthenticationExceptionHandler {
 
     @ExceptionHandler(PasswordIncorrectException.class)
     public ResponseEntity<Error> handlePasswordIncorrect(PasswordIncorrectException e) {
+        return Error.toResponseEntity(e.getErrorCode());
+    }
+
+    @ExceptionHandler(InvalidPaginationException.class)
+    public ResponseEntity<Error> handleInvalidPage(InvalidPaginationException e) {
         return Error.toResponseEntity(e.getErrorCode());
     }
 

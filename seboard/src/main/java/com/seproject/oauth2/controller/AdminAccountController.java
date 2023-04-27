@@ -25,7 +25,6 @@ import static com.seproject.oauth2.controller.dto.AccountDTO.*;
 @Controller
 public class AdminAccountController {
 
-
     private final AccountService accountService;
     private final JwtDecoder jwtDecoder;
 
@@ -48,13 +47,8 @@ public class AdminAccountController {
         int perPage = accountRequest.getPerPage();
         page = Math.max(page-1,0);
         perPage = Math.max(perPage,1);
-        try{
-            RetrieveAllAccountResponse allAccount = accountService.findAllAccount(page, perPage);
-            return new ResponseEntity<>(allAccount, HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>("페이지 번호가 잘못되었습니다.",HttpStatus.BAD_REQUEST);
-        }
-
+        RetrieveAllAccountResponse allAccount = accountService.findAllAccount(page, perPage);
+        return new ResponseEntity<>(allAccount, HttpStatus.OK);
     }
 
 
