@@ -16,7 +16,6 @@ import javax.persistence.Table;
 @Table(name="anonymous")
 @PrimaryKeyJoinColumn(name="anonymous_id")
 public class Anonymous extends BoardUser {
-    private String name;
     private Long accountId; //TODO : 암호화
 
     @Override
@@ -27,5 +26,10 @@ public class Anonymous extends BoardUser {
     @Override
     public boolean isOwnAccountId(Long accountId) {
         return this.accountId.equals(accountId);
+    }
+
+    @Override
+    public String getLoginId() {
+        return null;
     }
 }

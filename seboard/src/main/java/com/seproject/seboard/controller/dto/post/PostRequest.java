@@ -1,14 +1,13 @@
 package com.seproject.seboard.controller.dto.post;
 
-import com.seproject.seboard.application.dto.post.PostCommand;
 import com.seproject.seboard.application.dto.post.PostCommand.PostWriteCommand;
 import com.seproject.seboard.controller.dto.user.AnonymousRequest;
 import com.seproject.seboard.domain.model.exposeOptions.ExposeState;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.seproject.seboard.application.dto.post.PostCommand.*;
@@ -28,7 +27,7 @@ public class PostRequest {
     public static class CreatePostRequest {
         private String title;
         private String contents;
-        private List<MultipartFile> attachment;
+        private List<Long> attachmentIds = new ArrayList<>();
         private Long categoryId;
         private boolean pined;
         private ExposeOptionRequest exposeOption;
@@ -44,6 +43,7 @@ public class PostRequest {
                     .exposeState(ExposeState.valueOf(exposeOption.getName()))
                     .privatePassword(exposeOption.getPassword())
                     .anonymous(isAnonymous)
+                    .attachmentIds(attachmentIds)
                     .build();
         }
     }
@@ -52,7 +52,7 @@ public class PostRequest {
     public static class UpdateNamedPostRequest {
         private String title;
         private String contents;
-        private List<MultipartFile> attachment;
+        private List<Long> attachmentIds = new ArrayList<>();
         private Long categoryId;
         private boolean pined;
         private ExposeOptionRequest exposeOption;
@@ -67,6 +67,7 @@ public class PostRequest {
                     .accountId(accountId)
                     .exposeState(ExposeState.valueOf(exposeOption.getName()))
                     .privatePassword(exposeOption.getPassword())
+                    .attachmentIds(attachmentIds)
                     .build();
         }
     }
@@ -75,7 +76,7 @@ public class PostRequest {
     public static class CreateUnnamedPostRequest {
         private String title;
         private String contents;
-        private List<MultipartFile> attachment;
+//        private List<MultipartFile> attachment;
         private Long categoryId;
         private AnonymousRequest author;
 
@@ -85,7 +86,7 @@ public class PostRequest {
     public static class UpdateUnnamedPostRequest {
         private String title;
         private String contents;
-        private List<MultipartFile> attachment;
+//        private List<MultipartFile> attachment;
         private Long categoryId;
         private AnonymousRequest author;
 

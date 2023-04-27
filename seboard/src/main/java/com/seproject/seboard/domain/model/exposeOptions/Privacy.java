@@ -12,6 +12,11 @@ public class Privacy extends ExposeOption{
     private String password;
 
     public Privacy(String password) {
+        super(ExposeState.PRIVACY);
         this.password = password;
+    }
+
+    public boolean checkPassword(String password){
+        return this.password.equals(password);
     }
 }

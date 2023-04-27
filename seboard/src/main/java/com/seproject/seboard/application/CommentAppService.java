@@ -30,6 +30,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
 
 import static com.seproject.seboard.application.utils.AppServiceHelper.findByIdOrThrow;
@@ -53,7 +54,7 @@ public class CommentAppService {
     }
     protected void writeNamedComment(CommentWriteCommand command) {
         Post post = findByIdOrThrow(command.getPostId(), postRepository, "");
-        Member member = memberRepository.findByAccountId(command.getAccountId());
+        Member member = memberRepository.findByAccountId(command.getAccountId()).orElseThrow(NoSuchElementException::new);
 
         if (member == null) {
             //TODO : member 생성 로직 호출
@@ -90,7 +91,7 @@ public class CommentAppService {
     protected void writeNamedReply(ReplyWriteCommand command) {
         Post post = findByIdOrThrow(command.getPostId(), postRepository, "");
 
-        Member member = memberRepository.findByAccountId(command.getAccountId());
+        Member member = memberRepository.findByAccountId(command.getAccountId()).orElseThrow(NoSuchElementException::new);
         Comment superComment = findByIdOrThrow(command.getSuperCommentId(), commentRepository, "");
         Comment taggedComment = findByIdOrThrow(command.getTagCommentId(), commentRepository, "");
 

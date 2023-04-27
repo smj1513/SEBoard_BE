@@ -1,16 +1,24 @@
 package com.seproject.seboard.controller.dto.post;
 
+import com.seproject.seboard.controller.dto.FileMetaDataResponse;
+import com.seproject.seboard.controller.dto.FileMetaDataResponse.FileMetaDataListResponse;
 import com.seproject.seboard.controller.dto.PaginationResponse;
-import com.seproject.seboard.domain.model.common.BaseTime;
-import com.seproject.seboard.domain.model.post.Post;
 import com.seproject.seboard.controller.dto.user.UserResponse;
+import com.seproject.seboard.domain.model.common.BaseTime;
+import com.seproject.seboard.domain.model.common.FileMetaData;
+import com.seproject.seboard.domain.model.exposeOptions.ExposeOption;
+import com.seproject.seboard.domain.model.post.Category;
+import com.seproject.seboard.domain.model.post.Post;
+import com.seproject.seboard.domain.model.user.BoardUser;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class PostResponse {
 
@@ -28,33 +36,34 @@ public class PostResponse {
         private Integer commentSize;
         private boolean pined;
 
-        public static RetrievePostListResponseElement toDTO(Post post,int commentSize) {
-            CategoryResponse categoryResponse = CategoryResponse.toDTO(post.getCategory());
-            UserResponse userResponse = UserResponse.toDTO(post.getAuthor());
-            BaseTime baseTime = post.getBaseTime();
-            boolean hasAttachment = post.getAttachments() != null && post.getAttachments().size() != 0;
-            return builder()
-                    .postId(post.getPostId())
-                    .title(post.getTitle())
-                    .category(categoryResponse)
-                    .author(userResponse)
-                    .views(post.getViews())
-                    .createdAt(baseTime.getCreatedAt())
-                    .modifiedAt(baseTime.getModifiedAt())
-                    .hasAttachment(hasAttachment)
-                    .commentSize(commentSize)
-                    .pined(post.isPined())
-                    .build();
-        }
+
+//        public static RetrievePostListResponseElement toDTO(Post post, int commentSize) {
+//            CategoryResponse categoryResponse = CategoryResponse.toDTO(post.getCategory());
+//            UserResponse userResponse = UserResponse.toDTO(post.getAuthor());
+//            BaseTime baseTime = post.getBaseTime();
+//            boolean hasAttachment = post.getAttachments() != null && post.getAttachments().size() != 0;
+//            return builder()
+//                    .postId(post.getPostId())
+//                    .title(post.getTitle())
+//                    .category(categoryResponse)
+//                    .author(userResponse)
+//                    .views(post.getViews())
+//                    .createdAt(baseTime.getCreatedAt())
+//                    .modifiedAt(baseTime.getModifiedAt())
+//                    .hasAttachment(hasAttachment)
+//                    .commentSize(commentSize)
+//                    .pined(post.isPined())
+//                    .build();
+//        }
     }
 
     @Data
     @Builder(access = AccessLevel.PRIVATE)
-    public static class RetrievePinedPostListResponse{
+    public static class RetrievePinedPostListResponse {
         private RetrievePostListResponse pined;
         private RetrievePostListResponse normal;
 
-        public static RetrievePinedPostListResponse toDTO(RetrievePostListResponse pined, RetrievePostListResponse normal){
+        public static RetrievePinedPostListResponse toDTO(RetrievePostListResponse pined, RetrievePostListResponse normal) {
             return builder()
                     .pined(pined)
                     .normal(normal)
@@ -78,11 +87,11 @@ public class PostResponse {
     }
 
     @Data
-    @Builder(access = AccessLevel.PRIVATE)
-    public static class RetrievePostResponse {
+    public static class RetrievePostDetailResponse {
         @Schema(description = "게시물 pk")
         private Long postId;
         private String title;
+        private String contents;
         private CategoryResponse category;
         private UserResponse author;
         private Integer views;
@@ -90,26 +99,21 @@ public class PostResponse {
         private LocalDateTime modifiedAt;
         private boolean isEditable;
         private boolean isBookmarked;
-        //TODO : attachment
+        private String exposeType;
+        private FileMetaDataListResponse attachments;
 
 
-        public static RetrievePostResponse toDTO(Post post, boolean isEditable, boolean isBookmarked) {
-            CategoryResponse categoryResponse = CategoryResponse.toDTO(post.getCategory());
-            UserResponse user = UserResponse.toDTO(post.getAuthor());
-            BaseTime baseTime = post.getBaseTime();
-            return builder()
-                    .postId(post.getPostId())
-                    .title(post.getTitle())
-                    .category(categoryResponse)
-                    .author(user)
-                    .views(post.getViews())
-                    .createdAt(baseTime.getCreatedAt())
-                    .modifiedAt(baseTime.getModifiedAt())
-                    .isEditable(isEditable)
-                    .isBookmarked(isBookmarked)
-                    .build();
+        public RetrievePostDetailResponse(Post post) {
+            this.postId = post.getPostId();
+            this.title = post.getTitle();
+            this.contents = post.getContents();
+            this.category = new CategoryResponse(post.getCategory().getCategoryId(), post.getCategory().getName());
+            this.author = new UserResponse(post.getAuthor().getLoginId(), post.getAuthor().getName());
+            this.views = post.getViews();
+            this.createdAt = post.getBaseTime().getCreatedAt();
+            this.modifiedAt = post.getBaseTime().getModifiedAt();
+            this.exposeType = post.getExposeOption().getExposeState().toString();
+            this.attachments = new FileMetaDataListResponse(new ArrayList<>(post.getAttachments()));
         }
-
-
     }
 }

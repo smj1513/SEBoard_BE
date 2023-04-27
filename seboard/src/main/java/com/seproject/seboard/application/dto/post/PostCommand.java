@@ -4,6 +4,8 @@ import com.seproject.seboard.domain.model.exposeOptions.ExposeState;
 import lombok.Builder;
 import lombok.Data;
 
+import java.util.List;
+
 public class PostCommand {
     @Data
     @Builder
@@ -16,6 +18,7 @@ public class PostCommand {
         private ExposeState exposeState;
         private String privatePassword;
         private boolean anonymous;
+        private List<Long> attachmentIds;
     }
 
     @Data
@@ -29,6 +32,7 @@ public class PostCommand {
         private boolean pined;
         private ExposeState exposeState;
         private String privatePassword;
+        private List<Long> attachmentIds;
     }
 
     @Data

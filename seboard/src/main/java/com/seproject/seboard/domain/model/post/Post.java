@@ -2,6 +2,7 @@ package com.seproject.seboard.domain.model.post;
 
 import com.seproject.seboard.domain.model.comment.Comment;
 import com.seproject.seboard.domain.model.common.BaseTime;
+import com.seproject.seboard.domain.model.common.FileMetaData;
 import com.seproject.seboard.domain.model.exposeOptions.ExposeOption;
 import com.seproject.seboard.domain.model.exposeOptions.ExposeState;
 import com.seproject.seboard.domain.model.exposeOptions.Public;
@@ -12,7 +13,10 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @NoArgsConstructor
 @Entity
@@ -39,17 +43,18 @@ public class Post {
     @ManyToOne
     @JoinColumn(name = "board_user_id")
     private BoardUser author;
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "expose_option_id")
     @Builder.Default
     private ExposeOption exposeOption = new Public();
-    @OneToMany
-    private List<Attachment> attachments;
+    @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "post_id")
+    private Set<FileMetaData> attachments = new HashSet<>();
     private int anonymousCount;
 
     public Post(Long postId, String title, String contents, int views,
                 boolean pined, BaseTime baseTime, Category category,
-                BoardUser author, ExposeOption exposeOption, List<Attachment> attachments, int anonymousCount) {
+                BoardUser author, ExposeOption exposeOption,  Set<FileMetaData> attachments,  int anonymousCount) {
         if(!isValidTitle(title)) {
             throw new IllegalArgumentException();
         }
@@ -113,8 +118,13 @@ public class Post {
         this.contents = contents;
     }
 
-    public void changeExposeOption(ExposeOption exposeOption) {
-        this.exposeOption = exposeOption;
+    public void changeExposeOption(ExposeState exposeState, String password) {
+        if(exposeState==ExposeState.PRIVACY &&
+                exposeOption.getExposeState()==ExposeState.PRIVACY && password==null){
+            return;
+        }
+
+        exposeOption = ExposeOption.of(exposeState, password);
     }
 
     public void changeCategory(Category category) {
@@ -129,8 +139,19 @@ public class Post {
         return TITLE_MIN_SIZE < title.length() && title.length() <= TITLE_MAX_SIZE;
     }
 
-    public boolean isValidContents(String contents) {
+    private boolean isValidContents(String contents) {
         return CONTENTS_MIN_SIZE < contents.length() && contents.length() <= CONTENTS_MAX_SIZE;
     }
 
+    public void removeAttachment(FileMetaData attachment){
+        attachments.remove(attachment);
+    }
+
+    public Set<FileMetaData> getAttachments() {
+        return new HashSet<>(attachments);
+    }
+
+    public void addAttachment(FileMetaData attachment) {
+        attachments.add(attachment);
+    }
 }

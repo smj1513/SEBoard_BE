@@ -20,12 +20,12 @@ public class ReplyResponse {
     private boolean isEditable;
 
     public static ReplyResponse toDto(Reply reply, boolean isEditable){
-        UserResponse userResponse = UserResponse.toDTO(reply.getAuthor());
+//        UserResponse userResponse = UserResponse.toDTO(reply.getAuthor());
 
         return builder()
                 .commentId(reply.getCommentId())
                 .tag(reply.getTag().getCommentId())
-                .author(userResponse)
+//                .author(userResponse)
                 .createdAt(reply.getBaseTime().getCreatedAt())
                 .modifiedAt(reply.getBaseTime().getModifiedAt())
                 .contents(reply.getContents())

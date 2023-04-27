@@ -39,11 +39,12 @@ public class CommentResponse {
         private List<ReplyResponse> subComments;
 
         public static CommentListElement toDto(Comment comment, boolean isEditable, List<ReplyResponse> subComments){
-            UserResponse userResponse = UserResponse.toDTO(comment.getAuthor());
+//            UserResponse userResponse = UserResponse.toDTO(comment.getAuthor());
+
 
             return builder()
                     .commentId(comment.getCommentId())
-                    .author(userResponse)
+//                    .author(userResponse)
                     .createdAt(comment.getBaseTime().getCreatedAt())
                     .modifiedAt(comment.getBaseTime().getModifiedAt())
                     .contents(comment.getContents())

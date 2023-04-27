@@ -19,7 +19,6 @@ public class CategoryAppService {
     private final CategoryRepository categoryRepository;
     private final AccountRepository accountRepository;
     private final PostRepository postRepository;
-    private final PostSearchRepository postSearchRepository;
 
     public void createCategory(Long superCategoryId, Long accountId, String name){
         Account requestAccount = findByIdOrThrow(accountId, accountRepository, "");

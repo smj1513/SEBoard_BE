@@ -10,6 +10,7 @@ import com.seproject.seboard.domain.repository.user.MemberRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.NoSuchElementException;
 import java.util.Optional;
 
 import static com.seproject.seboard.application.utils.AppServiceHelper.findByIdOrThrow;
@@ -19,12 +20,11 @@ import static com.seproject.seboard.application.utils.AppServiceHelper.findByIdO
 public class BookmarkAppService {
     private final BookmarkRepository bookmarkRepository;
     private final PostRepository postRepository;
-    private final CommentRepository commentRepository;
     private final MemberRepository memberRepository;
 
     public void enrollBookmark(Long postId, Long accountId) {
         //TODO : member 없을 때 처리 필요, member 생성 or error?
-        Member member = memberRepository.findByAccountId(accountId);
+        Member member = memberRepository.findByAccountId(accountId).orElseThrow(NoSuchElementException::new);
         Post post = findByIdOrThrow(postId, postRepository, "");
 
         boolean existBookmark = bookmarkRepository.existsByPostIdAndMemberId(postId, member.getBoardUserId());
@@ -41,7 +41,7 @@ public class BookmarkAppService {
 
     public void cancelBookmark(Long postId, Long accountId) {
         //TODO : member 없을 때 처리 필요, member 생성 or error?
-        Member member = memberRepository.findByAccountId(accountId);
+        Member member = memberRepository.findByAccountId(accountId).orElseThrow(NoSuchElementException::new);
 
         Optional<Bookmark> bookmarkBox = bookmarkRepository.findByPostIdAndMemberId(postId, member.getBoardUserId());
 
