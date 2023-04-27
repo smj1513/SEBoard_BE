@@ -13,8 +13,7 @@ public class CommentCommand {
         private Long accountId;
         private String contents;
         private boolean isAnonymous;
-        private ExposeState exposeState;
-        private String exposePassword;
+        private boolean isOnlyReadByAuthor;
     }
 
     @Data
@@ -23,8 +22,7 @@ public class CommentCommand {
         private Long commentId;
         private Long accountId;
         private String contents;
-        private ExposeState exposeState;
-        private String exposePassword;
+        private boolean isOnlyReadByAuthor;
     }
 
     @Data

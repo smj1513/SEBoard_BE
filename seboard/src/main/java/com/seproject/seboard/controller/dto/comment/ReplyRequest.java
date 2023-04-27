@@ -18,7 +18,7 @@ public class ReplyRequest {
         private Long tagCommentId;
         private boolean isAnonymous;
         private String contents;
-        private ExposeOptionRequest exposeOption;
+        private boolean isReadOnlyAuthor;
 
         public ReplyWriteCommand toCommand(Long accountId) {
             return ReplyWriteCommand.builder()
@@ -28,34 +28,22 @@ public class ReplyRequest {
                     .tagCommentId(tagCommentId)
                     .contents(contents)
                     .isAnonymous(isAnonymous)
-                    .exposeState(ExposeState.valueOf(exposeOption.getName()))
-                    .exposePassword(exposeOption.getPassword())
+                    .isOnlyReadByAuthor(isReadOnlyAuthor)
                     .build();
         }
-    }
-
-
-    @Data
-    public static class CreateUnnamedReplyRequest {
-        private Long commentId;
-        private Long tag;
-        private TagAuthorRequest tagAuthor;
-        private String contents;
-        private AnonymousRequest author;
     }
 
     @Data
     public static class UpdateReplyRequest {
         private String contents;
-        private ExposeOptionRequest exposeOption;
+        private boolean isReadOnlyAuthor;
 
         public ReplyEditCommand toCommand(Long replyId, Long accountId) {
             return ReplyEditCommand.builder()
                     .accountId(accountId)
                     .replyId(replyId)
                     .contents(contents)
-                    .exposeState(ExposeState.valueOf(exposeOption.getName()))
-                    .exposePassword(exposeOption.getPassword())
+                    .isOnlyReadByAuthor(isReadOnlyAuthor)
                     .build();
         }
     }
