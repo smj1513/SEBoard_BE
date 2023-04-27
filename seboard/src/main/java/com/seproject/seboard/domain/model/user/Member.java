@@ -16,6 +16,8 @@ import javax.persistence.*;
 @Table(name="members")
 @PrimaryKeyJoinColumn(name="member_id")
 public class Member extends BoardUser{
+
+    @JoinColumn(name="account_id")
     @OneToOne
     private Account account;
 
