@@ -1,5 +1,7 @@
 package com.seproject.oauth2.utils.form;
 
+import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.PasswordIncorrectException;
 import com.seproject.oauth2.service.CustomUserDetailsService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -30,7 +32,7 @@ public class UsernameAuthenticationProvider implements AuthenticationProvider {
             return new UsernamePasswordAuthenticationToken(username,password, userDetails.getAuthorities());
         }
 
-        throw new BadCredentialsException("비밀번호가 틀렸습니다.");
+        throw new PasswordIncorrectException(ErrorCode.PASSWORD_INCORRECT);
     }
 
     @Override

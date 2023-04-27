@@ -1,10 +1,13 @@
 package com.seproject.oauth2.utils.jwt;
 
+import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.TokenValidateException;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class JwtDecoder {
 
@@ -12,6 +15,16 @@ public class JwtDecoder {
 
     public JwtDecoder(String secret) {
         this.secret = secret;
+    }
+
+    public void validate(String jwt) {
+        try {
+            Jwts.parser()
+                    .setSigningKey(secret)
+                    .parseClaimsJws(jwt);
+        } catch (JwtException e) {
+            throw new TokenValidateException(ErrorCode.INVALID_JWT, e);
+        }
     }
 
     public String getLoginId(String token){
@@ -27,8 +40,9 @@ public class JwtDecoder {
                 .setSigningKey(secret)
                 .parseClaimsJws(token)
                 .getBody();
-
-        return (String)claims.getOrDefault(JWTProperties.EMAIL,null);
+        String email = (String)claims.get(JWTProperties.EMAIL);
+        if(email == null) throw new NoSuchElementException();
+        return email;
     }
 
     public String getProvider(String token){
@@ -36,8 +50,9 @@ public class JwtDecoder {
                 .setSigningKey(secret)
                 .parseClaimsJws(token)
                 .getBody();
-
-        return (String)claims.getOrDefault(JWTProperties.PROVIDER,null);
+        String provider = (String)claims.get(JWTProperties.PROVIDER);
+        if(provider == null) throw new NoSuchElementException();
+        return provider;
     }
 
     public String getProfile(String token){
@@ -45,8 +60,9 @@ public class JwtDecoder {
                 .setSigningKey(secret)
                 .parseClaimsJws(token)
                 .getBody();
-
-        return (String)claims.getOrDefault(JWTProperties.PROFILE,null);
+        String profile = (String)claims.get(JWTProperties.PROFILE);
+        if(profile == null) throw new NoSuchElementException();
+        return profile;
     }
 
     public List<String> getAuthorities(String token){
@@ -54,6 +70,8 @@ public class JwtDecoder {
                 .setSigningKey(secret)
                 .parseClaimsJws(token)
                 .getBody();
-        return (List<String>) claims.getOrDefault(JWTProperties.AUTHORITIES,new ArrayList<>());
+        List<String> authorities = (List<String>)claims.get(JWTProperties.AUTHORITIES);
+        if(authorities == null) throw new NoSuchElementException();
+        return authorities;
     }
 }

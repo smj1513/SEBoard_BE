@@ -1,13 +1,8 @@
 package com.seproject.oauth2.controller;
 
-import com.seproject.oauth2.model.Account;
-import com.seproject.oauth2.repository.AccountRepository;
 import com.seproject.oauth2.service.AccountService;
 import com.seproject.oauth2.utils.jwt.JwtDecoder;
-import com.seproject.oauth2.utils.jwt.annotation.JWT;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -28,8 +23,7 @@ import static com.seproject.oauth2.controller.dto.AccountDTO.*;
 @AllArgsConstructor
 @RequestMapping(value = "/admin")
 @Controller
-public class AdminController {
-
+public class AdminAccountController {
 
     private final AccountService accountService;
     private final JwtDecoder jwtDecoder;
@@ -53,13 +47,8 @@ public class AdminController {
         int perPage = accountRequest.getPerPage();
         page = Math.max(page-1,0);
         perPage = Math.max(perPage,1);
-        try{
-            RetrieveAllAccountResponse allAccount = accountService.findAllAccount(page, perPage);
-            return new ResponseEntity<>(allAccount, HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>("페이지 번호가 잘못되었습니다.",HttpStatus.BAD_REQUEST);
-        }
-
+        RetrieveAllAccountResponse allAccount = accountService.findAllAccount(page, perPage);
+        return new ResponseEntity<>(allAccount, HttpStatus.OK);
     }
 
 

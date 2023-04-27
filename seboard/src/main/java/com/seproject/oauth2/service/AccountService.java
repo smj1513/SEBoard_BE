@@ -1,5 +1,7 @@
 package com.seproject.oauth2.service;
 
+import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.InvalidPaginationException;
 import com.seproject.oauth2.controller.command.AccountRegisterCommand;
 import com.seproject.oauth2.controller.command.OAuthAccountCommand;
 import com.seproject.oauth2.controller.dto.AccountDTO;
@@ -79,13 +81,19 @@ public class AccountService {
 
 
     public RetrieveAllAccountResponse findAllAccount(int page,int perPage) {
-        PageRequest pageRequest = PageRequest.of(page,perPage);
-        Page<Account> all = accountRepository.findAll(pageRequest);
-        List<Account> accounts = all.stream().collect(Collectors.toList());
-        int total = all.getTotalPages();
-        int nowPage = all.getNumber();
 
-        return RetrieveAllAccountResponse.toDTO(total,nowPage+1,perPage,accounts);
+        try {
+            PageRequest pageRequest = PageRequest.of(page,perPage);
+            Page<Account> all = accountRepository.findAll(pageRequest);
+            List<Account> accounts = all.stream().collect(Collectors.toList());
+            int total = all.getTotalPages();
+            int nowPage = all.getNumber();
+
+            return RetrieveAllAccountResponse.toDTO(total,nowPage+1,perPage,accounts);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidPaginationException(ErrorCode.INVALID_PAGINATION);
+        }
+
     }
 
     public RetrieveAccountResponse findAccount(Long accountId) {
