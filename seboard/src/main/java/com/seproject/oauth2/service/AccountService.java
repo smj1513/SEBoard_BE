@@ -2,20 +2,26 @@ package com.seproject.oauth2.service;
 
 import com.seproject.oauth2.controller.command.AccountRegisterCommand;
 import com.seproject.oauth2.controller.command.OAuthAccountCommand;
-import com.seproject.oauth2.model.EmailAuthentication;
+import com.seproject.oauth2.controller.dto.AccountDTO;
 import com.seproject.oauth2.repository.AccountRepository;
 import com.seproject.oauth2.repository.RoleRepository;
 import com.seproject.oauth2.model.Account;
 import com.seproject.oauth2.model.Role;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.stream.Collectors;
+
+import static com.seproject.oauth2.controller.dto.AccountDTO.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -69,6 +75,74 @@ public class AccountService {
                 .build();
 
         accountRepository.save(account);
+    }
+
+
+    public RetrieveAllAccountResponse findAllAccount(int page,int perPage) {
+        PageRequest pageRequest = PageRequest.of(page,perPage);
+        Page<Account> all = accountRepository.findAll(pageRequest);
+        List<Account> accounts = all.stream().collect(Collectors.toList());
+        int total = all.getTotalPages();
+        int nowPage = all.getNumber();
+
+        return RetrieveAllAccountResponse.toDTO(total,nowPage+1,perPage,accounts);
+    }
+
+    public RetrieveAccountResponse findAccount(Long accountId) {
+        Account account = accountRepository.findById(accountId).orElseThrow();
+        return RetrieveAccountResponse.toDTO(account);
+    }
+
+    private List<Role> convertAuthorities(List<String> authorities) {
+        List<Role> convertedAuthorities = roleRepository.findByNameIn(authorities);
+
+        if(authorities.size() != convertedAuthorities.size()) {
+            throw new IllegalArgumentException("존재하지 않는 권한을 요청하였습니다.");
+        }
+
+        return convertedAuthorities;
+    }
+
+    public CreateAccountResponse createAccount(CreateAccountRequest request) {
+
+        Account account = Account.builder()
+                .loginId(request.getId())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .email(request.getEmail())
+                .profile(request.getProfile())
+                .nickname(request.getNickname())
+                .username(request.getName())
+                .provider("se")
+                .authorities(convertAuthorities(request.getAuthorities()))
+                .build();
+
+        Account savedAccount = accountRepository.save(account);
+        return CreateAccountResponse.toDTO(savedAccount);
+    }
+
+    public UpdateAccountResponse updateAccount(UpdateAccountRequest request) {
+
+        Account account = accountRepository.findById(request.getAccountId()).orElseThrow();
+
+        Account updateAccount = Account.builder()
+                .loginId(request.getId())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .email(request.getEmail())
+                .profile(request.getProfile())
+                .nickname(request.getNickname())
+                .username(request.getName())
+                .authorities(convertAuthorities(request.getAuthorities()))
+                .build();
+
+        return UpdateAccountResponse.toDTO(account.update(updateAccount));
+    }
+
+    public DeleteAccountResponse deleteAccount(Long accountId) {
+
+        Account account = accountRepository.findById(accountId).orElseThrow();
+        accountRepository.delete(account);
+
+        return DeleteAccountResponse.toDTO(account);
     }
 
 }
