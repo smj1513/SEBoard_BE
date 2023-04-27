@@ -4,7 +4,7 @@ import com.seproject.oauth2.repository.AuthorizationMetaDataRepository;
 import com.seproject.oauth2.service.CustomOidcUserService;
 import com.seproject.oauth2.utils.*;
 import com.seproject.oauth2.utils.handler.FormLoginAuthenticationSuccessHandler;
-import com.seproject.oauth2.utils.handler.FormLoginFailureHandler;
+import com.seproject.oauth2.utils.handler.CustomAuthenticationFailureHandler;
 import com.seproject.oauth2.utils.handler.OidcAuthenticationSuccessHandler;
 import com.seproject.oauth2.utils.jwt.JwtDecoder;
 import com.seproject.oauth2.utils.jwt.JwtFilter;
@@ -22,6 +22,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 
@@ -34,7 +35,8 @@ public class SecurityConfig {
     private final CustomOidcUserService customOidcUserService;
     private final OidcAuthenticationSuccessHandler oidcAuthenticationSuccessHandler;
     private final FormLoginAuthenticationSuccessHandler formLoginAuthenticationSuccessHandler;
-    private final FormLoginFailureHandler formLoginFailureHandler;
+    private final CustomAuthenticationFailureHandler formLoginFailureHandler;
+    private final AuthenticationFailureHandler authenticationFailureHandler;
 
     private AuthorizationMetaDataRepository authorizationMetaDataRepository;
     private JwtDecoder jwtDecoder;
@@ -74,7 +76,7 @@ public class SecurityConfig {
                 .deleteCookies("JSESSIONID")
                 .deleteCookies("remember-me");
 
-        http.addFilterBefore(new JwtFilter(authorizationMetaDataRepository,jwtDecoder), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new JwtFilter(authorizationMetaDataRepository,jwtDecoder,authenticationFailureHandler), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
