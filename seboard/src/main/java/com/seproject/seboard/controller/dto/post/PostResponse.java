@@ -1,8 +1,12 @@
 package com.seproject.seboard.controller.dto.post;
 
+import com.seproject.seboard.controller.dto.FileMetaDataResponse;
+import com.seproject.seboard.controller.dto.FileMetaDataResponse.FileMetaDataListResponse;
 import com.seproject.seboard.controller.dto.PaginationResponse;
 import com.seproject.seboard.controller.dto.user.UserResponse;
 import com.seproject.seboard.domain.model.common.BaseTime;
+import com.seproject.seboard.domain.model.common.FileMetaData;
+import com.seproject.seboard.domain.model.exposeOptions.ExposeOption;
 import com.seproject.seboard.domain.model.post.Category;
 import com.seproject.seboard.domain.model.post.Post;
 import com.seproject.seboard.domain.model.user.BoardUser;
@@ -12,7 +16,9 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class PostResponse {
 
@@ -93,19 +99,21 @@ public class PostResponse {
         private LocalDateTime modifiedAt;
         private boolean isEditable;
         private boolean isBookmarked;
-        //TODO : attachment
+        private String exposeType;
+        private FileMetaDataListResponse attachments;
 
 
-        public RetrievePostDetailResponse(Long postId, String title, String contents, Category category,
-                                          BoardUser boardUser, int views, LocalDateTime createdAt, LocalDateTime modifiedAt) {
-            this.postId = postId;
-            this.title = title;
-            this.contents = contents;
-            this.category = new CategoryResponse(category.getCategoryId(), category.getName());
-            this.author = new UserResponse(boardUser.getLoginId(), boardUser.getName());
-            this.views = views;
-            this.createdAt = createdAt;
-            this.modifiedAt = modifiedAt;
+        public RetrievePostDetailResponse(Post post) {
+            this.postId = post.getPostId();
+            this.title = post.getTitle();
+            this.contents = post.getContents();
+            this.category = new CategoryResponse(post.getCategory().getCategoryId(), post.getCategory().getName());
+            this.author = new UserResponse(post.getAuthor().getLoginId(), post.getAuthor().getName());
+            this.views = post.getViews();
+            this.createdAt = post.getBaseTime().getCreatedAt();
+            this.modifiedAt = post.getBaseTime().getModifiedAt();
+            this.exposeType = post.getExposeOption().getExposeState().toString();
+            this.attachments = new FileMetaDataListResponse(new ArrayList<>(post.getAttachments()));
         }
     }
 }

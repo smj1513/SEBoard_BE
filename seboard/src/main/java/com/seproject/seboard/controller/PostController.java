@@ -111,7 +111,7 @@ public class PostController {
     @GetMapping("/{postId}")
     public ResponseEntity<?> retrievePost(@PathVariable("postId") Long postId) { // TODO : accountId는 jwt에서 추출
 
-        Long accountId = 1L;
+        Long accountId = null;
         /***
          * TODO : jwt 추가
          *      없는 postId를 조회

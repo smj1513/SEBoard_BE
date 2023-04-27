@@ -7,8 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 
 public interface PostSearchJpaRepository extends PostSearchRepository {
-    @Query("select new com.seproject.seboard.controller.dto.post.PostResponse$RetrievePostDetailResponse" +
-            "(p.postId, p.title, p.contents, p.category.categoryId, p.category.name, p.author.boardUserId, p.author.name, p.views, p.baseTime.createdAt, p.baseTime.modifiedAt)" +
+    @Query("select new com.seproject.seboard.controller.dto.post.PostResponse$RetrievePostDetailResponse(p)" +
             "from Post p where p.postId = :id")
     Optional<PostResponse.RetrievePostDetailResponse> findPostDetailById(Long id);
 //    Page<Post> findByCategoryId(Long categoryId, Pageable pagingInfo);

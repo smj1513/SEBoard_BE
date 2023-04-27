@@ -12,9 +12,10 @@ import java.time.LocalDateTime;
 @Embeddable
 @Getter
 @AllArgsConstructor
+@NoArgsConstructor
 public class BaseTime {
-    private final LocalDateTime createdAt;
-    private final LocalDateTime modifiedAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime modifiedAt;
 
     public static BaseTime now(){
         return new BaseTime(LocalDateTime.now(), LocalDateTime.now());

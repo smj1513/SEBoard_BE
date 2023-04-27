@@ -32,7 +32,7 @@ public class PostSearchAppService {
         boolean isBookmarked = false;
 
         if(accountId!=null){
-            Member member = memberRepository.findByAccountId(accountId);
+            Member member = memberRepository.findByAccountId(accountId).orElseThrow(NoSuchElementException::new);
 
             isEditable = post.isWrittenBy(accountId);
             isBookmarked = bookmarkRepository.existsByPostIdAndMemberId(postId, member.getBoardUserId());

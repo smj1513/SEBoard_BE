@@ -1,9 +1,6 @@
 package com.seproject.seboard.domain.model.exposeOptions;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 
@@ -13,6 +10,7 @@ import javax.persistence.*;
 @Inheritance(strategy= InheritanceType.JOINED)
 @Entity
 @Table(name="expose_options")
+@Getter
 public abstract class ExposeOption {
 
     @Id @GeneratedValue
@@ -20,6 +18,10 @@ public abstract class ExposeOption {
 
     @Enumerated(EnumType.STRING)
     protected ExposeState exposeState;
+
+    protected ExposeOption(ExposeState state){
+        this.exposeState = state;
+    }
 
     public static ExposeOption of(ExposeState state, String password){
         switch (state){
@@ -33,4 +35,5 @@ public abstract class ExposeOption {
                 throw new IllegalArgumentException("Invalid ExposeState");
         }
     }
+
 }
