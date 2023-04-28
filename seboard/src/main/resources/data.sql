@@ -10,7 +10,13 @@ INSERT INTO authorities(account_id,role_id) values(5234058023850,5234058023850);
 INSERT INTO authorities(account_id,role_id) values(5234058023851,5234058023851);
 INSERT INTO authorities(account_id,role_id) values(5234058023852,5234058023852);
 INSERT INTO authorities(account_id,role_id) values(5234058023853,5234058023853);
-INSERT INTO public.authorization_meta_data(id, method_signature, role_id) VALUES (5234058023850, '/admin', 5234058023851);
+
+INSERT INTO public.authorizations(id, method, path, priority) VALUES (1543, 'GET', '/admin/**', 9999);
+INSERT INTO public.authorizations(id, method, path, priority) VALUES (1544, 'POST', '/admin/**', 9999);
+
+INSERT INTO public.authorization_metadata(authorization_id, role_id) VALUES (1543, 5234058023851);
+INSERT INTO public.authorization_metadata(authorization_id, role_id) VALUES (1544, 5234058023851);
+
 
 INSERT INTO categories(category_id,super_category_id,name) values (43214232,null,'공지사항');
 INSERT INTO categories(category_id,super_category_id,name) values (43214233,43214232,'일반');

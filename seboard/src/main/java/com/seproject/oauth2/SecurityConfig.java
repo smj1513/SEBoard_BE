@@ -1,6 +1,6 @@
 package com.seproject.oauth2;
 
-import com.seproject.oauth2.repository.AuthorizationMetaDataRepository;
+import com.seproject.oauth2.repository.AuthorizationRepository;
 import com.seproject.oauth2.service.CustomOidcUserService;
 import com.seproject.oauth2.utils.*;
 import com.seproject.oauth2.utils.handler.*;
@@ -9,28 +9,27 @@ import com.seproject.oauth2.utils.jwt.JwtFilter;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
-import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.access.vote.AffirmativeBased;
+import org.springframework.security.access.vote.RoleVoter;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
+import java.util.Arrays;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 
 @Slf4j
@@ -46,8 +45,8 @@ public class SecurityConfig {
     private final AuthenticationFailureHandler authenticationFailureHandler;
     private final CustomAccessDeniedHandler accessDeniedHandler;
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
-
-    private AuthorizationMetaDataRepository authorizationMetaDataRepository;
+    private final AuthenticationConfiguration authenticationConfiguration;
+    private UrlResourcesFactoryBean urlResourcesFactoryBean;
     private JwtDecoder jwtDecoder;
 
     @Bean
@@ -61,7 +60,7 @@ public class SecurityConfig {
         http.cors().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests()
-//                .antMatchers("/admin/**").hasRole("ADMIN")
+                .antMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().permitAll();
 
         http.formLogin()
@@ -89,7 +88,8 @@ public class SecurityConfig {
                 .accessDeniedHandler(accessDeniedHandler)
                 .authenticationEntryPoint(authenticationEntryPoint);
 
-        http.addFilterBefore(new JwtFilter(authorizationMetaDataRepository,jwtDecoder,authenticationFailureHandler), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new JwtFilter(jwtDecoder,authenticationFailureHandler), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(filterSecurityInterceptor(),FilterSecurityInterceptor.class);
         return http.build();
     }
 
@@ -109,7 +109,24 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
+    public AuthenticationManager authenticationManager() throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
     }
+
+    @Bean
+    public FilterSecurityInterceptor filterSecurityInterceptor() throws Exception {
+
+        FilterSecurityInterceptor filterSecurityInterceptor = new FilterSecurityInterceptor();
+        filterSecurityInterceptor.setSecurityMetadataSource(urlFilterInvocationSecurityMetaDataSource());
+        filterSecurityInterceptor.setAccessDecisionManager(new AffirmativeBased(Arrays.asList(new RoleVoter())));
+        filterSecurityInterceptor.setAuthenticationManager(authenticationManager());
+
+        return filterSecurityInterceptor;
+    }
+
+    @Bean
+    public UrlFilterInvocationSecurityMetaDataSource urlFilterInvocationSecurityMetaDataSource() throws Exception {
+        return new UrlFilterInvocationSecurityMetaDataSource(urlResourcesFactoryBean.getObject());
+    }
+
 }
