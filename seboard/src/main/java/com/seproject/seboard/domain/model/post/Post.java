@@ -91,14 +91,14 @@ public class Post {
                 .build();
     }
 
-    public Comment writeComment(String contents, BoardUser author, ExposeOption exposeOption){
+    public Comment writeComment(String contents, BoardUser author, boolean isOnlyReadByAuthor){
         //TODO : post가 kumoh이면 comment는 public 어차피 안되잖아? 그거 고려해야되나?
         return Comment.builder()
                 .contents(contents)
                 .baseTime(BaseTime.now())
                 .post(this)
                 .author(author)
-                .exposeOption(exposeOption)
+                .isOnlyReadByAuthor(isOnlyReadByAuthor)
                 .build();
     }
 

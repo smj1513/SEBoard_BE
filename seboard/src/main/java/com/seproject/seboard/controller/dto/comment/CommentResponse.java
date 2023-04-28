@@ -1,5 +1,6 @@
 package com.seproject.seboard.controller.dto.comment;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.seproject.seboard.controller.dto.PaginationResponse;
 import com.seproject.seboard.controller.dto.user.UserResponse;
 import com.seproject.seboard.domain.model.comment.Comment;
@@ -17,11 +18,11 @@ public class CommentResponse {
     @Builder(access = AccessLevel.PRIVATE)
     public static class CommentListResponse{
         private PaginationResponse paginationInfo;
-        private List<CommentListElement> data;
+        private List<CommentListElement> content;
 
         public static CommentListResponse toDto(List<CommentListElement> data, PaginationResponse paginationInfo){
             return builder()
-                    .data(data)
+                    .content(data)
                     .paginationInfo(paginationInfo)
                     .build();
         }
@@ -35,20 +36,32 @@ public class CommentResponse {
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
         private String contents;
+        @JsonProperty("isEditable")
         private boolean isEditable;
+        @JsonProperty("isActive")
+        private boolean isActive;
         private List<ReplyResponse> subComments;
 
         public static CommentListElement toDto(Comment comment, boolean isEditable, List<ReplyResponse> subComments){
-//            UserResponse userResponse = UserResponse.toDTO(comment.getAuthor());
-
+            UserResponse userResponse = null;
+            String contents = null;
+            //TODO : dto에 로직이 들어가는게 맞나?
+            if(comment.isDeleted()){
+                contents = "삭제된 댓글입니다.";
+                userResponse = new UserResponse(null, "(알수 없음)");
+            }else{
+                contents = comment.getContents();
+                userResponse = new UserResponse(comment.getAuthor());
+            }
 
             return builder()
                     .commentId(comment.getCommentId())
-//                    .author(userResponse)
+                    .author(userResponse)
                     .createdAt(comment.getBaseTime().getCreatedAt())
                     .modifiedAt(comment.getBaseTime().getModifiedAt())
-                    .contents(comment.getContents())
+                    .contents(contents)
                     .isEditable(isEditable)
+                    .isActive(comment.isDeleted()) //TODO : 작성자만 읽을 수 있는 경우 추가 필요
                     .subComments(subComments)
                     .build();
         }

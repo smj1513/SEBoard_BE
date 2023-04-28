@@ -35,13 +35,11 @@ public class Comment {
     @OneToOne
     @JoinColumn(name = "board_user_id")
     private BoardUser author;
+    private boolean isOnlyReadByAuthor;
 
-    @OneToOne
-    @JoinColumn(name="expose_option_id")
-    private ExposeOption exposeOption;
 
     private Comment(Long commentId, String contents, boolean isDeleted,
-                   BaseTime baseTime, Post post, BoardUser author, ExposeOption exposeOption) {
+                   BaseTime baseTime, Post post, BoardUser author, boolean isOnlyReadByAuthor) {
 
         if(!isValidContents(contents)) {
             throw new IllegalArgumentException();
@@ -53,16 +51,16 @@ public class Comment {
         this.baseTime = baseTime;
         this.post = post;
         this.author = author;
-        this.exposeOption = exposeOption;
+        this.isOnlyReadByAuthor = isOnlyReadByAuthor;
     }
 
-    public Reply writeReply(String contents, Comment taggedComment, BoardUser author, ExposeOption exposeOption){
+    public Reply writeReply(String contents, Comment taggedComment, BoardUser author, boolean isOnlyReadByAuthor){
         return Reply.builder()
                 .contents(contents)
                 .author(author)
                 .tag(taggedComment)
                 .baseTime(BaseTime.now())
-                .exposeOption(exposeOption)
+                .isOnlyReadByAuthor(isOnlyReadByAuthor)
                 .superComment(this)
                 .build();
     }
@@ -79,9 +77,10 @@ public class Comment {
         this.contents = contents;
     }
 
-    public void changeExposeOption(ExposeOption exposeOption) {
-        this.exposeOption = exposeOption;
+    public void changeOnlyReadByAuthor(boolean isOnlyReadByAuthor) {
+        this.isOnlyReadByAuthor = isOnlyReadByAuthor;
     }
+
 
     private boolean isValidContents(String contents) {
         return CONTENTS_MIN_SIZE < contents.length() && contents.length() <= CONTENTS_MAX_SIZE;

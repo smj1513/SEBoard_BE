@@ -6,6 +6,7 @@ import com.seproject.seboard.application.PostSearchAppService;
 import com.seproject.seboard.application.dto.comment.CommentCommand;
 import com.seproject.seboard.application.dto.post.PostCommand.PostListFindCommand;
 import com.seproject.seboard.controller.dto.MessageResponse;
+import com.seproject.seboard.controller.dto.comment.CommentResponse;
 import com.seproject.seboard.controller.dto.post.PostRequest.CreatePostRequest;
 import com.seproject.seboard.controller.dto.post.PostRequest.UpdateNamedPostRequest;
 import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostListResponse;
@@ -29,6 +30,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 
+import static com.seproject.seboard.controller.dto.comment.CommentResponse.*;
 import static com.seproject.seboard.controller.dto.post.PostResponse.*;
 
 @Slf4j
@@ -61,38 +63,38 @@ public class PostController {
             @RequestParam(defaultValue = "25") Integer perPage,
             @RequestParam(defaultValue = "true") Boolean pined
     ) {
-        if(pined){
-            RetrievePostListResponse pinedList = postAppService.findPostList(
-                    PostListFindCommand.builder()
-                            .categoryId(categoryId)
-                            .page(page)
-                            .size(perPage)
-                            .build(),
-                    true
-            );
+//        if(pined){
+//            RetrievePostListResponse pinedList = postAppService.findPostList(
+//                    PostListFindCommand.builder()
+//                            .categoryId(categoryId)
+//                            .page(page)
+//                            .size(perPage)
+//                            .build(),
+//                    true
+//            );
+//
+//            RetrievePostListResponse normalList = postAppService.findPostList(
+//                    PostListFindCommand.builder()
+//                            .categoryId(categoryId)
+//                            .page(page)
+//                            .size(perPage-pinedList.getPaginationInfo().getContentSize())
+//                            .build(),
+//                    false
+//            );
+//
+//            return new ResponseEntity<>(RetrievePinedPostListResponse.toDTO(pinedList, normalList), HttpStatus.OK);
+//        }else{
+//            RetrievePostListResponse retrievePostListResponse = postAppService.findPostList(
+//                    PostListFindCommand.builder()
+//                            .categoryId(categoryId)
+//                            .page(page)
+//                            .size(perPage)
+//                            .build(),
+//                    true
+//            );
+//
+//            return new ResponseEntity<>(retrievePostListResponse, HttpStatus.OK);
 
-            RetrievePostListResponse normalList = postAppService.findPostList(
-                    PostListFindCommand.builder()
-                            .categoryId(categoryId)
-                            .page(page)
-                            .size(perPage-pinedList.getPaginationInfo().getContentSize())
-                            .build(),
-                    false
-            );
-
-            return new ResponseEntity<>(RetrievePinedPostListResponse.toDTO(pinedList, normalList), HttpStatus.OK);
-        }else{
-            RetrievePostListResponse retrievePostListResponse = postAppService.findPostList(
-                    PostListFindCommand.builder()
-                            .categoryId(categoryId)
-                            .page(page)
-                            .size(perPage)
-                            .build(),
-                    true
-            );
-
-            return new ResponseEntity<>(retrievePostListResponse, HttpStatus.OK);
-        }
 
 
         /***
@@ -100,6 +102,7 @@ public class PostController {
          *          페이지 번호 MAX 이상
          *          category id가 없는 경우, 설정 안된경우
          */
+        return null;
     }
 
     @Parameter(name = "postId", description = "상세 조회를 할 게시물의 pk")
@@ -186,14 +189,14 @@ public class PostController {
     )
     @Operation(summary = "게시물에 달린 댓글 조회", description = "게시물에 달린 댓글을 조회한다")
     @GetMapping("/{postId}/comments")
-    public ResponseEntity<?> retrievePostComments(
+    public ResponseEntity<CommentListResponse> retrievePostComments(
             @PathVariable Long postId,
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "25") Integer perPage) {
 
         Long accountId = 1L; //TODO : jwt에서 추출
 
-        commentAppService.retrieveCommentList(
+        CommentListResponse commentListResponse = commentAppService.retrieveCommentList(
                 CommentCommand.CommentListFindCommand.builder()
                         .postId(postId)
                         .page(page)
@@ -202,7 +205,7 @@ public class PostController {
                         .build()
         );
 
-        return new ResponseEntity<>(postId, HttpStatus.OK);
+        return new ResponseEntity<>(commentListResponse, HttpStatus.OK);
     }
 
 }

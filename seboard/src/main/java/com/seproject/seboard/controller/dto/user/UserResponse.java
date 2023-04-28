@@ -16,4 +16,9 @@ public class UserResponse {
         this.loginId = loginId;
         this.name = name;
     }
+
+    public UserResponse(BoardUser boardUser) {
+        this.loginId = boardUser.getLoginId();
+        this.name = boardUser.getName();
+    }
 }

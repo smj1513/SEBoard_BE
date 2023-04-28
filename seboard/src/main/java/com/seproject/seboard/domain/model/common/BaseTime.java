@@ -13,7 +13,6 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
-@NoArgsConstructor
 public class BaseTime {
     private LocalDateTime createdAt;
     private LocalDateTime modifiedAt;

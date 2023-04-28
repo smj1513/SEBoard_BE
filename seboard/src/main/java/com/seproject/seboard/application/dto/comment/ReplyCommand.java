@@ -14,8 +14,7 @@ public class ReplyCommand {
         private Long accountId;
         private String contents;
         private boolean isAnonymous;
-        private ExposeState exposeState;
-        private String exposePassword;
+        private boolean isOnlyReadByAuthor;
     }
 
     @Getter
@@ -24,7 +23,6 @@ public class ReplyCommand {
         private Long replyId;
         private Long accountId;
         private String contents;
-        private ExposeState exposeState;
-        private String exposePassword;
+        private boolean isOnlyReadByAuthor;
     }
 }

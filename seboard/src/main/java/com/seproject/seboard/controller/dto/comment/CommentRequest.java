@@ -16,7 +16,7 @@ public class CommentRequest {
         private Long postId;
         private String contents;
         private boolean isAnonymous;
-        private ExposeOptionRequest exposeOption;
+        private boolean isReadOnlyAuthor;
 
         public CommentWriteCommand toCommand(Long accountId) {
             return CommentWriteCommand.builder()
@@ -24,8 +24,7 @@ public class CommentRequest {
                     .accountId(accountId)
                     .contents(contents)
                     .isAnonymous(isAnonymous)
-                    .exposeState(ExposeState.valueOf(exposeOption.getName()))
-                    .exposePassword(exposeOption.getPassword())
+                    .isOnlyReadByAuthor(isReadOnlyAuthor)
                     .build();
         }
     }
@@ -33,14 +32,13 @@ public class CommentRequest {
     @Data
     public static class UpdateCommentRequest {
         private String contents;
-        private ExposeOptionRequest exposeOption;
+        private boolean isReadOnlyAuthor;
         public CommentEditCommand toCommand(Long commentId, Long accountId) {
             return CommentEditCommand.builder()
                     .accountId(accountId)
                     .commentId(commentId)
                     .contents(contents)
-                    .exposeState(ExposeState.valueOf(exposeOption.getName()))
-                    .exposePassword(exposeOption.getPassword())
+                    .isOnlyReadByAuthor(isReadOnlyAuthor)
                     .build();
         }
     }
