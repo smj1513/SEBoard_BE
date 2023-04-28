@@ -1,7 +1,9 @@
 package com.seproject.oauth2.controller;
 
 
-import com.seproject.oauth2.controller.dto.RoleDTO;
+import com.seproject.oauth2.model.Account;
+import com.seproject.oauth2.service.AccountService;
+import com.seproject.oauth2.utils.jwt.JwtDecoder;
 import com.seproject.seboard.application.PostAppService;
 import com.seproject.seboard.application.dto.post.PostCommand;
 import com.seproject.seboard.controller.dto.post.PostResponse;
@@ -14,12 +16,12 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-
-import javax.servlet.http.HttpServletRequest;
+import org.springframework.web.bind.annotation.*;
 
 import static com.seproject.seboard.controller.dto.post.PostRequest.*;
 import static com.seproject.seboard.controller.dto.post.PostResponse.*;
@@ -32,14 +34,16 @@ import static com.seproject.seboard.application.dto.post.PostCommand.*;
 public class AdminPostController {
 
     private final PostAppService postAppService;
+    private final JwtDecoder jwtDecoder;
+    private final AccountService accountService;
 
-    @Operation(summary = "게시글 목록 조회", description = "등록된 권한 목록들을 조회한다.")
+    @Operation(summary = "게시글 목록 조회", description = "등록된 게시글 목록들을 조회한다.")
     @ApiResponses({
-            @ApiResponse(content = @Content(schema = @Schema(implementation = RoleDTO.RetrieveAllRoleResponse.class)), responseCode = "200", description = "권한 목록 조회 성공"),
-            @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "400", description = "잘못된 페이징 정보")
+            @ApiResponse(content = @Content(schema = @Schema(implementation = RetrievePostListResponse.class)), responseCode = "200", description = "게시글 목록 조회 성공"),
+            @ApiResponse(content = @Content(schema = @Schema(implementation = Error.class)), responseCode = "200", description = "잘못된 페이징 정보")
     })
     @GetMapping("/posts")
-    public ResponseEntity<?> retrieveAllRole(HttpServletRequest request, @RequestBody RetrievePostListRequest retrievePostListRequest) {
+    public ResponseEntity<?> retrieveAllPost(@RequestBody RetrievePostListRequest retrievePostListRequest) {
 
         PostListFindCommand command = PostCommand.PostListFindCommand.builder()
                 .categoryId(retrievePostListRequest.getCategoryId())
@@ -51,4 +55,21 @@ public class AdminPostController {
 
         return new ResponseEntity<>(postList, HttpStatus.OK);
     }
+
+//    //TODO: 예외 추가
+//    @Operation(summary = "게시글 삭제", description = "관리자는 게시글을 삭제한다.")
+//    @ApiResponses({
+//            @ApiResponse(content = @Content(schema = @Schema(implementation = RetrievePostListResponse.class)), responseCode = "200", description = "게시글 삭제 성공"),
+//            @ApiResponse(content = @Content(schema = @Schema(implementation = Error.class)), responseCode = "200", description = "잘못된 페이징 정보")
+//    })
+//    @DeleteMapping("/posts/{postId}")
+//    public ResponseEntity<?> deletePost(@PathVariable Long postId) {
+//        UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken)SecurityContextHolder.getContext().getAuthentication();
+//        User user = (User)authentication.getPrincipal();
+//        String username = user.getUsername();
+//        Account account = accountService.findAccountById(username);
+//
+//        postAppService.removePost(postId,account.getAccountId());
+//        return new ResponseEntity<>("게시글 삭제 성공", HttpStatus.OK);
+//    }
 }
