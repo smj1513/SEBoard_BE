@@ -1,11 +1,18 @@
 package com.seproject.oauth2.utils.jwt;
 
 import antlr.Token;
+import com.nimbusds.jose.proc.SecurityContext;
 import com.seproject.error.exception.TokenValidateException;
+import com.seproject.oauth2.model.Account;
 import com.seproject.oauth2.model.AuthorizationMetaData;
+import com.seproject.oauth2.model.social.KakaoOidcUser;
 import com.seproject.oauth2.repository.AuthorizationMetaDataRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -26,27 +33,29 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        List<AuthorizationMetaData> authorizationMetaDatas
-                = authorizationMetaDataRepository.findByMethodSignature(request.getRequestURI());
+//        List<AuthorizationMetaData> authorizationMetaDatas
+//                = authorizationMetaDataRepository.findByMethodSignature(request.getRequestURI());
 
         String jwt = request.getHeader("Authorization");
 
         try{
-            if(jwt != null) {
+            if(StringUtils.hasText(jwt)) {
                 jwtDecoder.validate(jwt);
+                Authentication authentication = jwtDecoder.getAuthentication(jwt);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
+//                if(authorizationMetaDatas != null && !authorizationMetaDatas.isEmpty()) {
+//                    boolean accessible = false;
+//
+//                    List<String> authorities = jwtDecoder.getAuthorities(jwt);
+//                    for (AuthorizationMetaData authorizationMetaData : authorizationMetaDatas) {
+//                        accessible |= authorizationMetaData.matches(authorities);
+//                    }
+//
+//
+//                    if(!accessible) throw new AccessDeniedException("접근 권한이 존재하지 않음");
+//                }
             }
 
-            if(authorizationMetaDatas != null && !authorizationMetaDatas.isEmpty()) {
-                boolean accessible = false;
-                if(jwt != null) {
-                    List<String> authorities = jwtDecoder.getAuthorities(jwt);
-                    for (AuthorizationMetaData authorizationMetaData : authorizationMetaDatas) {
-                        accessible |= authorizationMetaData.matches(authorities);
-                    }
-                }
-
-                if(!accessible) throw new AccessDeniedException("접근 권한이 존재하지 않음");
-            }
 
             filterChain.doFilter(request,response);
         } catch (TokenValidateException e) {
