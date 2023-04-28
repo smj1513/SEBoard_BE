@@ -33,16 +33,9 @@ public class AdminAccountController {
             @ApiResponse(content = @Content(schema = @Schema(implementation = RetrieveAllAccountResponse.class)), responseCode = "200", description = "계정 목록 조회 성공"),
             @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "400", description = "잘못된 페이징 정보")
     })
-//    @JWT
+
     @GetMapping("/accounts")
     public ResponseEntity<?> retrieveAllAccount(HttpServletRequest request,@RequestBody RetrieveAllAccountRequest accountRequest) {
-//        String jwt = request.getHeader("Authorization");
-//        List<String> authorities = jwtDecoder.getAuthorities(jwt);
-//
-//        if(!authorities.contains("ROLE_ADMIN")) {
-//            return new ResponseEntity<>("접근 권한이 없습니다.",HttpStatus.NOT_ACCEPTABLE);
-//        }
-
         int page = accountRequest.getPage();
         int perPage = accountRequest.getPerPage();
         page = Math.max(page-1,0);
@@ -57,16 +50,8 @@ public class AdminAccountController {
             @ApiResponse(content = @Content(schema = @Schema(implementation = RetrieveAccountResponse.class)), responseCode = "200", description = "계정 상세 정보 조회 성공"),
             @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "404", description = "존재하지 않는 계정")
     })
-    //    @JWT
     @GetMapping("/accounts/{accountId}")
     public ResponseEntity<?> retrieveAllAccount(HttpServletRequest request,@PathVariable Long accountId) {
-//        String jwt = request.getHeader("Authorization");
-//        List<String> authorities = jwtDecoder.getAuthorities(jwt);
-//
-//        if(!authorities.contains("ROLE_ADMIN")) {
-//            return new ResponseEntity<>("접근 권한이 없습니다.",HttpStatus.NOT_ACCEPTABLE);
-//        }
-
         try{
             return new ResponseEntity<>(accountService.findAccount(accountId), HttpStatus.OK);
         }  catch (NoSuchElementException e) {
@@ -81,16 +66,11 @@ public class AdminAccountController {
             @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "400", description = "이메일 형식이 일치하지 않음"),
             @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "400", description = "존재하지 않는 권한 요청")
     })
-    //    @JWT
     @PostMapping("/accounts")
     public ResponseEntity<?> createAccountByAdmin(HttpServletRequest request,@RequestBody CreateAccountRequest createAccountRequest) {
-//        String jwt = request.getHeader("Authorization");
-//        List<String> authorities = jwtDecoder.getAuthorities(jwt);
-//
-//        if(!authorities.contains("ROLE_ADMIN")) {
-//            return new ResponseEntity<>("접근 권한이 없습니다.",HttpStatus.NOT_ACCEPTABLE);
-//        }
+
         String email = createAccountRequest.getEmail();
+
         if(!email.matches("\\w+@\\w+\\.\\w+(\\.\\w+)?")) {
             return new ResponseEntity<>("이메일 형식이 맞지 않습니다." , HttpStatus.BAD_REQUEST);
         }
@@ -111,15 +91,8 @@ public class AdminAccountController {
             @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "400", description = "존재하지 않는 권한 요청"),
             @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "404", description = "존재하지 않는 계정")
     })
-    //    @JWT
     @PutMapping("/accounts")
     public ResponseEntity<?> updateAccount(HttpServletRequest request,@RequestBody UpdateAccountRequest updateAccountRequest) {
-//        String jwt = request.getHeader("Authorization");
-//        List<String> authorities = jwtDecoder.getAuthorities(jwt);
-//
-//        if(!authorities.contains("ROLE_ADMIN")) {
-//            return new ResponseEntity<>("접근 권한이 없습니다.",HttpStatus.NOT_ACCEPTABLE);
-//        }
 
         String email = updateAccountRequest.getEmail();
         if(!email.matches("\\w+@\\w+\\.\\w+(\\.\\w+)?")) {
@@ -142,15 +115,8 @@ public class AdminAccountController {
             @ApiResponse(content = @Content(schema = @Schema(implementation = DeleteAccountResponse.class)), responseCode = "200", description = "계정 삭제 성공"),
             @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "404", description = "존자해지 않는 계정")
     })
-    //    @JWT
     @DeleteMapping("/accounts")
     public ResponseEntity<?> deleteAccount(HttpServletRequest request,@RequestBody DeleteAccountRequest deleteAccountRequest) {
-//        String jwt = request.getHeader("Authorization");
-//        List<String> authorities = jwtDecoder.getAuthorities(jwt);
-//
-//        if(!authorities.contains("ROLE_ADMIN")) {
-//            return new ResponseEntity<>("접근 권한이 없습니다.",HttpStatus.NOT_ACCEPTABLE);
-//        }
 
         try{
             DeleteAccountResponse deleteAccount = accountService.deleteAccount(deleteAccountRequest.getAccountId());
