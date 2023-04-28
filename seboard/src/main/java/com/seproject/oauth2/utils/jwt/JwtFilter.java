@@ -36,11 +36,10 @@ public class JwtFilter extends OncePerRequestFilter {
 //        List<AuthorizationMetaData> authorizationMetaDatas
 //                = authorizationMetaDataRepository.findByMethodSignature(request.getRequestURI());
 
-        String jwt = request.getHeader("Authorization");
+        String jwt = jwtDecoder.getAccessToken(request);
 
         try{
             if(StringUtils.hasText(jwt)) {
-                jwtDecoder.validate(jwt);
                 Authentication authentication = jwtDecoder.getAuthentication(jwt);
                 SecurityContextHolder.getContext().setAuthentication(authentication);
 //                if(authorizationMetaDatas != null && !authorizationMetaDatas.isEmpty()) {
@@ -55,7 +54,6 @@ public class JwtFilter extends OncePerRequestFilter {
 //                    if(!accessible) throw new AccessDeniedException("접근 권한이 존재하지 않음");
 //                }
             }
-
 
             filterChain.doFilter(request,response);
         } catch (TokenValidateException e) {
