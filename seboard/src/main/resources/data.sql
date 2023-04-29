@@ -13,10 +13,13 @@ INSERT INTO authorities(account_id,role_id) values(5234058023853,5234058023853);
 
 INSERT INTO public.authorizations(id, method, path, priority) VALUES (1543, 'GET', '/admin/**', 9999);
 INSERT INTO public.authorizations(id, method, path, priority) VALUES (1544, 'POST', '/admin/**', 9999);
+INSERT INTO public.authorizations(id, method, path, priority) VALUES (1545, 'PUT', '/admin/**', 9999);
+INSERT INTO public.authorizations(id, method, path, priority) VALUES (1546, 'DELETE', '/admin/**', 9999);
 
-INSERT INTO public.authorization_metadata(authorization_id, role_id) VALUES (1543, 5234058023851);
-INSERT INTO public.authorization_metadata(authorization_id, role_id) VALUES (1544, 5234058023851);
-
+INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243124,1543, 5234058023851);
+INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243125,1544, 5234058023851);
+INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243126,1545, 5234058023851);
+INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243127,1546, 5234058023851);
 
 INSERT INTO categories(category_id,super_category_id,name) values (43214232,null,'공지사항');
 INSERT INTO categories(category_id,super_category_id,name) values (43214233,43214232,'일반');

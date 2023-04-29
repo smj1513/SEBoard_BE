@@ -8,6 +8,10 @@ import java.util.List;
 
 public interface AuthorizationRepository extends JpaRepository<Authorization,Long> {
 
-    @Query("select data from Authorization data join fetch data.roles order by data.priority desc")
+//    @Query(value = "select * from authorizations join authorization_metadata on authorizations.id = authorization_metadata.authorization_id order by priority desc", nativeQuery = true)
+    @Query("select distinct data from Authorization data join fetch data.roleAuthorizations order by data.priority desc")
     List<Authorization> findAllAuthorization();
+    Authorization findAuthorizationByPathAndMethod(String path, String method);
+
+    boolean existsByPathAndMethod(String path,String method);
 }

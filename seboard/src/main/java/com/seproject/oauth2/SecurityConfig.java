@@ -1,6 +1,5 @@
 package com.seproject.oauth2;
 
-import com.seproject.oauth2.repository.AuthorizationRepository;
 import com.seproject.oauth2.service.CustomOidcUserService;
 import com.seproject.oauth2.utils.*;
 import com.seproject.oauth2.utils.handler.*;
@@ -25,11 +24,8 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import java.util.Arrays;
-import java.util.LinkedHashMap;
-import java.util.List;
 
 
 @Slf4j
@@ -60,7 +56,7 @@ public class SecurityConfig {
         http.cors().disable();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests()
-                .antMatchers("/admin/**").hasRole("ADMIN")
+//                .antMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().permitAll();
 
         http.formLogin()
@@ -89,7 +85,7 @@ public class SecurityConfig {
                 .authenticationEntryPoint(authenticationEntryPoint);
 
         http.addFilterBefore(new JwtFilter(jwtDecoder,authenticationFailureHandler), UsernamePasswordAuthenticationFilter.class);
-        http.addFilterBefore(filterSecurityInterceptor(),FilterSecurityInterceptor.class);
+//        http.addFilterBefore(filterSecurityInterceptor(),FilterSecurityInterceptor.class);
         return http.build();
     }
 
@@ -126,7 +122,7 @@ public class SecurityConfig {
 
     @Bean
     public UrlFilterInvocationSecurityMetaDataSource urlFilterInvocationSecurityMetaDataSource() throws Exception {
-        return new UrlFilterInvocationSecurityMetaDataSource(urlResourcesFactoryBean.getObject());
+        return new UrlFilterInvocationSecurityMetaDataSource(urlResourcesFactoryBean);
     }
 
 }

@@ -6,6 +6,7 @@ import javax.persistence.*;
 import java.util.List;
 import java.util.Objects;
 
+@Builder
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
@@ -19,11 +20,8 @@ public class Authorization {
     private String method;
     private int priority;
 
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(name = "authorization_metadata" , joinColumns = {
-            @JoinColumn(name = "authorization_id")
-    }, inverseJoinColumns = {@JoinColumn(name = "role_id")})
-    private List<Role> roles;
+    @OneToMany(fetch = FetchType.EAGER,mappedBy = "authorization",cascade = CascadeType.ALL)
+    private List<RoleAuthorization> roleAuthorizations;
 
     @Override
     public boolean equals(Object o) {

@@ -1,10 +1,8 @@
 package com.seproject.oauth2;
 
 import org.springframework.security.access.ConfigAttribute;
-import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.web.FilterInvocation;
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 
 import javax.servlet.http.HttpServletRequest;
@@ -14,13 +12,30 @@ public class UrlFilterInvocationSecurityMetaDataSource implements FilterInvocati
 
     private final LinkedHashMap<RequestMatcher, List<ConfigAttribute>> requestMap;
 
-    public UrlFilterInvocationSecurityMetaDataSource(LinkedHashMap<RequestMatcher, List<ConfigAttribute>> requestMap) {
-        this.requestMap = requestMap;
+    private final UrlResourcesFactoryBean urlResourcesFactoryBean;
+    private boolean reset; //TODO : 나중에 제거
+
+    public UrlFilterInvocationSecurityMetaDataSource(UrlResourcesFactoryBean urlResourcesFactoryBean) throws Exception {
+        this.urlResourcesFactoryBean = urlResourcesFactoryBean;
+        requestMap = urlResourcesFactoryBean.getObject();
+        reset = false; //TODO : 나중에 제거
     }
 
     @Override
     public Collection<ConfigAttribute> getAttributes(Object object) throws IllegalArgumentException {
-        if(requestMap.isEmpty()) requestMap.put(new AntPathRequestMatcher("/admin"), Arrays.asList(new SecurityConfig("ROLE_ADMIN")));
+
+        //TODO : 나중에 제거
+        if(!reset) {
+            try{
+                reset();
+                reset = true;
+            }
+            catch (Exception e) {
+                throw new IllegalArgumentException();
+            }
+        }
+
+//        if(requestMap.isEmpty()) requestMap.put(new AntPathRequestMatcher("/admin"), Arrays.asList(new SecurityConfig("ROLE_ADMIN")));
         FilterInvocation filterInvocation = (FilterInvocation) object;
         HttpServletRequest request = filterInvocation.getRequest();
 
@@ -33,7 +48,6 @@ public class UrlFilterInvocationSecurityMetaDataSource implements FilterInvocati
         }
 
         return null;
-
     }
 
     @Override
@@ -47,4 +61,11 @@ public class UrlFilterInvocationSecurityMetaDataSource implements FilterInvocati
     public boolean supports(Class<?> clazz) {
         return FilterInvocation.class.isAssignableFrom(clazz);
     }
+
+    public void reset() throws Exception {
+        LinkedHashMap<RequestMatcher,List<ConfigAttribute>> requestMap = urlResourcesFactoryBean.getObject();
+        this.requestMap.clear();
+        this.requestMap.putAll(requestMap);
+    }
+
 }

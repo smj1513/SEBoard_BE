@@ -14,7 +14,6 @@ import java.util.List;
 public class UrlResourcesFactoryBean implements FactoryBean<LinkedHashMap<RequestMatcher, List<ConfigAttribute>>> {
 
     private final AuthorizationService authorizationService;
-    private LinkedHashMap<RequestMatcher,List<ConfigAttribute>> requestMap;
 
     public UrlResourcesFactoryBean(AuthorizationService authorizationService) {
         this.authorizationService = authorizationService;
@@ -22,13 +21,7 @@ public class UrlResourcesFactoryBean implements FactoryBean<LinkedHashMap<Reques
 
     @Override
     public LinkedHashMap<RequestMatcher, List<ConfigAttribute>> getObject() throws Exception {
-
-        if(requestMap == null) {
-            requestMap = authorizationService.getRequestMap();
-        }
-
-
-        return requestMap;
+        return authorizationService.getRequestMap();
     }
 
     @Override
