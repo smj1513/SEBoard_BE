@@ -88,8 +88,8 @@ public class JwtDecoder {
 
     public Authentication getAuthentication(String jwt) {
         Claims claims = getClaims(jwt);
-
-        List<SimpleGrantedAuthority> authorities = Arrays.stream(claims.get(JWTProperties.AUTHORITIES).toString().split(","))
+        List<String> authoritiesFromToken = (List<String>)claims.get(JWTProperties.AUTHORITIES);
+        List<SimpleGrantedAuthority> authorities = authoritiesFromToken.stream()
                 .map(SimpleGrantedAuthority::new)
                 .collect(Collectors.toList());
 
