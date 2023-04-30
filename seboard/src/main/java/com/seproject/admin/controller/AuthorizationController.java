@@ -1,6 +1,6 @@
 package com.seproject.admin.controller;
 
-import com.seproject.account.authorize.UrlFilterInvocationSecurityMetaDataSource;
+import com.seproject.account.authorize.url.UrlFilterInvocationSecurityMetaDataSource;
 import com.seproject.account.service.AuthorizationService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;

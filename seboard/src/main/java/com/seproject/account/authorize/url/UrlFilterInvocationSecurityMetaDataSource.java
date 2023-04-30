@@ -1,4 +1,4 @@
-package com.seproject.account.authorize;
+package com.seproject.account.authorize.url;
 
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.web.FilterInvocation;

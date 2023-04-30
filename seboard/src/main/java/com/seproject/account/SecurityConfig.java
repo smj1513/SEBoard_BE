@@ -4,8 +4,8 @@ import com.seproject.account.authentication.entrypoint.CustomAuthenticationEntry
 import com.seproject.account.authentication.handler.failure.CustomAuthenticationFailureHandler;
 import com.seproject.account.authentication.handler.success.FormLoginAuthenticationSuccessHandler;
 import com.seproject.account.authentication.handler.success.OidcAuthenticationSuccessHandler;
-import com.seproject.account.authorize.UrlFilterInvocationSecurityMetaDataSource;
-import com.seproject.account.authorize.UrlResourcesFactoryBean;
+import com.seproject.account.authorize.url.UrlFilterInvocationSecurityMetaDataSource;
+import com.seproject.account.authorize.url.UrlResourcesFactoryBean;
 import com.seproject.account.authorize.handler.CustomAccessDeniedHandler;
 import com.seproject.account.service.CustomOidcUserService;
 import com.seproject.account.utils.*;

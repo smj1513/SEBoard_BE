@@ -1,4 +1,4 @@
-package com.seproject.account.authorize;
+package com.seproject.account.authorize.url;
 
 import com.seproject.account.service.AuthorizationService;
 import org.springframework.beans.factory.FactoryBean;
@@ -21,7 +21,7 @@ public class UrlResourcesFactoryBean implements FactoryBean<LinkedHashMap<Reques
 
     @Override
     public LinkedHashMap<RequestMatcher, List<ConfigAttribute>> getObject() throws Exception {
-        return authorizationService.getRequestMap();
+        return authorizationService.getUrlRequestMap();
     }
 
     @Override
