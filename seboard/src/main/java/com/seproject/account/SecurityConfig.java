@@ -7,13 +7,18 @@ import com.seproject.account.authentication.handler.success.OidcAuthenticationSu
 import com.seproject.account.authorize.url.UrlFilterInvocationSecurityMetaDataSource;
 import com.seproject.account.authorize.url.UrlResourcesFactoryBean;
 import com.seproject.account.authorize.handler.CustomAccessDeniedHandler;
+import com.seproject.account.filter.CustomFilterSecurityInterceptor;
+import com.seproject.account.filter.IpFilter;
 import com.seproject.account.service.CustomOidcUserService;
+import com.seproject.account.service.IpService;
 import com.seproject.account.utils.*;
 import com.seproject.account.jwt.JwtDecoder;
 import com.seproject.account.filter.JwtFilter;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.vote.AffirmativeBased;
 import org.springframework.security.access.vote.RoleVoter;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -31,7 +36,8 @@ import org.springframework.security.web.access.intercept.FilterSecurityIntercept
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import java.util.Arrays;
+import java.util.ArrayList;
+import java.util.List;
 
 
 @Slf4j
@@ -48,8 +54,10 @@ public class SecurityConfig {
     private final CustomAccessDeniedHandler accessDeniedHandler;
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
     private final AuthenticationConfiguration authenticationConfiguration;
+    private final IpService ipService;
     private UrlResourcesFactoryBean urlResourcesFactoryBean;
     private JwtDecoder jwtDecoder;
+
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -91,7 +99,8 @@ public class SecurityConfig {
                 .authenticationEntryPoint(authenticationEntryPoint);
 
         http.addFilterBefore(new JwtFilter(jwtDecoder,authenticationFailureHandler), UsernamePasswordAuthenticationFilter.class);
-//        http.addFilterBefore(filterSecurityInterceptor(),FilterSecurityInterceptor.class);
+        http.addFilterBefore(new IpFilter(ipService,accessDeniedHandler), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(filterSecurityInterceptor(),FilterSecurityInterceptor.class);
         return http.build();
     }
 
@@ -116,11 +125,26 @@ public class SecurityConfig {
     }
 
     @Bean
-    public FilterSecurityInterceptor filterSecurityInterceptor() throws Exception {
+    public List<AccessDecisionVoter<?>> accessDecisionVoters() {
+        List<AccessDecisionVoter<?>> voters = new ArrayList<>();
+        voters.add(new RoleVoter());
+        return voters;
+    }
 
-        FilterSecurityInterceptor filterSecurityInterceptor = new FilterSecurityInterceptor();
+    @Bean
+    public FilterRegistrationBean<FilterSecurityInterceptor> filterRegistrationBean() throws Exception {
+        FilterRegistrationBean<FilterSecurityInterceptor> filterRegistrationBean = new FilterRegistrationBean<>();
+        filterRegistrationBean.setFilter(filterSecurityInterceptor());
+        filterRegistrationBean.setEnabled(false);
+        return filterRegistrationBean;
+    }
+
+    @Bean
+    public FilterSecurityInterceptor filterSecurityInterceptor() throws Exception {
+        String[] permitAllRequest = {"/", "/login", "/index/**"};
+        CustomFilterSecurityInterceptor filterSecurityInterceptor = new CustomFilterSecurityInterceptor(permitAllRequest);
         filterSecurityInterceptor.setSecurityMetadataSource(urlFilterInvocationSecurityMetaDataSource());
-        filterSecurityInterceptor.setAccessDecisionManager(new AffirmativeBased(Arrays.asList(new RoleVoter())));
+        filterSecurityInterceptor.setAccessDecisionManager(new AffirmativeBased(accessDecisionVoters()));
         filterSecurityInterceptor.setAuthenticationManager(authenticationManager());
 
         return filterSecurityInterceptor;
