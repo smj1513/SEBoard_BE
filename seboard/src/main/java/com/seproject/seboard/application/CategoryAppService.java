@@ -3,10 +3,9 @@ package com.seproject.seboard.application;
 import com.seproject.seboard.domain.model.post.Category;
 import com.seproject.seboard.domain.repository.post.CategoryRepository;
 import com.seproject.seboard.domain.repository.post.PostRepository;
-import com.seproject.seboard.domain.repository.post.PostSearchRepository;
 import com.seproject.seboard.domain.service.CategoryService;
-import com.seproject.oauth2.model.Account;
-import com.seproject.oauth2.repository.AccountRepository;
+import com.seproject.account.model.Account;
+import com.seproject.account.repository.AccountRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 

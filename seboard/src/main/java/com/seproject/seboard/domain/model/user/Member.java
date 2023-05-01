@@ -1,6 +1,6 @@
 package com.seproject.seboard.domain.model.user;
 
-import com.seproject.oauth2.model.Account;
+import com.seproject.account.model.Account;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
