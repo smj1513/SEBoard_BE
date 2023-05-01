@@ -99,6 +99,7 @@ public class PostResponse {
         private LocalDateTime modifiedAt;
         private boolean isEditable;
         private boolean isBookmarked;
+        private boolean isPined;
         private String exposeType;
         private FileMetaDataListResponse attachments;
 
@@ -114,6 +115,7 @@ public class PostResponse {
             this.modifiedAt = post.getBaseTime().getModifiedAt();
             this.exposeType = post.getExposeOption().getExposeState().toString();
             this.attachments = new FileMetaDataListResponse(new ArrayList<>(post.getAttachments()));
+            this.isPined = post.isPined();
         }
     }
 }
