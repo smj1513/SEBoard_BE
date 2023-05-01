@@ -103,7 +103,7 @@ public class SecurityConfig {
                 .authenticationEntryPoint(authenticationEntryPoint);
 
         http.addFilterBefore(new JwtFilter(jwtDecoder,authenticationFailureHandler), UsernamePasswordAuthenticationFilter.class);
-        http.addFilterBefore(new IpFilter(ipService,accessDeniedHandler), UsernamePasswordAuthenticationFilter.class);
+//        http.addFilterBefore(new IpFilter(ipService,accessDeniedHandler), UsernamePasswordAuthenticationFilter.class);
 //        http.addFilterBefore(categoryAccessFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(filterSecurityInterceptor(),FilterSecurityInterceptor.class);
         return http.build();
@@ -161,7 +161,7 @@ public class SecurityConfig {
     }
 
 
-    @Bean
+//    @Bean
     public CategoryAccessFilter categoryAccessFilter() {
         CategoryResourceFactoryBean categoryResourceFactoryBean = new CategoryResourceFactoryBean(categoryAuthorizationService);
         CategoryAccessFilter categoryAccessFilter = new CategoryAccessFilter(categoryResourceFactoryBean,accessDeniedHandler);
