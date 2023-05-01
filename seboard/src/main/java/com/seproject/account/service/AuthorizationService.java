@@ -29,7 +29,7 @@ public class AuthorizationService {
     private final RoleAuthorizationRepository roleAuthorizationRepository;
     private final RoleRepository roleRepository;
 
-    public LinkedHashMap<RequestMatcher, List<ConfigAttribute>> getRequestMap() {
+    public LinkedHashMap<RequestMatcher, List<ConfigAttribute>> getUrlRequestMap() {
         LinkedHashMap<RequestMatcher,List<ConfigAttribute>> requestMap = new LinkedHashMap<>();
         List<Authorization> authorizations = authorizationRepository.findAllAuthorization();
 

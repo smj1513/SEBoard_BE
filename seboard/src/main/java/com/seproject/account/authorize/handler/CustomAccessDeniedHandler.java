@@ -1,6 +1,7 @@
 package com.seproject.account.authorize.handler;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.seproject.error.exception.IpAccessDeniedException;
 import com.seproject.error.Error;
 import com.seproject.error.errorCode.ErrorCode;
 import org.springframework.security.access.AccessDeniedException;
@@ -21,7 +22,7 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
         response.setContentType("application/json");
         response.setCharacterEncoding("utf-8");
 
-        ErrorCode errorCode = ErrorCode.ACCESS_DENIED;
+        ErrorCode errorCode;
 
 //        if(accessDeniedException instanceof com.seproject.error.exception.AccessDeniedException) {
 //            errorCode =
@@ -29,6 +30,12 @@ public class CustomAccessDeniedHandler implements AccessDeniedHandler {
 //            response.sendError(HttpStatus.FORBIDDEN.value(),accessDeniedException.getMessage());
 //            return;
 //        }
+
+        if(accessDeniedException instanceof IpAccessDeniedException) {
+            errorCode = ErrorCode.BANNED_IP;
+        } else {
+            errorCode = ErrorCode.ACCESS_DENIED;
+        }
 
         Error error = Error.of(errorCode);
         String result = objectMapper.writeValueAsString(error);
