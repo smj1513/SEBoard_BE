@@ -4,11 +4,14 @@ import com.seproject.account.authentication.entrypoint.CustomAuthenticationEntry
 import com.seproject.account.authentication.handler.failure.CustomAuthenticationFailureHandler;
 import com.seproject.account.authentication.handler.success.FormLoginAuthenticationSuccessHandler;
 import com.seproject.account.authentication.handler.success.OidcAuthenticationSuccessHandler;
+import com.seproject.account.authorize.category.CategoryResourceFactoryBean;
 import com.seproject.account.authorize.url.UrlFilterInvocationSecurityMetaDataSource;
 import com.seproject.account.authorize.url.UrlResourcesFactoryBean;
 import com.seproject.account.authorize.handler.CustomAccessDeniedHandler;
+import com.seproject.account.filter.CategoryAccessFilter;
 import com.seproject.account.filter.CustomFilterSecurityInterceptor;
 import com.seproject.account.filter.IpFilter;
+import com.seproject.account.service.CategoryAuthorizationService;
 import com.seproject.account.service.CustomOidcUserService;
 import com.seproject.account.service.IpService;
 import com.seproject.account.utils.*;
@@ -55,6 +58,7 @@ public class SecurityConfig {
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final IpService ipService;
+    private final CategoryAuthorizationService categoryAuthorizationService;
     private UrlResourcesFactoryBean urlResourcesFactoryBean;
     private JwtDecoder jwtDecoder;
 
@@ -100,6 +104,7 @@ public class SecurityConfig {
 
         http.addFilterBefore(new JwtFilter(jwtDecoder,authenticationFailureHandler), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(new IpFilter(ipService,accessDeniedHandler), UsernamePasswordAuthenticationFilter.class);
+//        http.addFilterBefore(categoryAccessFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(filterSecurityInterceptor(),FilterSecurityInterceptor.class);
         return http.build();
     }
@@ -155,4 +160,11 @@ public class SecurityConfig {
         return new UrlFilterInvocationSecurityMetaDataSource(urlResourcesFactoryBean);
     }
 
+
+    @Bean
+    public CategoryAccessFilter categoryAccessFilter() {
+        CategoryResourceFactoryBean categoryResourceFactoryBean = new CategoryResourceFactoryBean(categoryAuthorizationService);
+        CategoryAccessFilter categoryAccessFilter = new CategoryAccessFilter(categoryResourceFactoryBean,accessDeniedHandler);
+        return categoryAccessFilter;
+    }
 }
