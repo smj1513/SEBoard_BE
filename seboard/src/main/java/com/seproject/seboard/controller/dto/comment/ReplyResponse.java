@@ -22,6 +22,8 @@ public class ReplyResponse {
     private boolean isEditable;
     @JsonProperty("isActive")
     private boolean isActive;
+    @JsonProperty("isReadOnlyAuthor")
+    private boolean isReadOnlyAuthor;
 
     public static ReplyResponse toDto(Reply reply, boolean isEditable){
         UserResponse userResponse = null;
@@ -45,6 +47,7 @@ public class ReplyResponse {
                 .contents(reply.getContents())
                 .isEditable(isEditable)
                 .isActive(reply.isDeleted()) //TODO : 작성자만 읽을 수 있는 경우 추가 필요
+                .isReadOnlyAuthor(reply.isOnlyReadByAuthor())
                 .build();
     }
 }
