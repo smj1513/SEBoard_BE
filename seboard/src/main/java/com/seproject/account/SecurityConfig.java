@@ -63,9 +63,10 @@ public class SecurityConfig {
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final IpService ipService;
+    private final JwtFilter jwtFilter;
     private final CategoryAuthorizationService categoryAuthorizationService;
     private UrlResourcesFactoryBean urlResourcesFactoryBean;
-    private JwtDecoder jwtDecoder;
+
 
 
     @Bean
@@ -111,7 +112,7 @@ public class SecurityConfig {
                 .accessDeniedHandler(accessDeniedHandler)
                 .authenticationEntryPoint(authenticationEntryPoint);
 
-        http.addFilterBefore(new JwtFilter(jwtDecoder,authenticationFailureHandler), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtFilter,UsernamePasswordAuthenticationFilter.class);
 //        http.addFilterBefore(new IpFilter(ipService,accessDeniedHandler), UsernamePasswordAuthenticationFilter.class);
 //        http.addFilterBefore(categoryAccessFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(filterSecurityInterceptor(),FilterSecurityInterceptor.class);

@@ -1,11 +1,14 @@
 package com.seproject.account.filter;
 
+import com.seproject.account.model.Token;
+import com.seproject.account.service.TokenService;
 import com.seproject.error.exception.TokenValidateException;
 import com.seproject.account.jwt.JwtDecoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -16,11 +19,13 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @RequiredArgsConstructor
+@Component
 public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtDecoder jwtDecoder;
 
     private final AuthenticationFailureHandler failureHandler;
+    private final TokenService tokenService;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
@@ -29,10 +34,12 @@ public class JwtFilter extends OncePerRequestFilter {
 
         try{
             if(StringUtils.hasText(jwt)) {
-                Authentication authentication = jwtDecoder.getAuthentication(jwt);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                Token token = tokenService.findToken(jwt);
+                if(token != null) {
+                    Authentication authentication = jwtDecoder.getAuthentication(token);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
             }
-
             filterChain.doFilter(request,response);
         } catch (TokenValidateException e) {
             failureHandler.onAuthenticationFailure(request,response,e);

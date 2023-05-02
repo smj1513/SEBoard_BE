@@ -1,5 +1,7 @@
 package com.seproject.account.jwt;
 
+import com.nimbusds.oauth2.sdk.token.AccessToken;
+import com.seproject.account.model.Token;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.TokenValidateException;
 import io.jsonwebtoken.Claims;
@@ -7,7 +9,7 @@ import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -16,7 +18,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 
 public class JwtDecoder {
 
@@ -77,19 +78,10 @@ public class JwtDecoder {
         return profile;
     }
 
-    public List<String> getAuthorities(String token){
-        Claims claims = getClaims(token);
-        List<String> authorities = (List<String>)claims.get(JWTProperties.AUTHORITIES);
-        if(authorities == null) throw new NoSuchElementException();
-        return authorities;
-    }
-
-    public Authentication getAuthentication(String jwt) {
+    public Authentication getAuthentication(Token token) {
+        String jwt = token.getAccessToken();
         Claims claims = getClaims(jwt);
-        List<String> authoritiesFromToken = (List<String>)claims.get(JWTProperties.AUTHORITIES);
-        List<SimpleGrantedAuthority> authorities = authoritiesFromToken.stream()
-                .map(SimpleGrantedAuthority::new)
-                .collect(Collectors.toList());
+        List<? extends GrantedAuthority> authorities = token.getAuthorities();
 
         User principal = new User(claims.getSubject(), "", authorities);
         return new UsernamePasswordAuthenticationToken(principal, jwt, authorities);

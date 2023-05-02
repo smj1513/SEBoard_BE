@@ -5,13 +5,12 @@ import com.seproject.account.model.social.KakaoOidcUser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
 import java.util.Date;
-import java.util.stream.Collectors;
 
 @Slf4j
 public class JwtProvider {
@@ -63,10 +62,11 @@ public class JwtProvider {
         return result;
     }
 
-    public String createRefreshToken() {
+    public String createRefreshToken(AbstractAuthenticationToken token) {
         String refreshToken = Jwts.builder()
                 .setHeaderParam(JWTProperties.TYPE, JWTProperties.REFRESH_TOKEN)
                 .setHeaderParam(JWTProperties.ALGORITHM, JWTProperties.HS256)
+                .setSubject(token.getPrincipal().toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
                 .signWith(SignatureAlgorithm.HS256, secret)
@@ -76,7 +76,6 @@ public class JwtProvider {
         return result;
     }
 
-
     public String createJWT(UsernamePasswordAuthenticationToken token) {
 
         String jwt = Jwts.builder()
@@ -85,7 +84,6 @@ public class JwtProvider {
                 .setSubject(token.getPrincipal().toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-                .claim(JWTProperties.AUTHORITIES, token.getAuthorities().stream().map(GrantedAuthority::getAuthority).collect(Collectors.toList()))
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
         return tokenPrefix + " " + jwt;
