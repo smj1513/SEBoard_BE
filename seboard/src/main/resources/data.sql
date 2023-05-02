@@ -48,7 +48,7 @@ INSERT INTO public.anonymous(account_id, anonymous_id) VALUES (5234058023850, 34
 INSERT INTO public.posts(
     post_id, anonymous_count, created_at, modified_at, contents, pined, title, views, board_user_id, category_id, expose_option_id)
 VALUES (1234879892103, 1, '2023-04-24', '2023-04-26','<div class="document_91563_19198 xe_content"><p>&nbsp;</p>
-<p><span style="font-size:18px;">안녕하십니까&nbsp;18학번 이충엽입니다&nbsp;</span></p><script>alert(\"xss\")</script>
+<p><span style="font-size:18px;">안녕하십니까&nbsp;18학번 이충엽입니다&nbsp;</span></p>
   <p><span style="font-size:18px;">저는 5월 1일 14시부로 논산 훈련소에 입대 예정입니다.&nbsp;</span></p>
   <p><span style="font-size:18px;">그동안 감사했습니다! 충성!</span></p></div>' ,
         true, '18이충엽 재입대 합니다.', 123,3421243 , 43214233, 10001);
