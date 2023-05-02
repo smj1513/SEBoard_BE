@@ -153,24 +153,24 @@ public class SecurityConfig {
         return filterRegistrationBean;
     }
 
-    @Bean
-    public FilterRegistrationBean<XssEscapeServletFilter> xssEscapeServletFilterFilterRegistrationBean() throws Exception {
-        FilterRegistrationBean<XssEscapeServletFilter> filterRegistrationBean = new FilterRegistrationBean<>();
-        filterRegistrationBean.setFilter(new XssEscapeServletFilter());
-        filterRegistrationBean.setOrder(1);
-        filterRegistrationBean.addUrlPatterns("/*");
-        return filterRegistrationBean;
-    }
-
-    @Bean
-    public MappingJackson2HttpMessageConverter jsonEscapeConverter() {
-        SimpleModule simpleModule = new SimpleModule();
-        simpleModule = simpleModule.addSerializer(LocalDateTime.class, new CustomLocalDateTimeSerializer());
-//        simpleModule = simpleModule.addDeserializer(LocalDateTime.class, new CustomLocalDateTimeDeSerializer());
-        ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules().registerModule(simpleModule);
-        objectMapper.getFactory().setCharacterEscapes(new HTMLCharacterEscapes());
-        return new MappingJackson2HttpMessageConverter(objectMapper);
-    }
+//    @Bean
+//    public FilterRegistrationBean<XssEscapeServletFilter> xssEscapeServletFilterFilterRegistrationBean() throws Exception {
+//        FilterRegistrationBean<XssEscapeServletFilter> filterRegistrationBean = new FilterRegistrationBean<>();
+//        filterRegistrationBean.setFilter(new XssEscapeServletFilter());
+//        filterRegistrationBean.setOrder(1);
+//        filterRegistrationBean.addUrlPatterns("/*");
+//        return filterRegistrationBean;
+//    }
+//
+//    @Bean
+//    public MappingJackson2HttpMessageConverter jsonEscapeConverter() {
+//        SimpleModule simpleModule = new SimpleModule();
+//        simpleModule = simpleModule.addSerializer(LocalDateTime.class, new CustomLocalDateTimeSerializer());
+////        simpleModule = simpleModule.addDeserializer(LocalDateTime.class, new CustomLocalDateTimeDeSerializer());
+//        ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules().registerModule(simpleModule);
+//        objectMapper.getFactory().setCharacterEscapes(new HTMLCharacterEscapes());
+//        return new MappingJackson2HttpMessageConverter(objectMapper);
+//    }
 
     @Bean
     public FilterSecurityInterceptor filterSecurityInterceptor() throws Exception {
