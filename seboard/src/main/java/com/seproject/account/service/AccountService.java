@@ -35,7 +35,9 @@ public class AccountService {
     public boolean isExist(String loginId){
         return accountRepository.existsByLoginId(loginId);
     }
-
+    public boolean isExistByNickname(String nickname) {
+        return accountRepository.existsByNickname(nickname);
+    }
     public void register(OAuthAccountCommand accountCommand) {
         Optional<Role> roleUser = roleRepository.findByName("ROLE_USER");
         List<Role> authorities = List.of(roleUser.get());

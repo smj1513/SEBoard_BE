@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.servlet.http.HttpServletRequest;
 
+import static com.seproject.account.controller.dto.RegisterDTO.*;
+
 @Tag(name = "회원가입 API", description = "회원가입(Register) 관련 API")
 @AllArgsConstructor
 @Controller
@@ -45,7 +47,7 @@ public class RegisterController {
             @ApiResponse(content = @Content(schema = @Schema(implementation = IllegalArgumentException.class)), responseCode = "400", description = "전달 항목이 비었거나 유효하지 않은경우"),
     })
     @PostMapping("/account/oauth")
-    public ResponseEntity<?> registerUserWithOAuth(HttpServletRequest request, @RequestBody RegisterDTO.OAuth2RegisterRequest oAuth2RegisterRequest) {
+    public ResponseEntity<?> registerUserWithOAuth(HttpServletRequest request, @RequestBody OAuth2RegisterRequest oAuth2RegisterRequest) {
 
         String token = request.getHeader("Authorization");
 
@@ -82,7 +84,7 @@ public class RegisterController {
             @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "400", description = "인증되지 않은 이메일을 전달"),
     })
     @PostMapping("/account/form")
-    public ResponseEntity<?> registerUserWithForm(@RequestBody RegisterDTO.FormRegisterRequest formRegisterRequest) {
+    public ResponseEntity<?> registerUserWithForm(@RequestBody FormRegisterRequest formRegisterRequest) {
 
         String id = formRegisterRequest.getId();
 
@@ -100,4 +102,17 @@ public class RegisterController {
         return new ResponseEntity<>("인증되지 않은 이메일입니다.",HttpStatus.BAD_REQUEST);
     }
 
+    @Operation(summary = "OAuth 회원가입", description = "소셜 로그인 사용시 추가 정보를 입력하여 회원가입을 요청한다.")
+    @ApiResponses({
+            @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "200", description = "회원가입 성공 시 메세지 전달"),
+    })
+    @PostMapping("/account/oauth")
+    public ResponseEntity<?> confirmDuplicateNickname(@RequestBody ConfirmDuplicateNicknameRequest confirmDuplicateNicknameRequest) {
+
+
+        String nickname = confirmDuplicateNicknameRequest.getNickname();
+        boolean existNickname = accountService.isExistByNickname(nickname);
+
+        return new ResponseEntity<>(ConfirmDuplicateNicknameResponse.toDTO(existNickname),HttpStatus.OK);
+    }
 }
