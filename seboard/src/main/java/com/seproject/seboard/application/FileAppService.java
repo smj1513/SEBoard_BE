@@ -23,7 +23,6 @@ public class FileAppService {
 
         fileList.forEach(multipartFile -> {
             FileMetaData fileMetaData = saveFile(multipartFile, "/files");
-            System.out.println("fileMetaData.getFileMetaDataId() = " + fileMetaData.getFileMetaDataId());
             fileMetaDataList.add(fileMetaData);
         });
 
@@ -36,7 +35,7 @@ public class FileAppService {
         String originalFileName = file.getOriginalFilename();
         String storedFileName = FileUtils.getStoredFileName(originalFileName);
         String filePath = FileUtils.getFilePath()+"/"+storedFileName;
-        String urlPath = urlRootPath+"/"+storedFileName;
+        String urlPath = FileUtils.getUrlPath(urlRootPath)+"/"+storedFileName;
         Long fileSize = file.getSize();
 
         try{
