@@ -31,6 +31,7 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     public boolean isExist(String loginId){
         return accountRepository.existsByLoginId(loginId);
@@ -62,11 +63,22 @@ public class AccountService {
 
     @Transactional
     public void register(AccountRegisterCommand accountRegisterCommand) {
-        Optional<Role> roleUser = roleRepository.findByName("ROLE_KUMOH");
-        List<Role> authorities = List.of(roleUser.get());
+
+        String id = accountRegisterCommand.getId();
+        Role role;
+
+        if(emailService.isKumohMail(id)){
+            role = roleRepository.findByName("ROLE_KUMOH").orElseThrow();
+        } else if(emailService.isEmail(id)) {
+            role = roleRepository.findByName("ROLE_USER").orElseThrow();
+        } else {
+            throw new IllegalArgumentException("잘못된 이메일");
+        }
+
+        List<Role> authorities = List.of(role);
 
         Account account = Account.builder()
-                .loginId(accountRegisterCommand.getId())
+                .loginId(id)
                 .provider("se")
                 .username(accountRegisterCommand.getName())
                 .nickname(accountRegisterCommand.getNickname())

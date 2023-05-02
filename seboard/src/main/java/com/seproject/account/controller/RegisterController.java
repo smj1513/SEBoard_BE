@@ -72,7 +72,7 @@ public class RegisterController {
 
     @Parameters(
             {
-                    @Parameter(name = "id", description = "인증한 금오 이메일을 전달한다."),
+                    @Parameter(name = "id", description = "인증한 이메일을 전달한다."),
                     @Parameter(name = "password", description = "계정에 사용될 비밀번호를 전달한다."),
                     @Parameter(name = "nickname", description = "닉네임(활동명)을 입력한다."),
                     @Parameter(name = "name", description = "실명을 입력한다.")
@@ -89,17 +89,18 @@ public class RegisterController {
         String id = formRegisterRequest.getId();
 
         boolean confirmed = emailService.isConfirmed(id);
+        boolean isDuplicateUser = accountService.isExistByNickname(formRegisterRequest.getNickname());
 
-        if(confirmed) {
-            accountService.register(AccountRegisterCommand.builder()
-                    .id(id)
-                    .password(formRegisterRequest.getPassword())
-                    .name(formRegisterRequest.getName())
-                    .nickname(formRegisterRequest.getNickname()).build());
-            return new ResponseEntity<>("가입 완료",HttpStatus.OK);
-        }
+        if(!confirmed) return new ResponseEntity<>("인증되지 않은 이메일입니다.",HttpStatus.BAD_REQUEST);
+        if(isDuplicateUser) return new ResponseEntity<>("중복된 닉네임을 가진 사용자입니다.",HttpStatus.BAD_REQUEST);
 
-        return new ResponseEntity<>("인증되지 않은 이메일입니다.",HttpStatus.BAD_REQUEST);
+
+        accountService.register(AccountRegisterCommand.builder()
+                .id(id)
+                .password(formRegisterRequest.getPassword())
+                .name(formRegisterRequest.getName())
+                .nickname(formRegisterRequest.getNickname()).build());
+        return new ResponseEntity<>("가입 완료",HttpStatus.OK);
     }
 
     @Operation(summary = "닉네임 중복 체크", description = "이미 존재하는 닉네임인지 중복 확인을 한다")

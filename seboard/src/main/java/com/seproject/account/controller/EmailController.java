@@ -30,6 +30,8 @@ public class EmailController {
     private final AccountService accountService;
     private final EmailService emailService;
 
+
+
     @Parameters(
             {
                     @Parameter(name = "email", description = "인증번호를 받을 금오 이메일을 전달한다.")
@@ -44,7 +46,7 @@ public class EmailController {
     @PostMapping("/email/auth")
     public ResponseEntity<?> sendEmail(@RequestBody EmailAuthenticationRequest request) {
         String email = request.getEmail();
-        if(!email.matches("\\w+@kumoh.ac.kr")){
+        if(!emailService.isEmail(email)){
             return new ResponseEntity<>("잘못된 이메일 형식입니다.", HttpStatus.BAD_REQUEST);
         }
         if(accountService.isExist(email)) {
