@@ -1,4 +1,4 @@
-package com.seproject.seboard.domain.model.exposeOptions;
+package com.seproject.seboard.domain.model.post.exposeOptions;
 
 import lombok.NoArgsConstructor;
 
