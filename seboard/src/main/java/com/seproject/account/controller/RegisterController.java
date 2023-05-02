@@ -102,11 +102,11 @@ public class RegisterController {
         return new ResponseEntity<>("인증되지 않은 이메일입니다.",HttpStatus.BAD_REQUEST);
     }
 
-    @Operation(summary = "OAuth 회원가입", description = "소셜 로그인 사용시 추가 정보를 입력하여 회원가입을 요청한다.")
+    @Operation(summary = "닉네임 중복 체크", description = "이미 존재하는 닉네임인지 중복 확인을 한다")
     @ApiResponses({
-            @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "200", description = "회원가입 성공 시 메세지 전달"),
+            @ApiResponse(content = @Content(schema = @Schema(implementation = ConfirmDuplicateNicknameResponse.class)), responseCode = "200", description = "닉네임 중복 여부 응답"),
     })
-    @PostMapping("/account/oauth")
+    @PostMapping("/nickname")
     public ResponseEntity<?> confirmDuplicateNickname(@RequestBody ConfirmDuplicateNicknameRequest confirmDuplicateNicknameRequest) {
 
 
