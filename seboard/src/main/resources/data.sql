@@ -100,6 +100,13 @@ VALUES (2342350,'2023-04-27', '2023-04-27', '전 괜찮은데 금슐랭 박형�
     VALUES (2342351,'2023-04-28', '2023-04-28', '좋은 정보 감사합니다!', FALSE, 3421244, FALSE, 1234879892104);
     INSERT INTO public.replies(comment_id, super_comment_id, tag_comment_id) VALUES (2342351, 2342350, 2342350);
 
+
+INSERT INTO public.posts(
+    post_id, anonymous_count, created_at, modified_at, contents, pined, title, views, board_user_id, category_id, expose_option_id)
+VALUES (1234879892105, 1, '2023-04-25', '2023-04-28','<script>alert("xss")</script>' ,
+        true, 'xss 테스트', 9999,3421244 , 43214233, 10001);
+
+
 -- INSERT INTO public.ip(id, ip_address) VALUES (5343452, '127.0.0.1');
 -- INSERT INTO public.ip(id, ip_address) VALUES (5343453, '0:0:0:0:0:0:0:1');
 
