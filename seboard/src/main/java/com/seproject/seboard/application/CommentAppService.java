@@ -1,10 +1,8 @@
 package com.seproject.seboard.application;
 
-import com.seproject.seboard.application.dto.comment.CommentCommand;
 import com.seproject.seboard.application.dto.comment.CommentCommand.CommentEditCommand;
 import com.seproject.seboard.application.dto.comment.CommentCommand.CommentListFindCommand;
 import com.seproject.seboard.application.dto.comment.CommentCommand.CommentWriteCommand;
-import com.seproject.seboard.application.dto.comment.ReplyCommand;
 import com.seproject.seboard.application.dto.comment.ReplyCommand.ReplyEditCommand;
 import com.seproject.seboard.application.dto.comment.ReplyCommand.ReplyWriteCommand;
 import com.seproject.seboard.controller.dto.PaginationResponse;
@@ -13,7 +11,6 @@ import com.seproject.seboard.controller.dto.comment.CommentResponse.CommentListR
 import com.seproject.seboard.controller.dto.comment.ReplyResponse;
 import com.seproject.seboard.domain.model.comment.Comment;
 import com.seproject.seboard.domain.model.comment.Reply;
-import com.seproject.seboard.domain.model.exposeOptions.ExposeOption;
 import com.seproject.seboard.domain.model.post.Post;
 import com.seproject.seboard.domain.model.user.Anonymous;
 import com.seproject.seboard.domain.model.user.Member;
@@ -146,9 +143,9 @@ public class CommentAppService {
         Comment comment = findByIdOrThrow(command.getCommentId(), commentRepository, "");
 
         //TODO : 추후 주석 해제 필요
-//        if (!comment.isWrittenBy(command.getAccountId())) { //TODO : 관리자 권한의 경우 생각
-//            throw new IllegalArgumentException();
-//        }
+        if (!comment.isWrittenBy(command.getAccountId())) { //TODO : 관리자 권한의 경우 생각
+            throw new IllegalArgumentException();
+        }
 
         comment.changeContents(command.getContents());
         comment.changeOnlyReadByAuthor(command.isOnlyReadByAuthor());
@@ -158,9 +155,9 @@ public class CommentAppService {
         Reply reply = findByIdOrThrow(command.getReplyId(), replyRepository, "");
 
         //TODO : 추후 주석 해제 필요
-//        if (!reply.isWrittenBy(command.getAccountId())) { //TODO : 관리자 권한의 경우 생각
-//            throw new IllegalArgumentException();
-//        }
+        if (!reply.isWrittenBy(command.getAccountId())) { //TODO : 관리자 권한의 경우 생각
+            throw new IllegalArgumentException();
+        }
 
         reply.changeContents(command.getContents());
         reply.changeOnlyReadByAuthor(command.isOnlyReadByAuthor());
@@ -170,9 +167,9 @@ public class CommentAppService {
         Comment comment = findByIdOrThrow(commentId, commentRepository, "");
 
         //TODO : 추후 주석 해제 필요
-//        if (!comment.isWrittenBy(accountId)) { //TODO : 관리자 권한의 경우 생각
-//            throw new IllegalArgumentException();
-//        }
+        if (!comment.isWrittenBy(accountId)) { //TODO : 관리자 권한의 경우 생각
+            throw new IllegalArgumentException();
+        }
 
         comment.delete();
     }

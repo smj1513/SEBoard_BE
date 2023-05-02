@@ -1,15 +1,9 @@
 package com.seproject.seboard.controller.dto.post;
 
-import com.seproject.seboard.controller.dto.FileMetaDataResponse;
 import com.seproject.seboard.controller.dto.FileMetaDataResponse.FileMetaDataListResponse;
 import com.seproject.seboard.controller.dto.PaginationResponse;
 import com.seproject.seboard.controller.dto.user.UserResponse;
-import com.seproject.seboard.domain.model.common.BaseTime;
-import com.seproject.seboard.domain.model.common.FileMetaData;
-import com.seproject.seboard.domain.model.exposeOptions.ExposeOption;
-import com.seproject.seboard.domain.model.post.Category;
 import com.seproject.seboard.domain.model.post.Post;
-import com.seproject.seboard.domain.model.user.BoardUser;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -18,7 +12,6 @@ import lombok.Data;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class PostResponse {
 
