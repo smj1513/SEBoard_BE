@@ -1,6 +1,6 @@
 package com.seproject.seboard.application.dto.post;
 
-import com.seproject.seboard.domain.model.exposeOptions.ExposeState;
+import com.seproject.seboard.domain.model.post.exposeOptions.ExposeState;
 import lombok.Builder;
 import lombok.Data;
 

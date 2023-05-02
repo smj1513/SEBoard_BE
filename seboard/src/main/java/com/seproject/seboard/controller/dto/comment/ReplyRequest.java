@@ -1,10 +1,5 @@
 package com.seproject.seboard.controller.dto.comment;
 
-import com.seproject.seboard.controller.dto.post.ExposeOptionRequest;
-import com.seproject.seboard.controller.dto.user.AnonymousRequest;
-import com.seproject.seboard.controller.dto.user.TagAuthorRequest;
-import com.seproject.seboard.domain.model.exposeOptions.ExposeState;
-import lombok.Builder;
 import lombok.Data;
 
 import static com.seproject.seboard.application.dto.comment.ReplyCommand.*;

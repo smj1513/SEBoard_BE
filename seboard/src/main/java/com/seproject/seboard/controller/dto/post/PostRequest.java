@@ -2,7 +2,7 @@ package com.seproject.seboard.controller.dto.post;
 
 import com.seproject.seboard.application.dto.post.PostCommand.PostWriteCommand;
 import com.seproject.seboard.controller.dto.user.AnonymousRequest;
-import com.seproject.seboard.domain.model.exposeOptions.ExposeState;
+import com.seproject.seboard.domain.model.post.exposeOptions.ExposeState;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;

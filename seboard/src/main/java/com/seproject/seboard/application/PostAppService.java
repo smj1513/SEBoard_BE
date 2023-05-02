@@ -5,9 +5,9 @@ import com.seproject.seboard.application.dto.post.PostCommand.PostListFindComman
 import com.seproject.seboard.application.dto.post.PostCommand.PostWriteCommand;
 import com.seproject.seboard.domain.model.common.BaseTime;
 import com.seproject.seboard.domain.model.common.FileMetaData;
-import com.seproject.seboard.domain.model.exposeOptions.*;
-import com.seproject.seboard.domain.model.post.Category;
+import com.seproject.seboard.domain.model.category.Category;
 import com.seproject.seboard.domain.model.post.Post;
+import com.seproject.seboard.domain.model.post.exposeOptions.ExposeOption;
 import com.seproject.seboard.domain.model.user.Anonymous;
 import com.seproject.seboard.domain.model.user.BoardUser;
 import com.seproject.seboard.domain.model.user.Member;

@@ -1,11 +1,12 @@
 package com.seproject.seboard.domain.model.post;
 
+import com.seproject.seboard.domain.model.category.Category;
 import com.seproject.seboard.domain.model.comment.Comment;
 import com.seproject.seboard.domain.model.common.BaseTime;
 import com.seproject.seboard.domain.model.common.FileMetaData;
-import com.seproject.seboard.domain.model.exposeOptions.ExposeOption;
-import com.seproject.seboard.domain.model.exposeOptions.ExposeState;
-import com.seproject.seboard.domain.model.exposeOptions.Public;
+import com.seproject.seboard.domain.model.post.exposeOptions.ExposeOption;
+import com.seproject.seboard.domain.model.post.exposeOptions.ExposeState;
+import com.seproject.seboard.domain.model.post.exposeOptions.Public;
 import com.seproject.seboard.domain.model.user.Anonymous;
 import com.seproject.seboard.domain.model.user.BoardUser;
 import lombok.Builder;
@@ -13,9 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @NoArgsConstructor

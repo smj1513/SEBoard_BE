@@ -1,7 +1,5 @@
 package com.seproject.seboard.application.dto.comment;
 
-import com.seproject.seboard.domain.model.exposeOptions.ExposeState;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
