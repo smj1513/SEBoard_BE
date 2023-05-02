@@ -106,7 +106,7 @@ public class RegisterController {
     @ApiResponses({
             @ApiResponse(content = @Content(schema = @Schema(implementation = ConfirmDuplicateNicknameResponse.class)), responseCode = "200", description = "닉네임 중복 여부 응답"),
     })
-    @PostMapping("/nickname")
+    @PostMapping("account/nickname")
     public ResponseEntity<?> confirmDuplicateNickname(@RequestBody ConfirmDuplicateNicknameRequest confirmDuplicateNicknameRequest) {
 
 
