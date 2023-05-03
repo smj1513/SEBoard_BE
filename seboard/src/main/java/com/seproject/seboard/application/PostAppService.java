@@ -14,7 +14,7 @@ import com.seproject.seboard.domain.model.user.Member;
 import com.seproject.seboard.domain.repository.comment.CommentRepository;
 import com.seproject.seboard.domain.repository.commons.FileMetaDataRepository;
 import com.seproject.seboard.domain.repository.post.BookmarkRepository;
-import com.seproject.seboard.domain.repository.post.CategoryRepository;
+import com.seproject.seboard.domain.repository.category.CategoryRepository;
 import com.seproject.seboard.domain.repository.post.PostRepository;
 import com.seproject.seboard.domain.repository.post.PostSearchRepository;
 import com.seproject.seboard.domain.repository.user.AnonymousRepository;
@@ -127,9 +127,9 @@ public class PostAppService {
         Post post = findByIdOrThrow(command.getPostId(), postRepository, "");
 
         //TODO : 추후 활성화 필요
-//        if(!post.isWrittenBy(command.getAccountId())){
-//            throw new IllegalArgumentException();
-//        }
+        if(!post.isWrittenBy(command.getAccountId())){
+            throw new IllegalArgumentException();
+        }
 
         post.changeTitle(command.getTitle());
         post.changeContents(command.getContents());

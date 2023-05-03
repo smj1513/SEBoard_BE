@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface ReplyRepository extends JpaRepository<Reply,Long> {
-    @Query(value = "select * from replies where post_id = :postId", nativeQuery = true)
+    @Query("select r from Reply r where r.post.postId = :postId" )
     List<Reply> findByPostId(Long postId);
 }

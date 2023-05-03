@@ -63,7 +63,7 @@ public class CommentResponse {
                     .modifiedAt(comment.getBaseTime().getModifiedAt())
                     .contents(contents)
                     .isEditable(isEditable)
-                    .isActive(comment.isDeleted()) //TODO : 작성자만 읽을 수 있는 경우 추가 필요
+                    .isActive(!comment.isDeleted()) //TODO : 작성자만 읽을 수 있는 경우 추가 필요
                     .isReadOnlyAuthor(comment.isOnlyReadByAuthor())
                     .subComments(subComments)
                     .build();

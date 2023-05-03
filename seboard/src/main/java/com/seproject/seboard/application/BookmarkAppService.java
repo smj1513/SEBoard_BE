@@ -9,6 +9,7 @@ import com.seproject.seboard.domain.repository.post.PostRepository;
 import com.seproject.seboard.domain.repository.user.MemberRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -17,6 +18,7 @@ import static com.seproject.seboard.application.utils.AppServiceHelper.findByIdO
 
 @Service
 @AllArgsConstructor
+@Transactional
 public class BookmarkAppService {
     private final BookmarkRepository bookmarkRepository;
     private final PostRepository postRepository;
