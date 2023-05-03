@@ -2,6 +2,8 @@ package com.seproject.account.filter;
 
 import com.seproject.account.model.Token;
 import com.seproject.account.service.TokenService;
+import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.NotRegisteredUserException;
 import com.seproject.error.exception.TokenValidateException;
 import com.seproject.account.jwt.JwtDecoder;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +36,13 @@ public class JwtFilter extends OncePerRequestFilter {
 
         try{
             if(StringUtils.hasText(jwt)) {
+
+                if(jwtDecoder.isTemporalToken(jwt)) {
+                    failureHandler.onAuthenticationFailure(request,response,new NotRegisteredUserException(ErrorCode.NOT_REGISTERED_USER));
+                }
+
                 Token token = tokenService.findToken(jwt);
+
                 if(token != null) {
                     Authentication authentication = jwtDecoder.getAuthentication(token);
                     SecurityContextHolder.getContext().setAuthentication(authentication);

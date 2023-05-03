@@ -12,4 +12,15 @@ public class LoginDTO {
         private String accessToken;
         private String refreshToken;
     }
+
+    @Data
+    @Builder
+    public static class TemporalLoginResponseDTO {
+        private String subject;
+        private String provider;
+        private String email;
+        private String name;
+        private String nickname;
+        private String accessToken;
+    }
 }
