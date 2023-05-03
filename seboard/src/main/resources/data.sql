@@ -1,9 +1,9 @@
 BEGIN;
 
-INSERT INTO accounts(account_id,login_id,username,nickname,password,provider,email,profile,created_at) values (5234058023850,'user','user','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','se','20180167@kumoh.ac.kr','none','2023-04-26');
-INSERT INTO accounts(account_id,login_id,username,nickname,password,provider,email,profile,created_at) values (5234058023851,'admin','admin','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','se','hanna@kumoh.ac.kr','none','2023-04-26');
-INSERT INTO accounts(account_id,login_id,username,nickname,password,provider,email,profile,created_at) values (5234058023852,'professor','professor','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','se','halee@kumoh.ac.kr','none','2023-04-26');
-INSERT INTO accounts(account_id,login_id,username,nickname,password,provider,email,profile,created_at) values (5234058023853,'kumoh','maanjong','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','se','lcy@kumoh.ac.kr','none','2023-04-26');
+INSERT INTO accounts(account_id,login_id,username,nickname,password,created_at) values (5234058023850,'user','user','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','2023-04-26');
+INSERT INTO accounts(account_id,login_id,username,nickname,password,created_at) values (5234058023851,'admin','admin','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','2023-04-26');
+INSERT INTO accounts(account_id,login_id,username,nickname,password,created_at) values (5234058023852,'professor','professor','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','2023-04-26');
+INSERT INTO accounts(account_id,login_id,username,nickname,password,created_at) values (5234058023853,'kumoh','maanjong','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','2023-04-26');
 INSERT INTO roles (role_id, name) values (5234058023850, 'ROLE_USER'),(5234058023851, 'ROLE_ADMIN'),(5234058023852, 'ROLE_PROFESSOR'),(5234058023853, 'ROLE_KUMOH');
 
 INSERT INTO authorities(account_id,role_id) values(5234058023850,5234058023850);
