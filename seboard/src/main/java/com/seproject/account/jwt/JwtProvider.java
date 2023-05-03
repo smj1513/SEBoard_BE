@@ -25,43 +25,6 @@ public class JwtProvider {
         this.secret = secret;
     }
 
-    private AbstractOidcUser parseUser(OAuth2User oAuth2User) {
-        AbstractOidcUser abstractOidcUser;
-        if(oAuth2User instanceof KakaoOidcUser) {
-            abstractOidcUser = (KakaoOidcUser)oAuth2User;
-        } else {
-            abstractOidcUser = null;
-        }
-
-        return abstractOidcUser;
-    }
-
-    public String createJWT(OAuth2AuthenticationToken authenticationToken) {
-        AbstractOidcUser oidcUser = parseUser(authenticationToken.getPrincipal());
-
-//        if(accountService.isExist(oidcUser.getId())) {
-//            Account account = accountService.findAccountById(oidcUser.getId());
-//            account.updateProfile(oidcUser.getProfile());
-//            return createJWT(account);
-//        }
-
-        String jwt = Jwts.builder()
-                .setHeaderParam(JWTProperties.TYPE, JWTProperties.TEMPORAL_TOKEN)
-                .setHeaderParam(JWTProperties.ALGORITHM, JWTProperties.HS256)
-                .setSubject(oidcUser.getProvider() + "_" + oidcUser.getId())
-                .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
-                .claim(JWTProperties.PROVIDER,oidcUser.getProvider())
-                .claim(JWTProperties.ID,oidcUser.getId())
-                .claim(JWTProperties.EMAIL,oidcUser.getEmail())
-                .claim(JWTProperties.PROFILE,oidcUser.getProfile())
-                .signWith(SignatureAlgorithm.HS256, secret)
-                .compact();
-
-        String result = tokenPrefix + " " + jwt;
-        return result;
-    }
-
     public String createRefreshToken(AbstractAuthenticationToken token) {
         String refreshToken = Jwts.builder()
                 .setHeaderParam(JWTProperties.TYPE, JWTProperties.REFRESH_TOKEN)
@@ -76,10 +39,23 @@ public class JwtProvider {
         return result;
     }
 
-    public String createJWT(UsernamePasswordAuthenticationToken token) {
+    public String createJWT(AbstractAuthenticationToken token) {
 
         String jwt = Jwts.builder()
                 .setHeaderParam(JWTProperties.TYPE, JWTProperties.ACCESS_TOKEN)
+                .setHeaderParam(JWTProperties.ALGORITHM, JWTProperties.HS256)
+                .setSubject(token.getPrincipal().toString())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+                .signWith(SignatureAlgorithm.HS256, secret)
+                .compact();
+        return tokenPrefix + " " + jwt;
+    }
+
+    public String createTemporalJWT(AbstractAuthenticationToken token) {
+
+        String jwt = Jwts.builder()
+                .setHeaderParam(JWTProperties.TYPE, JWTProperties.TEMPORAL_TOKEN)
                 .setHeaderParam(JWTProperties.ALGORITHM, JWTProperties.HS256)
                 .setSubject(token.getPrincipal().toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
