@@ -65,7 +65,6 @@ public class EmailService {
         try{
             simpleEmail.setFrom("jongjong159@naver.com");
             simpleEmail.setSubject("SE 게시판 회원가입 이메일 인증");
-//            simpleEmail.setMsg(sendUrl+"?email="+email+"&authToken="+authToken);
             simpleEmail.setMsg("인증번호: " + emailAuthentication.getAuthToken());
             simpleEmail.addTo(email);
 
@@ -93,6 +92,7 @@ public class EmailService {
 
     public boolean isConfirmed(String email) {
         EmailAuthentication emailAuthentication = emailAuthRepository.findByEmail(email);
+        if(emailAuthentication == null) return false;
         return emailAuthentication.getExpired();
     }
 }
