@@ -9,8 +9,12 @@ public class RegisterDTO {
     @Data
     @Builder
     public static class OAuth2RegisterRequest {
-        private String nickname;
+        private String subject;
+        private String provider;
+        private String email;
+        private String password;
         private String name;
+        private String nickname;
     }
 
 
