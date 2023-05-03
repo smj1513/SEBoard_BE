@@ -44,8 +44,7 @@ public class Post {
     private BoardUser author;
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "expose_option_id")
-    @Builder.Default
-    private ExposeOption exposeOption = new Public();
+    private ExposeOption exposeOption;
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "post_id")
     private Set<FileMetaData> attachments = new HashSet<>();
@@ -117,13 +116,19 @@ public class Post {
         this.contents = contents;
     }
 
+    //TODO : exposeOption 변경 필요
     public void changeExposeOption(ExposeState exposeState, String password) {
         if(exposeState==ExposeState.PRIVACY &&
                 exposeOption.getExposeState()==ExposeState.PRIVACY && password==null){
             return;
         }
 
-        exposeOption = ExposeOption.of(exposeState, password);
+        if(exposeOption.getExposeState()==exposeState){
+            return;
+        }else{
+            exposeOption = ExposeOption.of(exposeState, password);
+        }
+
     }
 
     public void changeCategory(Category category) {

@@ -44,9 +44,9 @@ public class ReplyResponse {
                 .author(userResponse)
                 .createdAt(reply.getBaseTime().getCreatedAt())
                 .modifiedAt(reply.getBaseTime().getModifiedAt())
-                .contents(reply.getContents())
+                .contents(contents)
                 .isEditable(isEditable)
-                .isActive(reply.isDeleted()) //TODO : 작성자만 읽을 수 있는 경우 추가 필요
+                .isActive(!reply.isDeleted()) //TODO : 작성자만 읽을 수 있는 경우 추가 필요
                 .isReadOnlyAuthor(reply.isOnlyReadByAuthor())
                 .build();
     }

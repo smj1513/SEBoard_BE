@@ -1,5 +1,6 @@
 package com.seproject.seboard.controller.dto.comment;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.seproject.seboard.application.dto.comment.CommentCommand.CommentEditCommand;
 import com.seproject.seboard.application.dto.comment.CommentCommand.CommentWriteCommand;
 import lombok.Data;
@@ -10,7 +11,9 @@ public class CommentRequest {
     public static class CreateCommentRequest {
         private Long postId;
         private String contents;
+        @JsonProperty("isAnonymous")
         private boolean isAnonymous;
+        @JsonProperty("isReadOnlyAuthor")
         private boolean isReadOnlyAuthor;
 
         public CommentWriteCommand toCommand(Long accountId) {
@@ -27,6 +30,7 @@ public class CommentRequest {
     @Data
     public static class UpdateCommentRequest {
         private String contents;
+        @JsonProperty("isReadOnlyAuthor")
         private boolean isReadOnlyAuthor;
         public CommentEditCommand toCommand(Long commentId, Long accountId) {
             return CommentEditCommand.builder()

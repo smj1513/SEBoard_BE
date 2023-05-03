@@ -21,6 +21,7 @@ import com.seproject.seboard.domain.repository.post.PostRepository;
 import com.seproject.seboard.domain.repository.user.AnonymousRepository;
 import com.seproject.seboard.domain.repository.user.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -34,6 +35,8 @@ import static com.seproject.seboard.application.utils.AppServiceHelper.findByIdO
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
+@Transactional
 public class CommentAppService {
     private final CommentRepository commentRepository;
     private final CommentSearchRepository commentSearchRepository;
@@ -49,6 +52,7 @@ public class CommentAppService {
             writeNamedComment(command);
         }
     }
+    @Transactional
     protected void writeNamedComment(CommentWriteCommand command) {
         Post post = findByIdOrThrow(command.getPostId(), postRepository, "");
         Member member = memberRepository.findByAccountId(command.getAccountId()).orElseThrow(NoSuchElementException::new);
@@ -126,8 +130,8 @@ public class CommentAppService {
                                             reply -> ReplyResponse.toDto(reply, reply.isWrittenBy(command.getAccountId()))
                                     ).collect(Collectors.toList());
                     return CommentListElement.toDto(comment, comment.isWrittenBy(command.getAccountId()), subComments);
-                })
-                .collect(Collectors.toList());
+                }).collect(Collectors.toList());
+
 
         PaginationResponse paginationResponse = PaginationResponse.builder()
                 .totalCommentSize(commentPage.getTotalElements())
@@ -178,14 +182,15 @@ public class CommentAppService {
         Reply reply = findByIdOrThrow(replyId, replyRepository, "");
 
         //TODO : 추후 주석 해제 필요
-//        if (!reply.isWrittenBy(accountId)) { //TODO : 관리자 권한의 경우 생각
-//            throw new IllegalArgumentException();
-//        }
+        if (!reply.isWrittenBy(accountId)) { //TODO : 관리자 권한의 경우 생각
+            throw new IllegalArgumentException();
+        }
 
         reply.delete();
     }
 
-    private Anonymous getAnonymous(Long accountId, Long postId, Post post) {
+    @Transactional
+    protected Anonymous getAnonymous(Long accountId, Long postId, Post post) {
         Anonymous author = commentRepository.findByPostId(postId).stream()
                 .filter(comment -> comment.getAuthor().isAnonymous())
                 .map(comment -> (Anonymous) comment.getAuthor())

@@ -21,12 +21,12 @@ public class BookmarkController {
     @Operation(summary = "게시글 북마크 지정", description = "사용자가 게시글을 즐겨찾기로 등록한다")
     @PostMapping
     public ResponseEntity<?> createBookmark(@PathVariable Long postId){
-        Long accountId = 1L;
+        Long accountId = 5234058023853L;
         /**
          * TODO : 존재하지 않는 postId
          *          jwt
          */
-        bookmarkAppService.enrollBookmark(accountId, postId);
+        bookmarkAppService.enrollBookmark(postId, accountId);
 
         return new ResponseEntity<>(postId,HttpStatus.OK);
     }
@@ -35,12 +35,12 @@ public class BookmarkController {
     @Operation(summary = "게시글 북마크 해제", description = "사용자가 즐겨찾기한 게시물을 즐겨찾기 해제한다")
     @DeleteMapping
     public ResponseEntity<?> cancelBookmark(@PathVariable Long postId){
-        Long accountId = 1L;
+        Long accountId = 5234058023853L;
         /**
          * TODO : 존재하지 않는 postId
          *          jwt
          */
-        bookmarkAppService.cancelBookmark(accountId, postId);
+        bookmarkAppService.cancelBookmark(postId, accountId);
 
         return new ResponseEntity<>(postId,HttpStatus.OK);
     }

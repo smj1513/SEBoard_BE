@@ -1,5 +1,6 @@
 package com.seproject.seboard.controller.dto.post;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.seproject.seboard.controller.dto.FileMetaDataResponse.FileMetaDataListResponse;
 import com.seproject.seboard.controller.dto.PaginationResponse;
 import com.seproject.seboard.controller.dto.user.UserResponse;
@@ -90,8 +91,11 @@ public class PostResponse {
         private Integer views;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
+        @JsonProperty("isEditable")
         private boolean isEditable;
+        @JsonProperty("isBookmarked")
         private boolean isBookmarked;
+        @JsonProperty("isPined")
         private boolean isPined;
         private String exposeType;
         private FileMetaDataListResponse attachments;
