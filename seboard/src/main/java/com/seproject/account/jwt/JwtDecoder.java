@@ -1,6 +1,5 @@
 package com.seproject.account.jwt;
 
-import com.nimbusds.oauth2.sdk.token.AccessToken;
 import com.seproject.account.model.Token;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.TokenValidateException;
@@ -17,7 +16,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 public class JwtDecoder {
 
@@ -52,32 +50,6 @@ public class JwtDecoder {
         }
     }
 
-    public String getLoginId(String token){
-        Claims claims = getClaims(token);
-        return claims.getSubject();
-    }
-
-    public String getEmail(String token) {
-        Claims claims = getClaims(token);
-        String email = (String)claims.get(JWTProperties.EMAIL);
-        if(email == null) throw new NoSuchElementException();
-        return email;
-    }
-
-    public String getProvider(String token){
-        Claims claims = getClaims(token);
-        String provider = (String)claims.get(JWTProperties.PROVIDER);
-        if(provider == null) throw new NoSuchElementException();
-        return provider;
-    }
-
-    public String getProfile(String token){
-        Claims claims = getClaims(token);
-        String profile = (String)claims.get(JWTProperties.PROFILE);
-        if(profile == null) throw new NoSuchElementException();
-        return profile;
-    }
-
     public Authentication getAuthentication(Token token) {
         String jwt = token.getAccessToken();
         Claims claims = getClaims(jwt);
@@ -85,5 +57,13 @@ public class JwtDecoder {
 
         User principal = new User(claims.getSubject(), "", authorities);
         return new UsernamePasswordAuthenticationToken(principal, jwt, authorities);
+    }
+
+    public boolean isTemporalToken(String accessToken) {
+        String type = (String)Jwts.parser()
+                .setSigningKey(secret)
+                .parse(accessToken)
+                .getHeader().get(JWTProperties.TYPE);
+        return type.equals(JWTProperties.TEMPORAL_TOKEN);
     }
 }
