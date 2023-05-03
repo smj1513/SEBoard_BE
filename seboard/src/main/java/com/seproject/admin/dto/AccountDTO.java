@@ -90,10 +90,8 @@ public class AccountDTO {
         public static CreateAccountResponse toDTO(Account account){
             return builder()
                     .id(account.getLoginId())
-                    .email(account.getEmail())
                     .name(account.getUsername())
                     .nickname(account.getNickname())
-                    .profile(account.getProfile())
                     .authorities(account.getAuthorities())
                     .build();
         }
@@ -125,11 +123,9 @@ public class AccountDTO {
         public static UpdateAccountResponse toDTO(Account account){
             return builder()
                     .id(account.getLoginId())
-                    .email(account.getEmail())
                     .name(account.getUsername())
                     .nickname(account.getNickname())
                     .authorities(account.getAuthorities())
-                    .profile(account.getProfile())
                     .build();
         }
     }
@@ -152,11 +148,9 @@ public class AccountDTO {
         public static DeleteAccountResponse toDTO(Account account){
             return builder()
                     .id(account.getLoginId())
-                    .email(account.getEmail())
                     .name(account.getUsername())
                     .nickname(account.getNickname())
                     .authorities(account.getAuthorities())
-                    .profile(account.getProfile())
                     .build();
         }
     }
