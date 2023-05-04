@@ -15,8 +15,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import java.util.NoSuchElementException;
-
 @Tag(name = "계정 시스템 API", description = "계정(Account) 관련 API")
 @AllArgsConstructor
 @Controller
@@ -46,7 +44,7 @@ public class AccountController {
         String accessToken = jwtDecoder.getAccessToken();
 
         if (accessToken != null){
-            tokenService.deleteToken(accessToken);
+            tokenService.deleteAccessToken(accessToken);
             return new ResponseEntity<>("로그아웃 성공", HttpStatus.OK);
         }
 

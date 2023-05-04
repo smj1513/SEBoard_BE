@@ -1,6 +1,6 @@
 package com.seproject.account.jwt;
 
-import com.seproject.account.model.Token;
+import com.seproject.account.model.AccessToken;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.TokenValidateException;
 import io.jsonwebtoken.Claims;
@@ -39,6 +39,15 @@ public class JwtDecoder {
         return null;
     }
 
+    public String getRefreshToken(HttpServletRequest request) {
+        String jwt = request.getHeader("Authorization");
+
+        if (StringUtils.hasText(jwt) && jwt.startsWith("Bearer ")) {
+            return jwt.substring(7);
+        }
+        return null;
+    }
+
     private Claims getClaims(String jwt) {
         try {
             return Jwts.parser()
@@ -50,10 +59,10 @@ public class JwtDecoder {
         }
     }
 
-    public Authentication getAuthentication(Token token) {
-        String jwt = token.getAccessToken();
+    public Authentication getAuthentication(AccessToken accessToken) {
+        String jwt = accessToken.getAccessToken();
         Claims claims = getClaims(jwt);
-        List<? extends GrantedAuthority> authorities = token.getAuthorities();
+        List<? extends GrantedAuthority> authorities = accessToken.getAuthorities();
 
         User principal = new User(claims.getSubject(), "", authorities);
         return new UsernamePasswordAuthenticationToken(principal, jwt, authorities);

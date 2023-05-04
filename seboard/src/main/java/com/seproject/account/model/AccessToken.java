@@ -10,11 +10,10 @@ import java.util.List;
 
 @Builder
 @Getter
-@RedisHash(value = "JWT", timeToLive = 2_592_000L)
-public class Token {
+@RedisHash(value = "ACCESS_TOKEN", timeToLive = 3600L)
+public class AccessToken {
 
     @Id
     private String accessToken;
-    private String refreshToken;
     private List<? extends GrantedAuthority> authorities;
 }

@@ -65,6 +65,8 @@ public class OidcAuthenticationSuccessHandler implements AuthenticationSuccessHa
             String result = objectMapper.writeValueAsString(responseDTO);
             response.getWriter().write(result);
         }
+
+        response.sendRedirect("/");
     }
 }
 
