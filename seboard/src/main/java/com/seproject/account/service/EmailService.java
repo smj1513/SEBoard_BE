@@ -34,6 +34,15 @@ public class EmailService {
     @Value("${mail.password}")
     private String password;
 
+    private static final String EMAIL_REGEX = "[0-9a-zA-Z]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$";
+    private static final String KUMOH_EMAIL_REGEX = "\\w+@kumoh.ac.kr";
+    public boolean isEmail(String email) {
+        return email.matches(EMAIL_REGEX);
+    }
+
+    public boolean isKumohMail(String email) {
+        return email.matches(KUMOH_EMAIL_REGEX);
+    }
 
     @Async
     public void send(String email) {
@@ -56,7 +65,6 @@ public class EmailService {
         try{
             simpleEmail.setFrom("jongjong159@naver.com");
             simpleEmail.setSubject("SE 게시판 회원가입 이메일 인증");
-//            simpleEmail.setMsg(sendUrl+"?email="+email+"&authToken="+authToken);
             simpleEmail.setMsg("인증번호: " + emailAuthentication.getAuthToken());
             simpleEmail.addTo(email);
 
@@ -84,6 +92,7 @@ public class EmailService {
 
     public boolean isConfirmed(String email) {
         EmailAuthentication emailAuthentication = emailAuthRepository.findByEmail(email);
+        if(emailAuthentication == null) return false;
         return emailAuthentication.getExpired();
     }
 }

@@ -1,5 +1,8 @@
 package com.seproject.account;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+import com.navercorp.lucy.security.xss.servletfilter.XssEscapeServletFilter;
 import com.seproject.account.authentication.entrypoint.CustomAuthenticationEntryPoint;
 import com.seproject.account.authentication.handler.failure.CustomAuthenticationFailureHandler;
 import com.seproject.account.authentication.handler.success.FormLoginAuthenticationSuccessHandler;
@@ -10,17 +13,18 @@ import com.seproject.account.authorize.url.UrlResourcesFactoryBean;
 import com.seproject.account.authorize.handler.CustomAccessDeniedHandler;
 import com.seproject.account.filter.CategoryAccessFilter;
 import com.seproject.account.filter.CustomFilterSecurityInterceptor;
-import com.seproject.account.filter.IpFilter;
 import com.seproject.account.service.CategoryAuthorizationService;
 import com.seproject.account.service.CustomOidcUserService;
 import com.seproject.account.service.IpService;
 import com.seproject.account.utils.*;
 import com.seproject.account.jwt.JwtDecoder;
 import com.seproject.account.filter.JwtFilter;
+import com.seproject.account.utils.xss.HTMLCharacterEscapes;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.vote.AffirmativeBased;
 import org.springframework.security.access.vote.RoleVoter;
@@ -39,6 +43,7 @@ import org.springframework.security.web.access.intercept.FilterSecurityIntercept
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -58,9 +63,10 @@ public class SecurityConfig {
     private final CustomAuthenticationEntryPoint authenticationEntryPoint;
     private final AuthenticationConfiguration authenticationConfiguration;
     private final IpService ipService;
+    private final JwtFilter jwtFilter;
     private final CategoryAuthorizationService categoryAuthorizationService;
     private UrlResourcesFactoryBean urlResourcesFactoryBean;
-    private JwtDecoder jwtDecoder;
+
 
 
     @Bean
@@ -72,6 +78,10 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf().disable();
         http.cors().disable();
+//        http.headers()
+//                .xssProtection()
+//            .and()
+//                .contentSecurityPolicy("script-src 'self'");
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
         http.authorizeRequests()
 //                .antMatchers("/admin/**").hasRole("ADMIN")
@@ -102,7 +112,7 @@ public class SecurityConfig {
                 .accessDeniedHandler(accessDeniedHandler)
                 .authenticationEntryPoint(authenticationEntryPoint);
 
-        http.addFilterBefore(new JwtFilter(jwtDecoder,authenticationFailureHandler), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtFilter,UsernamePasswordAuthenticationFilter.class);
 //        http.addFilterBefore(new IpFilter(ipService,accessDeniedHandler), UsernamePasswordAuthenticationFilter.class);
 //        http.addFilterBefore(categoryAccessFilter(), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(filterSecurityInterceptor(),FilterSecurityInterceptor.class);
@@ -143,6 +153,25 @@ public class SecurityConfig {
         filterRegistrationBean.setEnabled(false);
         return filterRegistrationBean;
     }
+
+//    @Bean
+//    public FilterRegistrationBean<XssEscapeServletFilter> xssEscapeServletFilterFilterRegistrationBean() throws Exception {
+//        FilterRegistrationBean<XssEscapeServletFilter> filterRegistrationBean = new FilterRegistrationBean<>();
+//        filterRegistrationBean.setFilter(new XssEscapeServletFilter());
+//        filterRegistrationBean.setOrder(1);
+//        filterRegistrationBean.addUrlPatterns("/*");
+//        return filterRegistrationBean;
+//    }
+//
+//    @Bean
+//    public MappingJackson2HttpMessageConverter jsonEscapeConverter() {
+//        SimpleModule simpleModule = new SimpleModule();
+//        simpleModule = simpleModule.addSerializer(LocalDateTime.class, new CustomLocalDateTimeSerializer());
+////        simpleModule = simpleModule.addDeserializer(LocalDateTime.class, new CustomLocalDateTimeDeSerializer());
+//        ObjectMapper objectMapper = new ObjectMapper().findAndRegisterModules().registerModule(simpleModule);
+//        objectMapper.getFactory().setCharacterEscapes(new HTMLCharacterEscapes());
+//        return new MappingJackson2HttpMessageConverter(objectMapper);
+//    }
 
     @Bean
     public FilterSecurityInterceptor filterSecurityInterceptor() throws Exception {

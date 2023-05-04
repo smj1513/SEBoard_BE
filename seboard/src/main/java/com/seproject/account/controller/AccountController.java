@@ -1,16 +1,21 @@
 package com.seproject.account.controller;
 
 import com.seproject.account.application.LogoutAppService;
+import com.seproject.account.jwt.JwtDecoder;
 import com.seproject.account.service.AccountService;
+import com.seproject.account.service.TokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
+import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import java.util.NoSuchElementException;
 
 @Tag(name = "계정 시스템 API", description = "계정(Account) 관련 API")
 @AllArgsConstructor
@@ -19,21 +24,33 @@ public class AccountController {
 
     private final LogoutAppService logoutAppService;
     private final AccountService accountService;
+    private final TokenService tokenService;
+    private final JwtDecoder jwtDecoder;
 
-    @Operation(summary = "로그아웃", description = "미해결 상태")
-    @GetMapping("/logoutProc") //미해결
+    @Operation(summary = "로그아웃", description = "로그아웃")
+    @GetMapping("/logoutProc")
     public ResponseEntity<?> logout(Authentication authentication) {
+
         if(authentication == null) {
             return new ResponseEntity<>("로그인 상태가 아닙니다.",HttpStatus.BAD_REQUEST);
         }
 
-        if(authentication instanceof OAuth2AuthenticationToken) {
-            OAuth2AuthenticationToken token = (OAuth2AuthenticationToken)authentication;
-            logoutAppService.logout(token.getAuthorizedClientRegistrationId());
+        User user = (User)authentication.getPrincipal();
+        String username = user.getUsername();
 
+        if(!StringUtils.isEmpty(username) && accountService.isOAuthUser(username)) {
+            String redirectURL = logoutAppService.getRedirectURL();
+            return new ResponseEntity<>(redirectURL, HttpStatus.PERMANENT_REDIRECT);
+        }
+
+        String accessToken = jwtDecoder.getAccessToken();
+
+        if (accessToken != null){
+            tokenService.deleteToken(accessToken);
             return new ResponseEntity<>("로그아웃 성공", HttpStatus.OK);
         }
 
-        return null;
+        return new ResponseEntity<>("세션이 만료되었습니다.", HttpStatus.BAD_REQUEST);
+
     }
 }

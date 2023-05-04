@@ -1,9 +1,9 @@
 package com.seproject.account.service;
 
+import com.seproject.account.model.social.OAuthAccount;
+import com.seproject.account.repository.OAuthAccountRepository;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.InvalidPaginationException;
-import com.seproject.account.controller.command.AccountRegisterCommand;
-import com.seproject.account.controller.command.OAuthAccountCommand;
 import com.seproject.account.repository.AccountRepository;
 import com.seproject.account.repository.RoleRepository;
 import com.seproject.account.model.Account;
@@ -17,11 +17,10 @@ import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.seproject.admin.dto.AccountDTO.*;
+import static com.seproject.account.controller.dto.RegisterDTO.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -29,52 +28,82 @@ import static com.seproject.admin.dto.AccountDTO.*;
 public class AccountService {
 
     private final AccountRepository accountRepository;
+    private final OAuthAccountRepository oAuthAccountRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
     public boolean isExist(String loginId){
         return accountRepository.existsByLoginId(loginId);
     }
+    public boolean isExistByNickname(String nickname) {
+        return accountRepository.existsByNickname(nickname);
+    }
+    public boolean isOAuthUser(String subject) {
+        return oAuthAccountRepository.existsBySub(subject);
+    }
+    @Transactional
+    public OAuthAccount register(OAuth2RegisterRequest oAuth2RegisterRequest) {
+        String email = oAuth2RegisterRequest.getEmail();
+        Role role;
 
-    public void register(OAuthAccountCommand accountCommand) {
-        Optional<Role> roleUser = roleRepository.findByName("ROLE_USER");
-        List<Role> authorities = List.of(roleUser.get());
+        if(emailService.isKumohMail(email)){
+            role = roleRepository.findByName("ROLE_KUMOH").orElseThrow();
+        } else if(emailService.isEmail(email)) {
+            role = roleRepository.findByName("ROLE_USER").orElseThrow();
+        } else {
+            throw new IllegalArgumentException("잘못된 이메일");
+        }
+
+        List<Role> authorities = List.of(role);
 
         Account account = Account.builder()
-                .loginId(accountCommand.getId())
-                .provider(accountCommand.getProvider())
-                .username(accountCommand.getName())
-                .nickname(accountCommand.getNickname())
-                .password(UUID.randomUUID().toString())
-                .email(accountCommand.getEmail())
-                .profile(accountCommand.getProfile())
+                .loginId(email)
+                .username(oAuth2RegisterRequest.getName())
+                .nickname(oAuth2RegisterRequest.getNickname())
+                .password(passwordEncoder.encode(oAuth2RegisterRequest.getPassword()))
                 .authorities(authorities)
                 .build();
 
-        accountRepository.save(account);
-    }
+        OAuthAccount oAuthAccount = OAuthAccount.builder()
+                .sub(oAuth2RegisterRequest.getSubject())
+                .provider(oAuth2RegisterRequest.getProvider())
+                .account(account)
+                .build();
 
-    public Account findAccountById(String loginId) {
-        return accountRepository.findByLoginId(loginId);
+        accountRepository.save(account);
+        oAuthAccountRepository.save(oAuthAccount);
+
+        return oAuthAccount;
     }
 
     @Transactional
-    public void register(AccountRegisterCommand accountRegisterCommand) {
-        Optional<Role> roleUser = roleRepository.findByName("ROLE_KUMOH");
-        List<Role> authorities = List.of(roleUser.get());
+    public Account register(FormRegisterRequest formRegisterRequest) {
+
+        String id = formRegisterRequest.getId();
+        Role role;
+
+        if(emailService.isKumohMail(id)){
+            role = roleRepository.findByName("ROLE_KUMOH").orElseThrow();
+        } else if(emailService.isEmail(id)) {
+            role = roleRepository.findByName("ROLE_USER").orElseThrow();
+        } else {
+            throw new IllegalArgumentException("잘못된 이메일");
+        }
+
+        List<Role> authorities = List.of(role);
 
         Account account = Account.builder()
-                .loginId(accountRegisterCommand.getId())
-                .provider("se")
-                .username(accountRegisterCommand.getName())
-                .nickname(accountRegisterCommand.getNickname())
-                .password(passwordEncoder.encode(accountRegisterCommand.getPassword()))
-                .email(accountRegisterCommand.getId())
-                .profile("none")
+                .loginId(id)
+                .username(formRegisterRequest.getName())
+                .nickname(formRegisterRequest.getNickname())
+                .password(passwordEncoder.encode(formRegisterRequest.getPassword()))
                 .authorities(authorities)
                 .build();
 
         accountRepository.save(account);
+
+        return account;
     }
 
 
@@ -114,11 +143,8 @@ public class AccountService {
         Account account = Account.builder()
                 .loginId(request.getId())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .email(request.getEmail())
-                .profile(request.getProfile())
                 .nickname(request.getNickname())
                 .username(request.getName())
-                .provider("se")
                 .authorities(convertAuthorities(request.getAuthorities()))
                 .build();
 
@@ -133,8 +159,6 @@ public class AccountService {
         Account updateAccount = Account.builder()
                 .loginId(request.getId())
                 .password(passwordEncoder.encode(request.getPassword()))
-                .email(request.getEmail())
-                .profile(request.getProfile())
                 .nickname(request.getNickname())
                 .username(request.getName())
                 .authorities(convertAuthorities(request.getAuthorities()))

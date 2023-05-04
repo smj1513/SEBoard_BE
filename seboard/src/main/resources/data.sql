@@ -1,9 +1,9 @@
 BEGIN;
 
-INSERT INTO accounts(account_id,login_id,username,nickname,password,provider,email,profile,created_at) values (5234058023850,'user','user','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','se','20180167@kumoh.ac.kr','none','2023-04-26');
-INSERT INTO accounts(account_id,login_id,username,nickname,password,provider,email,profile,created_at) values (5234058023851,'admin','admin','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','se','hanna@kumoh.ac.kr','none','2023-04-26');
-INSERT INTO accounts(account_id,login_id,username,nickname,password,provider,email,profile,created_at) values (5234058023852,'professor','professor','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','se','halee@kumoh.ac.kr','none','2023-04-26');
-INSERT INTO accounts(account_id,login_id,username,nickname,password,provider,email,profile,created_at) values (5234058023853,'kumoh','maanjong','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','se','lcy@kumoh.ac.kr','none','2023-04-26');
+INSERT INTO accounts(account_id,login_id,username,nickname,password,created_at) values (5234058023850,'user','user','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','2023-04-26');
+INSERT INTO accounts(account_id,login_id,username,nickname,password,created_at) values (5234058023851,'admin','admin','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','2023-04-26');
+INSERT INTO accounts(account_id,login_id,username,nickname,password,created_at) values (5234058023852,'professor','professor','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','2023-04-26');
+INSERT INTO accounts(account_id,login_id,username,nickname,password,created_at) values (5234058023853,'kumoh','maanjong','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','2023-04-26');
 INSERT INTO roles (role_id, name) values (5234058023850, 'ROLE_USER'),(5234058023851, 'ROLE_ADMIN'),(5234058023852, 'ROLE_PROFESSOR'),(5234058023853, 'ROLE_KUMOH');
 
 INSERT INTO authorities(account_id,role_id) values(5234058023850,5234058023850);
@@ -99,6 +99,13 @@ VALUES (2342350,'2023-04-27', '2023-04-27', '전 괜찮은데 금슐랭 박형�
         comment_id, created_at, modified_at, contents, is_deleted, board_user_id, is_only_read_by_author, post_id)
     VALUES (2342351,'2023-04-28', '2023-04-28', '좋은 정보 감사합니다!', FALSE, 3421244, FALSE, 1234879892104);
     INSERT INTO public.replies(comment_id, super_comment_id, tag_comment_id) VALUES (2342351, 2342350, 2342350);
+
+
+INSERT INTO public.posts(
+    post_id, anonymous_count, created_at, modified_at, contents, pined, title, views, board_user_id, category_id, expose_option_id)
+VALUES (1234879892105, 1, '2023-04-25', '2023-04-28','<script>alert("xss")</script>' ,
+        true, 'xss 테스트', 9999,3421244 , 43214233, 10001);
+
 
 -- INSERT INTO public.ip(id, ip_address) VALUES (5343452, '127.0.0.1');
 -- INSERT INTO public.ip(id, ip_address) VALUES (5343453, '0:0:0:0:0:0:0:1');
