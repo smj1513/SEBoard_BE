@@ -5,7 +5,11 @@ import com.seproject.account.model.Account;
 import com.seproject.account.model.social.KakaoOidcUser;
 import com.seproject.account.model.social.OAuthAccount;
 import com.seproject.account.jwt.JwtProvider;
+import com.seproject.account.model.social.TemporalUserInfo;
+import com.seproject.account.model.social.UserToken;
 import com.seproject.account.repository.OAuthAccountRepository;
+import com.seproject.account.repository.TemporalUserInfoRepository;
+import com.seproject.account.repository.UserTokenRepository;
 import com.seproject.account.service.TokenService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,6 +22,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.UUID;
 
 import static com.seproject.account.controller.dto.LoginDTO.*;
 
@@ -27,8 +32,10 @@ public class OidcAuthenticationSuccessHandler implements AuthenticationSuccessHa
 
     private final JwtProvider jwtProvider;
     private final OAuthAccountRepository oAuthAccountRepository;
-    private final ObjectMapper objectMapper;
     private final TokenService tokenService;
+    private final TemporalUserInfoRepository temporalUserInfoRepository;
+    private final UserTokenRepository userTokenRepository;
+
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
         String jwt;
@@ -43,17 +50,25 @@ public class OidcAuthenticationSuccessHandler implements AuthenticationSuccessHa
             Account account = oAuthAccount.getAccount();
             jwt = jwtProvider.createJWT(new UsernamePasswordAuthenticationToken(oAuthAccount.getSub(),"",account.getAuthorities()));
             String refreshToken = jwtProvider.createRefreshToken(token);
+
             LoginResponseDTO responseDTO = LoginResponseDTO.builder()
                     .accessToken(jwt)
                     .refreshToken(refreshToken)
                     .build();
+            String id = UUID.randomUUID().toString();
+            UserToken userToken = UserToken.builder()
+                    .id(id)
+                    .userToken(responseDTO)
+                    .build();
 
-            String result = objectMapper.writeValueAsString(responseDTO);
-            response.getWriter().write(result);
+            userTokenRepository.save(userToken);
             tokenService.addToken(jwt,refreshToken,oidcUser.getAuthorities());
+
+            response.sendRedirect("http://localhost:3000/login?id=" + id );
         } else {
             String sub = oidcUser.getId();
             jwt = jwtProvider.createTemporalJWT(new UsernamePasswordAuthenticationToken(sub,"",oidcUser.getAuthorities()));
+
             TemporalLoginResponseDTO responseDTO = TemporalLoginResponseDTO.builder()
                     .subject(sub)
                     .provider(oidcUser.getProvider())
@@ -62,11 +77,18 @@ public class OidcAuthenticationSuccessHandler implements AuthenticationSuccessHa
                     .nickname(oidcUser.getNickName())
                     .accessToken(jwt)
                     .build();
-            String result = objectMapper.writeValueAsString(responseDTO);
-            response.getWriter().write(result);
+
+            String id = UUID.randomUUID().toString();
+            TemporalUserInfo temporalUserInfo = TemporalUserInfo.builder()
+                    .id(id)
+                    .userInfo(responseDTO)
+                    .build();
+
+            temporalUserInfoRepository.save(temporalUserInfo);
+            response.sendRedirect("http://localhost:3000/signup/oauth?id=" + id);
         }
 
-        response.sendRedirect("http://localhost:3000");
+
     }
 }
 
