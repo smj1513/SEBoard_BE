@@ -6,9 +6,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -58,14 +55,6 @@ public class IndexController {
                 "</html>";
     }
 
-    @PostMapping("/index")
-    public ResponseEntity<?> jwtDecode(){
-        String jwt = jwtDecoder.getAccessToken();
-
-        Authentication authentication = jwtDecoder.getAuthentication(jwt);
-
-        return new ResponseEntity<>(authentication,HttpStatus.OK);
-    }
 
 
     @GetMapping("/admin")

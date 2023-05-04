@@ -21,9 +21,6 @@ public class Account implements UserDetails {
     private String username;
     private String nickname;
     private String password;
-    private String provider;
-    private String email;
-    private String profile;
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
@@ -37,16 +34,12 @@ public class Account implements UserDetails {
     @Builder
     public Account(Long accountId, String loginId,
                    String username, String nickname,
-                   String password, String provider,
-                   String email, String profile, List<Role> authorities, LocalDateTime createdAt) {
+                   String password, List<Role> authorities, LocalDateTime createdAt) {
         this.accountId = accountId;
         this.loginId = loginId;
         this.username = username;
         this.nickname = nickname;
         this.password = password;
-        this.provider = provider;
-        this.email = email;
-        this.profile = profile;
         this.authorities = authorities;
         this.createdAt = LocalDateTime.now();
     }
@@ -56,8 +49,6 @@ public class Account implements UserDetails {
         password = account.password;
         username = account.username;
         nickname = account.nickname;
-        email = account.email;
-        profile = account.profile;
         authorities = account.authorities;
 
         return this;
