@@ -66,7 +66,7 @@ public class OidcAuthenticationSuccessHandler implements AuthenticationSuccessHa
             response.getWriter().write(result);
         }
 
-        response.sendRedirect("/");
+        response.sendRedirect("http://localhost:3000");
     }
 }
 
