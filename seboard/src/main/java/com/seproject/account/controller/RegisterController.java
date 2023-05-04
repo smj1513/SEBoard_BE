@@ -5,6 +5,10 @@ import com.seproject.account.jwt.JwtProvider;
 import com.seproject.account.model.Account;
 import com.seproject.account.model.Role;
 import com.seproject.account.model.social.OAuthAccount;
+import com.seproject.account.model.social.TemporalUserInfo;
+import com.seproject.account.model.social.UserToken;
+import com.seproject.account.repository.TemporalUserInfoRepository;
+import com.seproject.account.repository.UserTokenRepository;
 import com.seproject.account.service.AccountService;
 import com.seproject.account.service.EmailService;
 import com.seproject.account.jwt.JwtDecoder;
@@ -21,11 +25,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import static com.seproject.account.controller.dto.LoginDTO.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.seproject.account.controller.dto.RegisterDTO.*;
 
@@ -38,6 +46,9 @@ public class RegisterController {
     private final AccountService accountService;
     private final EmailService emailService;
     private final JwtProvider jwtProvider;
+
+    private final TemporalUserInfoRepository temporalUserInfoRepository;
+    private final UserTokenRepository userTokenRepository;
 
     @Operation(summary = "OAuth 회원가입", description = "소셜 로그인 사용시 추가 정보를 입력하여 회원가입을 요청한다.")
     @ApiResponses({
@@ -63,7 +74,7 @@ public class RegisterController {
             String accessToken = jwtProvider.createJWT(authenticationToken);
             String refreshToken = jwtProvider.createRefreshToken(authenticationToken);
 
-            LoginDTO.LoginResponseDTO responseDTO = LoginDTO.LoginResponseDTO.builder()
+            LoginResponseDTO responseDTO = LoginResponseDTO.builder()
                     .accessToken(accessToken)
                     .refreshToken(refreshToken)
                     .build();
@@ -106,7 +117,7 @@ public class RegisterController {
         String accessToken = jwtProvider.createJWT(authenticationToken);
         String refreshToken = jwtProvider.createRefreshToken(authenticationToken);
 
-        LoginDTO.LoginResponseDTO responseDTO = LoginDTO.LoginResponseDTO.builder()
+        LoginResponseDTO responseDTO = LoginResponseDTO.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
@@ -123,5 +134,35 @@ public class RegisterController {
         boolean existNickname = accountService.isExistByNickname(nickname);
 
         return new ResponseEntity<>(ConfirmDuplicateNicknameResponse.toDTO(existNickname),HttpStatus.OK);
+    }
+
+
+    @GetMapping("/auth/kakao")
+    public ResponseEntity<?> findUserToken(@RequestParam String id) {
+        Optional<UserToken> userTokenOptional = userTokenRepository.findById(id);
+
+        if(userTokenOptional.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        UserToken userToken = userTokenOptional.get();
+        LoginResponseDTO responseDTO = userToken.getUserToken();
+        userTokenRepository.delete(userToken);
+        return new ResponseEntity<>(responseDTO,HttpStatus.OK);
+    }
+
+    @GetMapping("/register/oauth")
+    public ResponseEntity<?> findTemporalUserInfo(@RequestParam("id") String id) {
+        Optional<TemporalUserInfo> optionalTemporalUserInfo = temporalUserInfoRepository.findById(id);
+
+        if(optionalTemporalUserInfo.isEmpty()) {
+            return new ResponseEntity<>("존재하지 않는 데이터",HttpStatus.NOT_FOUND);
+        }
+
+        TemporalUserInfo temporalUserInfo = optionalTemporalUserInfo.get();
+        TemporalLoginResponseDTO userInfo = temporalUserInfo.getUserInfo();
+        temporalUserInfoRepository.delete(temporalUserInfo);
+
+        return new ResponseEntity<>(userInfo,HttpStatus.OK);
     }
 }
