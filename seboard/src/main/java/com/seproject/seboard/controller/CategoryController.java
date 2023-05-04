@@ -1,5 +1,6 @@
 package com.seproject.seboard.controller;
 
+import com.seproject.seboard.application.CategoryAppService;
 import com.seproject.seboard.controller.dto.post.CategoryRequest;
 import com.seproject.seboard.controller.dto.post.CategoryRequest.CreateCategoryRequest;
 import com.seproject.seboard.controller.dto.post.CategoryRequest.UpdateCategoryRequest;
@@ -8,6 +9,7 @@ import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,11 +19,12 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/category")
 @AllArgsConstructor
 public class CategoryController {
+    private final CategoryAppService categoryAppService;
 
     @Parameter(name = "request", description = "상위 카테고리, 생성할 카테고리 이름 정보")
-    @Operation(summary = "하위 카테고리 생성", description = "소분류 카테고리를 생성한다")
+    @Operation(summary = "하위 카테고리 생성", description = "카테고리를 생성한다")
     @PostMapping
-    public ResponseEntity<?> createCategory(@RequestBody CreateCategoryRequest request) {
+    public ResponseEntity<?> createCategory(@RequestBody CreateCategoryRequest request, @RequestParam String categoryType) {
 
         /**
          * TODO : jwt
@@ -29,6 +32,7 @@ public class CategoryController {
          *         이미 존재하는 카테고리 이름
          *         권한 없음
          */
+        categoryAppService.createCategory(request.toCommand(categoryType));
 
         return new ResponseEntity<>(request, HttpStatus.OK);
     }
@@ -62,6 +66,7 @@ public class CategoryController {
          *    존재하지 않는 상위 카테고리
          *    이미 존재하는 카테고리 이름
          */
+        categoryAppService.updateCategory(request.toCommand(categoryId));
 
         return new ResponseEntity<>(request, HttpStatus.OK);
     }
@@ -76,8 +81,16 @@ public class CategoryController {
          *    권한 없음
          *    대분류 삭제시 하위 카테고리 없어야함
          */
+        categoryAppService.deleteCategory(categoryId);
 
         return new ResponseEntity<>(categoryId, HttpStatus.OK);
+    }
+
+    @PostMapping("/migrate")
+    public ResponseEntity<?> migrateCategory(@RequestParam Long from,@RequestParam Long to){
+        categoryAppService.migrateCategory(from,to);
+
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }
