@@ -1,6 +1,6 @@
 package com.seproject.account.model;
 
-import com.seproject.seboard.domain.model.post.Category;
+import com.seproject.seboard.domain.model.category.Category;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
