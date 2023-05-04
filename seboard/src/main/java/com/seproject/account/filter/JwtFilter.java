@@ -1,6 +1,6 @@
 package com.seproject.account.filter;
 
-import com.seproject.account.model.Token;
+import com.seproject.account.model.AccessToken;
 import com.seproject.account.service.TokenService;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.NotRegisteredUserException;
@@ -41,10 +41,10 @@ public class JwtFilter extends OncePerRequestFilter {
                     failureHandler.onAuthenticationFailure(request,response,new NotRegisteredUserException(ErrorCode.NOT_REGISTERED_USER));
                 }
 
-                Token token = tokenService.findToken(jwt);
+                AccessToken accessToken = tokenService.findAccessToken(jwt);
 
-                if(token != null) {
-                    Authentication authentication = jwtDecoder.getAuthentication(token);
+                if(accessToken != null) {
+                    Authentication authentication = jwtDecoder.getAuthentication(accessToken);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }

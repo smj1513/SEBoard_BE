@@ -4,7 +4,6 @@ import com.seproject.account.controller.dto.LoginDTO;
 import com.seproject.account.jwt.JwtProvider;
 import com.seproject.account.model.Account;
 import com.seproject.account.model.Role;
-import com.seproject.account.model.Token;
 import com.seproject.account.model.social.OAuthAccount;
 import com.seproject.account.service.AccountService;
 import com.seproject.account.service.EmailService;
