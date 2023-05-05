@@ -11,5 +11,7 @@ import org.springframework.data.annotation.Id;
 public class RefreshToken {
 
     @Id
-    private  String refreshToken;
+    private String refreshToken;
+
+    private String loginId;
 }

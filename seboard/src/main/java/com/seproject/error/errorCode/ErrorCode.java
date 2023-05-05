@@ -14,6 +14,7 @@ public enum ErrorCode {
     BANNED_IP(HttpStatus.FORBIDDEN,104, "금지된 ip입니다."),
     NOT_REGISTERED_USER(HttpStatus.TEMPORARY_REDIRECT,105, "추가 정보를 입력하지 않은 사용자입니다."),
     USER_NOT_FOUND(HttpStatus.UNAUTHORIZED,106, "존재하지 않는 아이디입니다."),
+    REFRESH_TOKEN_NOT_FOUND(HttpStatus.NOT_FOUND,107,"존재하지 않는 refreshToken 입니다.")
     ;
 
     ErrorCode(HttpStatus httpStatus, int code,String message) {

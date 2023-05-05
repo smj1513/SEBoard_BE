@@ -22,4 +22,23 @@ public class TokenDTO {
                     .build();
         }
     }
+
+    @Data
+    public static class AccessTokenRefreshRequest {
+        private String refreshToken;
+    }
+
+    @Builder
+    @Data
+    public static class AccessTokenRefreshResponse {
+        private String accessToken;
+        private String refreshToken;
+
+        public static AccessTokenRefreshResponse toDTO(String accessToken,String refreshToken) {
+            return builder()
+                    .accessToken(accessToken)
+                    .refreshToken(refreshToken)
+                    .build();
+        }
+    }
 }

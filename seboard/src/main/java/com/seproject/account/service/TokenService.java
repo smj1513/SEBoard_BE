@@ -1,16 +1,21 @@
 package com.seproject.account.service;
 
 import com.seproject.account.controller.dto.TokenDTO;
+import com.seproject.account.jwt.JwtDecoder;
+import com.seproject.account.jwt.JwtProvider;
 import com.seproject.account.model.AccessToken;
 import com.seproject.account.model.RefreshToken;
 import com.seproject.account.repository.AccessTokenRepository;
 import com.seproject.account.repository.RefreshTokenRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
+import java.util.Collection;
 import java.util.List;
 
 import static com.seproject.account.controller.dto.TokenDTO.*;
@@ -22,8 +27,13 @@ public class TokenService {
     private final AccessTokenRepository accessTokenRepository;
     private final RefreshTokenRepository refreshTokenRepository;
 
+    private final CustomUserDetailsService userDetailsService;
+
+    private final JwtProvider jwtProvider;
+    private final JwtDecoder jwtDecoder;
+
     @Transactional
-    public TokenResponse addToken(String accessToken, String refreshToken, List<? extends GrantedAuthority> authorities) {
+    public TokenResponse addToken(String accessToken, String refreshToken, Collection<? extends GrantedAuthority> authorities) {
 
         if (StringUtils.hasText(accessToken) && accessToken.startsWith("Bearer ")) {
             accessToken = accessToken.substring(7);
@@ -66,6 +76,24 @@ public class TokenService {
         RefreshToken token = refreshTokenRepository.findById(refreshToken).orElseThrow();
         refreshTokenRepository.delete(token);
         return token;
+    }
+
+    @Transactional
+    public AccessTokenRefreshResponse refresh(String refreshToken){
+        String subject = jwtDecoder.getSubject(refreshToken);
+        UserDetails user = userDetailsService.loadUserByUsername(subject);
+        Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
+
+        UsernamePasswordAuthenticationToken newToken
+                = new UsernamePasswordAuthenticationToken(user.getUsername(),"",authorities);
+
+        deleteRefreshToken(refreshToken);
+        String newAccessToken = jwtProvider.createJWT(newToken);
+        String newRefreshToken = jwtProvider.createRefreshToken(newToken);
+
+        addToken(newAccessToken,newRefreshToken,authorities);
+
+        return AccessTokenRefreshResponse.toDTO(newAccessToken,newRefreshToken);
     }
 
 }
