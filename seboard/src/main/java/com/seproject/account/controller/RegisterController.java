@@ -10,6 +10,7 @@ import com.seproject.account.model.social.UserToken;
 import com.seproject.account.repository.TemporalUserInfoRepository;
 import com.seproject.account.repository.UserTokenRepository;
 import com.seproject.account.service.AccountService;
+import com.seproject.account.service.CustomUserDetailsService;
 import com.seproject.account.service.EmailService;
 import com.seproject.account.jwt.JwtDecoder;
 import com.seproject.account.service.TokenService;
@@ -25,6 +26,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -47,6 +49,7 @@ public class RegisterController {
     private final AccountService accountService;
     private final EmailService emailService;
     private final JwtProvider jwtProvider;
+    private final CustomUserDetailsService customUserDetailsService;
 
     private final TemporalUserInfoRepository temporalUserInfoRepository;
     private final UserTokenRepository userTokenRepository;
@@ -153,6 +156,9 @@ public class RegisterController {
 
         UserToken userToken = userTokenOptional.get();
         LoginResponseDTO responseDTO = userToken.getUserToken();
+        String subject = jwtDecoder.getSubject(responseDTO.getAccessToken());
+        UserDetails userDetails = customUserDetailsService.loadUserByUsername(subject);
+        tokenService.addToken(responseDTO.getAccessToken(),responseDTO.getRefreshToken(),userDetails.getAuthorities());
         userTokenRepository.delete(userToken);
         return new ResponseEntity<>(responseDTO,HttpStatus.OK);
     }
