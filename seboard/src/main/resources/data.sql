@@ -1,6 +1,6 @@
 BEGIN;
 
-INSERT INTO accounts(account_id,login_id,username,nickname,password,created_at) values (5234058023850,'user','user','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','2023-04-26');
+INSERT INTO accounts(account_id,login_id,username,nickname,password,created_at) values (5234058023850,'user','username','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','2023-04-26');
 INSERT INTO accounts(account_id,login_id,username,nickname,password,created_at) values (5234058023851,'admin','admin','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','2023-04-26');
 INSERT INTO accounts(account_id,login_id,username,nickname,password,created_at) values (5234058023852,'professor','professor','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','2023-04-26');
 INSERT INTO accounts(account_id,login_id,username,nickname,password,created_at) values (5234058023853,'kumoh','maanjong','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','2023-04-26');

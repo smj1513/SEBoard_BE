@@ -96,7 +96,7 @@ public class TokenService {
         Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
 
         UsernamePasswordAuthenticationToken newToken
-                = new UsernamePasswordAuthenticationToken(user.getUsername(),"",authorities);
+                = new UsernamePasswordAuthenticationToken(subject,"",authorities);
 
         deleteRefreshToken(refreshToken);
         String newAccessToken = jwtProvider.createJWT(newToken);
