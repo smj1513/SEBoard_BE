@@ -35,8 +35,7 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
         } else if(exception instanceof TokenValidateException){
             errorCode = ErrorCode.INVALID_JWT;
         } else {
-            response.sendError(HttpStatus.UNAUTHORIZED.value(),exception.getMessage());
-            return;
+            errorCode = ErrorCode.USER_NOT_FOUND;
         }
 
         Error error = Error.of(errorCode);
