@@ -21,12 +21,13 @@ public class LogoutAppService {
     private static final String ENCRYPTION_PREFIX = "Bearer";
     private static final String CONTENT_TYPE = "Content-Type";
     private static final String X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
+    private static final String REDIRECT_PATH = "&logout_redirect_uri=http://localhost:3000";
     private final String KEY = "Authorization";
 
     public void logout(String token) {
 
        try {
-           URL url = new URL(LOGOUT_URL + clientId + "&logout_redirect_uri=http://localhost:8080");
+           URL url = new URL(LOGOUT_URL + clientId + REDIRECT_PATH);
 //           URL url = new URL("https://kapi.kakao.com/v1/user/unlink");
            HttpURLConnection request = (HttpURLConnection)url.openConnection();
 //           request.setRequestMethod(POST_METHOD);
@@ -45,7 +46,7 @@ public class LogoutAppService {
     }
 
     public String getRedirectURL() {
-        return LOGOUT_URL + clientId + "&logout_redirect_uri=http://localhost:8080";
+        return LOGOUT_URL + clientId + REDIRECT_PATH;
     }
 
 
