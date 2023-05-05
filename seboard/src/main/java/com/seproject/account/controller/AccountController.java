@@ -35,20 +35,22 @@ public class AccountController {
 
         User user = (User)authentication.getPrincipal();
         String username = user.getUsername();
+        String accessToken = jwtDecoder.getAccessToken();
+
+        doLogout(accessToken);
 
         if(!StringUtils.isEmpty(username) && accountService.isOAuthUser(username)) {
             String redirectURL = logoutAppService.getRedirectURL();
             return new ResponseEntity<>(redirectURL, HttpStatus.PERMANENT_REDIRECT);
         }
 
-        String accessToken = jwtDecoder.getAccessToken();
+        return new ResponseEntity<>("로그아웃 성공", HttpStatus.OK);
 
+    }
+
+    private void doLogout(String accessToken){
         if (accessToken != null){
             tokenService.deleteAccessToken(accessToken);
-            return new ResponseEntity<>("로그아웃 성공", HttpStatus.OK);
         }
-
-        return new ResponseEntity<>("세션이 만료되었습니다.", HttpStatus.BAD_REQUEST);
-
     }
 }
