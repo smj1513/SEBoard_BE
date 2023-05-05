@@ -67,12 +67,13 @@ public class OidcAuthenticationSuccessHandler implements AuthenticationSuccessHa
             response.sendRedirect("http://localhost:3000/login?id=" + id );
         } else {
             String sub = oidcUser.getId();
-            jwt = jwtProvider.createTemporalJWT(new UsernamePasswordAuthenticationToken(sub,"",oidcUser.getAuthorities()));
+            String email = oidcUser.getEmail();
+            jwt = jwtProvider.createTemporalJWT(new UsernamePasswordAuthenticationToken(email,"",oidcUser.getAuthorities()));
 
             TemporalLoginResponseDTO responseDTO = TemporalLoginResponseDTO.builder()
                     .subject(sub)
                     .provider(oidcUser.getProvider())
-                    .email(oidcUser.getEmail())
+                    .email(email)
                     .name(oidcUser.getName())
                     .nickname(oidcUser.getNickName())
                     .accessToken(jwt)

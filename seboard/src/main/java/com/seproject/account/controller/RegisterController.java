@@ -12,6 +12,7 @@ import com.seproject.account.repository.UserTokenRepository;
 import com.seproject.account.service.AccountService;
 import com.seproject.account.service.EmailService;
 import com.seproject.account.jwt.JwtDecoder;
+import com.seproject.account.service.TokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -49,6 +50,7 @@ public class RegisterController {
 
     private final TemporalUserInfoRepository temporalUserInfoRepository;
     private final UserTokenRepository userTokenRepository;
+    private final TokenService tokenService;
 
     @Operation(summary = "OAuth 회원가입", description = "소셜 로그인 사용시 추가 정보를 입력하여 회원가입을 요청한다.")
     @ApiResponses({
@@ -70,7 +72,7 @@ public class RegisterController {
             OAuthAccount oAuthAccount = accountService.register(oAuth2RegisterRequest);
             List<Role> authorities = oAuthAccount.getAccount().getAuthorities();
             UsernamePasswordAuthenticationToken authenticationToken =
-                    new UsernamePasswordAuthenticationToken(oAuthAccount.getSub(), "", authorities);
+                    new UsernamePasswordAuthenticationToken(oAuthAccount.getAccount().getLoginId(), "", authorities);
             String accessToken = jwtProvider.createJWT(authenticationToken);
             String refreshToken = jwtProvider.createRefreshToken(authenticationToken);
 
@@ -78,6 +80,8 @@ public class RegisterController {
                     .accessToken(accessToken)
                     .refreshToken(refreshToken)
                     .build();
+
+            tokenService.addToken(accessToken,refreshToken,authorities);
             return new ResponseEntity<>(responseDTO,HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e, HttpStatus.BAD_REQUEST);
@@ -121,6 +125,8 @@ public class RegisterController {
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
+
+        tokenService.addToken(accessToken,refreshToken,authorities);
         return new ResponseEntity<>(responseDTO,HttpStatus.OK);
     }
 
