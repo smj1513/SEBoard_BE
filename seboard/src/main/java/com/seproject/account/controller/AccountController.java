@@ -1,6 +1,7 @@
 package com.seproject.account.controller;
 
 import com.seproject.account.application.LogoutAppService;
+import com.seproject.account.controller.dto.LogoutDTO;
 import com.seproject.account.jwt.JwtDecoder;
 import com.seproject.account.service.AccountService;
 import com.seproject.account.service.TokenService;
@@ -14,6 +15,8 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+
+import java.util.HashMap;
 
 @Tag(name = "계정 시스템 API", description = "계정(Account) 관련 API")
 @AllArgsConstructor
@@ -41,10 +44,9 @@ public class AccountController {
 
         if(!StringUtils.isEmpty(username) && accountService.isOAuthUser(username)) {
             String redirectURL = logoutAppService.getRedirectURL();
-            return new ResponseEntity<>(redirectURL, HttpStatus.PERMANENT_REDIRECT);
+            return new ResponseEntity<>(new LogoutDTO(true,redirectURL), HttpStatus.OK);
         }
-
-        return new ResponseEntity<>("로그아웃 성공", HttpStatus.OK);
+        return new ResponseEntity<>(new LogoutDTO(false,""), HttpStatus.OK);
 
     }
 
