@@ -24,10 +24,10 @@ public class AuthenticationExceptionHandler {
         return Error.toResponseEntity(e.getErrorCode());
     }
 
-//    @ExceptionHandler(AccessTokenExpiredException.class)
-//    public ResponseEntity<Error> handleAccessTokenExpiredException(AccessTokenExpiredException e) {
-//        return Error.toResponseEntity(e.getErrorCode());
-//    }
+    @ExceptionHandler(AccessTokenExpiredException.class)
+    public ResponseEntity<Error> handleAccessTokenExpiredException(AccessTokenExpiredException e) {
+        return Error.toResponseEntity(e.getErrorCode());
+    }
 
     @ExceptionHandler(InvalidPaginationException.class)
     public ResponseEntity<Error> handleInvalidPage(InvalidPaginationException e) {
