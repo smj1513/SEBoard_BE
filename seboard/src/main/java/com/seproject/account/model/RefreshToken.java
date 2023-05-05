@@ -9,9 +9,6 @@ import org.springframework.data.annotation.Id;
 @Getter
 @RedisHash(value = "REFRESH_TOKEN", timeToLive = 1_209_600L)
 public class RefreshToken {
-
     @Id
     private String refreshToken;
-
-    private String loginId;
 }
