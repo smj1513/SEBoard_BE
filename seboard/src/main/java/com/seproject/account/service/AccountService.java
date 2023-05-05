@@ -45,6 +45,8 @@ public class AccountService {
     @Transactional
     public OAuthAccount register(OAuth2RegisterRequest oAuth2RegisterRequest) {
         String email = oAuth2RegisterRequest.getEmail();
+
+        if(isExist(email)) throw new IllegalArgumentException("이미 존재하는 사용자입니다.");
         Role role;
 
         if(emailService.isKumohMail(email)){

@@ -48,13 +48,15 @@ public class OidcAuthenticationSuccessHandler implements AuthenticationSuccessHa
         if(oAuthAccountRepository.existsBySubAndProvider(oidcUser.getId(),oidcUser.getProvider())) {
             OAuthAccount oAuthAccount = oAuthAccountRepository.findOAuthAccountBySubAndProvider(oidcUser.getId(),oidcUser.getProvider());
             Account account = oAuthAccount.getAccount();
-            jwt = jwtProvider.createJWT(new UsernamePasswordAuthenticationToken(account.getLoginId(),"",account.getAuthorities()));
-            String refreshToken = jwtProvider.createRefreshToken(token);
+            UsernamePasswordAuthenticationToken tkn = new UsernamePasswordAuthenticationToken(account.getLoginId(),"",account.getAuthorities());
+            jwt = jwtProvider.createJWT(tkn);
+            String refreshToken = jwtProvider.createRefreshToken(tkn);
 
             LoginResponseDTO responseDTO = LoginResponseDTO.builder()
                     .accessToken(jwt)
                     .refreshToken(refreshToken)
                     .build();
+
             String id = UUID.randomUUID().toString();
             UserToken userToken = UserToken.builder()
                     .id(id)

@@ -104,6 +104,7 @@ INSERT INTO public.posts(
 VALUES (1234879892105, 1, '2023-04-25', '2023-04-28','<script>alert("xss")</script>' ,
         true, 'xss 테스트', 9999,3421244 , 43214232, 28822823, false);
 
+INSERT INTO public.email_authentication(id, auth_token, email, expire_date, expired) VALUES (765674765, '5efd0d19','alswhd1113@gmail.com', '2023-05-05', true);
 
 -- INSERT INTO public.ip(id, ip_address) VALUES (5343452, '127.0.0.1');
 -- INSERT INTO public.ip(id, ip_address) VALUES (5343453, '0:0:0:0:0:0:0:1');

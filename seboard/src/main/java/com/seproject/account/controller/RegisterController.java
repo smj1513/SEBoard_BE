@@ -156,7 +156,9 @@ public class RegisterController {
 
         UserToken userToken = userTokenOptional.get();
         LoginResponseDTO responseDTO = userToken.getUserToken();
+
         String subject = jwtDecoder.getSubject(responseDTO.getAccessToken());
+
         UserDetails userDetails = customUserDetailsService.loadUserByUsername(subject);
         tokenService.addToken(responseDTO.getAccessToken(),responseDTO.getRefreshToken(),userDetails.getAuthorities());
         userTokenRepository.delete(userToken);
