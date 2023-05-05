@@ -3,6 +3,7 @@ package com.seproject.account.filter;
 import com.seproject.account.model.AccessToken;
 import com.seproject.account.service.TokenService;
 import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.AccessTokenExpiredException;
 import com.seproject.error.exception.NotRegisteredUserException;
 import com.seproject.error.exception.TokenValidateException;
 import com.seproject.account.jwt.JwtDecoder;
@@ -47,9 +48,10 @@ public class JwtFilter extends OncePerRequestFilter {
                     Authentication authentication = jwtDecoder.getAuthentication(accessToken);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
+
             }
             filterChain.doFilter(request,response);
-        } catch (TokenValidateException e) {
+        } catch (TokenValidateException | AccessTokenExpiredException e) {
             failureHandler.onAuthenticationFailure(request,response,e);
         }
     }

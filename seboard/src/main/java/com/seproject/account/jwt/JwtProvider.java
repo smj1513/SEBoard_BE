@@ -31,7 +31,8 @@ public class JwtProvider {
                 .setHeaderParam(JWTProperties.ALGORITHM, JWTProperties.HS256)
                 .setSubject(token.getPrincipal().toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+//                .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000*60))
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
 
@@ -47,6 +48,7 @@ public class JwtProvider {
                 .setSubject(token.getPrincipal().toString())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
                 .setExpiration(new Date(System.currentTimeMillis() + expirationTime))
+                .setExpiration(new Date(System.currentTimeMillis() + 1000*10))
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
         return tokenPrefix + " " + jwt;

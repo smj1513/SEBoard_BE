@@ -7,6 +7,8 @@ import com.seproject.account.model.AccessToken;
 import com.seproject.account.model.RefreshToken;
 import com.seproject.account.repository.AccessTokenRepository;
 import com.seproject.account.repository.RefreshTokenRepository;
+import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.RefreshTokenNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -80,6 +82,15 @@ public class TokenService {
 
     @Transactional
     public AccessTokenRefreshResponse refresh(String refreshToken){
+
+        if (StringUtils.hasText(refreshToken) && refreshToken.startsWith("Bearer ")) {
+            refreshToken = refreshToken.substring(7);
+        }
+
+        RefreshToken findRefreshToken = findRefreshToken(refreshToken);
+
+        if(findRefreshToken == null) throw new RefreshTokenNotFoundException(ErrorCode.REFRESH_TOKEN_NOT_FOUND);
+
         String subject = jwtDecoder.getSubject(refreshToken);
         UserDetails user = userDetailsService.loadUserByUsername(subject);
         Collection<? extends GrantedAuthority> authorities = user.getAuthorities();
