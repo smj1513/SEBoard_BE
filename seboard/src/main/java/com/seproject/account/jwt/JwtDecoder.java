@@ -46,6 +46,9 @@ public class JwtDecoder {
 
     private Claims getClaims(String jwt) {
         try {
+            if (StringUtils.hasText(jwt) && jwt.startsWith("Bearer ")) {
+                jwt = jwt.substring(7);
+            }
             Claims body = Jwts.parser()
                     .setSigningKey(secret)
                     .parseClaimsJws(jwt)
