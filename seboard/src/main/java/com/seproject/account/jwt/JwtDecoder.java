@@ -2,8 +2,10 @@ package com.seproject.account.jwt;
 
 import com.seproject.account.model.AccessToken;
 import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.AccessTokenExpiredException;
 import com.seproject.error.exception.TokenValidateException;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -17,6 +19,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 public class JwtDecoder {
@@ -43,11 +46,16 @@ public class JwtDecoder {
 
     private Claims getClaims(String jwt) {
         try {
-            return Jwts.parser()
+            Claims body = Jwts.parser()
                     .setSigningKey(secret)
                     .parseClaimsJws(jwt)
                     .getBody();
-        } catch (JwtException e) {
+
+            return body;
+        } catch (ExpiredJwtException e) {
+            throw new AccessTokenExpiredException(ErrorCode.ACCESS_TOKEN_EXPIRED);
+        }
+        catch (JwtException e) {
             throw new TokenValidateException(ErrorCode.INVALID_JWT, e);
         }
     }
@@ -65,10 +73,18 @@ public class JwtDecoder {
     }
 
     public boolean isTemporalToken(String accessToken) {
-        String type = (String)Jwts.parser()
-                .setSigningKey(secret)
-                .parse(accessToken)
-                .getHeader().get(JWTProperties.TYPE);
-        return type.equals(JWTProperties.TEMPORAL_TOKEN);
+        try{
+            String type = (String)Jwts.parser()
+                    .setSigningKey(secret)
+                    .parse(accessToken)
+                    .getHeader().get(JWTProperties.TYPE);
+            return type.equals(JWTProperties.TEMPORAL_TOKEN);
+        }
+        catch (ExpiredJwtException e) {
+            throw new AccessTokenExpiredException(ErrorCode.ACCESS_TOKEN_EXPIRED);
+        }
+        catch (JwtException e) {
+            throw new TokenValidateException(ErrorCode.INVALID_JWT, e);
+        }
     }
 }

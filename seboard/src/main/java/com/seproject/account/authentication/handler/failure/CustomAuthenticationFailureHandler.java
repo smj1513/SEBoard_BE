@@ -3,6 +3,7 @@ package com.seproject.account.authentication.handler.failure;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seproject.error.Error;
 import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.AccessTokenExpiredException;
 import com.seproject.error.exception.PasswordIncorrectException;
 import com.seproject.error.exception.TokenValidateException;
 import org.springframework.http.HttpStatus;
@@ -34,6 +35,8 @@ public class CustomAuthenticationFailureHandler implements AuthenticationFailure
             errorCode = ErrorCode.PASSWORD_INCORRECT;
         } else if(exception instanceof TokenValidateException){
             errorCode = ErrorCode.INVALID_JWT;
+        } else if(exception instanceof AccessTokenExpiredException) {
+            errorCode = ErrorCode.ACCESS_TOKEN_EXPIRED;
         } else {
             errorCode = ErrorCode.USER_NOT_FOUND;
         }
