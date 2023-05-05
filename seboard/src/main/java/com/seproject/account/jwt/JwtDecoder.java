@@ -15,6 +15,8 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 public class JwtDecoder {
@@ -39,15 +41,6 @@ public class JwtDecoder {
         return null;
     }
 
-    public String getRefreshToken(HttpServletRequest request) {
-        String jwt = request.getHeader("Authorization");
-
-        if (StringUtils.hasText(jwt) && jwt.startsWith("Bearer ")) {
-            return jwt.substring(7);
-        }
-        return null;
-    }
-
     private Claims getClaims(String jwt) {
         try {
             return Jwts.parser()
@@ -58,11 +51,14 @@ public class JwtDecoder {
             throw new TokenValidateException(ErrorCode.INVALID_JWT, e);
         }
     }
-
+    public String getSubject(String token) {
+        Claims claims = getClaims(token);
+        return claims.getSubject();
+    }
     public Authentication getAuthentication(AccessToken accessToken) {
         String jwt = accessToken.getAccessToken();
         Claims claims = getClaims(jwt);
-        List<? extends GrantedAuthority> authorities = accessToken.getAuthorities();
+        Collection<? extends GrantedAuthority> authorities = accessToken.getAuthorities();
 
         User principal = new User(claims.getSubject(), "", authorities);
         return new UsernamePasswordAuthenticationToken(principal, jwt, authorities);
