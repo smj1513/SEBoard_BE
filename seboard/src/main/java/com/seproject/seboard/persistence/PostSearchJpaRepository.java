@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface PostSearchJpaRepository extends PostSearchRepository {
     @Query("select new com.seproject.seboard.controller.dto.post.PostResponse$RetrievePostDetailResponse(p)" +
-            "from Post p where p.postId = :id")
+            "from Post p where p.postId = :id and p.isDeleted = false")
     Optional<PostResponse.RetrievePostDetailResponse> findPostDetailById(Long id);
 //    Page<Post> findByCategoryId(Long categoryId, Pageable pagingInfo);
 //    Page<Post> findByTitle(String title, Pageable pagingInfo);
