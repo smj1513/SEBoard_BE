@@ -56,6 +56,15 @@ public class CategoryAppService {
                     .build();
 
             boardMenuRepository.save(boardMenu);
+
+            Category category = Category.builder()
+                    .superMenu(boardMenu)
+                    .name("일반")
+                    .description("기본으로 생성되는 게시판 카테고리")
+                    .urlInfo(null)
+                    .build();
+
+            categoryRepository.save(category);
         }else if(command.getCategoryType().equals("CATEGORY")){
             Category category = Category.builder()
                     .superMenu(superMenu)
