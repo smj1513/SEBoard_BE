@@ -49,10 +49,11 @@ public class Post {
     @JoinColumn(name = "post_id")
     private Set<FileMetaData> attachments = new HashSet<>();
     private int anonymousCount;
+    private boolean isDeleted;
 
     public Post(Long postId, String title, String contents, int views,
                 boolean pined, BaseTime baseTime, Category category,
-                BoardUser author, ExposeOption exposeOption,  Set<FileMetaData> attachments,  int anonymousCount) {
+                BoardUser author, ExposeOption exposeOption,  Set<FileMetaData> attachments,  int anonymousCount, boolean isDeleted) {
         if(!isValidTitle(title)) {
             throw new IllegalArgumentException();
         }
@@ -72,6 +73,7 @@ public class Post {
         this.exposeOption = exposeOption;
         this.attachments = attachments;
         this.anonymousCount = anonymousCount;
+        this.isDeleted = false;
     }
 
     public boolean isNamed() {
@@ -116,7 +118,6 @@ public class Post {
         this.contents = contents;
     }
 
-    //TODO : exposeOption 변경 필요
     public void changeExposeOption(ExposeState exposeState, String password) {
         if(exposeState==ExposeState.PRIVACY &&
                 exposeOption.getExposeState()==ExposeState.PRIVACY && password==null){
@@ -155,5 +156,9 @@ public class Post {
 
     public void addAttachment(FileMetaData attachment) {
         attachments.add(attachment);
+    }
+
+    public void delete() {
+        this.isDeleted = true;
     }
 }

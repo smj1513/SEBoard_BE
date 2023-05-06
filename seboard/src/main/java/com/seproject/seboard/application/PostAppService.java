@@ -34,6 +34,7 @@ import static com.seproject.seboard.controller.dto.post.PostResponse.*;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class PostAppService {
     private final PostRepository postRepository;
     private final PostSearchRepository postSearchRepository;
@@ -53,7 +54,6 @@ public class PostAppService {
         }
     }
 
-    @Transactional
     protected void writeUnnamedPost(PostWriteCommand command) { //accID는 체킹되었다고 가정
         Anonymous anonymous = Anonymous.builder()
                 .name("익명") //TODO : 익명 이름 다양하게?
@@ -158,12 +158,12 @@ public class PostAppService {
     public void removePost(Long postId, Long accountId) {
         Post post = findByIdOrThrow(postId, postRepository, "");
 
-        //TODO : 추후 활성화 필요
-//        if(!post.isWrittenBy(accountId)){ // TODO : 관리자 삭제 경우 추가해야함
-//            throw new IllegalArgumentException();
-//        }
+        if(!post.isWrittenBy(accountId)){ // TODO : 관리자 삭제 경우 추가해야함
+            throw new IllegalArgumentException();
+        }
 
-        post.getAttachments().forEach(fileAppService::deleteFileFromStorage); //TODO : fileSystem에서 transactional 처리 필요
-        postRepository.deleteById(postId);
+        post.delete();
+//        post.getAttachments().forEach(fileAppService::deleteFileFromStorage); //TODO : fileSystem에서 transactional 처리 필요
+//        postRepository.deleteById(postId);
     }
 }
