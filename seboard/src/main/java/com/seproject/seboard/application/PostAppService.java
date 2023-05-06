@@ -149,6 +149,7 @@ public class PostAppService {
 
         attachments.forEach(fileMetaData -> post.addAttachment(fileMetaData));
 
+        System.out.println("command.getCategoryId() = " + command.getCategoryId());
         //TODO : category 권한 체킹 필요
         Category category = findByIdOrThrow(command.getCategoryId(), categoryRepository, "");
         post.changeCategory(category);

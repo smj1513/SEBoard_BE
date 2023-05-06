@@ -2,21 +2,24 @@ package com.seproject.seboard.domain.model.post.exposeOptions;
 
 import lombok.NoArgsConstructor;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.Table;
 
 @NoArgsConstructor
 @Entity
-@Table(name="privacies")
+@DiscriminatorValue("PRIVACY")
 public class Privacy extends ExposeOption{
-    private String password;
 
-    public Privacy(String password) {
-        super(ExposeState.PRIVACY);
+    protected Privacy(String password) {
         this.password = password;
     }
 
     public boolean checkPassword(String password){
         return this.password.equals(password);
+    }
+
+    @Override
+    public ExposeState getExposeState() {
+        return ExposeState.PRIVACY;
     }
 }

@@ -1,12 +1,14 @@
 package com.seproject.seboard.domain.model.post.exposeOptions;
 
+
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.Table;
 
 @Entity
-@Table(name = "kumohs")
+@DiscriminatorValue("KUMOH")
 public class Kumoh extends ExposeOption{
-    public Kumoh() {
-        super(ExposeState.KUMOH);
+    @Override
+    public ExposeState getExposeState() {
+        return ExposeState.KUMOH;
     }
 }

@@ -1,14 +1,14 @@
 package com.seproject.seboard.domain.model.post.exposeOptions;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
-import javax.persistence.Table;
 
 @Entity
-@Table(name = "publics")
+@DiscriminatorValue("PUBLIC")
 public class Public extends ExposeOption {
 
-    public Public() {
-        super(ExposeState.PUBLIC);
+    @Override
+    public ExposeState getExposeState() {
+        return ExposeState.PUBLIC;
     }
-
 }
