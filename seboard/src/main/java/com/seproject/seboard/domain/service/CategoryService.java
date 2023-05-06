@@ -1,5 +1,6 @@
 package com.seproject.seboard.domain.service;
 
+import com.seproject.seboard.domain.repository.category.MenuRepository;
 import com.seproject.seboard.domain.repository.post.PostRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -8,13 +9,13 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class CategoryService {
     private final PostRepository postRepository;
-    private final CategoryRepository categoryRepository;
+    private final MenuRepository menuRepository;
 
     public boolean hasPost(Long categoryId) {
         return postRepository.existsByCategoryId(categoryId);
     }
 
     public boolean hasSubCategory(Long categoryId){
-        return categoryRepository.existsSubCategory(categoryId);
+        return menuRepository.existsSubMenuById(categoryId);
     }
 }

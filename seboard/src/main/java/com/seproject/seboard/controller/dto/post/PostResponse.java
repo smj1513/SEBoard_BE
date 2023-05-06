@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.seproject.seboard.controller.dto.FileMetaDataResponse.FileMetaDataListResponse;
 import com.seproject.seboard.controller.dto.PaginationResponse;
 import com.seproject.seboard.controller.dto.user.UserResponse;
+import com.seproject.seboard.domain.model.category.Category;
 import com.seproject.seboard.domain.model.post.Post;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.AccessLevel;
@@ -86,7 +87,7 @@ public class PostResponse {
         private Long postId;
         private String title;
         private String contents;
-        private CategoryResponse category;
+        private PostDetailCategoryResponse category;
         private UserResponse author;
         private Integer views;
         private LocalDateTime createdAt;
@@ -105,7 +106,7 @@ public class PostResponse {
             this.postId = post.getPostId();
             this.title = post.getTitle();
             this.contents = post.getContents();
-            this.category = new CategoryResponse(post.getMenu().getMenuId(), post.getMenu().getName());
+            this.category = new PostDetailCategoryResponse(post.getCategory());
             this.author = new UserResponse(post.getAuthor());
             this.views = post.getViews();
             this.createdAt = post.getBaseTime().getCreatedAt();
@@ -113,6 +114,17 @@ public class PostResponse {
             this.exposeType = post.getExposeOption().getExposeState().toString();
             this.attachments = new FileMetaDataListResponse(new ArrayList<>(post.getAttachments()));
             this.isPined = post.isPined();
+        }
+    }
+
+    @Data
+    public static class PostDetailCategoryResponse{
+        private Long categoryId;
+        private String name;
+
+        public PostDetailCategoryResponse(Category category) {
+            this.categoryId = category.getMenuId();
+            this.name = category.getName();
         }
     }
 }

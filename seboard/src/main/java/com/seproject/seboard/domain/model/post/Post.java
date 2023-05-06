@@ -1,5 +1,6 @@
 package com.seproject.seboard.domain.model.post;
 
+import com.seproject.seboard.domain.model.category.Category;
 import com.seproject.seboard.domain.model.category.Menu;
 import com.seproject.seboard.domain.model.comment.Comment;
 import com.seproject.seboard.domain.model.common.BaseTime;
@@ -37,7 +38,7 @@ public class Post {
     private BaseTime baseTime;
     @ManyToOne
     @JoinColumn(name = "category_id")
-    private Menu menu;
+    private Category category;
     @ManyToOne
     @JoinColumn(name = "board_user_id")
     private BoardUser author;
@@ -50,7 +51,7 @@ public class Post {
     private int anonymousCount;
 
     public Post(Long postId, String title, String contents, int views,
-                boolean pined, BaseTime baseTime, Menu menu,
+                boolean pined, BaseTime baseTime, Category category,
                 BoardUser author, ExposeOption exposeOption,  Set<FileMetaData> attachments,  int anonymousCount) {
         if(!isValidTitle(title)) {
             throw new IllegalArgumentException();
@@ -66,7 +67,7 @@ public class Post {
         this.views = views;
         this.pined = pined;
         this.baseTime = baseTime;
-        this.menu = menu;
+        this.category = category;
         this.author = author;
         this.exposeOption = exposeOption;
         this.attachments = attachments;
@@ -130,8 +131,8 @@ public class Post {
 
     }
 
-    public void changeCategory(Menu menu) {
-        this.menu = menu;
+    public void changeCategory(Category category) {
+        this.category = category;
     }
 
     public void changePin(boolean pinState) {
