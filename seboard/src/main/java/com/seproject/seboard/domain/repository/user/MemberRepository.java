@@ -7,6 +7,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member,Long> {
-    @Query(value = "select * from members where account_id = :accountId", nativeQuery = true)
+    @Query("select m from Member m where m.account.accountId = :accountId")
     Optional<Member> findByAccountId(Long accountId);
 }

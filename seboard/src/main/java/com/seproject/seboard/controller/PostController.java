@@ -114,7 +114,7 @@ public class PostController {
     @GetMapping("/{postId}")
     public ResponseEntity<?> retrievePost(@PathVariable("postId") Long postId) { // TODO : accountId는 jwt에서 추출
 
-        Long accountId = null;
+        Long accountId = 5234058023853L;
         /***
          * TODO : jwt 추가
          *      없는 postId를 조회
@@ -133,7 +133,7 @@ public class PostController {
     @Operation(summary = "게시글 작성", description = "사용자는 실명으로 게시글을 작성한다")
     @PostMapping
     public ResponseEntity<?> createPost(@RequestBody CreatePostRequest request) { //TODO : accountId 어떻게?
-        Long accountId = null;
+        Long accountId = 5234058023853L;
 
         postAppService.writePost(request.toCommand(accountId));
 
@@ -150,7 +150,7 @@ public class PostController {
     @Operation(summary = "게시글 수정", description = "사용자는 본인이 실명으로 작성한 게시물을 수정한다")
     @PutMapping("/{postId}")
     public ResponseEntity<?> updatePost(@PathVariable Long postId, @RequestBody UpdateNamedPostRequest request) { //TODO : 첨부파일 필드 추가
-        Long accountId = 1L; //TODO : accountId 어떻게?
+        Long accountId = 5234058023853L; //TODO : accountId 어떻게?
 
         /**
          * TODO : required 필드 null 체크
@@ -173,7 +173,7 @@ public class PostController {
          * TODO : jwt 확인
          *    권한 처리
          */
-        Long accountId = 1L; //TODO : accountId 어떻게?
+        Long accountId = 5234058023853L; //TODO : accountId 어떻게?
 
         postAppService.removePost(postId, accountId);
 
@@ -194,7 +194,7 @@ public class PostController {
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "25") Integer perPage) {
 
-        Long accountId = 1L; //TODO : jwt에서 추출
+        Long accountId = 5234058023853L; //TODO : jwt에서 추출
 
         CommentListResponse commentListResponse = commentAppService.retrieveCommentList(
                 CommentCommand.CommentListFindCommand.builder()

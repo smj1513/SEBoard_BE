@@ -1,11 +1,12 @@
 package com.seproject.seboard.domain.model.post;
 
+import com.seproject.seboard.domain.model.category.Category;
+import com.seproject.seboard.domain.model.category.Menu;
 import com.seproject.seboard.domain.model.comment.Comment;
 import com.seproject.seboard.domain.model.common.BaseTime;
 import com.seproject.seboard.domain.model.common.FileMetaData;
-import com.seproject.seboard.domain.model.exposeOptions.ExposeOption;
-import com.seproject.seboard.domain.model.exposeOptions.ExposeState;
-import com.seproject.seboard.domain.model.exposeOptions.Public;
+import com.seproject.seboard.domain.model.post.exposeOptions.ExposeOption;
+import com.seproject.seboard.domain.model.post.exposeOptions.ExposeState;
 import com.seproject.seboard.domain.model.user.Anonymous;
 import com.seproject.seboard.domain.model.user.BoardUser;
 import lombok.Builder;
@@ -13,9 +14,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @NoArgsConstructor
@@ -43,18 +42,18 @@ public class Post {
     @ManyToOne
     @JoinColumn(name = "board_user_id")
     private BoardUser author;
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "expose_option_id")
-    @Builder.Default
-    private ExposeOption exposeOption = new Public();
+    private ExposeOption exposeOption;
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "post_id")
     private Set<FileMetaData> attachments = new HashSet<>();
     private int anonymousCount;
+    private boolean isDeleted;
 
     public Post(Long postId, String title, String contents, int views,
                 boolean pined, BaseTime baseTime, Category category,
-                BoardUser author, ExposeOption exposeOption,  Set<FileMetaData> attachments,  int anonymousCount) {
+                BoardUser author, ExposeOption exposeOption,  Set<FileMetaData> attachments,  int anonymousCount, boolean isDeleted) {
         if(!isValidTitle(title)) {
             throw new IllegalArgumentException();
         }
@@ -74,6 +73,7 @@ public class Post {
         this.exposeOption = exposeOption;
         this.attachments = attachments;
         this.anonymousCount = anonymousCount;
+        this.isDeleted = false;
     }
 
     public boolean isNamed() {
@@ -122,9 +122,12 @@ public class Post {
         if(exposeState==ExposeState.PRIVACY &&
                 exposeOption.getExposeState()==ExposeState.PRIVACY && password==null){
             return;
+        }else if(exposeOption.getExposeState()==exposeState){
+            return;
+        }else{
+            exposeOption = ExposeOption.of(exposeState, password);
         }
 
-        exposeOption = ExposeOption.of(exposeState, password);
     }
 
     public void changeCategory(Category category) {
@@ -153,5 +156,9 @@ public class Post {
 
     public void addAttachment(FileMetaData attachment) {
         attachments.add(attachment);
+    }
+
+    public void delete() {
+        this.isDeleted = true;
     }
 }

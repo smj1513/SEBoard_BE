@@ -1,6 +1,6 @@
 package com.seproject.account.model;
 
-import com.seproject.seboard.domain.model.post.Category;
+import com.seproject.seboard.domain.model.category.Menu;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,7 +24,7 @@ public class CategoryAuthorization {
     private Role role;
 
     @JoinColumn(name = "category_id")
-    @ManyToOne(fetch = FetchType.LAZY, targetEntity = Category.class)
-    private Category category;
+    @ManyToOne(fetch = FetchType.LAZY, targetEntity = Menu.class)
+    private Menu menu;
 
 }

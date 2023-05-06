@@ -1,84 +1,186 @@
 package com.seproject.seboard.application;
 
-import com.seproject.seboard.domain.model.post.Category;
-import com.seproject.seboard.domain.repository.post.CategoryRepository;
+import com.seproject.seboard.application.dto.category.CategoryCommand.CategoryCreateCommand;
+import com.seproject.seboard.application.dto.category.CategoryCommand.CategoryUpdateCommand;
+import com.seproject.seboard.controller.dto.post.CategoryResponse;
+import com.seproject.seboard.domain.model.category.*;
+import com.seproject.seboard.domain.repository.category.BoardMenuRepository;
+import com.seproject.seboard.domain.repository.category.CategoryRepository;
+import com.seproject.seboard.domain.repository.category.ExternalSiteMenuRepository;
+import com.seproject.seboard.domain.repository.category.MenuRepository;
 import com.seproject.seboard.domain.repository.post.PostRepository;
 import com.seproject.seboard.domain.service.CategoryService;
-import com.seproject.account.model.Account;
-import com.seproject.account.repository.AccountRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static com.seproject.seboard.application.utils.AppServiceHelper.findByIdOrThrow;
 
 @Service
 @AllArgsConstructor
+@Transactional
 public class CategoryAppService {
     private final CategoryService categoryService;
+    private final MenuRepository menuRepository;
+    private final BoardMenuRepository boardMenuRepository;
     private final CategoryRepository categoryRepository;
-    private final AccountRepository accountRepository;
+    private final ExternalSiteMenuRepository externalSiteMenuRepository;
     private final PostRepository postRepository;
 
-    public void createCategory(Long superCategoryId, Long accountId, String name){
-        Account requestAccount = findByIdOrThrow(accountId, accountRepository, "");
-        Category superCategory = findByIdOrThrow(superCategoryId, categoryRepository, "");
-        //TODO : 권한 처리
+    public void createCategory(CategoryCreateCommand command){
+        //TODO : 상위 카테고리로 지정할 수 있는 카테고리 구분?
+        Menu superMenu = menuRepository.findById(command.getSuperCategoryId()).get();
 
-        //TODO : category name에 대한 validation?
-        Category createdCategory = Category.builder()
-                .superCategory(superCategory)
-                .name(name)
-                .build();
+        if(command.getCategoryType().equals("MENU")){
+            //TODO : urlInfo NULL일 경우 자동으로 넣는 로직 필요
+            if(superMenu!=null){
+                throw new IllegalArgumentException();
+            }
 
-        categoryRepository.save(createdCategory);
+            Menu menu = Menu.builder()
+                    .superMenu(null)
+                    .name(command.getName())
+                    .description(command.getDescription())
+                    .build();
+
+            menuRepository.save(menu);
+        }else if(command.getCategoryType().equals("BOARD")){
+            BoardMenu boardMenu = BoardMenu.builder()
+                    .superMenu(superMenu)
+                    .name(command.getName())
+                    .description(command.getDescription())
+                    .urlInfo(command.getUrlId())
+                    .build();
+
+            boardMenuRepository.save(boardMenu);
+
+            Category category = Category.builder()
+                    .superMenu(boardMenu)
+                    .name("일반")
+                    .description("기본으로 생성되는 게시판 카테고리")
+                    .urlInfo(null)
+                    .build();
+
+            categoryRepository.save(category);
+        }else if(command.getCategoryType().equals("CATEGORY")){
+            Category category = Category.builder()
+                    .superMenu(superMenu)
+                    .name(command.getName())
+                    .description(command.getDescription())
+                    .urlInfo(command.getUrlId())
+                    .build();
+
+            categoryRepository.save(category);
+        }else if(command.getCategoryType().equals("EXTERNAL")){
+            ExternalSiteMenu externalSiteCategory = ExternalSiteMenu.builder()
+                    .superMenu(superMenu)
+                    .name(command.getName())
+                    .description(command.getDescription())
+                    .urlInfo(command.getExternalUrl())
+                    .build();
+
+            externalSiteMenuRepository.save(externalSiteCategory);
+        }else{
+            throw new IllegalArgumentException();
+        }
     }
 
-    public void updateCategory(Long categoryId, Long accountId, String name){
-        Account requestAccount = findByIdOrThrow(accountId, accountRepository, "");
-        //TODO : 권한 처리 어디서? post update는?
+    public void updateCategory(CategoryUpdateCommand command){
         //TODO : superCategory 수정?
-        Category targetCategory = findByIdOrThrow(categoryId, categoryRepository, "");
+        Menu targetMenu = findByIdOrThrow(command.getCategoryId(), categoryRepository, "");
 
-        targetCategory.changeName(name);
+        targetMenu.changeName(command.getName());
+        targetMenu.changeDescription(command.getDescription());
+
+        if(targetMenu instanceof InternalSiteMenu){
+            InternalSiteMenu internalSiteMenu = (InternalSiteMenu) targetMenu;
+            internalSiteMenu.changeCategoryPathId(command.getUrlId());
+        }else if(targetMenu instanceof ExternalSiteMenu){
+            ExternalSiteMenu externalSiteMenu = (ExternalSiteMenu) targetMenu;
+            externalSiteMenu.changeExternalSiteUrl(command.getExternalUrl());
+        }
     }
 
 
-    public void deleteCategory(Long categoryId, Long accountId){
-        Account requestAccount = findByIdOrThrow(accountId, accountRepository, "");
-
-        //TODO : 권한 처리 어디서?
-        Category targetCategory = findByIdOrThrow(categoryId, categoryRepository, "");
+    public void deleteCategory(Long categoryId){
+        Menu targetMenu = findByIdOrThrow(categoryId, categoryRepository, "");
 
         //TODO : message
-        if(!targetCategory.isRemovable(categoryService)){
+        if(!targetMenu.isRemovable(categoryService)){
             throw new IllegalArgumentException();
         }
 
         categoryRepository.deleteById(categoryId);
     }
 
-    public void migrateCategory(Long fromId, Long toId, Long accountId){
-        Account requestAccount = findByIdOrThrow(accountId, accountRepository, "");
-
+    public void migrateCategory(Long fromCategoryId, Long toCategoryId){
         //TODO : 권한 처리 어디서?
-        Category from = findByIdOrThrow(fromId, categoryRepository, "");
-        Category to = findByIdOrThrow(toId, categoryRepository, "");
+        Category from = findByIdOrThrow(fromCategoryId, categoryRepository, "");
+        Category to = findByIdOrThrow(toCategoryId, categoryRepository, "");
 
-        //TODO : from에 있는 Post를 to로 카테고리 변경
-        //TODO : JPQL?
-        postRepository.findByCategoryId(fromId).forEach(post -> {
+        //TODO : bulk update 적용
+        postRepository.findByCategoryId(fromCategoryId).forEach(post -> {
             post.changeCategory(to);
         });
     }
+
+    public CategoryResponse retrieveMenuById(Long menuId){
+        Menu targetMenu = menuRepository.findById(menuId).orElseThrow();
+        CategoryResponse res = new CategoryResponse(targetMenu);
+
+        retrieveSubMenu(targetMenu, res);
+
+        return res;
+    }
+
+    protected void retrieveSubMenu(Menu targetMenu, CategoryResponse res){
+        if(targetMenu.getDepth()==0){
+            List<Menu> depth1menu = menuRepository.findBySuperMenu(targetMenu.getMenuId());
+            for(Menu menu : depth1menu){
+                CategoryResponse subMenuRes = new CategoryResponse(menu);
+                List<Menu> depth2menu = menuRepository.findBySuperMenu(menu.getMenuId());
+                for(Menu menu2 : depth2menu){
+                    subMenuRes.addSubMenu(new CategoryResponse(menu2));
+                }
+                res.addSubMenu(subMenuRes);
+            }
+        }else if(targetMenu.getDepth()==1){
+            List<Menu> depth2menu = menuRepository.findBySuperMenu(targetMenu.getMenuId());
+            for(Menu menu : depth2menu){
+                res.addSubMenu(new CategoryResponse(menu));
+            }
+        }
+    }
+
+    public List<CategoryResponse> retrieveAllMenu() {
+        //TODO : query로 최적화
+        List<Menu> mainMenus = menuRepository.findByDepth(0);
+        List<CategoryResponse> res = new ArrayList<>();
+
+        for(Menu mainMenu : mainMenus){
+            CategoryResponse mainMenuRes = new CategoryResponse(mainMenu);
+            retrieveSubMenu(mainMenu, mainMenuRes);
+//            List<Menu> subMenus = menuRepository.findByDepth(1);
 //
-//    public List<CategoryDTO.CategoryResponseDTO> retrieveCategoryList(){
-//        //TODO : paging 고려
-//        return categoryRepository.findAll().stream().map(
-//                CategoryDTO.CategoryResponseDTO::toDTO
-//        ).collect(Collectors.toList());
-//    }
+//            for(Menu subMenu : subMenus){
+//                CategoryResponse subMenuRes = new CategoryResponse(subMenu);
+//                List<Menu> categories = menuRepository.findByDepth(2);
 //
-//    private <T> T findByIdOrThrow(Long id, JpaRepository<T, Long> repo, String errorMsg){
-//        return repo.findById(id).orElseThrow(() -> new NoSuchElementException(errorMsg));
-//    }
+//                for(Menu category : categories){
+//                    subMenuRes.addSubMenu(new CategoryResponse(category));
+//                }
+//
+//                mainMenuRes.addSubMenu(subMenuRes);
+//            }
+
+            res.add(mainMenuRes);
+        }
+
+        return res;
+    }
 }

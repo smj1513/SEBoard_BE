@@ -1,10 +1,8 @@
 package com.seproject.seboard.application;
 
-import com.seproject.seboard.application.dto.comment.CommentCommand;
 import com.seproject.seboard.application.dto.comment.CommentCommand.CommentEditCommand;
 import com.seproject.seboard.application.dto.comment.CommentCommand.CommentListFindCommand;
 import com.seproject.seboard.application.dto.comment.CommentCommand.CommentWriteCommand;
-import com.seproject.seboard.application.dto.comment.ReplyCommand;
 import com.seproject.seboard.application.dto.comment.ReplyCommand.ReplyEditCommand;
 import com.seproject.seboard.application.dto.comment.ReplyCommand.ReplyWriteCommand;
 import com.seproject.seboard.controller.dto.PaginationResponse;
@@ -13,7 +11,6 @@ import com.seproject.seboard.controller.dto.comment.CommentResponse.CommentListR
 import com.seproject.seboard.controller.dto.comment.ReplyResponse;
 import com.seproject.seboard.domain.model.comment.Comment;
 import com.seproject.seboard.domain.model.comment.Reply;
-import com.seproject.seboard.domain.model.exposeOptions.ExposeOption;
 import com.seproject.seboard.domain.model.post.Post;
 import com.seproject.seboard.domain.model.user.Anonymous;
 import com.seproject.seboard.domain.model.user.Member;
@@ -24,6 +21,7 @@ import com.seproject.seboard.domain.repository.post.PostRepository;
 import com.seproject.seboard.domain.repository.user.AnonymousRepository;
 import com.seproject.seboard.domain.repository.user.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -37,6 +35,8 @@ import static com.seproject.seboard.application.utils.AppServiceHelper.findByIdO
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
+@Transactional
 public class CommentAppService {
     private final CommentRepository commentRepository;
     private final CommentSearchRepository commentSearchRepository;
@@ -52,6 +52,7 @@ public class CommentAppService {
             writeNamedComment(command);
         }
     }
+    @Transactional
     protected void writeNamedComment(CommentWriteCommand command) {
         Post post = findByIdOrThrow(command.getPostId(), postRepository, "");
         Member member = memberRepository.findByAccountId(command.getAccountId()).orElseThrow(NoSuchElementException::new);
@@ -129,8 +130,8 @@ public class CommentAppService {
                                             reply -> ReplyResponse.toDto(reply, reply.isWrittenBy(command.getAccountId()))
                                     ).collect(Collectors.toList());
                     return CommentListElement.toDto(comment, comment.isWrittenBy(command.getAccountId()), subComments);
-                })
-                .collect(Collectors.toList());
+                }).collect(Collectors.toList());
+
 
         PaginationResponse paginationResponse = PaginationResponse.builder()
                 .totalCommentSize(commentPage.getTotalElements())
@@ -146,9 +147,9 @@ public class CommentAppService {
         Comment comment = findByIdOrThrow(command.getCommentId(), commentRepository, "");
 
         //TODO : 추후 주석 해제 필요
-//        if (!comment.isWrittenBy(command.getAccountId())) { //TODO : 관리자 권한의 경우 생각
-//            throw new IllegalArgumentException();
-//        }
+        if (!comment.isWrittenBy(command.getAccountId())) { //TODO : 관리자 권한의 경우 생각
+            throw new IllegalArgumentException();
+        }
 
         comment.changeContents(command.getContents());
         comment.changeOnlyReadByAuthor(command.isOnlyReadByAuthor());
@@ -158,9 +159,9 @@ public class CommentAppService {
         Reply reply = findByIdOrThrow(command.getReplyId(), replyRepository, "");
 
         //TODO : 추후 주석 해제 필요
-//        if (!reply.isWrittenBy(command.getAccountId())) { //TODO : 관리자 권한의 경우 생각
-//            throw new IllegalArgumentException();
-//        }
+        if (!reply.isWrittenBy(command.getAccountId())) { //TODO : 관리자 권한의 경우 생각
+            throw new IllegalArgumentException();
+        }
 
         reply.changeContents(command.getContents());
         reply.changeOnlyReadByAuthor(command.isOnlyReadByAuthor());
@@ -170,9 +171,9 @@ public class CommentAppService {
         Comment comment = findByIdOrThrow(commentId, commentRepository, "");
 
         //TODO : 추후 주석 해제 필요
-//        if (!comment.isWrittenBy(accountId)) { //TODO : 관리자 권한의 경우 생각
-//            throw new IllegalArgumentException();
-//        }
+        if (!comment.isWrittenBy(accountId)) { //TODO : 관리자 권한의 경우 생각
+            throw new IllegalArgumentException();
+        }
 
         comment.delete();
     }
@@ -181,14 +182,15 @@ public class CommentAppService {
         Reply reply = findByIdOrThrow(replyId, replyRepository, "");
 
         //TODO : 추후 주석 해제 필요
-//        if (!reply.isWrittenBy(accountId)) { //TODO : 관리자 권한의 경우 생각
-//            throw new IllegalArgumentException();
-//        }
+        if (!reply.isWrittenBy(accountId)) { //TODO : 관리자 권한의 경우 생각
+            throw new IllegalArgumentException();
+        }
 
         reply.delete();
     }
 
-    private Anonymous getAnonymous(Long accountId, Long postId, Post post) {
+    @Transactional
+    protected Anonymous getAnonymous(Long accountId, Long postId, Post post) {
         Anonymous author = commentRepository.findByPostId(postId).stream()
                 .filter(comment -> comment.getAuthor().isAnonymous())
                 .map(comment -> (Anonymous) comment.getAuthor())

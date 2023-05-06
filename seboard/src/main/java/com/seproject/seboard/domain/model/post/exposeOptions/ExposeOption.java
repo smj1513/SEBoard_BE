@@ -1,27 +1,21 @@
-package com.seproject.seboard.domain.model.exposeOptions;
+package com.seproject.seboard.domain.model.post.exposeOptions;
 
 import lombok.*;
 
 import javax.persistence.*;
 
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
-@AllArgsConstructor(access = AccessLevel.PROTECTED)
-@DiscriminatorColumn
-@Inheritance(strategy= InheritanceType.JOINED)
-@Entity
-@Table(name="expose_options")
 @Getter
+@Entity
+@Table(name = "expose_options")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "expose_type")
 public abstract class ExposeOption {
-
     @Id @GeneratedValue
-    protected Long exposeOptionId;
+    private Long exposeOptionId;
+    protected String password;
 
-    @Enumerated(EnumType.STRING)
-    protected ExposeState exposeState;
+    public abstract ExposeState getExposeState();
 
-    protected ExposeOption(ExposeState state){
-        this.exposeState = state;
-    }
 
     public static ExposeOption of(ExposeState state, String password){
         switch (state){

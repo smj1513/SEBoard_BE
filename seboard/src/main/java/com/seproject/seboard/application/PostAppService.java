@@ -3,18 +3,19 @@ package com.seproject.seboard.application;
 import com.seproject.seboard.application.dto.post.PostCommand.PostEditCommand;
 import com.seproject.seboard.application.dto.post.PostCommand.PostListFindCommand;
 import com.seproject.seboard.application.dto.post.PostCommand.PostWriteCommand;
+import com.seproject.seboard.domain.model.category.Category;
 import com.seproject.seboard.domain.model.common.BaseTime;
 import com.seproject.seboard.domain.model.common.FileMetaData;
-import com.seproject.seboard.domain.model.exposeOptions.*;
-import com.seproject.seboard.domain.model.post.Category;
+import com.seproject.seboard.domain.model.category.Menu;
 import com.seproject.seboard.domain.model.post.Post;
+import com.seproject.seboard.domain.model.post.exposeOptions.ExposeOption;
 import com.seproject.seboard.domain.model.user.Anonymous;
 import com.seproject.seboard.domain.model.user.BoardUser;
 import com.seproject.seboard.domain.model.user.Member;
+import com.seproject.seboard.domain.repository.category.CategoryRepository;
 import com.seproject.seboard.domain.repository.comment.CommentRepository;
 import com.seproject.seboard.domain.repository.commons.FileMetaDataRepository;
 import com.seproject.seboard.domain.repository.post.BookmarkRepository;
-import com.seproject.seboard.domain.repository.post.CategoryRepository;
 import com.seproject.seboard.domain.repository.post.PostRepository;
 import com.seproject.seboard.domain.repository.post.PostSearchRepository;
 import com.seproject.seboard.domain.repository.user.AnonymousRepository;
@@ -33,6 +34,7 @@ import static com.seproject.seboard.controller.dto.post.PostResponse.*;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class PostAppService {
     private final PostRepository postRepository;
     private final PostSearchRepository postSearchRepository;
@@ -52,7 +54,6 @@ public class PostAppService {
         }
     }
 
-    @Transactional
     protected void writeUnnamedPost(PostWriteCommand command) { //accID는 체킹되었다고 가정
         Anonymous anonymous = Anonymous.builder()
                 .name("익명") //TODO : 익명 이름 다양하게?
@@ -127,9 +128,9 @@ public class PostAppService {
         Post post = findByIdOrThrow(command.getPostId(), postRepository, "");
 
         //TODO : 추후 활성화 필요
-//        if(!post.isWrittenBy(command.getAccountId())){
-//            throw new IllegalArgumentException();
-//        }
+        if(!post.isWrittenBy(command.getAccountId())){
+            throw new IllegalArgumentException();
+        }
 
         post.changeTitle(command.getTitle());
         post.changeContents(command.getContents());
@@ -148,6 +149,7 @@ public class PostAppService {
 
         attachments.forEach(fileMetaData -> post.addAttachment(fileMetaData));
 
+        System.out.println("command.getCategoryId() = " + command.getCategoryId());
         //TODO : category 권한 체킹 필요
         Category category = findByIdOrThrow(command.getCategoryId(), categoryRepository, "");
         post.changeCategory(category);
@@ -156,12 +158,12 @@ public class PostAppService {
     public void removePost(Long postId, Long accountId) {
         Post post = findByIdOrThrow(postId, postRepository, "");
 
-        //TODO : 추후 활성화 필요
-//        if(!post.isWrittenBy(accountId)){ // TODO : 관리자 삭제 경우 추가해야함
-//            throw new IllegalArgumentException();
-//        }
+        if(!post.isWrittenBy(accountId)){ // TODO : 관리자 삭제 경우 추가해야함
+            throw new IllegalArgumentException();
+        }
 
-        post.getAttachments().forEach(fileAppService::deleteFileFromStorage); //TODO : fileSystem에서 transactional 처리 필요
-        postRepository.deleteById(postId);
+        post.delete();
+//        post.getAttachments().forEach(fileAppService::deleteFileFromStorage); //TODO : fileSystem에서 transactional 처리 필요
+//        postRepository.deleteById(postId);
     }
 }

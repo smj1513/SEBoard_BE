@@ -1,10 +1,6 @@
 package com.seproject.seboard.controller.dto.comment;
 
-import com.seproject.seboard.controller.dto.post.ExposeOptionRequest;
-import com.seproject.seboard.controller.dto.user.AnonymousRequest;
-import com.seproject.seboard.controller.dto.user.TagAuthorRequest;
-import com.seproject.seboard.domain.model.exposeOptions.ExposeState;
-import lombok.Builder;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import static com.seproject.seboard.application.dto.comment.ReplyCommand.*;
@@ -16,8 +12,10 @@ public class ReplyRequest {
         private Long postId;
         private Long superCommentId;
         private Long tagCommentId;
+        @JsonProperty("isAnonymous")
         private boolean isAnonymous;
         private String contents;
+        @JsonProperty("isReadOnlyAuthor")
         private boolean isReadOnlyAuthor;
 
         public ReplyWriteCommand toCommand(Long accountId) {
@@ -36,6 +34,7 @@ public class ReplyRequest {
     @Data
     public static class UpdateReplyRequest {
         private String contents;
+        @JsonProperty("isReadOnlyAuthor")
         private boolean isReadOnlyAuthor;
 
         public ReplyEditCommand toCommand(Long replyId, Long accountId) {

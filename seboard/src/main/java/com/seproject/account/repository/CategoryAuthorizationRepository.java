@@ -9,7 +9,7 @@ import java.util.List;
 public interface CategoryAuthorizationRepository extends JpaRepository<CategoryAuthorization,Long> {
 
 
-    @Query("select data from CategoryAuthorization data where data.category = :categoryId")
+    @Query("select data from CategoryAuthorization data where data.menu = :categoryId")
     List<CategoryAuthorization> findByCategoryId(Long categoryId);
 
 }

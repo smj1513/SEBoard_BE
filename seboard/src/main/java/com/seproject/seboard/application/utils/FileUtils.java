@@ -1,9 +1,7 @@
 package com.seproject.seboard.application.utils;
 
-import com.seproject.seboard.domain.model.common.FileMetaData;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.time.LocalDate;
@@ -25,7 +23,7 @@ public class FileUtils {
     }
 
     public static String getFilePath(){
-        String currentDate = LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
+        String currentDate = getCurrentDate();
 
         File directory = new File(rootPath+"/"+currentDate);
 
@@ -34,6 +32,16 @@ public class FileUtils {
         }
 
         return directory.getPath();
+    }
+
+    public static String getUrlPath(String urlRoot){
+        String currentDate = getCurrentDate();
+
+        return urlRoot+"/"+currentDate;
+    }
+
+    private static String getCurrentDate(){
+        return LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy/MM/dd"));
     }
 
 }

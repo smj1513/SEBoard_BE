@@ -25,7 +25,7 @@ public class CommentController {
     @Operation(summary = "댓글 작성", description = "사용자는 실명으로 댓글을 작성한다.")
     @PostMapping()
     public ResponseEntity<?> createComment(@RequestBody CreateCommentRequest request) {
-        Long accountId = 1L; //TODO : jwt
+        Long accountId = 5234058023853L; //TODO : jwt
 
         /**
          * TODO : jwt
@@ -50,7 +50,7 @@ public class CommentController {
     @Operation(summary = "댓글 수정", description = "사용자는 자신이 작성한 댓글을 수정한다.")
     @PutMapping("/{commentId}")
     public ResponseEntity<?> updateComment(@PathVariable Long commentId, @RequestBody UpdateCommentRequest request) {
-        Long accountId = 1L; //TODO : jwt
+        Long accountId = 5234058023853L; //TODO : jwt
         /**
          * TODO : jwt
          *  댓글 수정 권한이 없을때
@@ -68,7 +68,7 @@ public class CommentController {
     @Operation(summary = "댓글 삭제", description = "사용자는 자신이 작성한 댓글을 삭제한다")
     @DeleteMapping("/{commentId}")
     public ResponseEntity<?> deleteNamedComment(@PathVariable Long commentId) {
-        Long accountId = 1L;
+        Long accountId = 5234058023853L;
 
         /**
          * TODO : jwt

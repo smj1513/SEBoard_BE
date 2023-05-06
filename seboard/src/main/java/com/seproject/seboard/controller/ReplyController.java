@@ -24,7 +24,7 @@ public class ReplyController {
     @Operation(summary = "답글 작성", description = "답글을 작성한다")
     @PostMapping()
     public ResponseEntity<?> createReply(@RequestBody CreateReplyRequest request) {
-        Long accountId = 1L;
+        Long accountId = 5234058023853L;
 
         /**
          * TODO : tagAuthor가 존재하지 않음
@@ -44,7 +44,7 @@ public class ReplyController {
     @Operation(summary = "답글 수정", description = "답글을 수정한다")
     @PutMapping("/{replyId}")
     public ResponseEntity<?> updateReply(@PathVariable Long replyId , @RequestBody UpdateReplyRequest request) {
-        Long accountId = 1L; //TODO : jwt
+        Long accountId = 5234058023853L; //TODO : jwt
 
         /**
          * TODO : 비밀번호가 다른 경우
@@ -64,7 +64,7 @@ public class ReplyController {
     @Operation(summary = "답글 삭제", description = "답글을 삭제한다")
     @DeleteMapping("/{replyId}")
     public ResponseEntity<?> deleteReply(@PathVariable Long replyId) {
-        Long accountId = 1L; //TODO : jwt
+        Long accountId = 5234058023853L; //TODO : jwt
 
         /**
          * TODO : 존재하지 않는 답글
