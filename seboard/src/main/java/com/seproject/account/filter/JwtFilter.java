@@ -40,9 +40,7 @@ public class JwtFilter extends OncePerRequestFilter {
             if(StringUtils.hasText(jwt)) {
 
                 if(jwtDecoder.isTemporalToken(jwt)) {
-                    failureHandler.onAuthenticationFailure(request,
-                            response,
-                            new CustomAuthenticationException(ErrorCode.NOT_REGISTERED_USER,null));
+                    throw new CustomAuthenticationException(ErrorCode.NOT_REGISTERED_USER,null);
                 }
 
                 AccessToken accessToken = tokenService.findAccessToken(jwt);
