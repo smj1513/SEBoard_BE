@@ -35,7 +35,6 @@ public class UrlFilterInvocationSecurityMetaDataSource implements FilterInvocati
             }
         }
 
-//        if(requestMap.isEmpty()) requestMap.put(new AntPathRequestMatcher("/admin"), Arrays.asList(new SecurityConfig("ROLE_ADMIN")));
         FilterInvocation filterInvocation = (FilterInvocation) object;
         HttpServletRequest request = filterInvocation.getRequest();
 

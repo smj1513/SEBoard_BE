@@ -1,8 +1,8 @@
 package com.seproject.account.authentication.provider;
 
+import com.seproject.account.service.AccountService;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.PasswordIncorrectException;
-import com.seproject.account.service.CustomUserDetailsService;
 import lombok.AllArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,7 +16,7 @@ import org.springframework.stereotype.Component;
 @Component
 public class UsernameAuthenticationProvider implements AuthenticationProvider {
 
-    private CustomUserDetailsService userDetailsService;
+    private AccountService accountService;
     private PasswordEncoder passwordEncoder;
 
     @Override
@@ -25,13 +25,13 @@ public class UsernameAuthenticationProvider implements AuthenticationProvider {
         String username = authentication.getName();
         String password = authentication.getCredentials().toString();
 
-        UserDetails userDetails = userDetailsService.loadUserByUsername(username);
+        UserDetails userDetails = accountService.loadUserByUsername(username);
 
         if(passwordEncoder.matches(password,userDetails.getPassword())) {
             return new UsernamePasswordAuthenticationToken(username,password, userDetails.getAuthorities());
         }
 
-        throw new PasswordIncorrectException(ErrorCode.PASSWORD_INCORRECT);
+        throw new PasswordIncorrectException(ErrorCode.PASSWORD_INCORRECT,null);
     }
 
     @Override

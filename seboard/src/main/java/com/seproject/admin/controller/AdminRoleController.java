@@ -35,7 +35,7 @@ public class AdminRoleController {
             @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "400", description = "잘못된 페이징 정보")
     })
     @GetMapping("/roles")
-    public ResponseEntity<?> retrieveAllRole(HttpServletRequest request, @RequestBody RetrieveAllRoleRequest retrieveRoleRequest) {
+    public ResponseEntity<?> retrieveAllRole(@RequestBody RetrieveAllRoleRequest retrieveRoleRequest) {
 
         int page = retrieveRoleRequest.getPage();
         int perPage = retrieveRoleRequest.getPerPage();
@@ -57,7 +57,7 @@ public class AdminRoleController {
             @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "400", description = "이미 존재하는 권한 이름")
     })
     @PostMapping("/roles")
-    public ResponseEntity<?> createRole(HttpServletRequest request, @RequestBody CreateRoleRequest createRoleRequest) {
+    public ResponseEntity<?> createRole(@RequestBody CreateRoleRequest createRoleRequest) {
         try{
             CreateRoleResponse createRoleResponse = roleService.createRole(createRoleRequest.getName());
             return new ResponseEntity<>(createRoleResponse, HttpStatus.OK);
@@ -74,7 +74,7 @@ public class AdminRoleController {
             @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "400", description = "존재하지 않는 권한"),
     })
     @DeleteMapping("/roles")
-    public ResponseEntity<?> deleteRole(HttpServletRequest request, @RequestBody DeleteRoleRequest deleteRoleRequest) {
+    public ResponseEntity<?> deleteRole(@RequestBody DeleteRoleRequest deleteRoleRequest) {
         try{
             DeleteRoleResponse deleteRoleResponse = roleService.deleteRole(deleteRoleRequest.getRoleId());
             return new ResponseEntity<>(deleteRoleResponse, HttpStatus.OK);

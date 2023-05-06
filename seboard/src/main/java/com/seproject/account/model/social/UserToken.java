@@ -1,6 +1,7 @@
 package com.seproject.account.model.social;
 
 import com.seproject.account.model.AccessToken;
+import com.seproject.account.model.Account;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
@@ -16,6 +17,6 @@ public class UserToken {
     @Id
     private String id;
 
-    private LoginResponseDTO userToken;
+    private Account account;
 
 }

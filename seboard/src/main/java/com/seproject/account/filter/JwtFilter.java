@@ -1,12 +1,11 @@
 package com.seproject.account.filter;
 
+import com.seproject.account.authentication.handler.failure.CustomAuthenticationFailureHandler;
 import com.seproject.account.model.AccessToken;
 import com.seproject.account.service.TokenService;
 import com.seproject.error.errorCode.ErrorCode;
-import com.seproject.error.exception.AccessTokenExpiredException;
-import com.seproject.error.exception.NotRegisteredUserException;
-import com.seproject.error.exception.TokenValidateException;
 import com.seproject.account.jwt.JwtDecoder;
+import com.seproject.error.exception.CustomAuthenticationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,11 +26,13 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtDecoder jwtDecoder;
 
-    private final AuthenticationFailureHandler failureHandler;
+    private final CustomAuthenticationFailureHandler failureHandler;
     private final TokenService tokenService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
 
         String jwt = jwtDecoder.getAccessToken(request);
 
@@ -39,7 +40,9 @@ public class JwtFilter extends OncePerRequestFilter {
             if(StringUtils.hasText(jwt)) {
 
                 if(jwtDecoder.isTemporalToken(jwt)) {
-                    failureHandler.onAuthenticationFailure(request,response,new NotRegisteredUserException(ErrorCode.NOT_REGISTERED_USER));
+                    failureHandler.onAuthenticationFailure(request,
+                            response,
+                            new CustomAuthenticationException(ErrorCode.NOT_REGISTERED_USER,null));
                 }
 
                 AccessToken accessToken = tokenService.findAccessToken(jwt);
@@ -51,7 +54,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
             }
             filterChain.doFilter(request,response);
-        } catch (TokenValidateException | AccessTokenExpiredException e) {
+        } catch (CustomAuthenticationException e) {
             failureHandler.onAuthenticationFailure(request,response,e);
         }
     }

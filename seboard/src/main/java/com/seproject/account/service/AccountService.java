@@ -3,7 +3,8 @@ package com.seproject.account.service;
 import com.seproject.account.model.social.OAuthAccount;
 import com.seproject.account.repository.OAuthAccountRepository;
 import com.seproject.error.errorCode.ErrorCode;
-import com.seproject.error.exception.InvalidPaginationException;
+import com.seproject.error.exception.CustomIllegalArgumentException;
+import com.seproject.error.exception.CustomUserNotFoundException;
 import com.seproject.account.repository.AccountRepository;
 import com.seproject.account.repository.RoleRepository;
 import com.seproject.account.model.Account;
@@ -12,9 +13,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import javax.management.relation.RoleNotFoundException;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -25,7 +30,7 @@ import static com.seproject.account.controller.dto.RegisterDTO.*;
 @Slf4j
 @RequiredArgsConstructor
 @Service
-public class AccountService {
+public class AccountService implements UserDetailsService {
 
     private final AccountRepository accountRepository;
     private final OAuthAccountRepository oAuthAccountRepository;
@@ -39,33 +44,40 @@ public class AccountService {
     public boolean isExistByNickname(String nickname) {
         return accountRepository.existsByNickname(nickname);
     }
-    public boolean isOAuthUser(String subject) {
-        return oAuthAccountRepository.existsBySub(subject);
+    public boolean isOAuthUser(String loginId) {
+        return oAuthAccountRepository.findByLoginId(loginId).isPresent();
     }
+
+
+    private Role mapEmailToRole(String email) {
+
+        if(emailService.isKumohMail(email)){
+            return roleRepository.findByName("ROLE_KUMOH").orElseThrow();
+        } else if(emailService.isEmail(email)) {
+            return roleRepository.findByName("ROLE_USER").orElseThrow();
+        }
+
+        throw new CustomIllegalArgumentException(ErrorCode.INVALID_MAIL,null);
+    }
+
     @Transactional
     public OAuthAccount register(OAuth2RegisterRequest oAuth2RegisterRequest) {
         String email = oAuth2RegisterRequest.getEmail();
 
-        if(isExist(email)) throw new IllegalArgumentException("이미 존재하는 사용자입니다.");
-        Role role;
+        if(isExist(email)) throw new CustomIllegalArgumentException(ErrorCode.USER_ALREADY_EXIST, null);
 
-        if(emailService.isKumohMail(email)){
-            role = roleRepository.findByName("ROLE_KUMOH").orElseThrow();
-        } else if(emailService.isEmail(email)) {
-            role = roleRepository.findByName("ROLE_USER").orElseThrow();
-        } else {
-            throw new IllegalArgumentException("잘못된 이메일");
-        }
-
+        Role role = mapEmailToRole(email);
         List<Role> authorities = List.of(role);
 
         Account account = Account.builder()
                 .loginId(email)
-                .username(oAuth2RegisterRequest.getName())
+                .name(oAuth2RegisterRequest.getName())
                 .nickname(oAuth2RegisterRequest.getNickname())
                 .password(passwordEncoder.encode(oAuth2RegisterRequest.getPassword()))
                 .authorities(authorities)
                 .build();
+
+        accountRepository.save(account);
 
         OAuthAccount oAuthAccount = OAuthAccount.builder()
                 .sub(oAuth2RegisterRequest.getSubject())
@@ -73,7 +85,6 @@ public class AccountService {
                 .account(account)
                 .build();
 
-        accountRepository.save(account);
         oAuthAccountRepository.save(oAuthAccount);
 
         return oAuthAccount;
@@ -83,21 +94,13 @@ public class AccountService {
     public Account register(FormRegisterRequest formRegisterRequest) {
 
         String id = formRegisterRequest.getId();
-        Role role;
-
-        if(emailService.isKumohMail(id)){
-            role = roleRepository.findByName("ROLE_KUMOH").orElseThrow();
-        } else if(emailService.isEmail(id)) {
-            role = roleRepository.findByName("ROLE_USER").orElseThrow();
-        } else {
-            throw new IllegalArgumentException("잘못된 이메일");
-        }
-
+        if(isExist(id)) throw new CustomIllegalArgumentException(ErrorCode.USER_ALREADY_EXIST,null);
+        Role role = mapEmailToRole(id);
         List<Role> authorities = List.of(role);
 
         Account account = Account.builder()
                 .loginId(id)
-                .username(formRegisterRequest.getName())
+                .name(formRegisterRequest.getName())
                 .nickname(formRegisterRequest.getNickname())
                 .password(passwordEncoder.encode(formRegisterRequest.getPassword()))
                 .authorities(authorities)
@@ -120,7 +123,7 @@ public class AccountService {
 
             return RetrieveAllAccountResponse.toDTO(total,nowPage+1,perPage,accounts);
         } catch (IllegalArgumentException e) {
-            throw new InvalidPaginationException(ErrorCode.INVALID_PAGINATION);
+            throw new CustomIllegalArgumentException(ErrorCode.INVALID_PAGINATION,e);
         }
 
     }
@@ -134,7 +137,7 @@ public class AccountService {
         List<Role> convertedAuthorities = roleRepository.findByNameIn(authorities);
 
         if(authorities.size() != convertedAuthorities.size()) {
-            throw new IllegalArgumentException("존재하지 않는 권한을 요청하였습니다.");
+            throw new CustomIllegalArgumentException(ErrorCode.ROLE_NOT_FOUND,null);
         }
 
         return convertedAuthorities;
@@ -146,7 +149,7 @@ public class AccountService {
                 .loginId(request.getId())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .nickname(request.getNickname())
-                .username(request.getName())
+                .name(request.getName())
                 .authorities(convertAuthorities(request.getAuthorities()))
                 .build();
 
@@ -162,7 +165,7 @@ public class AccountService {
                 .loginId(request.getId())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .nickname(request.getNickname())
-                .username(request.getName())
+                .name(request.getName())
                 .authorities(convertAuthorities(request.getAuthorities()))
                 .build();
 
@@ -175,6 +178,17 @@ public class AccountService {
         accountRepository.delete(account);
 
         return DeleteAccountResponse.toDTO(account);
+    }
+    
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        Account account = accountRepository.findByLoginId(username);
+
+        if(account == null) {
+            throw new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null);
+        }
+
+        return account;
     }
 
 }
