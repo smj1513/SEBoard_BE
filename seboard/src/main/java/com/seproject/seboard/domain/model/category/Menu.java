@@ -14,6 +14,7 @@ import javax.persistence.*;
 @Table(name = "menus")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "menu_type")
+@DiscriminatorValue("MENU")
 public class Menu {
     private static final int MIN_NAME_LENGTH = 2;
     private static final int MAX_NAME_LENGTH = 20;

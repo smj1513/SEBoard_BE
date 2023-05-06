@@ -11,7 +11,7 @@ import javax.persistence.Table;
 @Entity
 @NoArgsConstructor
 @SuperBuilder
-@DiscriminatorValue("external_site")
+@DiscriminatorValue("EXTERNAL")
 public class ExternalSiteMenu extends Menu {
 
     public ExternalSiteMenu(Long menuId, Menu superMenu, String name, String description) {

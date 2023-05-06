@@ -6,11 +6,13 @@ import com.seproject.seboard.domain.model.category.Category;
 import com.seproject.seboard.domain.model.category.ExternalSiteMenu;
 import com.seproject.seboard.domain.model.category.Menu;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@NoArgsConstructor
 public class CategoryResponse {
     private Long menuId;
     private String name;
