@@ -105,7 +105,7 @@ public class PostResponse {
             this.postId = post.getPostId();
             this.title = post.getTitle();
             this.contents = post.getContents();
-            this.category = new CategoryResponse(post.getCategory().getCategoryId(), post.getCategory().getName());
+            this.category = new CategoryResponse(post.getMenu().getMenuId(), post.getMenu().getName());
             this.author = new UserResponse(post.getAuthor());
             this.views = post.getViews();
             this.createdAt = post.getBaseTime().getCreatedAt();
