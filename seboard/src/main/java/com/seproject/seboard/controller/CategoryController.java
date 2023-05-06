@@ -4,6 +4,7 @@ import com.seproject.seboard.application.CategoryAppService;
 import com.seproject.seboard.controller.dto.post.CategoryRequest;
 import com.seproject.seboard.controller.dto.post.CategoryRequest.CreateCategoryRequest;
 import com.seproject.seboard.controller.dto.post.CategoryRequest.UpdateCategoryRequest;
+import com.seproject.seboard.controller.dto.post.CategoryResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -14,9 +15,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @Tag(name = "카테고리 API", description = "카테고리(category) 관련 API")
 @RestController
-@RequestMapping("/category")
+@RequestMapping("/menu")
 @AllArgsConstructor
 public class CategoryController {
     private final CategoryAppService categoryAppService;
@@ -37,18 +40,26 @@ public class CategoryController {
         return new ResponseEntity<>(request, HttpStatus.OK);
     }
 
+    @GetMapping
+    public ResponseEntity<?> retrieveAllMenu(){
+        List<CategoryResponse> categoryResponses = categoryAppService.retrieveAllMenu();
+        return new ResponseEntity<>(categoryResponses, HttpStatus.OK);
+    }
+
     @Parameter(name = "categoryId", description = "대분류 카테고리 pk")
     @Operation(summary = "하위 카테고리 조회", description = "대분류 카테고리 하위에 있는 모든 소분류 카테고리를 조회한다")
-    @GetMapping("/{categoryId}")
-    public ResponseEntity<?> retrieveCategoryList(@PathVariable Long categoryId) {
+    @GetMapping("/{menuId}")
+    public ResponseEntity<?> retrieveMenuById(@PathVariable Long menuId) {
 
         /**
          * TODO :
          *    존재하지 않는 대분류 카테고리
          */
+        CategoryResponse categoryResponse = categoryAppService.retrieveMenuById(menuId);
 
-        return new ResponseEntity<>(categoryId, HttpStatus.OK);
+        return new ResponseEntity<>(categoryResponse, HttpStatus.OK);
     }
+
 
     @Parameters(
             {

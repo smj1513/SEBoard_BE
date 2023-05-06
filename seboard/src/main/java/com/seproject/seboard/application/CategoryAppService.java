@@ -2,6 +2,7 @@ package com.seproject.seboard.application;
 
 import com.seproject.seboard.application.dto.category.CategoryCommand.CategoryCreateCommand;
 import com.seproject.seboard.application.dto.category.CategoryCommand.CategoryUpdateCommand;
+import com.seproject.seboard.controller.dto.post.CategoryResponse;
 import com.seproject.seboard.domain.model.category.BoardMenu;
 import com.seproject.seboard.domain.model.category.Category;
 import com.seproject.seboard.domain.model.category.ExternalSiteMenu;
@@ -13,8 +14,13 @@ import com.seproject.seboard.domain.repository.category.MenuRepository;
 import com.seproject.seboard.domain.repository.post.PostRepository;
 import com.seproject.seboard.domain.service.CategoryService;
 import lombok.AllArgsConstructor;
+import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 
 import static com.seproject.seboard.application.utils.AppServiceHelper.findByIdOrThrow;
 
@@ -125,11 +131,53 @@ public class CategoryAppService {
         });
     }
 
-//    public List<CategoryDTO.CategoryResponseDTO> retrieveCategoryList(){
-//        //TODO : paging 고려
-//        return categoryRepository.findAll().stream().map(
-//                CategoryDTO.CategoryResponseDTO::toDTO
-//        ).collect(Collectors.toList());
-//    }
-//
+    public CategoryResponse retrieveMenuById(Long menuId){
+        Menu targetMenu = menuRepository.findById(menuId).orElseThrow();
+        CategoryResponse res = new CategoryResponse(targetMenu);
+
+        if(targetMenu.getDepth()==0){
+            List<Menu> depth1menu = menuRepository.findBySuperMenu(targetMenu.getMenuId());
+            for(Menu menu : depth1menu){
+                CategoryResponse subMenuRes = new CategoryResponse(menu);
+                List<Menu> depth2menu = menuRepository.findBySuperMenu(menu.getMenuId());
+                for(Menu menu2 : depth2menu){
+                    subMenuRes.addSubMenu(new CategoryResponse(menu2));
+                }
+                res.addSubMenu(subMenuRes);
+            }
+        }else if(targetMenu.getDepth()==1){
+            List<Menu> depth2menu = menuRepository.findBySuperMenu(targetMenu.getMenuId());
+            for(Menu menu : depth2menu){
+                res.addSubMenu(new CategoryResponse(menu));
+            }
+        }
+
+        return res;
+    }
+
+    public List<CategoryResponse> retrieveAllMenu() {
+        //TODO : query로 최적화
+        List<Menu> mainMenus = menuRepository.findByDepth(0);
+        List<CategoryResponse> res = new ArrayList<>();
+
+        for(Menu mainMenu : mainMenus){
+            CategoryResponse mainMenuRes = new CategoryResponse(mainMenu);
+            List<Menu> subMenus = menuRepository.findByDepth(1);
+
+            for(Menu subMenu : subMenus){
+                CategoryResponse subMenuRes = new CategoryResponse(subMenu);
+                List<Menu> categories = menuRepository.findByDepth(2);
+
+                for(Menu category : categories){
+                    subMenuRes.addSubMenu(new CategoryResponse(category));
+                }
+
+                mainMenuRes.addSubMenu(subMenuRes);
+            }
+
+            res.add(mainMenuRes);
+        }
+
+        return res;
+    }
 }
