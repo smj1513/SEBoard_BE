@@ -1,5 +1,6 @@
 package com.seproject.seboard.domain.model.category;
 
+import com.seproject.seboard.domain.service.CategoryService;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -16,5 +17,10 @@ public class Category extends BoardMenu {
         if(superMenu.getClass()==BoardMenu.class){ //TODO : 이게 맞나?
             throw new IllegalArgumentException();
         }
+    }
+
+    @Override
+    public boolean isRemovable(CategoryService categoryService) {
+        return !categoryService.hasPost(getMenuId());
     }
 }

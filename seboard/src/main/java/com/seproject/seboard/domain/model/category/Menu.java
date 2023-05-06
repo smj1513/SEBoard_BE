@@ -54,7 +54,7 @@ public class Menu {
     }
 
     public boolean isRemovable(CategoryService categoryService){
-        return !categoryService.hasPost(menuId) && !categoryService.hasSubCategory(menuId);
+        return !categoryService.hasSubCategory(menuId);
     }
 
     public void changeName(String name) {
@@ -67,5 +67,9 @@ public class Menu {
 
     private boolean isValidName(String name) {
         return MIN_NAME_LENGTH < name.length() && name.length() < MAX_NAME_LENGTH;
+    }
+
+    public void changeDescription(String description) {
+        this.description = description;
     }
 }
