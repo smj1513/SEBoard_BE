@@ -133,6 +133,12 @@ public class CategoryAppService {
         Menu targetMenu = menuRepository.findById(menuId).orElseThrow();
         CategoryResponse res = new CategoryResponse(targetMenu);
 
+        retrieveSubMenu(targetMenu, res);
+
+        return res;
+    }
+
+    protected void retrieveSubMenu(Menu targetMenu, CategoryResponse res){
         if(targetMenu.getDepth()==0){
             List<Menu> depth1menu = menuRepository.findBySuperMenu(targetMenu.getMenuId());
             for(Menu menu : depth1menu){
@@ -149,8 +155,6 @@ public class CategoryAppService {
                 res.addSubMenu(new CategoryResponse(menu));
             }
         }
-
-        return res;
     }
 
     public List<CategoryResponse> retrieveAllMenu() {
@@ -160,18 +164,19 @@ public class CategoryAppService {
 
         for(Menu mainMenu : mainMenus){
             CategoryResponse mainMenuRes = new CategoryResponse(mainMenu);
-            List<Menu> subMenus = menuRepository.findByDepth(1);
-
-            for(Menu subMenu : subMenus){
-                CategoryResponse subMenuRes = new CategoryResponse(subMenu);
-                List<Menu> categories = menuRepository.findByDepth(2);
-
-                for(Menu category : categories){
-                    subMenuRes.addSubMenu(new CategoryResponse(category));
-                }
-
-                mainMenuRes.addSubMenu(subMenuRes);
-            }
+            retrieveSubMenu(mainMenu, mainMenuRes);
+//            List<Menu> subMenus = menuRepository.findByDepth(1);
+//
+//            for(Menu subMenu : subMenus){
+//                CategoryResponse subMenuRes = new CategoryResponse(subMenu);
+//                List<Menu> categories = menuRepository.findByDepth(2);
+//
+//                for(Menu category : categories){
+//                    subMenuRes.addSubMenu(new CategoryResponse(category));
+//                }
+//
+//                mainMenuRes.addSubMenu(subMenuRes);
+//            }
 
             res.add(mainMenuRes);
         }

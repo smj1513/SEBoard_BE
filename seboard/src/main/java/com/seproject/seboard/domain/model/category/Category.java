@@ -5,11 +5,13 @@ import lombok.Builder;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
 @SuperBuilder
 @NoArgsConstructor
 @Entity
+@DiscriminatorValue("CATEGORY")
 public class Category extends BoardMenu {
     public Category(Long categoryId, Menu superMenu, String name, String description, String categoryPathId) {
         super(categoryId, superMenu, name, description, categoryPathId);
