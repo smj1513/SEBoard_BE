@@ -3,10 +3,7 @@ package com.seproject.seboard.application;
 import com.seproject.seboard.application.dto.category.CategoryCommand.CategoryCreateCommand;
 import com.seproject.seboard.application.dto.category.CategoryCommand.CategoryUpdateCommand;
 import com.seproject.seboard.controller.dto.post.CategoryResponse;
-import com.seproject.seboard.domain.model.category.BoardMenu;
-import com.seproject.seboard.domain.model.category.Category;
-import com.seproject.seboard.domain.model.category.ExternalSiteMenu;
-import com.seproject.seboard.domain.model.category.Menu;
+import com.seproject.seboard.domain.model.category.*;
 import com.seproject.seboard.domain.repository.category.BoardMenuRepository;
 import com.seproject.seboard.domain.repository.category.CategoryRepository;
 import com.seproject.seboard.domain.repository.category.ExternalSiteMenuRepository;
@@ -49,7 +46,6 @@ public class CategoryAppService {
                     .superMenu(null)
                     .name(command.getName())
                     .description(command.getDescription())
-                    .urlInfo(command.getUrlId())
                     .build();
 
             menuRepository.save(menu);
@@ -99,12 +95,14 @@ public class CategoryAppService {
         Menu targetMenu = findByIdOrThrow(command.getCategoryId(), categoryRepository, "");
 
         targetMenu.changeName(command.getName());
-        targetMenu.changeName(command.getDescription());
+        targetMenu.changeDescription(command.getDescription());
 
-        if(targetMenu instanceof Menu) {
-            ((Menu) targetMenu).changeCategoryPathId(command.getUrlId());
-        }else if(targetMenu instanceof com.seproject.seboard.domain.model.category.ExternalSiteMenu) {
-            ((com.seproject.seboard.domain.model.category.ExternalSiteMenu) targetMenu).changeExternalSiteUrl(command.getExternalUrl());
+        if(targetMenu instanceof InternalSiteMenu){
+            InternalSiteMenu internalSiteMenu = (InternalSiteMenu) targetMenu;
+            internalSiteMenu.changeCategoryPathId(command.getUrlId());
+        }else if(targetMenu instanceof ExternalSiteMenu){
+            ExternalSiteMenu externalSiteMenu = (ExternalSiteMenu) targetMenu;
+            externalSiteMenu.changeExternalSiteUrl(command.getExternalUrl());
         }
     }
 
