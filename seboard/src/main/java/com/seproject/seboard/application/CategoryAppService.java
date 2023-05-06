@@ -120,8 +120,8 @@ public class CategoryAppService {
 
     public void migrateCategory(Long fromCategoryId, Long toCategoryId){
         //TODO : 권한 처리 어디서?
-        Menu from = findByIdOrThrow(fromCategoryId, categoryRepository, "");
-        Menu to = findByIdOrThrow(toCategoryId, categoryRepository, "");
+        Category from = findByIdOrThrow(fromCategoryId, categoryRepository, "");
+        Category to = findByIdOrThrow(toCategoryId, categoryRepository, "");
 
         //TODO : bulk update 적용
         postRepository.findByCategoryId(fromCategoryId).forEach(post -> {
