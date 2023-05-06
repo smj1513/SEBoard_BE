@@ -42,7 +42,7 @@ public class Post {
     @ManyToOne
     @JoinColumn(name = "board_user_id")
     private BoardUser author;
-    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "expose_option_id")
     private ExposeOption exposeOption;
     @OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
@@ -121,9 +121,7 @@ public class Post {
         if(exposeState==ExposeState.PRIVACY &&
                 exposeOption.getExposeState()==ExposeState.PRIVACY && password==null){
             return;
-        }
-
-        if(exposeOption.getExposeState()==exposeState){
+        }else if(exposeOption.getExposeState()==exposeState){
             return;
         }else{
             exposeOption = ExposeOption.of(exposeState, password);
