@@ -5,8 +5,6 @@ import lombok.Getter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 
-import static com.seproject.account.controller.dto.LoginDTO.*;
-
 @Builder
 @Getter
 @RedisHash(value = "USER_INFO", timeToLive = 3600L)
@@ -14,7 +12,11 @@ public class TemporalUserInfo {
 
     @Id
     private String id;
-
-    private TemporalLoginResponseDTO userInfo;
+    private String subject;
+    private String provider;
+    private String email;
+    private String name;
+    private String nickname;
+    private String accessToken;
 
 }

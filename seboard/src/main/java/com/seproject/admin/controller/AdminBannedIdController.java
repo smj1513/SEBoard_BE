@@ -1,9 +1,6 @@
 package com.seproject.admin.controller;
 
-import com.seproject.admin.dto.BannedIdDTO;
 import com.seproject.admin.service.BannedIdService;
-import com.seproject.admin.service.BannedNicknameService;
-import com.seproject.seboard.controller.dto.post.PostResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

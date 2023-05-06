@@ -5,11 +5,11 @@ import lombok.Getter;
 import org.springframework.security.core.AuthenticationException;
 
 @Getter
-public class AccessTokenExpiredException extends AuthenticationException {
+public class CustomAuthenticationException extends AuthenticationException {
 
     private final ErrorCode errorCode;
-    public AccessTokenExpiredException(ErrorCode errorCode) {
-        super(errorCode.getMessage());
-        this.errorCode = ErrorCode.ACCESS_TOKEN_EXPIRED;
+    public CustomAuthenticationException(ErrorCode errorCode,Throwable e) {
+        super(errorCode.getMessage(),e);
+        this.errorCode = errorCode;
     }
 }

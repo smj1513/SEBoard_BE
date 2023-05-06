@@ -26,7 +26,6 @@ import static com.seproject.admin.dto.AccountDTO.*;
 public class AdminAccountController {
 
     private final AccountService accountService;
-    private final JwtDecoder jwtDecoder;
 
     @Operation(summary = "등록된 계정 목록 조회", description = "계정 관리를 위하여 등록된 계정 목록을 확인한다.")
     @ApiResponses({
@@ -35,7 +34,7 @@ public class AdminAccountController {
     })
 
     @GetMapping("/accounts")
-    public ResponseEntity<?> retrieveAllAccount(HttpServletRequest request,@RequestBody RetrieveAllAccountRequest accountRequest) {
+    public ResponseEntity<?> retrieveAllAccount(@RequestBody RetrieveAllAccountRequest accountRequest) {
         int page = accountRequest.getPage();
         int perPage = accountRequest.getPerPage();
         page = Math.max(page-1,0);
@@ -51,7 +50,7 @@ public class AdminAccountController {
             @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "404", description = "존재하지 않는 계정")
     })
     @GetMapping("/accounts/{accountId}")
-    public ResponseEntity<?> retrieveAllAccount(HttpServletRequest request,@PathVariable Long accountId) {
+    public ResponseEntity<?> retrieveAllAccount(@PathVariable Long accountId) {
         try{
             return new ResponseEntity<>(accountService.findAccount(accountId), HttpStatus.OK);
         }  catch (NoSuchElementException e) {
@@ -67,7 +66,7 @@ public class AdminAccountController {
             @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "400", description = "존재하지 않는 권한 요청")
     })
     @PostMapping("/accounts")
-    public ResponseEntity<?> createAccountByAdmin(HttpServletRequest request,@RequestBody CreateAccountRequest createAccountRequest) {
+    public ResponseEntity<?> createAccountByAdmin(@RequestBody CreateAccountRequest createAccountRequest) {
 
         String email = createAccountRequest.getEmail();
 
@@ -92,7 +91,7 @@ public class AdminAccountController {
             @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "404", description = "존재하지 않는 계정")
     })
     @PutMapping("/accounts")
-    public ResponseEntity<?> updateAccount(HttpServletRequest request,@RequestBody UpdateAccountRequest updateAccountRequest) {
+    public ResponseEntity<?> updateAccount(@RequestBody UpdateAccountRequest updateAccountRequest) {
 
         String email = updateAccountRequest.getEmail();
         if(!email.matches("\\w+@\\w+\\.\\w+(\\.\\w+)?")) {
@@ -116,7 +115,7 @@ public class AdminAccountController {
             @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "404", description = "존자해지 않는 계정")
     })
     @DeleteMapping("/accounts")
-    public ResponseEntity<?> deleteAccount(HttpServletRequest request,@RequestBody DeleteAccountRequest deleteAccountRequest) {
+    public ResponseEntity<?> deleteAccount(@RequestBody DeleteAccountRequest deleteAccountRequest) {
 
         try{
             DeleteAccountResponse deleteAccount = accountService.deleteAccount(deleteAccountRequest.getAccountId());

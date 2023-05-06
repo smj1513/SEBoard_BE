@@ -16,8 +16,6 @@ import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 
-import java.util.HashMap;
-
 @Tag(name = "계정 시스템 API", description = "계정(Account) 관련 API")
 @AllArgsConstructor
 @Controller
@@ -37,12 +35,12 @@ public class AccountController {
         }
 
         User user = (User)authentication.getPrincipal();
-        String username = user.getUsername();
+        String principal = user.getUsername();
         String accessToken = jwtDecoder.getAccessToken();
 
         doLogout(accessToken);
 
-        if(!StringUtils.isEmpty(username) && accountService.isOAuthUser(username)) {
+        if(!StringUtils.isEmpty(principal) && accountService.isOAuthUser(principal)) {
             String redirectURL = logoutAppService.getRedirectURL();
             return new ResponseEntity<>(new LogoutDTO(true,redirectURL), HttpStatus.OK);
         }

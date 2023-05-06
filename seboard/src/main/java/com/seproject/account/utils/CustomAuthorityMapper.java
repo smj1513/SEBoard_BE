@@ -21,7 +21,7 @@ public class CustomAuthorityMapper implements GrantedAuthoritiesMapper {
         return mapped;
     }
 
-    private GrantedAuthority mapAuthority(String name) { //google : http://google.com/asddasfasd.email
+    private GrantedAuthority mapAuthority(String name) {
         if(name.lastIndexOf(".") > 0) {
             int i = name.lastIndexOf(".");
             name = "SCOPE_" + name.substring(i + 1);

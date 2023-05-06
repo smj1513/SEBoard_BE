@@ -7,7 +7,6 @@ import org.springframework.data.redis.core.RedisHash;
 import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Collection;
-import java.util.List;
 
 @Builder
 @Getter
