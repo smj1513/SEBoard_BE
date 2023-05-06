@@ -1,14 +1,16 @@
 package com.seproject.account.controller;
 
-import com.seproject.account.controller.dto.LoginDTO;
-import com.seproject.account.jwt.JwtProvider;
+import com.seproject.account.jwt.JWT;
 import com.seproject.account.model.Account;
 import com.seproject.account.model.Role;
-import com.seproject.account.model.Token;
 import com.seproject.account.model.social.OAuthAccount;
+import com.seproject.account.model.social.TemporalUserInfo;
+import com.seproject.account.model.social.UserToken;
+import com.seproject.account.repository.TemporalUserInfoRepository;
+import com.seproject.account.repository.UserTokenRepository;
 import com.seproject.account.service.AccountService;
 import com.seproject.account.service.EmailService;
-import com.seproject.account.jwt.JwtDecoder;
+import com.seproject.account.service.TokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -22,11 +24,15 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
+import static com.seproject.account.controller.dto.LoginDTO.*;
 
 import java.util.List;
+import java.util.Optional;
 
 import static com.seproject.account.controller.dto.RegisterDTO.*;
 
@@ -35,10 +41,11 @@ import static com.seproject.account.controller.dto.RegisterDTO.*;
 @Controller
 public class RegisterController {
 
-    private final JwtDecoder jwtDecoder;
     private final AccountService accountService;
     private final EmailService emailService;
-    private final JwtProvider jwtProvider;
+    private final TemporalUserInfoRepository temporalUserInfoRepository;
+    private final UserTokenRepository userTokenRepository;
+    private final TokenService tokenService;
 
     @Operation(summary = "OAuth 회원가입", description = "소셜 로그인 사용시 추가 정보를 입력하여 회원가입을 요청한다.")
     @ApiResponses({
@@ -58,16 +65,20 @@ public class RegisterController {
 
         try{
             OAuthAccount oAuthAccount = accountService.register(oAuth2RegisterRequest);
-            List<Role> authorities = oAuthAccount.getAccount().getAuthorities();
-            UsernamePasswordAuthenticationToken authenticationToken =
-                    new UsernamePasswordAuthenticationToken(oAuthAccount.getSub(), "", authorities);
-            String accessToken = jwtProvider.createJWT(authenticationToken);
-            String refreshToken = jwtProvider.createRefreshToken(authenticationToken);
 
-            LoginDTO.LoginResponseDTO responseDTO = LoginDTO.LoginResponseDTO.builder()
+            Account account = oAuthAccount.getAccount();
+            JWT jwt  = tokenService.createToken(account);
+
+            String accessToken = jwt.getAccessToken();
+            String refreshToken = jwt.getRefreshToken();
+
+            tokenService.addToken(jwt,account.getAuthorities());
+
+            LoginResponseDTO responseDTO = LoginResponseDTO.builder()
                     .accessToken(accessToken)
                     .refreshToken(refreshToken)
                     .build();
+
             return new ResponseEntity<>(responseDTO,HttpStatus.OK);
         } catch (IllegalArgumentException e) {
             return new ResponseEntity<>(e, HttpStatus.BAD_REQUEST);
@@ -99,18 +110,19 @@ public class RegisterController {
         if(!confirmed) return new ResponseEntity<>("인증되지 않은 이메일입니다.",HttpStatus.BAD_REQUEST);
         if(isDuplicateUser) return new ResponseEntity<>("중복된 닉네임을 가진 사용자입니다.",HttpStatus.BAD_REQUEST);
 
-
         Account account = accountService.register(formRegisterRequest);
-        List<Role> authorities = account.getAuthorities();
-        UsernamePasswordAuthenticationToken authenticationToken =
-                new UsernamePasswordAuthenticationToken(account.getLoginId(), "", authorities);
-        String accessToken = jwtProvider.createJWT(authenticationToken);
-        String refreshToken = jwtProvider.createRefreshToken(authenticationToken);
+        JWT token = tokenService.createToken(account);
 
-        LoginDTO.LoginResponseDTO responseDTO = LoginDTO.LoginResponseDTO.builder()
+        String accessToken = token.getAccessToken();
+        String refreshToken = token.getRefreshToken();
+        tokenService.addToken(token,account.getAuthorities());
+
+        LoginResponseDTO responseDTO = LoginResponseDTO.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
                 .build();
+
+
         return new ResponseEntity<>(responseDTO,HttpStatus.OK);
     }
 
@@ -125,4 +137,43 @@ public class RegisterController {
 
         return new ResponseEntity<>(ConfirmDuplicateNicknameResponse.toDTO(existNickname),HttpStatus.OK);
     }
+
+
+    @GetMapping("/auth/kakao")
+    public ResponseEntity<?> findUserToken(@RequestParam String id) {
+        Optional<UserToken> userTokenOptional = userTokenRepository.findById(id);
+
+        if(userTokenOptional.isEmpty()) {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+
+        UserToken userToken = userTokenOptional.get();
+        userTokenRepository.delete(userToken);
+
+        Account account = userToken.getAccount();
+        JWT token = tokenService.createToken(account);
+        tokenService.addToken(token,account.getAuthorities());
+
+        LoginResponseDTO loginResponseDTO = LoginResponseDTO.builder()
+                .accessToken(token.getAccessToken())
+                .refreshToken(token.getRefreshToken())
+                .build();
+
+        return new ResponseEntity<>(loginResponseDTO,HttpStatus.OK);
+    }
+
+    @GetMapping("/register/oauth")
+    public ResponseEntity<?> findTemporalUserInfo(@RequestParam("id") String id) {
+        Optional<TemporalUserInfo> optionalTemporalUserInfo = temporalUserInfoRepository.findById(id);
+
+        if(optionalTemporalUserInfo.isEmpty()) {
+            return new ResponseEntity<>("존재하지 않는 데이터",HttpStatus.NOT_FOUND);
+        }
+
+        TemporalUserInfo temporalUserInfo = optionalTemporalUserInfo.get();
+        temporalUserInfoRepository.delete(temporalUserInfo);
+
+        return new ResponseEntity<>(temporalUserInfo,HttpStatus.OK);
+    }
+
 }

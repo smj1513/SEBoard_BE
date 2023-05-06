@@ -1,9 +1,9 @@
 BEGIN;
 
-INSERT INTO accounts(account_id,login_id,username,nickname,password,created_at) values (5234058023850,'user','user','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','2023-04-26');
-INSERT INTO accounts(account_id,login_id,username,nickname,password,created_at) values (5234058023851,'admin','admin','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','2023-04-26');
-INSERT INTO accounts(account_id,login_id,username,nickname,password,created_at) values (5234058023852,'professor','professor','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','2023-04-26');
-INSERT INTO accounts(account_id,login_id,username,nickname,password,created_at) values (5234058023853,'kumoh','maanjong','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','2023-04-26');
+INSERT INTO accounts(account_id,login_id,name,nickname,password,created_at) values (5234058023850,'user','username','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','2023-04-26');
+INSERT INTO accounts(account_id,login_id,name,nickname,password,created_at) values (5234058023851,'admin','admin','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','2023-04-26');
+INSERT INTO accounts(account_id,login_id,name,nickname,password,created_at) values (5234058023852,'professor','professor','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','2023-04-26');
+INSERT INTO accounts(account_id,login_id,name,nickname,password,created_at) values (5234058023853,'kumoh','maanjong','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','2023-04-26');
 INSERT INTO roles (role_id, name) values (5234058023850, 'ROLE_USER'),(5234058023851, 'ROLE_ADMIN'),(5234058023852, 'ROLE_PROFESSOR'),(5234058023853, 'ROLE_KUMOH');
 
 INSERT INTO authorities(account_id,role_id) values(5234058023850,5234058023850);
@@ -104,6 +104,7 @@ INSERT INTO public.posts(
 VALUES (1234879892105, 1, '2023-04-25', '2023-04-28','<script>alert("xss")</script>' ,
         true, 'xss 테스트', 9999,3421244 , 43214232, 28822823, false);
 
+INSERT INTO public.email_authentication(id, auth_token, email, expire_date, expired) VALUES (765674765, '5efd0d19','alswhd1113@gmail.com', '2023-05-05', true);
 
 -- INSERT INTO public.ip(id, ip_address) VALUES (5343452, '127.0.0.1');
 -- INSERT INTO public.ip(id, ip_address) VALUES (5343453, '0:0:0:0:0:0:0:1');

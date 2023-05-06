@@ -8,11 +8,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 public class PasswordIncorrectException extends BadCredentialsException {
 
     private ErrorCode errorCode;
-    public PasswordIncorrectException(ErrorCode errorCode) {
-        super(errorCode.getMessage());
-    }
-
-    public PasswordIncorrectException(ErrorCode errorCode, Throwable cause) {
-        super(errorCode.getMessage(), cause);
+    public PasswordIncorrectException(ErrorCode errorCode, BadCredentialsException e) {
+        super(errorCode.getMessage(), e);
     }
 }

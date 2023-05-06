@@ -1,6 +1,7 @@
 package com.seproject.account.controller;
 
 import com.seproject.account.application.LogoutAppService;
+import com.seproject.account.controller.dto.LogoutDTO;
 import com.seproject.account.jwt.JwtDecoder;
 import com.seproject.account.service.AccountService;
 import com.seproject.account.service.TokenService;
@@ -14,8 +15,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-
-import java.util.NoSuchElementException;
 
 @Tag(name = "계정 시스템 API", description = "계정(Account) 관련 API")
 @AllArgsConstructor
@@ -36,21 +35,22 @@ public class AccountController {
         }
 
         User user = (User)authentication.getPrincipal();
-        String username = user.getUsername();
-
-        if(!StringUtils.isEmpty(username) && accountService.isOAuthUser(username)) {
-            String redirectURL = logoutAppService.getRedirectURL();
-            return new ResponseEntity<>(redirectURL, HttpStatus.PERMANENT_REDIRECT);
-        }
-
+        String principal = user.getUsername();
         String accessToken = jwtDecoder.getAccessToken();
 
-        if (accessToken != null){
-            tokenService.deleteToken(accessToken);
-            return new ResponseEntity<>("로그아웃 성공", HttpStatus.OK);
+        doLogout(accessToken);
+
+        if(!StringUtils.isEmpty(principal) && accountService.isOAuthUser(principal)) {
+            String redirectURL = logoutAppService.getRedirectURL();
+            return new ResponseEntity<>(new LogoutDTO(true,redirectURL), HttpStatus.OK);
         }
+        return new ResponseEntity<>(new LogoutDTO(false,""), HttpStatus.OK);
 
-        return new ResponseEntity<>("세션이 만료되었습니다.", HttpStatus.BAD_REQUEST);
+    }
 
+    private void doLogout(String accessToken){
+        if (accessToken != null){
+            tokenService.deleteAccessToken(accessToken);
+        }
     }
 }
