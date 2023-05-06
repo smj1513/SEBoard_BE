@@ -1,18 +1,17 @@
 package com.seproject.seboard.application;
 
-import com.seproject.seboard.application.dto.category.CategoryCommand;
 import com.seproject.seboard.application.dto.category.CategoryCommand.CategoryCreateCommand;
 import com.seproject.seboard.application.dto.category.CategoryCommand.CategoryUpdateCommand;
-import com.seproject.seboard.domain.model.category.BoardCategory;
+import com.seproject.seboard.domain.model.category.BoardMenu;
 import com.seproject.seboard.domain.model.category.Category;
-import com.seproject.seboard.domain.model.category.ExternalSiteCategory;
-import com.seproject.seboard.domain.repository.category.BoardCategoryRepository;
+import com.seproject.seboard.domain.model.category.ExternalSiteMenu;
+import com.seproject.seboard.domain.model.category.Menu;
+import com.seproject.seboard.domain.repository.category.BoardMenuRepository;
 import com.seproject.seboard.domain.repository.category.CategoryRepository;
-import com.seproject.seboard.domain.repository.category.ExternalSiteCategoryRepository;
+import com.seproject.seboard.domain.repository.category.ExternalSiteMenuRepository;
+import com.seproject.seboard.domain.repository.category.MenuRepository;
 import com.seproject.seboard.domain.repository.post.PostRepository;
 import com.seproject.seboard.domain.service.CategoryService;
-import com.seproject.account.model.Account;
-import com.seproject.account.repository.AccountRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,34 +23,57 @@ import static com.seproject.seboard.application.utils.AppServiceHelper.findByIdO
 @Transactional
 public class CategoryAppService {
     private final CategoryService categoryService;
+    private final MenuRepository menuRepository;
+    private final BoardMenuRepository boardMenuRepository;
     private final CategoryRepository categoryRepository;
-    private final BoardCategoryRepository boardCategoryRepository;
-    private final ExternalSiteCategoryRepository externalSiteCategoryRepository;
-    private final AccountRepository accountRepository;
+    private final ExternalSiteMenuRepository externalSiteMenuRepository;
     private final PostRepository postRepository;
 
     public void createCategory(CategoryCreateCommand command){
         //TODO : 상위 카테고리로 지정할 수 있는 카테고리 구분?
-        Category superCategory = findByIdOrThrow(command.getSuperCategoryId(), categoryRepository, "");
+        Menu superMenu = menuRepository.findById(command.getSuperCategoryId()).get();
 
-        if(command.getCategoryType().equals("BOARD")){
-            BoardCategory boardCategory = BoardCategory.builder()
-                    .superCategory(superCategory)
+        if(command.getCategoryType().equals("MENU")){
+            //TODO : urlInfo NULL일 경우 자동으로 넣는 로직 필요
+            if(superMenu!=null){
+                throw new IllegalArgumentException();
+            }
+
+            Menu menu = Menu.builder()
+                    .superMenu(null)
                     .name(command.getName())
                     .description(command.getDescription())
-                    .categoryPathId(command.getUrlId())
+                    .urlInfo(command.getUrlId())
                     .build();
 
-            boardCategoryRepository.save(boardCategory);
+            menuRepository.save(menu);
+        }else if(command.getCategoryType().equals("BOARD")){
+            BoardMenu boardMenu = BoardMenu.builder()
+                    .superMenu(superMenu)
+                    .name(command.getName())
+                    .description(command.getDescription())
+                    .urlInfo(command.getUrlId())
+                    .build();
+
+            boardMenuRepository.save(boardMenu);
+        }else if(command.getCategoryType().equals("CATEGORY")){
+            Category category = Category.builder()
+                    .superMenu(superMenu)
+                    .name(command.getName())
+                    .description(command.getDescription())
+                    .urlInfo(command.getUrlId())
+                    .build();
+
+            categoryRepository.save(category);
         }else if(command.getCategoryType().equals("EXTERNAL")){
-            ExternalSiteCategory externalSiteCategory = ExternalSiteCategory.builder()
-                    .superCategory(superCategory)
+            ExternalSiteMenu externalSiteCategory = ExternalSiteMenu.builder()
+                    .superMenu(superMenu)
                     .name(command.getName())
                     .description(command.getDescription())
-                    .externSiteUrl(command.getExternalUrl())
+                    .urlInfo(command.getExternalUrl())
                     .build();
 
-            externalSiteCategoryRepository.save(externalSiteCategory);
+            externalSiteMenuRepository.save(externalSiteCategory);
         }else{
             throw new IllegalArgumentException();
         }
@@ -59,24 +81,24 @@ public class CategoryAppService {
 
     public void updateCategory(CategoryUpdateCommand command){
         //TODO : superCategory 수정?
-        Category targetCategory = findByIdOrThrow(command.getCategoryId(), categoryRepository, "");
+        Menu targetMenu = findByIdOrThrow(command.getCategoryId(), categoryRepository, "");
 
-        targetCategory.changeName(command.getName());
-        targetCategory.changeName(command.getDescription());
+        targetMenu.changeName(command.getName());
+        targetMenu.changeName(command.getDescription());
 
-        if(targetCategory instanceof BoardCategory) {
-            ((BoardCategory) targetCategory).changeCategoryPathId(command.getUrlId());
-        }else if(targetCategory instanceof ExternalSiteCategory) {
-            ((ExternalSiteCategory) targetCategory).changeExternalSiteUrl(command.getExternalUrl());
+        if(targetMenu instanceof Menu) {
+            ((Menu) targetMenu).changeCategoryPathId(command.getUrlId());
+        }else if(targetMenu instanceof com.seproject.seboard.domain.model.category.ExternalSiteMenu) {
+            ((com.seproject.seboard.domain.model.category.ExternalSiteMenu) targetMenu).changeExternalSiteUrl(command.getExternalUrl());
         }
     }
 
 
     public void deleteCategory(Long categoryId){
-        Category targetCategory = findByIdOrThrow(categoryId, categoryRepository, "");
+        Menu targetMenu = findByIdOrThrow(categoryId, categoryRepository, "");
 
         //TODO : message
-        if(!targetCategory.isRemovable(categoryService)){
+        if(!targetMenu.isRemovable(categoryService)){
             throw new IllegalArgumentException();
         }
 
@@ -85,15 +107,15 @@ public class CategoryAppService {
 
     public void migrateCategory(Long fromCategoryId, Long toCategoryId){
         //TODO : 권한 처리 어디서?
-        Category from = findByIdOrThrow(fromCategoryId, categoryRepository, "");
-        Category to = findByIdOrThrow(toCategoryId, categoryRepository, "");
+        Menu from = findByIdOrThrow(fromCategoryId, categoryRepository, "");
+        Menu to = findByIdOrThrow(toCategoryId, categoryRepository, "");
 
         //TODO : bulk update 적용
         postRepository.findByCategoryId(fromCategoryId).forEach(post -> {
             post.changeCategory(to);
         });
     }
-//
+
 //    public List<CategoryDTO.CategoryResponseDTO> retrieveCategoryList(){
 //        //TODO : paging 고려
 //        return categoryRepository.findAll().stream().map(
@@ -101,7 +123,4 @@ public class CategoryAppService {
 //        ).collect(Collectors.toList());
 //    }
 //
-//    private <T> T findByIdOrThrow(Long id, JpaRepository<T, Long> repo, String errorMsg){
-//        return repo.findById(id).orElseThrow(() -> new NoSuchElementException(errorMsg));
-//    }
 }

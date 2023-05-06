@@ -5,7 +5,7 @@ import com.seproject.seboard.application.dto.post.PostCommand.PostListFindComman
 import com.seproject.seboard.application.dto.post.PostCommand.PostWriteCommand;
 import com.seproject.seboard.domain.model.common.BaseTime;
 import com.seproject.seboard.domain.model.common.FileMetaData;
-import com.seproject.seboard.domain.model.category.Category;
+import com.seproject.seboard.domain.model.category.Menu;
 import com.seproject.seboard.domain.model.post.Post;
 import com.seproject.seboard.domain.model.post.exposeOptions.ExposeOption;
 import com.seproject.seboard.domain.model.user.Anonymous;
@@ -14,7 +14,6 @@ import com.seproject.seboard.domain.model.user.Member;
 import com.seproject.seboard.domain.repository.comment.CommentRepository;
 import com.seproject.seboard.domain.repository.commons.FileMetaDataRepository;
 import com.seproject.seboard.domain.repository.post.BookmarkRepository;
-import com.seproject.seboard.domain.repository.category.CategoryRepository;
 import com.seproject.seboard.domain.repository.post.PostRepository;
 import com.seproject.seboard.domain.repository.post.PostSearchRepository;
 import com.seproject.seboard.domain.repository.user.AnonymousRepository;
@@ -74,7 +73,7 @@ public class PostAppService {
         createPost(command, member);
     }
     private void createPost(PostWriteCommand command, BoardUser author){
-        Category category = findByIdOrThrow(command.getCategoryId(), categoryRepository, "");
+        Menu menu = findByIdOrThrow(command.getCategoryId(), categoryRepository, "");
 
         List<FileMetaData> fileMetaDataList =
                 fileMetaDataRepository.findAllById(command.getAttachmentIds());
@@ -82,7 +81,7 @@ public class PostAppService {
         Post post = Post.builder()
                 .title(command.getTitle())
                 .contents(command.getContents())
-                .category(category)
+                .menu(menu)
                 .author(author)
                 .baseTime(BaseTime.now())
                 .pined(command.isPined())
@@ -149,8 +148,8 @@ public class PostAppService {
         attachments.forEach(fileMetaData -> post.addAttachment(fileMetaData));
 
         //TODO : category 권한 체킹 필요
-        Category category = findByIdOrThrow(command.getCategoryId(), categoryRepository, "");
-        post.changeCategory(category);
+        Menu menu = findByIdOrThrow(command.getCategoryId(), categoryRepository, "");
+        post.changeCategory(menu);
     }
 
     public void removePost(Long postId, Long accountId) {
