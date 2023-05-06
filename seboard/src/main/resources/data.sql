@@ -21,11 +21,12 @@ INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (
 INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243126,1545, 5234058023851);
 INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243127,1546, 5234058023851);
 
-INSERT INTO categories(category_id,super_category_id,name) values (43214232,null,'공지사항');
-INSERT INTO categories(category_id,super_category_id,name) values (43214233,43214232,'일반');
-INSERT INTO categories(category_id,super_category_id,name) values (43214234,43214232,'강의');
-INSERT INTO categories(category_id,super_category_id,name) values (43214235,43214232,'학사');
-INSERT INTO categories(category_id,super_category_id,name) values (43214236,43214232,'학생회');
+INSERT INTO menus(menu_id, super_menu_id, name, description, depth, url_info, menu_type) VALUES (43214231, null, '공지사항', '공지임니둥', 0, 'notice', 'BOARD');
+INSERT INTO menus(menu_id, super_menu_id, name, description, depth, url_info, menu_type) VALUES (43214232, 43214231, '일반', '공지임니둥', 1, 'notice_normal', 'CATEGORY');
+INSERT INTO menus(menu_id, super_menu_id, name, description, depth, url_info, menu_type) VALUES (43214233, 43214231, '수업', '공지임니둥', 1, 'class', 'CATEGORY');
+INSERT INTO menus(menu_id, super_menu_id, name, description, depth, url_info, menu_type) VALUES (43214234, 43214231, '장학금', '공지임니둥', 1, 'money', 'CATEGORY');
+INSERT INTO menus(menu_id, super_menu_id, name, description, depth, url_info, menu_type) VALUES (43214235, 43214231, '학사', '공지임니둥', 1, 'student', 'CATEGORY');
+INSERT INTO menus(menu_id, super_menu_id, name, description, depth, url_info, menu_type) VALUES (43214236, null, '채용', '채용임니둥', 0, 'www.kumoh.ac.kr', 'EXTERNAL');
 
 INSERT INTO public.expose_options(dtype, expose_option_id, expose_state) VALUES ('Public', 10001, 'PUBLIC');
 INSERT INTO public.expose_options(dtype, expose_option_id, expose_state) VALUES ('Kumoh', 10002, 'KUMOH');
@@ -51,7 +52,7 @@ VALUES (1234879892103, 1, '2023-04-24', '2023-04-26','<div class="document_91563
 <p><span style="font-size:18px;">안녕하십니까&nbsp;18학번 이충엽입니다&nbsp;</span></p>
   <p><span style="font-size:18px;">저는 5월 1일 14시부로 논산 훈련소에 입대 예정입니다.&nbsp;</span></p>
   <p><span style="font-size:18px;">그동안 감사했습니다! 충성!</span></p></div>' ,
-        true, '18이충엽 재입대 합니다.', 123,3421243 , 43214233, 10001);
+        true, '18이충엽 재입대 합니다.', 123,3421243 , 43214232, 10001);
 
 INSERT INTO public.bookmarks(bookmark_id, post_id, member_id) VALUES (534453, 1234879892103, 3421243);
 
@@ -90,7 +91,7 @@ INSERT INTO public.posts(
     post_id, anonymous_count, created_at, modified_at, contents, pined, title, views, board_user_id, category_id, expose_option_id)
 VALUES (1234879892104, 1, '2023-04-25', '2023-04-28','<div class="document_91563_19198 xe_content"><p>&nbsp;</p>
 <p><span style="font-size:18px;">ㅈㄱㄴ&nbsp;</span></p></div>' ,
-        true, '옥계 참숯고기 어떤가요?', 9999,3421244 , 43214233, 10001);
+        true, '옥계 참숯고기 어떤가요?', 9999,3421244 , 43214232, 10001);
 
 INSERT INTO public.comments(
     comment_id, created_at, modified_at, contents, is_deleted, board_user_id, is_only_read_by_author, post_id)
@@ -104,7 +105,7 @@ VALUES (2342350,'2023-04-27', '2023-04-27', '전 괜찮은데 금슐랭 박형�
 INSERT INTO public.posts(
     post_id, anonymous_count, created_at, modified_at, contents, pined, title, views, board_user_id, category_id, expose_option_id)
 VALUES (1234879892105, 1, '2023-04-25', '2023-04-28','<script>alert("xss")</script>' ,
-        true, 'xss 테스트', 9999,3421244 , 43214233, 10001);
+        true, 'xss 테스트', 9999,3421244 , 43214232, 10001);
 
 INSERT INTO public.email_authentication(id, auth_token, email, expire_date, expired) VALUES (765674765, '5efd0d19','alswhd1113@gmail.com', '2023-05-05', true);
 
