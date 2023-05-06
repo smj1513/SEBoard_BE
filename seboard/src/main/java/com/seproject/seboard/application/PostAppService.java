@@ -75,7 +75,7 @@ public class PostAppService {
         createPost(command, member);
     }
     private void createPost(PostWriteCommand command, BoardUser author){
-        Category category = findByIdOrThrow(command.getCategoryId(), categoryRepository, "");
+        Menu menu = findByIdOrThrow(command.getCategoryId(), categoryRepository, "");
 
         List<FileMetaData> fileMetaDataList =
                 fileMetaDataRepository.findAllById(command.getAttachmentIds());
@@ -83,7 +83,7 @@ public class PostAppService {
         Post post = Post.builder()
                 .title(command.getTitle())
                 .contents(command.getContents())
-                .category(category)
+                .menu(menu)
                 .author(author)
                 .baseTime(BaseTime.now())
                 .pined(command.isPined())
@@ -151,8 +151,8 @@ public class PostAppService {
 
         System.out.println("command.getCategoryId() = " + command.getCategoryId());
         //TODO : category 권한 체킹 필요
-        Category category = findByIdOrThrow(command.getCategoryId(), categoryRepository, "");
-        post.changeCategory(category);
+        Menu menu = findByIdOrThrow(command.getCategoryId(), categoryRepository, "");
+        post.changeCategory(menu);
     }
 
     public void removePost(Long postId, Long accountId) {
