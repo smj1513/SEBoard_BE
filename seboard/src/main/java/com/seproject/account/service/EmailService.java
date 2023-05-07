@@ -2,6 +2,8 @@ package com.seproject.account.service;
 
 import com.seproject.account.model.EmailAuthentication;
 import com.seproject.account.repository.EmailAuthRepository;
+import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.CustomIllegalArgumentException;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.Email;
@@ -48,6 +50,11 @@ public class EmailService {
     public void send(String email) {
         EmailAuthentication emailAuthentication;
 
+        if(!isEmail(email)) {
+            throw new CustomIllegalArgumentException(ErrorCode.INVALID_MAIL,null);
+        }
+
+
         if(emailAuthRepository.existsByEmail(email)) {
             emailAuthentication = emailAuthRepository.findByEmail(email);
             emailAuthentication = emailAuthentication.update();
@@ -79,6 +86,10 @@ public class EmailService {
     public void confirm(String email,String token) {
         EmailAuthentication emailAuthentication = emailAuthRepository.findEmailAuthentication(email,token);
 
+        if(!isEmail(email)) {
+            throw new CustomIllegalArgumentException(ErrorCode.INVALID_MAIL,null);
+        }
+
         if(emailAuthentication == null) {
             throw new NoSuchElementException("일치하는 이메일 인증 정보가 없습니다.");
         }
@@ -87,12 +98,22 @@ public class EmailService {
             throw new IllegalStateException("만료된 인증 번호 입니다");
         }
 
-        emailAuthentication.setExpired();
+        emailAuthentication.confirm();
     }
 
     public boolean isConfirmed(String email) {
         EmailAuthentication emailAuthentication = emailAuthRepository.findByEmail(email);
+
+        if(!isEmail(email)) {
+            throw new CustomIllegalArgumentException(ErrorCode.INVALID_MAIL,null);
+        }
+
         if(emailAuthentication == null) return false;
+
+        if(emailAuthentication.getExpireDate().isBefore(LocalDateTime.now())) {
+            return false;
+        }
+
         return emailAuthentication.getExpired();
     }
 }
