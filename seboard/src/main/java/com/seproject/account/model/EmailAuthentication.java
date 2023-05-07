@@ -32,7 +32,7 @@ public class EmailAuthentication {
     }
 
     private LocalDateTime generateExpireDate() {
-        return LocalDateTime.now().plusMinutes(10);
+        return LocalDateTime.now().plusMinutes(5);
     }
     @Builder
     public EmailAuthentication(String email) {
@@ -54,8 +54,9 @@ public class EmailAuthentication {
         return authToken;
     }
 
-    public void setExpired(){
+    public void confirm(){
         this.expired = true;
+        this.expireDate = this.expireDate.plusMinutes(10);
     }
 
 }
