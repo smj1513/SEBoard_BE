@@ -1,6 +1,6 @@
-package com.seproject.account.repository;
+package com.seproject.account.repository.role;
 
-import com.seproject.account.model.Authorization;
+import com.seproject.account.model.role.Authorization;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

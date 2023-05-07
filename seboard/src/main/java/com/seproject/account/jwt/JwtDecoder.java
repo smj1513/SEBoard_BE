@@ -1,6 +1,6 @@
 package com.seproject.account.jwt;
 
-import com.seproject.account.model.AccessToken;
+import com.seproject.account.model.token.AccessToken;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomAuthenticationException;
 import io.jsonwebtoken.*;

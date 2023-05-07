@@ -2,12 +2,11 @@ package com.seproject.account.controller;
 
 import com.seproject.account.jwt.JWT;
 import com.seproject.account.model.Account;
-import com.seproject.account.model.Role;
 import com.seproject.account.model.social.OAuthAccount;
 import com.seproject.account.model.social.TemporalUserInfo;
 import com.seproject.account.model.social.UserToken;
-import com.seproject.account.repository.TemporalUserInfoRepository;
-import com.seproject.account.repository.UserTokenRepository;
+import com.seproject.account.repository.social.TemporalUserInfoRepository;
+import com.seproject.account.repository.social.UserTokenRepository;
 import com.seproject.account.service.AccountService;
 import com.seproject.account.service.EmailService;
 import com.seproject.account.service.TokenService;
@@ -22,7 +21,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,7 +29,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 import static com.seproject.account.controller.dto.LoginDTO.*;
 
-import java.util.List;
 import java.util.Optional;
 
 import static com.seproject.account.controller.dto.RegisterDTO.*;

@@ -1,14 +1,14 @@
 package com.seproject.account.service;
 
 import com.seproject.account.model.social.OAuthAccount;
-import com.seproject.account.repository.OAuthAccountRepository;
+import com.seproject.account.repository.social.OAuthAccountRepository;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
 import com.seproject.error.exception.CustomUserNotFoundException;
 import com.seproject.account.repository.AccountRepository;
-import com.seproject.account.repository.RoleRepository;
+import com.seproject.account.repository.role.RoleRepository;
 import com.seproject.account.model.Account;
-import com.seproject.account.model.Role;
+import com.seproject.account.model.role.Role;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -19,7 +19,6 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.management.relation.RoleNotFoundException;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;

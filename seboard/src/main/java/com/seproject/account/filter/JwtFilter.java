@@ -1,7 +1,7 @@
 package com.seproject.account.filter;
 
 import com.seproject.account.authentication.handler.failure.CustomAuthenticationFailureHandler;
-import com.seproject.account.model.AccessToken;
+import com.seproject.account.model.token.AccessToken;
 import com.seproject.account.service.TokenService;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.account.jwt.JwtDecoder;
@@ -9,7 +9,6 @@ import com.seproject.error.exception.CustomAuthenticationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;

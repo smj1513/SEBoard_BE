@@ -1,6 +1,6 @@
-package com.seproject.account.repository;
+package com.seproject.account.repository.role;
 
-import com.seproject.account.model.Role;
+import com.seproject.account.model.role.Role;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;

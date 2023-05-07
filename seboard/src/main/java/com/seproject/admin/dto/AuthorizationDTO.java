@@ -1,8 +1,8 @@
 package com.seproject.admin.dto;
 
-import com.seproject.account.model.Authorization;
-import com.seproject.account.model.Role;
-import com.seproject.account.model.RoleAuthorization;
+import com.seproject.account.model.role.Authorization;
+import com.seproject.account.model.role.Role;
+import com.seproject.account.model.role.RoleAuthorization;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;

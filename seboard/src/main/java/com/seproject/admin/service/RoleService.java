@@ -1,7 +1,7 @@
 package com.seproject.admin.service;
 
-import com.seproject.account.model.Role;
-import com.seproject.account.repository.RoleRepository;
+import com.seproject.account.model.role.Role;
+import com.seproject.account.repository.role.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;

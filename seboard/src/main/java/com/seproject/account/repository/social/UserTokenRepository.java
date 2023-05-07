@@ -1,4 +1,4 @@
-package com.seproject.account.repository;
+package com.seproject.account.repository.social;
 
 import com.seproject.account.model.social.UserToken;
 import org.springframework.data.repository.CrudRepository;
