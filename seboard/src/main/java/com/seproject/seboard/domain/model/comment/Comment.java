@@ -55,6 +55,7 @@ public class Comment {
 
     public Reply writeReply(String contents, Comment taggedComment, BoardUser author, boolean isOnlyReadByAuthor){
         return Reply.builder()
+                .post(post)
                 .contents(contents)
                 .author(author)
                 .tag(taggedComment)
