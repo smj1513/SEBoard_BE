@@ -19,6 +19,7 @@ public enum ErrorCode {
     ROLE_NOT_FOUND(HttpStatus.BAD_REQUEST,109,"존재하지 않는 권한을 요청하였습니다."),
     USER_ALREADY_EXIST(HttpStatus.BAD_REQUEST,110,"이미 존재하는 id입니다."),
     INVALID_MAIL(HttpStatus.BAD_REQUEST,111,"잘못된 이메일 형식입니다."),
+    INCORRECT_AUTH_CODE(HttpStatus.BAD_REQUEST,112,"인증 코드가 일치하지 않습니다."),
     ;
 
     ErrorCode(HttpStatus httpStatus, int code,String message) {

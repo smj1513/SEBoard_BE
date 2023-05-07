@@ -1,7 +1,9 @@
 package com.seproject.account.service;
 
-import com.seproject.account.model.EmailAuthentication;
-import com.seproject.account.repository.EmailAuthRepository;
+import com.seproject.account.model.email.AccountRegisterConfirmedEmail;
+import com.seproject.account.model.email.AccountRegisterEmail;
+import com.seproject.account.repository.email.AccountRegisterConfirmedEmailRepository;
+import com.seproject.account.repository.email.AccountRegisterEmailRepository;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
 import lombok.RequiredArgsConstructor;
@@ -17,12 +19,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 @EnableAsync
 public class EmailService {
-    private final EmailAuthRepository emailAuthRepository;
+    private final AccountRegisterEmailRepository accountRegisterEmailRepository;
+    private final AccountRegisterConfirmedEmailRepository accountRegisterConfirmedEmailRepository;
 
     @Value("${mail.host}")
     private String host;
@@ -48,19 +52,12 @@ public class EmailService {
 
     @Async
     public void send(String email) {
-        EmailAuthentication emailAuthentication;
 
         if(!isEmail(email)) {
             throw new CustomIllegalArgumentException(ErrorCode.INVALID_MAIL,null);
         }
 
-
-        if(emailAuthRepository.existsByEmail(email)) {
-            emailAuthentication = emailAuthRepository.findByEmail(email);
-            emailAuthentication = emailAuthentication.update();
-        } else {
-            emailAuthentication = new EmailAuthentication(email);
-        }
+        AccountRegisterEmail accountRegisterEmail = new AccountRegisterEmail(email);
 
         Email simpleEmail = new SimpleEmail();
         simpleEmail.setHostName(host);
@@ -69,13 +66,13 @@ public class EmailService {
         simpleEmail.setAuthenticator(new DefaultAuthenticator(username, password));
         simpleEmail.setTLS(true);
 
-        try{
+        try {
             simpleEmail.setFrom("jongjong159@naver.com");
             simpleEmail.setSubject("SE 게시판 회원가입 이메일 인증");
-            simpleEmail.setMsg("인증번호: " + emailAuthentication.getAuthToken());
+            simpleEmail.setMsg(accountRegisterEmail.toMessage());
             simpleEmail.addTo(email);
 
-            emailAuthRepository.save(emailAuthentication);
+            accountRegisterEmailRepository.save(accountRegisterEmail);
             simpleEmail.send();
         } catch (EmailException e) {
             throw new RuntimeException(e);
@@ -84,36 +81,32 @@ public class EmailService {
 
     @Transactional
     public void confirm(String email,String token) {
-        EmailAuthentication emailAuthentication = emailAuthRepository.findEmailAuthentication(email,token);
+        Optional<AccountRegisterEmail> emailOptional = accountRegisterEmailRepository.findById(email);
 
         if(!isEmail(email)) {
             throw new CustomIllegalArgumentException(ErrorCode.INVALID_MAIL,null);
         }
 
-        if(emailAuthentication == null) {
+        if(emailOptional.isEmpty()) {
             throw new NoSuchElementException("일치하는 이메일 인증 정보가 없습니다.");
         }
 
-        if(emailAuthentication.getExpireDate().isBefore(LocalDateTime.now())) {
-            throw new IllegalStateException("만료된 인증 번호 입니다");
+        AccountRegisterEmail accountRegisterEmail = emailOptional.get();
+
+        if(!accountRegisterEmail.confirm(token)) {
+            throw new CustomIllegalArgumentException(ErrorCode.INCORRECT_AUTH_CODE,null);
         }
 
-        emailAuthentication.confirm();
+        AccountRegisterConfirmedEmail confirmedEmail = new AccountRegisterConfirmedEmail(email);
+        accountRegisterConfirmedEmailRepository.save(confirmedEmail);
     }
 
     public boolean isConfirmed(String email) {
-        EmailAuthentication emailAuthentication = emailAuthRepository.findByEmail(email);
 
         if(!isEmail(email)) {
             throw new CustomIllegalArgumentException(ErrorCode.INVALID_MAIL,null);
         }
 
-        if(emailAuthentication == null) return false;
-
-        if(emailAuthentication.getExpireDate().isBefore(LocalDateTime.now())) {
-            return false;
-        }
-
-        return emailAuthentication.getExpired();
+        return accountRegisterConfirmedEmailRepository.findById(email).isPresent();
     }
 }
