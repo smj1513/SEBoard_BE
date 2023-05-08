@@ -6,6 +6,7 @@ import com.seproject.seboard.domain.model.post.Post;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.NoRepositoryBean;
 import org.springframework.data.repository.Repository;
 
@@ -17,11 +18,10 @@ public interface PostSearchRepository extends Repository<Post, Long> {
     Optional<RetrievePostDetailResponse> findPostDetailById(Long id);
     List<RetrievePostListResponseElement> findPinedPostByCategoryId(Long categoryId);
     Page<RetrievePostListResponseElement> findPostByCategoryId(Long categoryId, Pageable pagingInfo);
-//    Page<Post> findByCategoryId(Long categoryId, Pageable pagingInfo);
-//    Page<Post> findByTitle(String title, Pageable pagingInfo);
-//    Page<Post> findByContent(String content, Pageable pagingInfo);
-//    Page<Post> findByTitleOrContent(String title, Pageable pagingInfo);
-//    Page<Post> findByAuthorName(String authorName, Pageable pagingInfo);
-//    Page<Post> findByAllOptions(String searchQuery, Pageable pagingInfo);
+    Page<RetrievePostListResponseElement> findByTitle(String title, Pageable pagingInfo);
+    Page<RetrievePostListResponseElement> findByContents(String content, Pageable pagingInfo);
+    Page<RetrievePostListResponseElement> findByTitleOrContents(String title, Pageable pagingInfo);
+    Page<RetrievePostListResponseElement> findByAuthorName(String authorName, Pageable pagingInfo);
+    Page<RetrievePostListResponseElement> findByAllOptions(String searchQuery, Pageable pagingInfo);
 }
 

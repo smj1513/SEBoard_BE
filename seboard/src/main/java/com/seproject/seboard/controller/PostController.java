@@ -58,9 +58,9 @@ public class PostController {
     @GetMapping
     public ResponseEntity<?> retrievePostList(
             @RequestParam Long categoryId,
-            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "25") Integer perPage,
-            @RequestParam(defaultValue = "true") Boolean pined
+            @RequestParam(defaultValue = "false") Boolean pined
     ) {
         if(pined){
             List<RetrievePostListResponseElement> pinedPostList = postSearchAppService.findPinedPostList(categoryId);
