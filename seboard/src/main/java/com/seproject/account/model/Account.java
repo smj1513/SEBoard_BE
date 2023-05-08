@@ -1,5 +1,6 @@
 package com.seproject.account.model;
 
+import com.seproject.account.model.role.Role;
 import lombok.*;
 import org.springframework.security.core.userdetails.UserDetails;
 

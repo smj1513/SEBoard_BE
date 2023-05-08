@@ -53,7 +53,7 @@ public class JwtProvider {
 
     private String createRefreshToken(AbstractAuthenticationToken token) {
         Instant instant = Instant.now().truncatedTo(ChronoUnit.SECONDS);
-        Instant expiredDate = instant.plus(1000 * 300, ChronoUnit.SECONDS);
+        Instant expiredDate = instant.plus(30, ChronoUnit.SECONDS);
         String refreshToken = Jwts.builder()
                 .setHeaderParam(JWTProperties.TYPE, JWTProperties.REFRESH_TOKEN)
                 .setHeaderParam(JWTProperties.ALGORITHM, JWTProperties.HS256)
@@ -68,7 +68,7 @@ public class JwtProvider {
 
     private String createJWT(AbstractAuthenticationToken token) {
         Instant instant = Instant.now().truncatedTo(ChronoUnit.SECONDS);
-        Instant expiredDate = instant.plus(1000 * 180, ChronoUnit.SECONDS);
+        Instant expiredDate = instant.plus(10, ChronoUnit.SECONDS);
         String jwt = Jwts.builder()
                 .setHeaderParam(JWTProperties.TYPE, JWTProperties.ACCESS_TOKEN)
                 .setHeaderParam(JWTProperties.ALGORITHM, JWTProperties.HS256)

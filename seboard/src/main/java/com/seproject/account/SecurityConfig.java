@@ -63,10 +63,12 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf().disable();
         http.cors().disable();
-        http.headers()
-                .xssProtection()
-            .and()
-                .contentSecurityPolicy("script-src 'self'");
+
+//        http.headers()
+//                .xssProtection()
+//            .and()
+//                .contentSecurityPolicy("script-src 'self'");
+
         http.sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 

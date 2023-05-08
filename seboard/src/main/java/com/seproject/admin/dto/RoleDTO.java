@@ -1,6 +1,6 @@
 package com.seproject.admin.dto;
 
-import com.seproject.account.model.Role;
+import com.seproject.account.model.role.Role;
 import lombok.Builder;
 import lombok.Data;
 

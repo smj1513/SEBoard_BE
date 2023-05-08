@@ -1,14 +1,18 @@
 package com.seproject.account.controller;
 
 import com.seproject.account.jwt.JwtDecoder;
+import com.seproject.account.utils.SecurityUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Collection;
+import java.util.HashMap;
 
 
 @Slf4j
@@ -67,4 +71,15 @@ public class IndexController {
         return new ResponseEntity<>("method secured",HttpStatus.OK);
     }
 
+    @GetMapping("/parseAccount")
+    public ResponseEntity<?> parseAccount() {
+
+        String loginId = SecurityUtils.getLoginId();
+        Collection<? extends GrantedAuthority> authorities = SecurityUtils.getAuthorities();
+        HashMap<String,Object> map = new HashMap<>();
+        map.put("로그인한 아이디" , loginId);
+        map.put("사용자가 가진 권한" , authorities);
+
+        return new ResponseEntity<>(map,HttpStatus.OK);
+    }
 }
