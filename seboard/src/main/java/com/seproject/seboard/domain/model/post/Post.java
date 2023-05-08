@@ -158,6 +158,10 @@ public class Post {
         attachments.add(attachment);
     }
 
+    public boolean hasAttachments(){
+        return !attachments.isEmpty();
+    }
+
     public void delete() {
         this.isDeleted = true;
     }

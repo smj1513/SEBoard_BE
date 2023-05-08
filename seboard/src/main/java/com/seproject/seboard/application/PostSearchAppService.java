@@ -1,6 +1,7 @@
 package com.seproject.seboard.application;
 
 import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostDetailResponse;
+import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostListResponseElement;
 import com.seproject.seboard.domain.model.post.Post;
 import com.seproject.seboard.domain.model.user.Member;
 import com.seproject.seboard.domain.repository.comment.CommentRepository;
@@ -9,8 +10,11 @@ import com.seproject.seboard.domain.repository.post.PostRepository;
 import com.seproject.seboard.domain.repository.post.PostSearchRepository;
 import com.seproject.seboard.domain.repository.user.MemberRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @AllArgsConstructor
@@ -42,6 +46,30 @@ public class PostSearchAppService {
         postDetailResponse.setBookmarked(isBookmarked);
 
         return postDetailResponse;
+    }
+
+    public List<RetrievePostListResponseElement> findPinedPostList(Long categoryId){
+        List<RetrievePostListResponseElement> pinedPosts = postSearchRepository.findPinedPostByCategoryId(categoryId);
+
+        pinedPosts.forEach( postDto -> {
+            int commentSize = commentRepository.countCommentsByPostId(postDto.getPostId());
+            postDto.setCommentSize(commentSize);
+        });
+
+        return pinedPosts;
+    }
+    //TODO : paging 처리해야함
+    public Page<RetrievePostListResponseElement> findPostList(Long categoryId, int page, int size){
+        Page<RetrievePostListResponseElement> postPage;
+
+        postPage = postSearchRepository.findPostByCategoryId(categoryId, PageRequest.of(page, size));
+
+        postPage.getContent().forEach(postDto -> {
+            int commentSize = commentRepository.countCommentsByPostId(postDto.getPostId());
+            postDto.setCommentSize(commentSize);
+        });
+
+        return postPage;
     }
 
 //    public RetrievePostListResponse searchByTitle(String title, int page, int perPage){

@@ -4,12 +4,9 @@ import com.seproject.seboard.application.CommentAppService;
 import com.seproject.seboard.application.PostAppService;
 import com.seproject.seboard.application.PostSearchAppService;
 import com.seproject.seboard.application.dto.comment.CommentCommand;
-import com.seproject.seboard.application.dto.post.PostCommand.PostListFindCommand;
 import com.seproject.seboard.controller.dto.MessageResponse;
-import com.seproject.seboard.controller.dto.comment.CommentResponse;
 import com.seproject.seboard.controller.dto.post.PostRequest.CreatePostRequest;
 import com.seproject.seboard.controller.dto.post.PostRequest.UpdateNamedPostRequest;
-import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostListResponse;
 import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostListResponseElement;
 import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostDetailResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -22,12 +19,14 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 import static com.seproject.seboard.controller.dto.comment.CommentResponse.*;
@@ -63,46 +62,15 @@ public class PostController {
             @RequestParam(defaultValue = "25") Integer perPage,
             @RequestParam(defaultValue = "true") Boolean pined
     ) {
-//        if(pined){
-//            RetrievePostListResponse pinedList = postAppService.findPostList(
-//                    PostListFindCommand.builder()
-//                            .categoryId(categoryId)
-//                            .page(page)
-//                            .size(perPage)
-//                            .build(),
-//                    true
-//            );
-//
-//            RetrievePostListResponse normalList = postAppService.findPostList(
-//                    PostListFindCommand.builder()
-//                            .categoryId(categoryId)
-//                            .page(page)
-//                            .size(perPage-pinedList.getPaginationInfo().getContentSize())
-//                            .build(),
-//                    false
-//            );
-//
-//            return new ResponseEntity<>(RetrievePinedPostListResponse.toDTO(pinedList, normalList), HttpStatus.OK);
-//        }else{
-//            RetrievePostListResponse retrievePostListResponse = postAppService.findPostList(
-//                    PostListFindCommand.builder()
-//                            .categoryId(categoryId)
-//                            .page(page)
-//                            .size(perPage)
-//                            .build(),
-//                    true
-//            );
-//
-//            return new ResponseEntity<>(retrievePostListResponse, HttpStatus.OK);
+        if(pined){
+            List<RetrievePostListResponseElement> pinedPostList = postSearchAppService.findPinedPostList(categoryId);
 
+            return ResponseEntity.ok(pinedPostList);
+        }else{
+            Page<RetrievePostListResponseElement> postList = postSearchAppService.findPostList(categoryId, page, perPage);
 
-
-        /***
-         *  TODO:  페이지 번호 0일때
-         *          페이지 번호 MAX 이상
-         *          category id가 없는 경우, 설정 안된경우
-         */
-        return null;
+            return ResponseEntity.ok(postList);
+        }
     }
 
     @Parameter(name = "postId", description = "상세 조회를 할 게시물의 pk")
