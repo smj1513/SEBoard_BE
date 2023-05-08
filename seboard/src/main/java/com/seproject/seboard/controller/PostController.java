@@ -56,12 +56,18 @@ public class PostController {
         }
     }
 
+    @GetMapping("/pined")
+    public ResponseEntity<?> retrievePinedPost(@RequestParam Long categoryId){
+        List<RetrievePostListResponseElement> pinedPostList = postSearchAppService.findPinedPostList(categoryId);
+
+        return ResponseEntity.ok(pinedPostList);
+    }
+
     @Parameters(
             {
                     @Parameter(name = "categoryId", description = "조회하고자 하는 카테고리 pk"),
                     @Parameter(name = "page", description = "페이지 번호"),
                     @Parameter(name = "perPage", description = "페이지 당 게시글 개수"),
-                    @Parameter(name = "pined", description = "상단 고정 글 포함 여부")
             }
     )
     @Operation(summary = "게시글 목록 조회", description = "카테고리, 페이징 정보를 전달하여 게시글 목록 조회한다")
@@ -73,18 +79,11 @@ public class PostController {
     public ResponseEntity<?> retrievePostList(
             @RequestParam Long categoryId,
             @RequestParam(defaultValue = "0") Integer page,
-            @RequestParam(defaultValue = "25") Integer perPage,
-            @RequestParam(defaultValue = "false") Boolean pined
+            @RequestParam(defaultValue = "25") Integer perPage
     ) {
-        if(pined){
-            List<RetrievePostListResponseElement> pinedPostList = postSearchAppService.findPinedPostList(categoryId);
+        Page<RetrievePostListResponseElement> postList = postSearchAppService.findPostList(categoryId, page, perPage);
 
-            return ResponseEntity.ok(pinedPostList);
-        }else{
-            Page<RetrievePostListResponseElement> postList = postSearchAppService.findPostList(categoryId, page, perPage);
-
-            return ResponseEntity.ok(postList);
-        }
+        return ResponseEntity.ok(postList);
     }
 
     @Parameter(name = "postId", description = "상세 조회를 할 게시물의 pk")
