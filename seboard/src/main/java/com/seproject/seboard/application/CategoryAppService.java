@@ -34,6 +34,7 @@ public class CategoryAppService {
 
     public void createCategory(CategoryCreateCommand command){
         //TODO : 상위 카테고리로 지정할 수 있는 카테고리 구분?
+        //TODO : menuRepository Id 널포익
         Menu superMenu = menuRepository.findById(command.getSuperCategoryId()).get();
 
         if(command.getCategoryType().equals("MENU")){
