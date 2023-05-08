@@ -1,30 +1,22 @@
 package com.seproject.account;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.navercorp.lucy.security.xss.servletfilter.XssEscapeServletFilter;
 import com.seproject.account.authentication.entrypoint.CustomAuthenticationEntryPoint;
 import com.seproject.account.authentication.handler.failure.CustomAuthenticationFailureHandler;
 import com.seproject.account.authentication.handler.success.FormLoginAuthenticationSuccessHandler;
 import com.seproject.account.authentication.handler.success.OidcAuthenticationSuccessHandler;
-import com.seproject.account.authorize.category.CategoryResourceFactoryBean;
 import com.seproject.account.authorize.url.UrlFilterInvocationSecurityMetaDataSource;
 import com.seproject.account.authorize.url.UrlResourcesFactoryBean;
 import com.seproject.account.authorize.handler.CustomAccessDeniedHandler;
-import com.seproject.account.filter.CategoryAccessFilter;
 import com.seproject.account.filter.CustomFilterSecurityInterceptor;
-import com.seproject.account.service.CategoryAuthorizationService;
+import com.seproject.account.filter.IpFilter;
 import com.seproject.account.service.CustomOidcUserService;
 import com.seproject.account.service.IpService;
 import com.seproject.account.utils.*;
-import com.seproject.account.jwt.JwtDecoder;
 import com.seproject.account.filter.JwtFilter;
-import com.seproject.account.utils.xss.HTMLCharacterEscapes;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.vote.AffirmativeBased;
 import org.springframework.security.access.vote.RoleVoter;
@@ -36,14 +28,11 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.oauth2.client.oidc.web.logout.OidcClientInitiatedLogoutSuccessHandler;
-import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +42,6 @@ import java.util.List;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private ClientRegistrationRepository clientRegistrationRepository;
     private final CustomOidcUserService customOidcUserService;
     private final OidcAuthenticationSuccessHandler oidcAuthenticationSuccessHandler;
     private final FormLoginAuthenticationSuccessHandler formLoginAuthenticationSuccessHandler;
@@ -64,10 +52,7 @@ public class SecurityConfig {
     private final AuthenticationConfiguration authenticationConfiguration;
     private final IpService ipService;
     private final JwtFilter jwtFilter;
-    private final CategoryAuthorizationService categoryAuthorizationService;
     private UrlResourcesFactoryBean urlResourcesFactoryBean;
-
-
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -78,11 +63,15 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf().disable();
         http.cors().disable();
+
 //        http.headers()
 //                .xssProtection()
 //            .and()
 //                .contentSecurityPolicy("script-src 'self'");
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+        http.sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
         http.authorizeRequests()
 //                .antMatchers("/admin/**").hasRole("ADMIN")
                 .anyRequest().permitAll();
@@ -90,7 +79,6 @@ public class SecurityConfig {
         http.formLogin()
                 .usernameParameter("username")
                 .passwordParameter("password")
-                .loginPage("/index")
                 .loginProcessingUrl("/formLogin")
                 .successHandler(formLoginAuthenticationSuccessHandler)
                 .failureHandler(formLoginFailureHandler)
@@ -100,30 +88,20 @@ public class SecurityConfig {
                 userInfoEndpointConfig.oidcUserService(customOidcUserService))
                 .successHandler(oidcAuthenticationSuccessHandler));
 
-        //formlogin과 oauth2의 통합 로그아웃 처리가 필요
         http.logout()
-                .logoutSuccessHandler(oidcLogoutSuccessHandler())
                 .invalidateHttpSession(true)
-                .clearAuthentication(true)
-                .deleteCookies("JSESSIONID")
-                .deleteCookies("remember-me");
+                .clearAuthentication(true);
 
         http.exceptionHandling()
                 .accessDeniedHandler(accessDeniedHandler)
                 .authenticationEntryPoint(authenticationEntryPoint);
 
         http.addFilterBefore(jwtFilter,UsernamePasswordAuthenticationFilter.class);
-//        http.addFilterBefore(new IpFilter(ipService,accessDeniedHandler), UsernamePasswordAuthenticationFilter.class);
-//        http.addFilterBefore(categoryAccessFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new IpFilter(ipService,accessDeniedHandler), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(filterSecurityInterceptor(),FilterSecurityInterceptor.class);
         return http.build();
     }
 
-    private OidcClientInitiatedLogoutSuccessHandler oidcLogoutSuccessHandler() {
-        OidcClientInitiatedLogoutSuccessHandler successHandler = new OidcClientInitiatedLogoutSuccessHandler(clientRegistrationRepository);
-        successHandler.setPostLogoutRedirectUri("http://localhost:8080/login");
-        return successHandler;
-    }
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -189,11 +167,4 @@ public class SecurityConfig {
         return new UrlFilterInvocationSecurityMetaDataSource(urlResourcesFactoryBean);
     }
 
-
-//    @Bean
-    public CategoryAccessFilter categoryAccessFilter() {
-        CategoryResourceFactoryBean categoryResourceFactoryBean = new CategoryResourceFactoryBean(categoryAuthorizationService);
-        CategoryAccessFilter categoryAccessFilter = new CategoryAccessFilter(categoryResourceFactoryBean,accessDeniedHandler);
-        return categoryAccessFilter;
-    }
 }

@@ -1,15 +1,14 @@
 package com.seproject.account.filter;
 
-import com.seproject.account.model.Token;
+import com.seproject.account.authentication.handler.failure.CustomAuthenticationFailureHandler;
+import com.seproject.account.model.token.AccessToken;
 import com.seproject.account.service.TokenService;
 import com.seproject.error.errorCode.ErrorCode;
-import com.seproject.error.exception.NotRegisteredUserException;
-import com.seproject.error.exception.TokenValidateException;
 import com.seproject.account.jwt.JwtDecoder;
+import com.seproject.error.exception.CustomAuthenticationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -26,11 +25,13 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtDecoder jwtDecoder;
 
-    private final AuthenticationFailureHandler failureHandler;
+    private final CustomAuthenticationFailureHandler failureHandler;
     private final TokenService tokenService;
 
     @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
 
         String jwt = jwtDecoder.getAccessToken(request);
 
@@ -38,18 +39,19 @@ public class JwtFilter extends OncePerRequestFilter {
             if(StringUtils.hasText(jwt)) {
 
                 if(jwtDecoder.isTemporalToken(jwt)) {
-                    failureHandler.onAuthenticationFailure(request,response,new NotRegisteredUserException(ErrorCode.NOT_REGISTERED_USER));
+                    throw new CustomAuthenticationException(ErrorCode.NOT_REGISTERED_USER,null);
                 }
 
-                Token token = tokenService.findToken(jwt);
+                AccessToken accessToken = tokenService.findAccessToken(jwt);
 
-                if(token != null) {
-                    Authentication authentication = jwtDecoder.getAuthentication(token);
+                if(accessToken != null) {
+                    Authentication authentication = jwtDecoder.getAuthentication(accessToken);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
+
             }
             filterChain.doFilter(request,response);
-        } catch (TokenValidateException e) {
+        } catch (CustomAuthenticationException e) {
             failureHandler.onAuthenticationFailure(request,response,e);
         }
     }

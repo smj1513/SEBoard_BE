@@ -30,8 +30,6 @@ public class EmailController {
     private final AccountService accountService;
     private final EmailService emailService;
 
-
-
     @Parameters(
             {
                     @Parameter(name = "email", description = "인증번호를 받을 이메일을 전달한다.")
@@ -98,10 +96,6 @@ public class EmailController {
         if(!emailService.isKumohMail(email)){
             return new ResponseEntity<>("잘못된 이메일 형식입니다.", HttpStatus.BAD_REQUEST);
         }
-
-//        if(accountService.isExist(email)) {
-//            return new ResponseEntity<>("이미 인증된 이메일입니다." , HttpStatus.BAD_REQUEST);
-//        }
 
         emailService.send(email);
         return new ResponseEntity<>("입력한 이메일로 인증 코드를 전송했습니다.",HttpStatus.OK);

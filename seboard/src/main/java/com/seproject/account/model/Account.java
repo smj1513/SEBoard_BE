@@ -1,5 +1,6 @@
 package com.seproject.account.model;
 
+import com.seproject.account.model.role.Role;
 import lombok.*;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -18,7 +19,7 @@ public class Account implements UserDetails {
 
     @Column(name = "login_id",unique = true)
     private String loginId;
-    private String username;
+    private String name;
     private String nickname;
     private String password;
 
@@ -33,11 +34,11 @@ public class Account implements UserDetails {
 
     @Builder
     public Account(Long accountId, String loginId,
-                   String username, String nickname,
+                   String name, String nickname,
                    String password, List<Role> authorities, LocalDateTime createdAt) {
         this.accountId = accountId;
         this.loginId = loginId;
-        this.username = username;
+        this.name = name;
         this.nickname = nickname;
         this.password = password;
         this.authorities = authorities;
@@ -47,12 +48,17 @@ public class Account implements UserDetails {
     public Account update(Account account) {
         loginId = account.loginId;
         password = account.password;
-        username = account.username;
+        name = account.name;
         nickname = account.nickname;
         authorities = account.authorities;
 
         return this;
     }
+
+    public String getUsername() {
+        return loginId;
+    }
+
     @Override
     public boolean isAccountNonExpired() {
         return true;

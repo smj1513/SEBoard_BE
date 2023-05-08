@@ -1,4 +1,4 @@
-package com.seproject.account.model;
+package com.seproject.account.model.role;
 
 import lombok.*;
 

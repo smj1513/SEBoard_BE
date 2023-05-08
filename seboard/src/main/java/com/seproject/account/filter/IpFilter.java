@@ -1,14 +1,11 @@
 package com.seproject.account.filter;
 
-import com.seproject.account.SecurityConfig;
 import com.seproject.account.authorize.handler.CustomAccessDeniedHandler;
 import com.seproject.account.service.IpService;
-import com.seproject.error.exception.IpAccessDeniedException;
+import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.CustomAccessDeniedException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.WebAuthenticationDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.servlet.FilterChain;
@@ -31,7 +28,7 @@ public class IpFilter extends OncePerRequestFilter {
         String address = getClientIP(request);
 
         if(ipService.existIpAddress(address)) {
-            accessDeniedHandler.handle(request,response,new IpAccessDeniedException("ip 접근이 제한되었습니다."));
+            accessDeniedHandler.handle(request,response,new CustomAccessDeniedException(ErrorCode.BANNED_IP,null));
         } else {
             filterChain.doFilter(request,response);
         }
