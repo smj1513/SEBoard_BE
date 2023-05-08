@@ -1,4 +1,4 @@
-package com.seproject.account.model;
+package com.seproject.account.model.token;
 
 import lombok.Builder;
 import lombok.Getter;
@@ -6,15 +6,14 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.redis.core.RedisHash;
 import org.springframework.security.core.GrantedAuthority;
 
-import java.util.List;
+import java.util.Collection;
 
 @Builder
 @Getter
-@RedisHash(value = "JWT", timeToLive = 2_592_000L)
-public class Token {
+@RedisHash(value = "ACCESS_TOKEN", timeToLive = 3600L)
+public class AccessToken {
 
     @Id
     private String accessToken;
-    private String refreshToken;
-    private List<? extends GrantedAuthority> authorities;
+    private Collection<? extends GrantedAuthority> authorities;
 }

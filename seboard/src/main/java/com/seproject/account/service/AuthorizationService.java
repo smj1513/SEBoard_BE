@@ -1,11 +1,11 @@
 package com.seproject.account.service;
 
-import com.seproject.account.model.Authorization;
-import com.seproject.account.model.Role;
-import com.seproject.account.model.RoleAuthorization;
-import com.seproject.account.repository.AuthorizationRepository;
-import com.seproject.account.repository.RoleAuthorizationRepository;
-import com.seproject.account.repository.RoleRepository;
+import com.seproject.account.model.role.Authorization;
+import com.seproject.account.model.role.Role;
+import com.seproject.account.model.role.RoleAuthorization;
+import com.seproject.account.repository.role.AuthorizationRepository;
+import com.seproject.account.repository.role.RoleAuthorizationRepository;
+import com.seproject.account.repository.role.RoleRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;

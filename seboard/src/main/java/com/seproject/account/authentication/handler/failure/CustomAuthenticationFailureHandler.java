@@ -1,10 +1,9 @@
 package com.seproject.account.authentication.handler.failure;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.seproject.error.Error;
+import com.seproject.account.utils.ErrorCodeConverter;
+import com.seproject.account.utils.ResponseWriter;
 import com.seproject.error.errorCode.ErrorCode;
-import com.seproject.error.exception.PasswordIncorrectException;
-import com.seproject.error.exception.TokenValidateException;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
@@ -15,34 +14,25 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+@RequiredArgsConstructor
 @Component
 public class CustomAuthenticationFailureHandler implements AuthenticationFailureHandler {
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private final ResponseWriter responseWriter;
+    private final ErrorCodeConverter errorCodeConverter;
 
     @Override
     public void onAuthenticationFailure(HttpServletRequest request,
             HttpServletResponse response,
             AuthenticationException exception) throws IOException, ServletException {
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("utf-8");
+        ErrorCode errorCode = errorCodeConverter.convertExceptionToErrorCode(exception);
 
-        ErrorCode errorCode;
-
-        if(exception instanceof PasswordIncorrectException) {
-            errorCode = ErrorCode.PASSWORD_INCORRECT;
-        } else if(exception instanceof TokenValidateException){
-            errorCode = ErrorCode.INVALID_JWT;
-        } else {
-            response.sendError(HttpStatus.UNAUTHORIZED.value(),exception.getMessage());
-            return;
+        if(errorCode != null) {
+            responseWriter.write(errorCode, response);
         }
-
-        Error error = Error.of(errorCode);
-        String result = objectMapper.writeValueAsString(error);
-        response.setStatus(errorCode.getHttpStatus().value());
-        response.getWriter().write(result);
     }
+
+
 
 }

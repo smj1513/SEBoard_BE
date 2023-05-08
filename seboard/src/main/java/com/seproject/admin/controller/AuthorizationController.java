@@ -42,6 +42,7 @@ public class AuthorizationController {
     public ResponseEntity<?> createAuthorization(@RequestBody CreateAuthorizationRequest createAuthorizationRequest) {
         CreateAuthorizationResponse createAuthorizationResponse = authorizationService.addAuthorization(createAuthorizationRequest);
         try{
+            //TODO : 옵저버
             urlFilterInvocationSecurityMetaDataSource.reset();
         } catch (Exception e) {
             return new ResponseEntity<>("reload 실패하였습니다.", HttpStatus.SERVICE_UNAVAILABLE);
@@ -57,6 +58,7 @@ public class AuthorizationController {
     public ResponseEntity<?> deleteAuthorization(@PathVariable Long authorizationId) {
         DeleteAuthorizationResponse deleteAuthorizationResponse = authorizationService.deleteAuthorization(authorizationId);
         try{
+            //TODO : 옵저버
             urlFilterInvocationSecurityMetaDataSource.reset();
         } catch (Exception e) {
             return new ResponseEntity<>("reload 실패하였습니다.", HttpStatus.SERVICE_UNAVAILABLE);
