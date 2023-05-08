@@ -16,7 +16,7 @@ public class Category extends BoardMenu {
     public Category(Long categoryId, Menu superMenu, String name, String description, String categoryPathId) {
         super(categoryId, superMenu, name, description, categoryPathId);
 
-        if(superMenu.getClass()==BoardMenu.class){ //TODO : 이게 맞나?
+        if(superMenu.getClass()!=BoardMenu.class){ //TODO : 이게 맞나?
             throw new IllegalArgumentException();
         }
     }

@@ -5,6 +5,7 @@ import com.seproject.seboard.application.PostAppService;
 import com.seproject.seboard.application.PostSearchAppService;
 import com.seproject.seboard.application.dto.comment.CommentCommand;
 import com.seproject.seboard.controller.dto.MessageResponse;
+import com.seproject.seboard.controller.dto.post.PostRequest;
 import com.seproject.seboard.controller.dto.post.PostRequest.CreatePostRequest;
 import com.seproject.seboard.controller.dto.post.PostRequest.UpdateNamedPostRequest;
 import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostListResponseElement;
@@ -30,6 +31,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 
 import static com.seproject.seboard.controller.dto.comment.CommentResponse.*;
+import static com.seproject.seboard.controller.dto.post.PostRequest.*;
 import static com.seproject.seboard.controller.dto.post.PostResponse.*;
 
 @Slf4j
@@ -41,6 +43,18 @@ public class PostController {
     private final PostAppService postAppService;
     private final PostSearchAppService postSearchAppService;
     private final CommentAppService commentAppService;
+
+    @PostMapping("/{postId}/auth")
+    public ResponseEntity<?> retrievePrivacyPost(@RequestBody RetrievePrivacyPostRequest request, @PathVariable Long postId){
+        Long accountId = 5234058023853L;
+
+        try{
+            RetrievePostDetailResponse privacyPost = postSearchAppService.findPrivacyPost(postId, request.getPassword(), accountId);
+            return ResponseEntity.ok(privacyPost);
+        }catch (Exception e){
+            return ResponseEntity.badRequest().body(MessageResponse.of(e.getMessage()));
+        }
+    }
 
     @Parameters(
             {
@@ -91,7 +105,7 @@ public class PostController {
         try {
             RetrievePostDetailResponse postDetailRes = postSearchAppService.findPostDetail(postId, accountId);
             return new ResponseEntity<>(postDetailRes, HttpStatus.OK);
-        } catch (NoSuchElementException e) {
+        } catch (Exception e) {
             MessageResponse response = MessageResponse.of(e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
