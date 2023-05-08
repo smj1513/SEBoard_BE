@@ -31,6 +31,38 @@ public class PostSearchAppService {
     private final MemberRepository memberRepository;
     private final BookmarkRepository bookmarkRepository;
 
+    public RetrievePostDetailResponse findPrivacyPost(Long postId, String password, Long accountId){
+        Post post = postRepository.findById(postId).orElseThrow(NoSuchElementException::new);
+        RetrievePostDetailResponse postDetailResponse =
+                postSearchRepository.findPostDetailById(postId).orElseThrow(NoSuchElementException::new);
+
+        if(post.getExposeOption().getExposeState()!=ExposeState.PRIVACY){
+            return findPostDetail(postId, accountId);
+        }
+
+        if(!post.checkPassword(password)){
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+
+        //TODO : member없을 때 로직 추가 필요
+        //TODO : 관리자 권한일 때 editable 로직 추가필요
+        boolean isEditable = false;
+        boolean isBookmarked = false;
+
+        if(accountId!=null) {
+            Member member = memberRepository.findByAccountId(accountId).orElseThrow(NoSuchElementException::new);
+
+            isEditable = post.isWrittenBy(accountId);
+            isBookmarked = bookmarkRepository.existsByPostIdAndMemberId(postId, member.getBoardUserId());
+        }
+
+        postDetailResponse.setEditable(isEditable);
+        postDetailResponse.setBookmarked(isBookmarked);
+
+        return postDetailResponse;
+
+    }
+
     public RetrievePostDetailResponse findPostDetail(Long postId, Long accountId){
         Post post = postRepository.findById(postId).orElseThrow(NoSuchElementException::new);
         RetrievePostDetailResponse postDetailResponse =

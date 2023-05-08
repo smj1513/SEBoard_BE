@@ -6,6 +6,7 @@ import com.seproject.seboard.domain.model.post.exposeOptions.ExposeState;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,16 @@ public class PostRequest {
         private Integer page;
         private Integer perPage;
 
+    }
+
+    @Data
+    @NoArgsConstructor
+    public static class RetrievePrivacyPostRequest{
+        private String password;
+
+        public RetrievePrivacyPostRequest(String password) {
+            this.password = password;
+        }
     }
 
     @Data
