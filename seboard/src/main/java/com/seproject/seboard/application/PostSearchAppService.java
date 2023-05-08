@@ -3,6 +3,7 @@ package com.seproject.seboard.application;
 import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostDetailResponse;
 import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostListResponseElement;
 import com.seproject.seboard.domain.model.post.Post;
+import com.seproject.seboard.domain.model.post.exposeOptions.ExposeState;
 import com.seproject.seboard.domain.model.user.Member;
 import com.seproject.seboard.domain.repository.comment.CommentRepository;
 import com.seproject.seboard.domain.repository.comment.CommentSearchRepository;
@@ -39,17 +40,27 @@ public class PostSearchAppService {
         boolean isEditable = false;
         boolean isBookmarked = false;
 
-        if(accountId!=null){
+        if(accountId!=null) {
             Member member = memberRepository.findByAccountId(accountId).orElseThrow(NoSuchElementException::new);
 
             isEditable = post.isWrittenBy(accountId);
             isBookmarked = bookmarkRepository.existsByPostIdAndMemberId(postId, member.getBoardUserId());
+
         }
 
         postDetailResponse.setEditable(isEditable);
         postDetailResponse.setBookmarked(isBookmarked);
 
+        if(post.getExposeOption().getExposeState()== ExposeState.PRIVACY){
+            if(accountId!=null && post.isWrittenBy(accountId)){
+                return postDetailResponse;
+            }else{
+                throw new IllegalArgumentException("해당 게시글은 비공개 게시글입니다. 비밀번호를 입력해주세요");
+            }
+        }
+
         return postDetailResponse;
+
     }
 
     public List<RetrievePostListResponseElement> findPinedPostList(Long categoryId){

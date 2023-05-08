@@ -91,7 +91,7 @@ public class PostController {
         try {
             RetrievePostDetailResponse postDetailRes = postSearchAppService.findPostDetail(postId, accountId);
             return new ResponseEntity<>(postDetailRes, HttpStatus.OK);
-        } catch (NoSuchElementException e) {
+        } catch (Exception e) {
             MessageResponse response = MessageResponse.of(e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
