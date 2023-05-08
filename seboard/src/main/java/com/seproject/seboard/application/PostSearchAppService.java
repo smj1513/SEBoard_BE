@@ -1,16 +1,22 @@
 package com.seproject.seboard.application;
 
 import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostDetailResponse;
+import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostListResponseElement;
 import com.seproject.seboard.domain.model.post.Post;
 import com.seproject.seboard.domain.model.user.Member;
 import com.seproject.seboard.domain.repository.comment.CommentRepository;
+import com.seproject.seboard.domain.repository.comment.CommentSearchRepository;
+import com.seproject.seboard.domain.repository.comment.ReplyRepository;
 import com.seproject.seboard.domain.repository.post.BookmarkRepository;
 import com.seproject.seboard.domain.repository.post.PostRepository;
 import com.seproject.seboard.domain.repository.post.PostSearchRepository;
 import com.seproject.seboard.domain.repository.user.MemberRepository;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @AllArgsConstructor
@@ -18,7 +24,9 @@ import java.util.NoSuchElementException;
 public class PostSearchAppService {
     private final PostRepository postRepository;
     private final PostSearchRepository postSearchRepository;
+    private final CommentSearchRepository commentSearchRepository;
     private final CommentRepository commentRepository;
+    private final ReplyRepository replyRepository;
     private final MemberRepository memberRepository;
     private final BookmarkRepository bookmarkRepository;
 
@@ -44,53 +52,75 @@ public class PostSearchAppService {
         return postDetailResponse;
     }
 
-//    public RetrievePostListResponse searchByTitle(String title, int page, int perPage){
-//        Page<Post> postPage = postSearchRepository.findByTitle(title, new PagingInfo(page, perPage));
-//
-//        return getRetrievePostListResponse(postPage);
-//    }
-//
-//    public RetrievePostListResponse searchByContent(String content, int page, int perPage){
-//        Page<Post> postPage = postSearchRepository.findByContent(content, new PagingInfo(page, perPage));
-//
-//        return getRetrievePostListResponse(postPage);
-//    }
-//
-//    public RetrievePostListResponse searchByTitleOrContent(String query, int page, int perPage){
-//        Page<Post> postPage = postSearchRepository.findByTitleOrContent(query, new PagingInfo(page, perPage));
-//
-//        return getRetrievePostListResponse(postPage);
-//    }
-//
-//    public RetrievePostListResponse searchByAuthorName(String authorName, int page, int perPage){
-//        Page<Post> postPage = postSearchRepository.findByAuthorName(authorName, new PagingInfo(page, perPage));
-//
-//        return getRetrievePostListResponse(postPage);
-//    }
-//
-//    public RetrievePostListResponse searchByAll(String query, int page, int perPage){
-//        Page<Post> postPage = postSearchRepository.findByAllOptions(query, new PagingInfo(page, perPage));
-//
-//        return getRetrievePostListResponse(postPage);
-//    }
-//
-//    private RetrievePostListResponse getRetrievePostListResponse(Page<Post> postPage) {
-//        List<PostResponse.RetrievePostListResponseElement> postDtoList = postPage.getData()
-//                .stream()
-//                .map(post -> {
-//                    int commentSize = commentRepository.countCommentsByPostId(post.getPostId());
-//                    return PostResponse.RetrievePostListResponseElement.toDTO(post, commentSize);
-//                }).collect(Collectors.toList());
-//
-//        PaginationResponse paginationResponse = PaginationResponse.builder()
-//                .currentPage(postPage.getCurPage())
-//                .contentSize(postPage.getTotalSize())
-//                .perPage(postPage.getPerPage())
-//                .lastPage(postPage.getLastPage())
-//                .build();
-//
-//        return RetrievePostListResponse.toDTO(postDtoList, paginationResponse);
-//    }
-//
+    public List<RetrievePostListResponseElement> findPinedPostList(Long categoryId){
+        List<RetrievePostListResponseElement> pinedPosts = postSearchRepository.findPinedPostByCategoryId(categoryId);
+
+        pinedPosts.forEach(postDto -> {
+            int commentSize = commentRepository.countCommentsByPostId(postDto.getPostId());
+            int replySize = commentSearchRepository.countReplyByPostId(postDto.getPostId());
+            postDto.setCommentSize(commentSize+replySize);
+        });
+
+        return pinedPosts;
+    }
+    //TODO : paging 처리해야함
+    public Page<RetrievePostListResponseElement> findPostList(Long categoryId, int page, int size){
+        Page<RetrievePostListResponseElement> postPage;
+
+        postPage = postSearchRepository.findPostByCategoryId(categoryId, PageRequest.of(page, size));
+
+        setCommentSize(postPage);
+
+        return postPage;
+    }
+
+    public Page<RetrievePostListResponseElement> searchByTitle(String title, int page, int perPage){
+        Page<RetrievePostListResponseElement> postPage = postSearchRepository.findByTitle(title, PageRequest.of(page, perPage));
+
+        setCommentSize(postPage);
+
+        return postPage;
+    }
+
+    public Page<RetrievePostListResponseElement> searchByContent(String content, int page, int perPage){
+        Page<RetrievePostListResponseElement> postPage = postSearchRepository.findByContents(content, PageRequest.of(page, perPage));
+
+        setCommentSize(postPage);
+
+        return postPage;
+    }
+
+    public Page<RetrievePostListResponseElement> searchByTitleOrContent(String query, int page, int perPage){
+        Page<RetrievePostListResponseElement> postPage = postSearchRepository.findByTitleOrContents(query, PageRequest.of(page, perPage));
+
+        setCommentSize(postPage);
+
+        return postPage;
+    }
+
+    public Page<RetrievePostListResponseElement> searchByAuthorName(String authorName, int page, int perPage){
+        Page<RetrievePostListResponseElement> postPage = postSearchRepository.findByAuthorName(authorName, PageRequest.of(page, perPage));
+
+        setCommentSize(postPage);
+
+        return postPage;
+    }
+
+    public Page<RetrievePostListResponseElement> searchByAll(String query, int page, int perPage){
+        Page<RetrievePostListResponseElement> postPage = postSearchRepository.findByAllOptions(query, PageRequest.of(page, perPage));
+
+        setCommentSize(postPage);
+
+        return postPage;
+    }
+
+
+    private void setCommentSize(Page<RetrievePostListResponseElement> postPage){
+        postPage.forEach(postDto -> {
+            int commentSize = commentRepository.countCommentsByPostId(postDto.getPostId());
+            int replySize = commentSearchRepository.countReplyByPostId(postDto.getPostId());
+            postDto.setCommentSize(commentSize+replySize);
+        });
+    }
 
 }

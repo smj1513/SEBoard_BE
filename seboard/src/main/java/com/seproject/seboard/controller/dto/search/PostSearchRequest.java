@@ -2,9 +2,9 @@ package com.seproject.seboard.controller.dto.search;
 
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 @Data
-@Builder
 public class PostSearchRequest {
     private Long categoryId;
     private String searchOption;

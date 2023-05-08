@@ -34,12 +34,4 @@ public class PostCommand {
         private String privatePassword;
         private List<Long> attachmentIds;
     }
-
-    @Data
-    @Builder
-    public static class PostListFindCommand {
-        private Long categoryId;
-        private int page;
-        private int size;
-    }
 }

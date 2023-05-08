@@ -15,5 +15,5 @@ public interface CommentSearchJpaRepository extends CommentSearchRepository {
     @Query("select r from Reply r where r.superComment.commentId = :commentId")
     List<Reply> findReplyListByCommentId(Long commentId);
     @Query("select count(r) from Reply r where r.post.postId = :postId")
-    Long countReplyByPostId(Long postId);
+    int countReplyByPostId(Long postId);
 }

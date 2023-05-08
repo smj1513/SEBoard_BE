@@ -1,7 +1,6 @@
 package com.seproject.seboard.application;
 
 import com.seproject.seboard.application.dto.post.PostCommand.PostEditCommand;
-import com.seproject.seboard.application.dto.post.PostCommand.PostListFindCommand;
 import com.seproject.seboard.application.dto.post.PostCommand.PostWriteCommand;
 import com.seproject.seboard.domain.model.category.Category;
 import com.seproject.seboard.domain.model.common.BaseTime;
@@ -96,32 +95,6 @@ public class PostAppService {
     }
 
 
-    //TODO : paging 처리해야함
-    public RetrievePostListResponse findPostList(PostListFindCommand command, boolean pinedOption){
-//        Page<Post> postPage = null;
-//
-//        if(pinedOption){
-//            postPage = postSearchRepository.findPinedPostByCategoryId(command.getCategoryId(), PageRequest.of(command.getPage(), command.getSize()));
-//        }else{
-//            postPage = postSearchRepository.findByCategoryId(command.getCategoryId(), PageRequest.of(command.getPage(), command.getSize())));
-//        }
-//
-//        List<RetrievePostListResponseElement> postDtoList = postPage .stream()
-//            .map(post -> {
-//                int commentSize = commentRepository.countCommentsByPostId(post.getPostId());
-//                return RetrievePostListResponseElement.toDTO(post, commentSize);
-//            }).collect(Collectors.toList());
-//
-//        PaginationResponse paginationResponse = PaginationResponse.builder()
-//                .currentPage(postPage.getCurPage())
-//                .contentSize(postPage.getTotalSize())
-//                .perPage(postPage.getPerPage())
-//                .lastPage(postPage.getLastPage())
-//                .build();
-//
-//        return RetrievePostListResponse.toDTO(postDtoList, paginationResponse);
-        return null;
-    }
 
     @Transactional
     public void editPost(PostEditCommand command) {

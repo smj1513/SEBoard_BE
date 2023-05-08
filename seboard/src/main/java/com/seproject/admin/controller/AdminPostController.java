@@ -38,16 +38,17 @@ public class AdminPostController {
     })
     @GetMapping("/posts")
     public ResponseEntity<?> retrieveAllPost(@RequestBody RetrievePostListRequest retrievePostListRequest) {
-
-        PostListFindCommand command = PostCommand.PostListFindCommand.builder()
-                .categoryId(retrievePostListRequest.getCategoryId())
-                .page(retrievePostListRequest.getPage())
-                .size(retrievePostListRequest.getPerPage())
-                .build();
-
-        RetrievePostListResponse postList = postAppService.findPostList(command, false);
-
-        return new ResponseEntity<>(postList, HttpStatus.OK);
+//
+//        PostListFindCommand command = PostCommand.PostListFindCommand.builder()
+//                .categoryId(retrievePostListRequest.getCategoryId())
+//                .page(retrievePostListRequest.getPage())
+//                .size(retrievePostListRequest.getPerPage())
+//                .build();
+//
+//        RetrievePostListResponse postList = postAppService.findPostList(command, false);
+//
+//        return new ResponseEntity<>(postList, HttpStatus.OK);
+        return null;
     }
 
 //    //TODO: 예외 추가
