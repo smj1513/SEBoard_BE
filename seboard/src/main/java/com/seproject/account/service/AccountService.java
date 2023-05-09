@@ -90,6 +90,7 @@ public class AccountService implements UserDetailsService {
         oAuthAccountRepository.save(oAuthAccount);
 
         Member member = Member.builder()
+                .name(account.getNickname())
                 .account(account)
                 .build();
 
@@ -117,6 +118,7 @@ public class AccountService implements UserDetailsService {
         accountRepository.save(account);
 
         Member member = Member.builder()
+                .name(account.getNickname())
                 .account(account)
                 .build();
 
