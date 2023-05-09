@@ -13,7 +13,7 @@ public class PostCommand {
         private String title;
         private String contents;
         private Long categoryId;
-        private Long accountId;
+        private String loginId;
         private boolean pined;
         private ExposeState exposeState;
         private String privatePassword;

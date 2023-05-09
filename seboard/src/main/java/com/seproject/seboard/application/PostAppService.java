@@ -1,11 +1,14 @@
 package com.seproject.seboard.application;
 
+import com.seproject.account.model.Account;
+import com.seproject.account.repository.AccountRepository;
+import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.NoSuchResourceException;
 import com.seproject.seboard.application.dto.post.PostCommand.PostEditCommand;
 import com.seproject.seboard.application.dto.post.PostCommand.PostWriteCommand;
 import com.seproject.seboard.domain.model.category.Category;
 import com.seproject.seboard.domain.model.common.BaseTime;
 import com.seproject.seboard.domain.model.common.FileMetaData;
-import com.seproject.seboard.domain.model.category.Menu;
 import com.seproject.seboard.domain.model.post.Post;
 import com.seproject.seboard.domain.model.post.exposeOptions.ExposeOption;
 import com.seproject.seboard.domain.model.user.Anonymous;
@@ -29,7 +32,6 @@ import java.util.NoSuchElementException;
 import java.util.Set;
 
 import static com.seproject.seboard.application.utils.AppServiceHelper.*;
-import static com.seproject.seboard.controller.dto.post.PostResponse.*;
 
 @Service
 @RequiredArgsConstructor
@@ -44,37 +46,38 @@ public class PostAppService {
     private final CommentRepository commentRepository;
     private final BookmarkRepository bookmarkRepository;
     private final FileAppService fileAppService;
+    private final AccountRepository accountRepository;
 
-    public void writePost(PostWriteCommand command){
+    public Long writePost(PostWriteCommand command){
+        Account account = accountRepository.findByLoginId(command.getLoginId());
+
         if(command.isAnonymous()){
-            writeUnnamedPost(command);
+            return writeUnnamedPost(command, account.getAccountId());
         }else{
-            writeNamedPost(command);
+            return writeNamedPost(command, account.getAccountId());
         }
     }
 
-    protected void writeUnnamedPost(PostWriteCommand command) { //accID는 체킹되었다고 가정
+    protected Long writeUnnamedPost(PostWriteCommand command, Long accountId) {
         Anonymous anonymous = Anonymous.builder()
                 .name("익명") //TODO : 익명 이름 다양하게?
-                .accountId(command.getAccountId())
+                .accountId(accountId)
                 .build();
 
         anonymousRepository.save(anonymous);
 
-        createPost(command, anonymous);
+        return createPost(command, anonymous);
     }
 
-    protected void writeNamedPost(PostWriteCommand command) {
-        Member member = memberRepository.findByAccountId(command.getAccountId()).orElseThrow(NoSuchElementException::new);
+    protected Long writeNamedPost(PostWriteCommand command, Long accountId) {
+        Member member = memberRepository.findByAccountId(accountId).orElseThrow(NoSuchElementException::new);
 
-        if (member == null) {
-            //TODO : member 생성 로직 호출
-        }
-
-        createPost(command, member);
+        return createPost(command, member);
     }
-    private void createPost(PostWriteCommand command, BoardUser author){
-        Category category = findByIdOrThrow(command.getCategoryId(), categoryRepository, "");
+
+    private Long createPost(PostWriteCommand command, BoardUser author){
+        Category category = categoryRepository.findById(command.getCategoryId())
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_CATEGORY));
 
         List<FileMetaData> fileMetaDataList =
                 fileMetaDataRepository.findAllById(command.getAttachmentIds());
@@ -87,11 +90,12 @@ public class PostAppService {
                 .baseTime(BaseTime.now())
                 .pined(command.isPined())
                 .attachments(new HashSet<>(fileMetaDataList))
-                //TODO : 좀더 유연하게 변경?
                 .exposeOption(ExposeOption.of(command.getExposeState(), command.getPrivatePassword()))
                 .build();
 
         postRepository.save(post);
+
+        return post.getPostId();
     }
 
 

@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,21 +37,27 @@ public class PostRequest {
 
     @Data
     public static class CreatePostRequest {
+        @NotNull
         private String title;
+        @NotNull
         private String contents;
         private List<Long> attachmentIds = new ArrayList<>();
+        @NotNull
         private Long categoryId;
+        @NotNull
         private boolean pined;
+        @NotNull
         private ExposeOptionRequest exposeOption;
+        @NotNull
         private boolean isAnonymous;
 
-        public PostWriteCommand toCommand(Long accountId) {
+        public PostWriteCommand toCommand(String loginId) {
             return PostWriteCommand.builder()
                     .title(title)
                     .contents(getContents())
                     .categoryId(categoryId)
                     .pined(pined)
-                    .accountId(accountId)
+                    .loginId(loginId)
                     .exposeState(ExposeState.valueOf(exposeOption.getName()))
                     .privatePassword(exposeOption.getPassword())
                     .anonymous(isAnonymous)

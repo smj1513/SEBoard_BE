@@ -1,5 +1,6 @@
 package com.seproject.seboard.controller;
 
+import com.seproject.account.utils.SecurityUtils;
 import com.seproject.seboard.application.CommentAppService;
 import com.seproject.seboard.application.PostAppService;
 import com.seproject.seboard.application.PostSearchAppService;
@@ -23,6 +24,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
@@ -113,13 +115,12 @@ public class PostController {
     @Parameter(name = "request", description = "게시물 생성에 필요한 제목, 본문, 공개여부, 익명 여부, 첨부파일, 카테고리 pk, 상단 고정 여부 정보")
     @Operation(summary = "게시글 작성", description = "사용자는 실명으로 게시글을 작성한다")
     @PostMapping
-    public ResponseEntity<?> createPost(@RequestBody CreatePostRequest request) { //TODO : accountId 어떻게?
-        Long accountId = 5234058023853L;
+    public ResponseEntity<?> createPost(@Validated @RequestBody CreatePostRequest request) {
+        String loginId = SecurityUtils.getLoginId();
 
-        postAppService.writePost(request.toCommand(accountId));
+        Long postId = postAppService.writePost(request.toCommand(loginId));
 
-        //TODO : 실패시, 예외상황 추가 필요
-        return new ResponseEntity<>(MessageResponse.of("작성 성공"), HttpStatus.OK);
+        return ResponseEntity.ok().body(MessageResponse.CreateMessage.of(postId, "게시글 작성 성공"));
     }
 
     @Parameters(
