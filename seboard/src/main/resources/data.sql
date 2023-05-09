@@ -16,17 +16,54 @@ INSERT INTO public.authorizations(id, method, path, priority) VALUES (1544, 'POS
 INSERT INTO public.authorizations(id, method, path, priority) VALUES (1545, 'PUT', '/admin/**', 9999);
 INSERT INTO public.authorizations(id, method, path, priority) VALUES (1546, 'DELETE', '/admin/**', 9999);
 
+INSERT INTO public.authorizations(id, method, path, priority) VALUES (1547, 'POST', '/posts/**', 9999);
+INSERT INTO public.authorizations(id, method, path, priority) VALUES (1548, 'PUT', '/posts/**', 9999);
+INSERT INTO public.authorizations(id, method, path, priority) VALUES (1549, 'DELETE', '/posts/**', 9999);
+
+INSERT INTO public.authorizations(id, method, path, priority) VALUES (1550, 'POST', '/comments/**', 9999);
+INSERT INTO public.authorizations(id, method, path, priority) VALUES (1551, 'PUT', '/comments/**', 9999);
+INSERT INTO public.authorizations(id, method, path, priority) VALUES (1552, 'DELETE', '/comments/**', 9999);
+
+
 INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243124,1543, 5234058023851);
 INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243125,1544, 5234058023851);
 INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243126,1545, 5234058023851);
 INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243127,1546, 5234058023851);
+
+INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243128,1547, 5234058023850);
+INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243129,1547, 5234058023851);
+INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243130,1547, 5234058023853);
+
+INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243131,1548, 5234058023850);
+INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243132,1548, 5234058023851);
+INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243133,1548, 5234058023853);
+
+INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243134,1549, 5234058023850);
+INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243135,1549, 5234058023851);
+INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243136,1549, 5234058023853);
+
+INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243137,1550, 5234058023850);
+INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243138,1550, 5234058023851);
+INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243139,1550, 5234058023853);
+
+INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243140,1551, 5234058023850);
+INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243141,1551, 5234058023851);
+INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243142,1551, 5234058023853);
+
+INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243143,1552, 5234058023850);
+INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243144,1552, 5234058023851);
+INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243145,1552, 5234058023853);
 
 INSERT INTO menus(menu_id, super_menu_id, name, description, depth, url_info, menu_type) VALUES (43214231, null, '공지사항', '공지임니둥', 0, 'notice', 'BOARD');
 INSERT INTO menus(menu_id, super_menu_id, name, description, depth, url_info, menu_type) VALUES (43214232, 43214231, '일반', '공지임니둥', 1, 'notice_normal', 'CATEGORY');
 INSERT INTO menus(menu_id, super_menu_id, name, description, depth, url_info, menu_type) VALUES (43214233, 43214231, '수업', '공지임니둥', 1, 'class', 'CATEGORY');
 INSERT INTO menus(menu_id, super_menu_id, name, description, depth, url_info, menu_type) VALUES (43214234, 43214231, '장학금', '공지임니둥', 1, 'money', 'CATEGORY');
 INSERT INTO menus(menu_id, super_menu_id, name, description, depth, url_info, menu_type) VALUES (43214235, 43214231, '학사', '공지임니둥', 1, 'student', 'CATEGORY');
-INSERT INTO menus(menu_id, super_menu_id, name, description, depth, url_info, menu_type) VALUES (43214236, null, '채용', '채용임니둥', 0, 'www.kumoh.ac.kr', 'EXTERNAL');
+INSERT INTO menus(menu_id, super_menu_id, name, description, depth, url_info, menu_type) VALUES (43214238, null, '자유게시판', '자유이니둥', 0, 'freeboard', 'BOARD');
+INSERT INTO menus(menu_id, super_menu_id, name, description, depth, url_info, menu_type) VALUES (43214239, 43214238, '일반', '자유이니둥', 1, 'freeboard_normal', 'BOARD');
+INSERT INTO menus(menu_id, super_menu_id, name, description, depth, url_info, menu_type) VALUES (43214240, 43214238, '전공지식', '자유이니둥', 1, 'knwoledge', 'BOARD');
+INSERT INTO menus(menu_id, super_menu_id, name, description, depth, url_info, menu_type) VALUES (43214236, null, '채용', '채용임니둥', 0, 'https://cs.kumoh.ac.kr/cs/sub0602.do', 'EXTERNAL');
+INSERT INTO menus(menu_id, super_menu_id, name, description, depth, url_info, menu_type) VALUES (43214237, null, '학사', '학사임니둥', 0, 'https://cs.kumoh.ac.kr/cs/sub0601.do', 'EXTERNAL');
 
 INSERT INTO public.board_users(board_user_id, name) VALUES (3421243, '이충엽');
 INSERT INTO public.members(member_id, account_id) VALUES (3421243, 5234058023853);

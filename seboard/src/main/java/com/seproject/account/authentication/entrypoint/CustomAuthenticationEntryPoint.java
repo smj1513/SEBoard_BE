@@ -23,6 +23,10 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     @Override
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException exception) throws IOException, ServletException {
 //        responseWriter.write(exception, HttpStatus.UNAUTHORIZED,response);
+        ErrorCode errorCode = ErrorCode.NOT_LOGIN;
 
+        if(errorCode != null) {
+            responseWriter.write(errorCode, response);
+        }
     }
 }
