@@ -45,14 +45,10 @@ public class PostController {
 
     @PostMapping("/{postId}/auth")
     public ResponseEntity<?> retrievePrivacyPost(@RequestBody RetrievePrivacyPostRequest request, @PathVariable Long postId){
-        Long accountId = 5234058023853L;
+        String loginId = SecurityUtils.getLoginId();
 
-        try{
-            RetrievePostDetailResponse privacyPost = postSearchAppService.findPrivacyPost(postId, request.getPassword(), accountId);
-            return ResponseEntity.ok(privacyPost);
-        }catch (Exception e){
-            return ResponseEntity.badRequest().body(of(e.getMessage()));
-        }
+        RetrievePostDetailResponse privacyPost = postSearchAppService.findPrivacyPost(postId, request.getPassword(), loginId);
+        return ResponseEntity.ok(privacyPost);
     }
 
     @GetMapping("/pined")
@@ -92,21 +88,11 @@ public class PostController {
             @ApiResponse(content = @Content(schema = @Schema(implementation = MessageResponse.class)), responseCode = "404", description = "해당 pk를 가진 게시물이 없음")
     })
     @GetMapping("/{postId}")
-    public ResponseEntity<?> retrievePost(@PathVariable("postId") Long postId) { // TODO : accountId는 jwt에서 추출
+    public ResponseEntity<RetrievePostDetailResponse> retrievePost(@PathVariable("postId") Long postId) { // TODO : accountId는 jwt에서 추출
+        String loginId = SecurityUtils.getLoginId();
 
-        Long accountId = 5234058023853L;
-        /***
-         * TODO : jwt 추가
-         *      없는 postId를 조회
-         */
-
-        try {
-            RetrievePostDetailResponse postDetailRes = postSearchAppService.findPostDetail(postId, accountId);
-            return new ResponseEntity<>(postDetailRes, HttpStatus.OK);
-        } catch (Exception e) {
-            MessageResponse response = of(e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
+        RetrievePostDetailResponse postDetailRes = postSearchAppService.findPostDetail(postId, loginId);
+        return ResponseEntity.ok(postDetailRes);
     }
 
     @Parameter(name = "request", description = "게시물 생성에 필요한 제목, 본문, 공개여부, 익명 여부, 첨부파일, 카테고리 pk, 상단 고정 여부 정보")

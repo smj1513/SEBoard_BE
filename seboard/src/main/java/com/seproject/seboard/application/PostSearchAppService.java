@@ -1,5 +1,12 @@
 package com.seproject.seboard.application;
 
+import com.seproject.account.model.Account;
+import com.seproject.account.model.role.Role;
+import com.seproject.account.repository.AccountRepository;
+import com.seproject.account.utils.SecurityUtils;
+import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.InvalidAuthorizationException;
+import com.seproject.error.exception.NoSuchResourceException;
 import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostDetailResponse;
 import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostListResponseElement;
 import com.seproject.seboard.domain.model.post.Post;
@@ -15,8 +22,10 @@ import com.seproject.seboard.domain.repository.user.MemberRepository;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -30,18 +39,23 @@ public class PostSearchAppService {
     private final ReplyRepository replyRepository;
     private final MemberRepository memberRepository;
     private final BookmarkRepository bookmarkRepository;
+    private final AccountRepository accountRepository;
 
-    public RetrievePostDetailResponse findPrivacyPost(Long postId, String password, Long accountId){
-        Post post = postRepository.findById(postId).orElseThrow(NoSuchElementException::new);
-        RetrievePostDetailResponse postDetailResponse =
-                postSearchRepository.findPostDetailById(postId).orElseThrow(NoSuchElementException::new);
+    public RetrievePostDetailResponse findPrivacyPost(Long postId, String password, String loginId){
+        Account account = accountRepository.findByLoginId(loginId);
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
+
+        RetrievePostDetailResponse postDetailResponse = postSearchRepository.findPostDetailById(postId)
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
 
         if(post.getExposeOption().getExposeState()!=ExposeState.PRIVACY){
-            return findPostDetail(postId, accountId);
+            return findPostDetail(postId, loginId);
         }
 
         if(!post.checkPassword(password)){
-            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+            throw new InvalidAuthorizationException(ErrorCode.INCORRECT_POST_PASSWORD);
         }
 
         //TODO : member없을 때 로직 추가 필요
@@ -49,11 +63,12 @@ public class PostSearchAppService {
         boolean isEditable = false;
         boolean isBookmarked = false;
 
-        if(accountId!=null) {
-            Member member = memberRepository.findByAccountId(accountId).orElseThrow(NoSuchElementException::new);
+        if(account!=null) {
+            Member member = memberRepository.findByAccountId(account.getAccountId())
+                    .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_MEMBER));
 
-            isEditable = post.isWrittenBy(accountId);
             isBookmarked = bookmarkRepository.existsByPostIdAndMemberId(postId, member.getBoardUserId());
+            isEditable = post.isWrittenBy(account.getAccountId());
         }
 
         postDetailResponse.setEditable(isEditable);
@@ -63,20 +78,27 @@ public class PostSearchAppService {
 
     }
 
-    public RetrievePostDetailResponse findPostDetail(Long postId, Long accountId){
-        Post post = postRepository.findById(postId).orElseThrow(NoSuchElementException::new);
-        RetrievePostDetailResponse postDetailResponse =
-                postSearchRepository.findPostDetailById(postId).orElseThrow(NoSuchElementException::new);
-        //TODO : member없을 때 로직 추가 필요
+    public RetrievePostDetailResponse findPostDetail(Long postId, String loginId){
+        Account account = accountRepository.findByLoginId(loginId);
+
+        //TODO : 권한 처리 추가 필요
+
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
+
+        RetrievePostDetailResponse postDetailResponse = postSearchRepository.findPostDetailById(postId)
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
+
         //TODO : 관리자 권한일 때 editable 로직 추가필요
         boolean isEditable = false;
         boolean isBookmarked = false;
 
-        if(accountId!=null) {
-            Member member = memberRepository.findByAccountId(accountId).orElseThrow(NoSuchElementException::new);
+        if(account!=null) {
+            Member member = memberRepository.findByAccountId(account.getAccountId())
+                    .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_MEMBER));
 
-            isEditable = post.isWrittenBy(accountId);
             isBookmarked = bookmarkRepository.existsByPostIdAndMemberId(postId, member.getBoardUserId());
+            isEditable = post.isWrittenBy(account.getAccountId());
 
         }
 
@@ -84,10 +106,10 @@ public class PostSearchAppService {
         postDetailResponse.setBookmarked(isBookmarked);
 
         if(post.getExposeOption().getExposeState()== ExposeState.PRIVACY){
-            if(accountId!=null && post.isWrittenBy(accountId)){
+            if(account!=null && post.isWrittenBy(account.getAccountId())){
                 return postDetailResponse;
             }else{
-                throw new IllegalArgumentException("해당 게시글은 비공개 게시글입니다. 비밀번호를 입력해주세요");
+                throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
             }
         }
 
@@ -106,7 +128,7 @@ public class PostSearchAppService {
 
         return pinedPosts;
     }
-    //TODO : paging 처리해야함
+
     public Page<RetrievePostListResponseElement> findPostList(Long categoryId, int page, int size){
         Page<RetrievePostListResponseElement> postPage;
 
