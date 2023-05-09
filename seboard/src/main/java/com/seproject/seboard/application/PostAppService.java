@@ -3,6 +3,8 @@ package com.seproject.seboard.application;
 import com.seproject.account.model.Account;
 import com.seproject.account.repository.AccountRepository;
 import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.CustomAccessDeniedException;
+import com.seproject.error.exception.InvalidAuthorizationException;
 import com.seproject.error.exception.NoSuchResourceException;
 import com.seproject.seboard.application.dto.post.PostCommand.PostEditCommand;
 import com.seproject.seboard.application.dto.post.PostCommand.PostWriteCommand;
@@ -100,13 +102,15 @@ public class PostAppService {
 
 
 
-    @Transactional
-    public void editPost(PostEditCommand command) {
-        Post post = findByIdOrThrow(command.getPostId(), postRepository, "");
+    public Long editPost(PostEditCommand command) {
+        Account account = accountRepository.findByLoginId(command.getLoginId());
+
+        Post post = postRepository.findById(command.getPostId())
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
 
         //TODO : 추후 활성화 필요
-        if(!post.isWrittenBy(command.getAccountId())){
-            throw new IllegalArgumentException();
+        if(!post.isWrittenBy(account.getAccountId())){
+            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 
         post.changeTitle(command.getTitle());
@@ -126,10 +130,11 @@ public class PostAppService {
 
         attachments.forEach(fileMetaData -> post.addAttachment(fileMetaData));
 
-        System.out.println("command.getCategoryId() = " + command.getCategoryId());
-        //TODO : category 권한 체킹 필요
-        Category category = findByIdOrThrow(command.getCategoryId(), categoryRepository, "");
+        Category category = categoryRepository.findById(command.getCategoryId())
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_CATEGORY));
         post.changeCategory(category);
+
+        return post.getPostId();
     }
 
     public void removePost(Long postId, Long accountId) {

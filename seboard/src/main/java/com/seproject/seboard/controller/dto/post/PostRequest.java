@@ -1,12 +1,8 @@
 package com.seproject.seboard.controller.dto.post;
 
 import com.seproject.seboard.application.dto.post.PostCommand.PostWriteCommand;
-import com.seproject.seboard.controller.dto.user.AnonymousRequest;
 import com.seproject.seboard.domain.model.post.exposeOptions.ExposeState;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
@@ -36,6 +32,7 @@ public class PostRequest {
     }
 
     @Data
+    @AllArgsConstructor
     public static class CreatePostRequest {
         @NotNull
         private String title;
@@ -67,48 +64,32 @@ public class PostRequest {
     }
 
     @Data
-    public static class UpdateNamedPostRequest {
+    public static class UpdatePostRequest {
+        @NotNull
         private String title;
+        @NotNull
         private String contents;
         private List<Long> attachmentIds = new ArrayList<>();
+        @NotNull
         private Long categoryId;
+        @NotNull
         private boolean pined;
+        @NotNull
         private ExposeOptionRequest exposeOption;
 
-        public PostEditCommand toCommand(Long postId, Long accountId) {
+        public PostEditCommand toCommand(Long postId, String loginId) {
             return PostEditCommand.builder()
                     .postId(postId)
                     .title(title)
                     .contents(getContents())
                     .categoryId(categoryId)
                     .pined(pined)
-                    .accountId(accountId)
+                    .loginId(loginId)
                     .exposeState(ExposeState.valueOf(exposeOption.getName()))
                     .privatePassword(exposeOption.getPassword())
                     .attachmentIds(attachmentIds)
                     .build();
         }
     }
-
-    @Data
-    public static class CreateUnnamedPostRequest {
-        private String title;
-        private String contents;
-//        private List<MultipartFile> attachment;
-        private Long categoryId;
-        private AnonymousRequest author;
-
-    }
-
-    @Data
-    public static class UpdateUnnamedPostRequest {
-        private String title;
-        private String contents;
-//        private List<MultipartFile> attachment;
-        private Long categoryId;
-        private AnonymousRequest author;
-
-    }
-
 
 }

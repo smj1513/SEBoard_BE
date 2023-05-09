@@ -1,4 +1,9 @@
 package com.seproject.error.exception;
 
-public interface BusinessLogicException{
+import com.seproject.error.errorCode.ErrorCode;
+
+public abstract class BusinessLogicException extends AbstractErrorException{
+    public BusinessLogicException(ErrorCode errorCode) {
+        super(errorCode);
+    }
 }

@@ -6,9 +6,8 @@ import com.seproject.seboard.application.PostAppService;
 import com.seproject.seboard.application.PostSearchAppService;
 import com.seproject.seboard.application.dto.comment.CommentCommand;
 import com.seproject.seboard.controller.dto.MessageResponse;
-import com.seproject.seboard.controller.dto.post.PostRequest;
 import com.seproject.seboard.controller.dto.post.PostRequest.CreatePostRequest;
-import com.seproject.seboard.controller.dto.post.PostRequest.UpdateNamedPostRequest;
+import com.seproject.seboard.controller.dto.post.PostRequest.UpdatePostRequest;
 import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostListResponseElement;
 import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostDetailResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,11 +26,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.NoSuchElementException;
 
+import static com.seproject.seboard.controller.dto.MessageResponse.*;
 import static com.seproject.seboard.controller.dto.comment.CommentResponse.*;
 import static com.seproject.seboard.controller.dto.post.PostRequest.*;
 import static com.seproject.seboard.controller.dto.post.PostResponse.*;
@@ -54,7 +51,7 @@ public class PostController {
             RetrievePostDetailResponse privacyPost = postSearchAppService.findPrivacyPost(postId, request.getPassword(), accountId);
             return ResponseEntity.ok(privacyPost);
         }catch (Exception e){
-            return ResponseEntity.badRequest().body(MessageResponse.of(e.getMessage()));
+            return ResponseEntity.badRequest().body(of(e.getMessage()));
         }
     }
 
@@ -107,7 +104,7 @@ public class PostController {
             RetrievePostDetailResponse postDetailRes = postSearchAppService.findPostDetail(postId, accountId);
             return new ResponseEntity<>(postDetailRes, HttpStatus.OK);
         } catch (Exception e) {
-            MessageResponse response = MessageResponse.of(e.getMessage());
+            MessageResponse response = of(e.getMessage());
             return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
         }
     }
@@ -120,7 +117,7 @@ public class PostController {
 
         Long postId = postAppService.writePost(request.toCommand(loginId));
 
-        return ResponseEntity.ok().body(MessageResponse.CreateMessage.of(postId, "게시글 작성 성공"));
+        return ResponseEntity.ok().body(CreateAndUpdateMessage.of(postId, "게시글 작성 성공"));
     }
 
     @Parameters(
@@ -131,8 +128,8 @@ public class PostController {
     )
     @Operation(summary = "게시글 수정", description = "사용자는 본인이 실명으로 작성한 게시물을 수정한다")
     @PutMapping("/{postId}")
-    public ResponseEntity<?> updatePost(@PathVariable Long postId, @RequestBody UpdateNamedPostRequest request) { //TODO : 첨부파일 필드 추가
-        Long accountId = 5234058023853L; //TODO : accountId 어떻게?
+    public ResponseEntity<?> updatePost(@PathVariable Long postId, @Validated @RequestBody UpdatePostRequest request) { //TODO : 첨부파일 필드 추가
+        String loginId = SecurityUtils.getLoginId();
 
         /**
          * TODO : required 필드 null 체크
@@ -140,11 +137,11 @@ public class PostController {
          *    존재하지 않는 categoryId
          *    제목 또는 본문이 비어있거나 길이 초과
          */
-        postAppService.editPost(
-                request.toCommand(postId, accountId)
+        Long id = postAppService.editPost(
+                request.toCommand(postId, loginId)
         );
 
-        return new ResponseEntity<>(MessageResponse.of(""), HttpStatus.OK);
+        return new ResponseEntity<>(CreateAndUpdateMessage.of(id, "게시글 수정 성공"), HttpStatus.OK);
     }
 
     @Parameter(name = "postId", description = "삭제할 게시글의 pk")
@@ -159,7 +156,7 @@ public class PostController {
 
         postAppService.removePost(postId, accountId);
 
-        return new ResponseEntity<>(MessageResponse.of(""), HttpStatus.OK);
+        return new ResponseEntity<>(of(""), HttpStatus.OK);
     }
 
     @Parameters(
