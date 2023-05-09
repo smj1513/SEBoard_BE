@@ -7,8 +7,6 @@ import org.springframework.http.HttpStatus;
 public enum ErrorCode {
     INVALID_JWT(HttpStatus.UNAUTHORIZED,100, "유효하지 않은 Json Web Token입니다."),
     PASSWORD_INCORRECT(HttpStatus.BAD_REQUEST,101, "비밀번호가 틀렸습니다."),
-
-    INVALID_PAGINATION(HttpStatus.BAD_REQUEST,200, "올바르지 않은 페이지 정보를 전송하였습니다."),
     NOT_LOGIN(HttpStatus.UNAUTHORIZED,102, "로그인이 필요합니다."),
     ACCESS_DENIED(HttpStatus.FORBIDDEN,103, "접근 권한이 존재하지 않습니다."),
     BANNED_IP(HttpStatus.FORBIDDEN,104, "금지된 ip입니다."),
@@ -20,6 +18,19 @@ public enum ErrorCode {
     USER_ALREADY_EXIST(HttpStatus.BAD_REQUEST,110,"이미 존재하는 id입니다."),
     INVALID_MAIL(HttpStatus.BAD_REQUEST,111,"잘못된 이메일 형식입니다."),
     INCORRECT_AUTH_CODE(HttpStatus.BAD_REQUEST,112,"인증 코드가 일치하지 않습니다."),
+    NOT_POST_AUTHOR(HttpStatus.BAD_REQUEST,113,"비밀 게시글 작성자가 아닙니다."),
+    INCORRECT_POST_PASSWORD(HttpStatus.BAD_REQUEST,114,"게시글 비밀번호가 일치하지 않습니다."),
+    EXCEED_WRITING_COUNT(HttpStatus.BAD_REQUEST,115,"게시글 및 댓글 작성 횟수 초과입니다."),
+
+
+    INVALID_PAGINATION(HttpStatus.BAD_REQUEST,200, "올바르지 않은 페이지 정보를 전송하였습니다."),
+    INVALID_REQUEST(HttpStatus.BAD_REQUEST, 201, "올바르지 않은 형식의 요청입니다."),
+
+
+    NOT_EXIST_POST(HttpStatus.NOT_FOUND, 300, "존재하지 않는 게시글입니다."),
+    NOT_EXIST_CATEGORY(HttpStatus.NOT_FOUND, 301, "존재하지 않는 카테고리입니다."),
+    NOT_EXIST_ATTACHMENT(HttpStatus.NOT_FOUND, 302, "존재하지 않는 첨부파일입니다."),
+    NOT_EXIST_COMMENT(HttpStatus.NOT_FOUND, 303, "존재하지 않는 댓글/답글입니다."),
     ;
 
     ErrorCode(HttpStatus httpStatus, int code,String message) {
