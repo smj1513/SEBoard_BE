@@ -117,7 +117,7 @@ public class PostController {
 
         Long postId = postAppService.writePost(request.toCommand(loginId));
 
-        return ResponseEntity.ok().body(CreateAndUpdateMessage.of(postId, "게시글 작성 성공"));
+        return ResponseEntity.status(HttpStatus.CREATED).body(CreateAndUpdateMessage.of(postId, "게시글 작성 성공"));
     }
 
     @Parameters(
@@ -141,22 +141,18 @@ public class PostController {
                 request.toCommand(postId, loginId)
         );
 
-        return new ResponseEntity<>(CreateAndUpdateMessage.of(id, "게시글 수정 성공"), HttpStatus.OK);
+        return ResponseEntity.ok(CreateAndUpdateMessage.of(id, "게시글 수정 성공"));
     }
 
     @Parameter(name = "postId", description = "삭제할 게시글의 pk")
     @Operation(summary = "게시글 삭제", description = "사용자는 본인이 실명으로 작성한 게시물을 삭제한다")
     @DeleteMapping("/{postId}")
     public ResponseEntity<?> deletePost(@PathVariable Long postId) {
-        /**
-         * TODO : jwt 확인
-         *    권한 처리
-         */
-        Long accountId = 5234058023853L; //TODO : accountId 어떻게?
+        String loginId = SecurityUtils.getLoginId();
 
-        postAppService.removePost(postId, accountId);
+        postAppService.removePost(postId, loginId);
 
-        return new ResponseEntity<>(of(""), HttpStatus.OK);
+        return ResponseEntity.ok(CreateAndUpdateMessage.of(postId, "게시글 삭제 성공"));
     }
 
     @Parameters(

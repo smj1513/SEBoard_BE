@@ -3,7 +3,6 @@ package com.seproject.seboard.application;
 import com.seproject.account.model.Account;
 import com.seproject.account.repository.AccountRepository;
 import com.seproject.error.errorCode.ErrorCode;
-import com.seproject.error.exception.CustomAccessDeniedException;
 import com.seproject.error.exception.InvalidAuthorizationException;
 import com.seproject.error.exception.NoSuchResourceException;
 import com.seproject.seboard.application.dto.post.PostCommand.PostEditCommand;
@@ -33,7 +32,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import static com.seproject.seboard.application.utils.AppServiceHelper.*;
 
 @Service
 @RequiredArgsConstructor
@@ -108,7 +106,6 @@ public class PostAppService {
         Post post = postRepository.findById(command.getPostId())
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
 
-        //TODO : 추후 활성화 필요
         if(!post.isWrittenBy(account.getAccountId())){
             throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
@@ -137,11 +134,14 @@ public class PostAppService {
         return post.getPostId();
     }
 
-    public void removePost(Long postId, Long accountId) {
-        Post post = findByIdOrThrow(postId, postRepository, "");
+    public void removePost(Long postId, String loginId) {
+        Account account = accountRepository.findByLoginId(loginId);
 
-        if(!post.isWrittenBy(accountId)){ // TODO : 관리자 삭제 경우 추가해야함
-            throw new IllegalArgumentException();
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
+
+        if(!post.isWrittenBy(account.getAccountId())){ // TODO : 관리자 삭제 경우 추가해야함
+            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 
         post.delete();
