@@ -9,6 +9,8 @@ import com.seproject.account.repository.AccountRepository;
 import com.seproject.account.repository.role.RoleRepository;
 import com.seproject.account.model.Account;
 import com.seproject.account.model.role.Role;
+import com.seproject.seboard.domain.model.user.Member;
+import com.seproject.seboard.domain.repository.user.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -36,6 +38,7 @@ public class AccountService implements UserDetailsService {
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
+    private final MemberRepository memberRepository;
 
     public boolean isExist(String loginId){
         return accountRepository.existsByLoginId(loginId);
@@ -86,6 +89,12 @@ public class AccountService implements UserDetailsService {
 
         oAuthAccountRepository.save(oAuthAccount);
 
+        Member member = Member.builder()
+                .account(account)
+                .build();
+
+        memberRepository.save(member);
+
         return oAuthAccount;
     }
 
@@ -107,6 +116,11 @@ public class AccountService implements UserDetailsService {
 
         accountRepository.save(account);
 
+        Member member = Member.builder()
+                .account(account)
+                .build();
+
+        memberRepository.save(member);
         return account;
     }
 
