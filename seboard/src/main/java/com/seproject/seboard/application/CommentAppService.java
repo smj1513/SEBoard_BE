@@ -87,43 +87,52 @@ public class CommentAppService {
         return comment.getCommentId();
     }
 
-    public void writeReply(ReplyWriteCommand command){
+    public Long writeReply(ReplyWriteCommand command){
+        Account account = accountRepository.findByLoginId(command.getLoginId());
+
         if(command.isAnonymous()){
-            writeUnnamedReply(command);
+            return writeUnnamedReply(command, account.getAccountId());
         }else{
-            writeNamedReply(command);
+            return writeNamedReply(command, account.getAccountId());
         }
     }
 
-    protected void writeNamedReply(ReplyWriteCommand command) {
-        Post post = findByIdOrThrow(command.getPostId(), postRepository, "");
+    protected Long writeNamedReply(ReplyWriteCommand command, Long accountId){
+        Post post = postRepository.findById(command.getPostId())
+                .orElseThrow(()->new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
 
-        Member member = memberRepository.findByAccountId(command.getAccountId()).orElseThrow(NoSuchElementException::new);
-        Comment superComment = findByIdOrThrow(command.getSuperCommentId(), commentRepository, "");
-        Comment taggedComment = findByIdOrThrow(command.getTagCommentId(), commentRepository, "");
+        Member member = memberRepository.findByAccountId(accountId)
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_MEMBER));
 
-        if (member == null) {
-            //TODO : member 생성 로직 호출
-        }
+        Comment superComment = commentRepository.findById(command.getSuperCommentId())
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_COMMENT));
+        Comment taggedComment = commentRepository.findById(command.getTagCommentId())
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_COMMENT));
 
         Reply reply = superComment.writeReply(command.getContents(), taggedComment, member, command.isOnlyReadByAuthor());
 
         commentRepository.save(reply);
+
+        return reply.getCommentId();
     }
 
 
-    @Transactional
-    protected void writeUnnamedReply(ReplyWriteCommand command) {
-        Post post = findByIdOrThrow(command.getPostId(), postRepository, "");
-        Comment superComment = findByIdOrThrow(command.getSuperCommentId(), commentRepository, "");
-        Comment taggedComment = findByIdOrThrow(command.getTagCommentId(), commentRepository, "");
+    protected Long writeUnnamedReply(ReplyWriteCommand command, Long accountId) {
+        Post post = postRepository.findById(command.getPostId())
+                .orElseThrow(()->new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
 
-        //TODO : JPQL로 변경?
-        Anonymous author = getAnonymous(command.getAccountId(), command.getPostId(), post);
+        Comment superComment = commentRepository.findById(command.getSuperCommentId())
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_COMMENT));
+        Comment taggedComment = commentRepository.findById(command.getTagCommentId())
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_COMMENT));
+
+        Anonymous author = getAnonymous(accountId, command.getPostId(), post);
 
         Reply reply = superComment.writeReply(command.getContents(), taggedComment, author, command.isOnlyReadByAuthor());
 
         replyRepository.save(reply);
+
+        return reply.getCommentId();
     }
 
     public CommentListResponse retrieveCommentList(CommentListFindCommand command) {
