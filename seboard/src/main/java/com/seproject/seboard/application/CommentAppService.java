@@ -3,6 +3,7 @@ package com.seproject.seboard.application;
 import com.seproject.account.model.Account;
 import com.seproject.account.repository.AccountRepository;
 import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.InvalidAuthorizationException;
 import com.seproject.error.exception.NoSuchResourceException;
 import com.seproject.seboard.application.dto.comment.CommentCommand.CommentEditCommand;
 import com.seproject.seboard.application.dto.comment.CommentCommand.CommentListFindCommand;
@@ -150,16 +151,20 @@ public class CommentAppService {
         return CommentListResponse.toDto(commentDtoList, paginationResponse);
     }
 
-    public void editComment(CommentEditCommand command) {
-        Comment comment = findByIdOrThrow(command.getCommentId(), commentRepository, "");
+    public Long editComment(CommentEditCommand command) {
+        Account account = accountRepository.findByLoginId(command.getLoginId());
 
-        //TODO : 추후 주석 해제 필요
-        if (!comment.isWrittenBy(command.getAccountId())) { //TODO : 관리자 권한의 경우 생각
-            throw new IllegalArgumentException();
+        Comment comment = commentRepository.findById(command.getCommentId())
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_COMMENT));
+
+        if (!comment.isWrittenBy(account.getAccountId())) { //TODO : 관리자 권한의 경우 생각
+            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 
         comment.changeContents(command.getContents());
         comment.changeOnlyReadByAuthor(command.isOnlyReadByAuthor());
+
+        return comment.getCommentId();
     }
 
     public void editReply(ReplyEditCommand command) {

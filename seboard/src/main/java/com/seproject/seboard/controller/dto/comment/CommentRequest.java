@@ -35,13 +35,15 @@ public class CommentRequest {
 
     @Data
     public static class UpdateCommentRequest {
+        @NotNull
         private String contents;
+        @NotNull
         @JsonProperty("isReadOnlyAuthor")
         private boolean isReadOnlyAuthor;
-        public CommentEditCommand toCommand(Long commentId, Long accountId) {
+        public CommentEditCommand toCommand(Long commentId, String loginId) {
             return CommentEditCommand.builder()
-                    .accountId(accountId)
                     .commentId(commentId)
+                    .loginId(loginId)
                     .contents(contents)
                     .isOnlyReadByAuthor(isReadOnlyAuthor)
                     .build();

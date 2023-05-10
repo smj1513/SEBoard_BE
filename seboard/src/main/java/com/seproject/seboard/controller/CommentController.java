@@ -46,19 +46,14 @@ public class CommentController {
     )
     @Operation(summary = "댓글 수정", description = "사용자는 자신이 작성한 댓글을 수정한다.")
     @PutMapping("/{commentId}")
-    public ResponseEntity<?> updateComment(@PathVariable Long commentId, @RequestBody UpdateCommentRequest request) {
-        Long accountId = 5234058023853L; //TODO : jwt
-        /**
-         * TODO : jwt
-         *  댓글 수정 권한이 없을때
-         *  존재하지 않는 commentId
-         *  contens가 비어있음
-         */
-        commentAppService.editComment(
-                request.toCommand(commentId, accountId)
+    public ResponseEntity<?> updateComment(@PathVariable Long commentId, @Validated @RequestBody UpdateCommentRequest request) {
+        String loginId = SecurityUtils.getLoginId();
+
+        Long id = commentAppService.editComment(
+                request.toCommand(commentId, loginId)
         );
 
-        return new ResponseEntity<>(of(""), HttpStatus.OK);
+        return ResponseEntity.ok(CreateAndUpdateMessage.of(id, "댓글 수정 성공"));
     }
 
     @Parameter(name = "commentId", description = "삭제할 댓글의 pk")
