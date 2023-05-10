@@ -18,12 +18,12 @@ public class MessageResponse {
 
     @Data
     @AllArgsConstructor
-    public static class CreateMessage{
+    public static class CreateAndUpdateMessage {
         private Long id;
         private String message;
 
-        public static CreateMessage of(Long id, String message){
-            return new CreateMessage(id, message);
+        public static CreateAndUpdateMessage of(Long id, String message){
+            return new CreateAndUpdateMessage(id, message);
         }
     }
 }

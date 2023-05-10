@@ -25,13 +25,16 @@ public class ReplyResponse {
     @JsonProperty("isReadOnlyAuthor")
     private boolean isReadOnlyAuthor;
 
-    public static ReplyResponse toDto(Reply reply, boolean isEditable){
+    public static ReplyResponse toDto(Reply reply, boolean isAuthor, boolean isPostAuthor){
         UserResponse userResponse = null;
         String contents = null;
         //TODO : dto에 로직이 들어가는게 맞나?
-        //TODO : isOnlyReadByAuthor 처리
+
         if(reply.isDeleted()){
             contents = "삭제된 댓글입니다.";
+            userResponse = new UserResponse(null, "(알수 없음)");
+        }else if(reply.isOnlyReadByAuthor() && !isAuthor && !isPostAuthor){
+            contents = "글 작성자만 볼 수 있는 댓글 입니다.";
             userResponse = new UserResponse(null, "(알수 없음)");
         }else{
             contents = reply.getContents();
@@ -45,8 +48,8 @@ public class ReplyResponse {
                 .createdAt(reply.getBaseTime().getCreatedAt())
                 .modifiedAt(reply.getBaseTime().getModifiedAt())
                 .contents(contents)
-                .isEditable(isEditable)
-                .isActive(!reply.isDeleted()) //TODO : 작성자만 읽을 수 있는 경우 추가 필요
+                .isEditable(isAuthor)
+                .isActive(!reply.isDeleted() && ((reply.isOnlyReadByAuthor() && isAuthor) || !reply.isOnlyReadByAuthor())) //TODO : 작성자만 읽을 수 있는 경우 추가 필요
                 .isReadOnlyAuthor(reply.isOnlyReadByAuthor())
                 .build();
     }

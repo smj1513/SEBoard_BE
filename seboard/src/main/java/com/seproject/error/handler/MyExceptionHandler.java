@@ -18,4 +18,11 @@ public class MyExceptionHandler {
         return ResponseEntity.badRequest().body(Error.of(ErrorCode.INVALID_REQUEST));
     }
 
+    @ExceptionHandler(BusinessLogicException.class)
+    public ResponseEntity<Error> handleBusinessLogicException(
+            BusinessLogicException e){
+
+        return ResponseEntity.badRequest().body(Error.of(e.getErrorCode()));
+    }
+
 }

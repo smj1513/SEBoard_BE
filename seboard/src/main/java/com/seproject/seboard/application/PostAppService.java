@@ -3,6 +3,7 @@ package com.seproject.seboard.application;
 import com.seproject.account.model.Account;
 import com.seproject.account.repository.AccountRepository;
 import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.InvalidAuthorizationException;
 import com.seproject.error.exception.NoSuchResourceException;
 import com.seproject.seboard.application.dto.post.PostCommand.PostEditCommand;
 import com.seproject.seboard.application.dto.post.PostCommand.PostWriteCommand;
@@ -31,7 +32,6 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Set;
 
-import static com.seproject.seboard.application.utils.AppServiceHelper.*;
 
 @Service
 @RequiredArgsConstructor
@@ -100,13 +100,14 @@ public class PostAppService {
 
 
 
-    @Transactional
-    public void editPost(PostEditCommand command) {
-        Post post = findByIdOrThrow(command.getPostId(), postRepository, "");
+    public Long editPost(PostEditCommand command) {
+        Account account = accountRepository.findByLoginId(command.getLoginId());
 
-        //TODO : 추후 활성화 필요
-        if(!post.isWrittenBy(command.getAccountId())){
-            throw new IllegalArgumentException();
+        Post post = postRepository.findById(command.getPostId())
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
+
+        if(!post.isWrittenBy(account.getAccountId())){
+            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 
         post.changeTitle(command.getTitle());
@@ -126,17 +127,21 @@ public class PostAppService {
 
         attachments.forEach(fileMetaData -> post.addAttachment(fileMetaData));
 
-        System.out.println("command.getCategoryId() = " + command.getCategoryId());
-        //TODO : category 권한 체킹 필요
-        Category category = findByIdOrThrow(command.getCategoryId(), categoryRepository, "");
+        Category category = categoryRepository.findById(command.getCategoryId())
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_CATEGORY));
         post.changeCategory(category);
+
+        return post.getPostId();
     }
 
-    public void removePost(Long postId, Long accountId) {
-        Post post = findByIdOrThrow(postId, postRepository, "");
+    public void removePost(Long postId, String loginId) {
+        Account account = accountRepository.findByLoginId(loginId);
 
-        if(!post.isWrittenBy(accountId)){ // TODO : 관리자 삭제 경우 추가해야함
-            throw new IllegalArgumentException();
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
+
+        if(!post.isWrittenBy(account.getAccountId())){ // TODO : 관리자 삭제 경우 추가해야함
+            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 
         post.delete();

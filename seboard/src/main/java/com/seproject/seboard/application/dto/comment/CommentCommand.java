@@ -8,7 +8,7 @@ public class CommentCommand {
     @Builder
     public static class CommentWriteCommand{
         private Long postId;
-        private Long accountId;
+        private String loginId;
         private String contents;
         private boolean isAnonymous;
         private boolean isOnlyReadByAuthor;
@@ -18,7 +18,7 @@ public class CommentCommand {
     @Builder
     public static class CommentEditCommand{
         private Long commentId;
-        private Long accountId;
+        private String loginId;
         private String contents;
         private boolean isOnlyReadByAuthor;
     }
@@ -27,7 +27,7 @@ public class CommentCommand {
     @Builder
     public static class CommentListFindCommand {
         private Long postId;
-        private Long accountId;
+        private String loginId;
         private Integer page;
         private Integer perPage;
     }

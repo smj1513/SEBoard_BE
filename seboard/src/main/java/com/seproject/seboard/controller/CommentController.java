@@ -1,5 +1,6 @@
 package com.seproject.seboard.controller;
 
+import com.seproject.account.utils.SecurityUtils;
 import com.seproject.seboard.application.CommentAppService;
 import com.seproject.seboard.controller.dto.MessageResponse;
 import com.seproject.seboard.controller.dto.comment.CommentRequest.CreateCommentRequest;
@@ -10,8 +11,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+import static com.seproject.seboard.controller.dto.MessageResponse.*;
 import static com.seproject.seboard.controller.dto.comment.CommentRequest.*;
 
 @AllArgsConstructor
@@ -24,20 +27,14 @@ public class CommentController {
     @Parameter(name = "request", description = "댓글 달려고 하는 게시글의 pk, 댓글 내용을 전달")
     @Operation(summary = "댓글 작성", description = "사용자는 실명으로 댓글을 작성한다.")
     @PostMapping()
-    public ResponseEntity<?> createComment(@RequestBody CreateCommentRequest request) {
-        Long accountId = 5234058023853L; //TODO : jwt
+    public ResponseEntity<?> createComment(@Validated @RequestBody CreateCommentRequest request) {
+        String loginId = SecurityUtils.getLoginId();
 
-        /**
-         * TODO : jwt
-         *  required 체크
-         *  존재하지 않는 postId
-         *  contens가 비어있음
-         */
-
-        commentAppService.writeComment(request.toCommand(accountId));
+        Long commentId = commentAppService.writeComment(request.toCommand(loginId));
 
 
-        return new ResponseEntity<>(request, HttpStatus.OK);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(CreateAndUpdateMessage.of(commentId, "댓글 작성 성공"));
     }
 
 
@@ -49,34 +46,24 @@ public class CommentController {
     )
     @Operation(summary = "댓글 수정", description = "사용자는 자신이 작성한 댓글을 수정한다.")
     @PutMapping("/{commentId}")
-    public ResponseEntity<?> updateComment(@PathVariable Long commentId, @RequestBody UpdateCommentRequest request) {
-        Long accountId = 5234058023853L; //TODO : jwt
-        /**
-         * TODO : jwt
-         *  댓글 수정 권한이 없을때
-         *  존재하지 않는 commentId
-         *  contens가 비어있음
-         */
-        commentAppService.editComment(
-                request.toCommand(commentId, accountId)
+    public ResponseEntity<?> updateComment(@PathVariable Long commentId, @Validated @RequestBody UpdateCommentRequest request) {
+        String loginId = SecurityUtils.getLoginId();
+
+        Long id = commentAppService.editComment(
+                request.toCommand(commentId, loginId)
         );
 
-        return new ResponseEntity<>(MessageResponse.of(""), HttpStatus.OK);
+        return ResponseEntity.ok(CreateAndUpdateMessage.of(id, "댓글 수정 성공"));
     }
 
     @Parameter(name = "commentId", description = "삭제할 댓글의 pk")
     @Operation(summary = "댓글 삭제", description = "사용자는 자신이 작성한 댓글을 삭제한다")
     @DeleteMapping("/{commentId}")
     public ResponseEntity<?> deleteNamedComment(@PathVariable Long commentId) {
-        Long accountId = 5234058023853L;
+        String loginId = SecurityUtils.getLoginId();
 
-        /**
-         * TODO : jwt
-         *  댓글 수정 권한이 없을때
-         *  존재하지 않는 commentId
-         */
-        commentAppService.removeComment(commentId, accountId);
+        commentAppService.removeComment(commentId, loginId);
 
-        return new ResponseEntity<>(commentId, HttpStatus.OK);
+        return ResponseEntity.ok(MessageResponse.of("댓글 삭제 성공"));
     }
 }
