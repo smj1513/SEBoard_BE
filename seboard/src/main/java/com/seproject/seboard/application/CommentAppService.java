@@ -1,5 +1,9 @@
 package com.seproject.seboard.application;
 
+import com.seproject.account.model.Account;
+import com.seproject.account.repository.AccountRepository;
+import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.NoSuchResourceException;
 import com.seproject.seboard.application.dto.comment.CommentCommand.CommentEditCommand;
 import com.seproject.seboard.application.dto.comment.CommentCommand.CommentListFindCommand;
 import com.seproject.seboard.application.dto.comment.CommentCommand.CommentWriteCommand;
@@ -44,39 +48,42 @@ public class CommentAppService {
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
     private final AnonymousRepository anonymousRepository;
+    private final AccountRepository accountRepository;
 
-    public void writeComment(CommentWriteCommand command){
+    public Long writeComment(CommentWriteCommand command){
+        Account account = accountRepository.findByLoginId(command.getLoginId());
+
         if(command.isAnonymous()){
-            writeUnnamedComment(command);
+            return writeUnnamedComment(command, account.getAccountId());
         }else{
-            writeNamedComment(command);
+            return writeNamedComment(command, account.getAccountId());
         }
     }
-    @Transactional
-    protected void writeNamedComment(CommentWriteCommand command) {
-        Post post = findByIdOrThrow(command.getPostId(), postRepository, "");
-        Member member = memberRepository.findByAccountId(command.getAccountId()).orElseThrow(NoSuchElementException::new);
-
-        if (member == null) {
-            //TODO : member 생성 로직 호출
-        }
+    protected Long writeNamedComment(CommentWriteCommand command, Long accountId){
+        Post post = postRepository.findById(command.getPostId())
+                .orElseThrow(()->new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
+        Member member = memberRepository.findByAccountId(accountId)
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_MEMBER));
 
         Comment comment = post.writeComment(command.getContents(), member, command.isOnlyReadByAuthor());
 
         commentRepository.save(comment);
+
+        return comment.getCommentId();
     }
 
 
-    @Transactional
-    protected void writeUnnamedComment(CommentWriteCommand command) {
-        Post post = findByIdOrThrow(command.getPostId(), postRepository, "");
+    protected Long writeUnnamedComment(CommentWriteCommand command, Long accountdId) {
+        Post post = postRepository.findById(command.getPostId())
+                .orElseThrow(()->new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
 
-        //TODO : JPQL로 변경?
-        Anonymous author = getAnonymous(command.getAccountId(), command.getPostId(), post);
+        Anonymous author = getAnonymous(accountdId, command.getPostId(), post);
 
         Comment comment = post.writeComment(command.getContents(), author, command.isOnlyReadByAuthor());
 
         commentRepository.save(comment);
+
+        return comment.getCommentId();
     }
 
     public void writeReply(ReplyWriteCommand command){
