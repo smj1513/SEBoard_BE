@@ -136,30 +136,60 @@ public class CommentAppService {
     }
 
     public CommentListResponse retrieveCommentList(CommentListFindCommand command) {
-        Account account = accountRepository.findByLoginId(command.getLoginId());
+        //TODO : 추후 변경필요
+        if(command.getLoginId()==null){
+            Page<Comment> commentPage = commentSearchRepository.findCommentListByPostId(command.getPostId(), PageRequest.of(command.getPage(), command.getPerPage()));
+            long totalReplySize = commentSearchRepository.countReplyByPostId(command.getPostId());
 
-        Page<Comment> commentPage = commentSearchRepository.findCommentListByPostId(command.getPostId(), PageRequest.of(command.getPage(), command.getPerPage()));
-        long totalReplySize = commentSearchRepository.countReplyByPostId(command.getPostId());
-
-        List<CommentListElement> commentDtoList = commentPage.getContent().stream()
-                .map(comment -> {
-                            List<ReplyResponse> subComments = commentSearchRepository.findReplyListByCommentId(comment.getCommentId())
-                                    .stream()
-                                    .map(
-                                            reply -> ReplyResponse.toDto(reply, reply.isWrittenBy(account.getAccountId()), reply.getPost().isWrittenBy(account.getAccountId()))
-                                    ).collect(Collectors.toList());
-                    return CommentListElement.toDto(comment, comment.isWrittenBy(account.getAccountId()),comment.getPost().isWrittenBy(account.getAccountId()), subComments);
-                }).collect(Collectors.toList());
+            List<CommentListElement> commentDtoList = commentPage.getContent().stream()
+                    .map(comment -> {
+                        List<ReplyResponse> subComments = commentSearchRepository.findReplyListByCommentId(comment.getCommentId())
+                                .stream()
+                                .map(
+                                        reply -> ReplyResponse.toDto(reply, false, false)
+                                ).collect(Collectors.toList());
+                        return CommentListElement.toDto(comment, false,false, subComments);
+                    }).collect(Collectors.toList());
 
 
-        PaginationResponse paginationResponse = PaginationResponse.builder()
-                .totalCommentSize(commentPage.getTotalElements())
-                .last(commentPage.isLast())
-                .pageNum(commentPage.getNumber())
-                .totalAllSize(commentPage.getTotalElements() + totalReplySize)
-                .build();
+            PaginationResponse paginationResponse = PaginationResponse.builder()
+                    .totalCommentSize(commentPage.getTotalElements())
+                    .last(commentPage.isLast())
+                    .pageNum(commentPage.getNumber())
+                    .totalAllSize(commentPage.getTotalElements() + totalReplySize)
+                    .build();
 
-        return CommentListResponse.toDto(commentDtoList, paginationResponse);
+            return CommentListResponse.toDto(commentDtoList, paginationResponse);
+
+
+        }else{
+            Account account = accountRepository.findByLoginId(command.getLoginId());
+
+
+            Page<Comment> commentPage = commentSearchRepository.findCommentListByPostId(command.getPostId(), PageRequest.of(command.getPage(), command.getPerPage()));
+            long totalReplySize = commentSearchRepository.countReplyByPostId(command.getPostId());
+
+            List<CommentListElement> commentDtoList = commentPage.getContent().stream()
+                    .map(comment -> {
+                        List<ReplyResponse> subComments = commentSearchRepository.findReplyListByCommentId(comment.getCommentId())
+                                .stream()
+                                .map(
+                                        reply -> ReplyResponse.toDto(reply, reply.isWrittenBy(account.getAccountId()), reply.getPost().isWrittenBy(account.getAccountId()))
+                                ).collect(Collectors.toList());
+                        return CommentListElement.toDto(comment, comment.isWrittenBy(account.getAccountId()),comment.getPost().isWrittenBy(account.getAccountId()), subComments);
+                    }).collect(Collectors.toList());
+
+
+            PaginationResponse paginationResponse = PaginationResponse.builder()
+                    .totalCommentSize(commentPage.getTotalElements())
+                    .last(commentPage.isLast())
+                    .pageNum(commentPage.getNumber())
+                    .totalAllSize(commentPage.getTotalElements() + totalReplySize)
+                    .build();
+
+            return CommentListResponse.toDto(commentDtoList, paginationResponse);
+
+        }
     }
 
     public Long editComment(CommentEditCommand command) {
