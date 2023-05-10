@@ -1,5 +1,6 @@
 package com.seproject.account.utils;
 
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
@@ -46,6 +47,11 @@ public class SecurityUtils {
     private static User getUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(authentication == null) return null;
+
+        if (authentication instanceof AnonymousAuthenticationToken) {
+            return null;
+        }
+
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = (UsernamePasswordAuthenticationToken) authentication;
         return (User)usernamePasswordAuthenticationToken.getPrincipal();
     }
