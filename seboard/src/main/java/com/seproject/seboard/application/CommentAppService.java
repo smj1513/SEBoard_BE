@@ -204,12 +204,14 @@ public class CommentAppService {
         comment.delete();
     }
 
-    public void removeReply(Long replyId, Long accountId) {
-        Reply reply = findByIdOrThrow(replyId, replyRepository, "");
+    public void removeReply(Long replyId, String loginId) {
+        Account account = accountRepository.findByLoginId(loginId);
 
-        //TODO : 추후 주석 해제 필요
-        if (!reply.isWrittenBy(accountId)) { //TODO : 관리자 권한의 경우 생각
-            throw new IllegalArgumentException();
+        Reply reply = replyRepository.findById(replyId)
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_COMMENT));
+
+        if (!reply.isWrittenBy(account.getAccountId())) { //TODO : 관리자 권한의 경우 생각
+            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 
         reply.delete();

@@ -60,14 +60,10 @@ public class ReplyController {
     @Operation(summary = "답글 삭제", description = "답글을 삭제한다")
     @DeleteMapping("/{replyId}")
     public ResponseEntity<?> deleteReply(@PathVariable Long replyId) {
-        Long accountId = 5234058023853L; //TODO : jwt
+        String loginId = SecurityUtils.getLoginId();
 
-        /**
-         * TODO : 존재하지 않는 답글
-         *          비밀번호가 틀림
-         */
-        commentAppService.removeReply(replyId, accountId);
+        commentAppService.removeReply(replyId, loginId);
 
-        return new ResponseEntity<>(of(""),HttpStatus.OK);
+        return ResponseEntity.ok(MessageResponse.of("답글 삭제 완료"));
     }
 }
