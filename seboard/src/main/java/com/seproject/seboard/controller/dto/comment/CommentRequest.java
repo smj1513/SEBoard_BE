@@ -5,21 +5,27 @@ import com.seproject.seboard.application.dto.comment.CommentCommand.CommentEditC
 import com.seproject.seboard.application.dto.comment.CommentCommand.CommentWriteCommand;
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
+
 public class CommentRequest {
 
     @Data
     public static class CreateCommentRequest {
+        @NotNull
         private Long postId;
+        @NotNull
         private String contents;
+        @NotNull
         @JsonProperty("isAnonymous")
         private boolean isAnonymous;
+        @NotNull
         @JsonProperty("isReadOnlyAuthor")
         private boolean isReadOnlyAuthor;
 
-        public CommentWriteCommand toCommand(Long accountId) {
+        public CommentWriteCommand toCommand(String loginId) {
             return CommentWriteCommand.builder()
                     .postId(postId)
-                    .accountId(accountId)
+                    .loginId(loginId)
                     .contents(contents)
                     .isAnonymous(isAnonymous)
                     .isOnlyReadByAuthor(isReadOnlyAuthor)
@@ -29,13 +35,15 @@ public class CommentRequest {
 
     @Data
     public static class UpdateCommentRequest {
+        @NotNull
         private String contents;
+        @NotNull
         @JsonProperty("isReadOnlyAuthor")
         private boolean isReadOnlyAuthor;
-        public CommentEditCommand toCommand(Long commentId, Long accountId) {
+        public CommentEditCommand toCommand(Long commentId, String loginId) {
             return CommentEditCommand.builder()
-                    .accountId(accountId)
                     .commentId(commentId)
+                    .loginId(loginId)
                     .contents(contents)
                     .isOnlyReadByAuthor(isReadOnlyAuthor)
                     .build();

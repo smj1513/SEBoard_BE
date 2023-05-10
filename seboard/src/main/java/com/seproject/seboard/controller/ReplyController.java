@@ -1,5 +1,6 @@
 package com.seproject.seboard.controller;
 
+import com.seproject.account.utils.SecurityUtils;
 import com.seproject.seboard.application.CommentAppService;
 import com.seproject.seboard.controller.dto.MessageResponse;
 import com.seproject.seboard.controller.dto.comment.ReplyRequest.CreateReplyRequest;
@@ -11,7 +12,10 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
+import static com.seproject.seboard.controller.dto.MessageResponse.*;
 
 @Tag(name = "답글 API", description = "답글(reply) 관련 API")
 @AllArgsConstructor
@@ -23,16 +27,13 @@ public class ReplyController {
     @Parameter(name = "request", description = "답글을 달 댓글의 pk, 태그할 댓글(또는 답글)의 pk, 태그 작성자 정보, 본문, 익명 작성자 정보를 전달")
     @Operation(summary = "답글 작성", description = "답글을 작성한다")
     @PostMapping()
-    public ResponseEntity<?> createReply(@RequestBody CreateReplyRequest request) {
-        Long accountId = 5234058023853L;
+    public ResponseEntity<?> createReply(@Validated @RequestBody CreateReplyRequest request) {
+        String loginId = SecurityUtils.getLoginId();
 
-        /**
-         * TODO : tagAuthor가 존재하지 않음
-         *          content가 비어있음
-         */
-        commentAppService.writeReply(request.toCommand(accountId));
+        Long replyId = commentAppService.writeReply(request.toCommand(loginId));
 
-        return new ResponseEntity<>(MessageResponse.of(""), HttpStatus.CREATED);
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(CreateAndUpdateMessage.of(replyId, "답글 작성 완료"));
     }
 
     @Parameters(
@@ -43,17 +44,12 @@ public class ReplyController {
     )
     @Operation(summary = "답글 수정", description = "답글을 수정한다")
     @PutMapping("/{replyId}")
-    public ResponseEntity<?> updateReply(@PathVariable Long replyId , @RequestBody UpdateReplyRequest request) {
-        Long accountId = 5234058023853L; //TODO : jwt
+    public ResponseEntity<?> updateReply(@PathVariable Long replyId , @Validated @RequestBody UpdateReplyRequest request) {
+        String loginId = SecurityUtils.getLoginId();
 
-        /**
-         * TODO : 비밀번호가 다른 경우
-         *      contents가 비어있음
-         *      존재하지 않는 replyId
-         */
-        commentAppService.editReply(request.toCommand(replyId, accountId));
+        Long id = commentAppService.editReply(request.toCommand(replyId, loginId));
 
-        return new ResponseEntity<>(MessageResponse.of("") ,HttpStatus.OK);
+        return ResponseEntity.ok(CreateAndUpdateMessage.of(id, "답글 수정 완료"));
     }
 
     @Parameters(
@@ -64,14 +60,10 @@ public class ReplyController {
     @Operation(summary = "답글 삭제", description = "답글을 삭제한다")
     @DeleteMapping("/{replyId}")
     public ResponseEntity<?> deleteReply(@PathVariable Long replyId) {
-        Long accountId = 5234058023853L; //TODO : jwt
+        String loginId = SecurityUtils.getLoginId();
 
-        /**
-         * TODO : 존재하지 않는 답글
-         *          비밀번호가 틀림
-         */
-        commentAppService.removeReply(replyId, accountId);
+        commentAppService.removeReply(replyId, loginId);
 
-        return new ResponseEntity<>(MessageResponse.of(""),HttpStatus.OK);
+        return ResponseEntity.ok(MessageResponse.of("답글 삭제 완료"));
     }
 }

@@ -6,9 +6,8 @@ import com.seproject.seboard.application.PostAppService;
 import com.seproject.seboard.application.PostSearchAppService;
 import com.seproject.seboard.application.dto.comment.CommentCommand;
 import com.seproject.seboard.controller.dto.MessageResponse;
-import com.seproject.seboard.controller.dto.post.PostRequest;
 import com.seproject.seboard.controller.dto.post.PostRequest.CreatePostRequest;
-import com.seproject.seboard.controller.dto.post.PostRequest.UpdateNamedPostRequest;
+import com.seproject.seboard.controller.dto.post.PostRequest.UpdatePostRequest;
 import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostListResponseElement;
 import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostDetailResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -27,11 +26,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.NoSuchElementException;
 
+import static com.seproject.seboard.application.dto.comment.CommentCommand.*;
+import static com.seproject.seboard.controller.dto.MessageResponse.*;
 import static com.seproject.seboard.controller.dto.comment.CommentResponse.*;
 import static com.seproject.seboard.controller.dto.post.PostRequest.*;
 import static com.seproject.seboard.controller.dto.post.PostResponse.*;
@@ -48,14 +46,10 @@ public class PostController {
 
     @PostMapping("/{postId}/auth")
     public ResponseEntity<?> retrievePrivacyPost(@RequestBody RetrievePrivacyPostRequest request, @PathVariable Long postId){
-        Long accountId = 5234058023853L;
+        String loginId = SecurityUtils.getLoginId();
 
-        try{
-            RetrievePostDetailResponse privacyPost = postSearchAppService.findPrivacyPost(postId, request.getPassword(), accountId);
-            return ResponseEntity.ok(privacyPost);
-        }catch (Exception e){
-            return ResponseEntity.badRequest().body(MessageResponse.of(e.getMessage()));
-        }
+        RetrievePostDetailResponse privacyPost = postSearchAppService.findPrivacyPost(postId, request.getPassword(), loginId);
+        return ResponseEntity.ok(privacyPost);
     }
 
     @GetMapping("/pined")
@@ -95,21 +89,11 @@ public class PostController {
             @ApiResponse(content = @Content(schema = @Schema(implementation = MessageResponse.class)), responseCode = "404", description = "해당 pk를 가진 게시물이 없음")
     })
     @GetMapping("/{postId}")
-    public ResponseEntity<?> retrievePost(@PathVariable("postId") Long postId) { // TODO : accountId는 jwt에서 추출
+    public ResponseEntity<RetrievePostDetailResponse> retrievePost(@PathVariable("postId") Long postId) { // TODO : accountId는 jwt에서 추출
+        String loginId = SecurityUtils.getLoginId();
 
-        Long accountId = 5234058023853L;
-        /***
-         * TODO : jwt 추가
-         *      없는 postId를 조회
-         */
-
-        try {
-            RetrievePostDetailResponse postDetailRes = postSearchAppService.findPostDetail(postId, accountId);
-            return new ResponseEntity<>(postDetailRes, HttpStatus.OK);
-        } catch (Exception e) {
-            MessageResponse response = MessageResponse.of(e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
-        }
+        RetrievePostDetailResponse postDetailRes = postSearchAppService.findPostDetail(postId, loginId);
+        return ResponseEntity.ok(postDetailRes);
     }
 
     @Parameter(name = "request", description = "게시물 생성에 필요한 제목, 본문, 공개여부, 익명 여부, 첨부파일, 카테고리 pk, 상단 고정 여부 정보")
@@ -120,7 +104,7 @@ public class PostController {
 
         Long postId = postAppService.writePost(request.toCommand(loginId));
 
-        return ResponseEntity.ok().body(MessageResponse.CreateMessage.of(postId, "게시글 작성 성공"));
+        return ResponseEntity.status(HttpStatus.CREATED).body(CreateAndUpdateMessage.of(postId, "게시글 작성 성공"));
     }
 
     @Parameters(
@@ -131,8 +115,8 @@ public class PostController {
     )
     @Operation(summary = "게시글 수정", description = "사용자는 본인이 실명으로 작성한 게시물을 수정한다")
     @PutMapping("/{postId}")
-    public ResponseEntity<?> updatePost(@PathVariable Long postId, @RequestBody UpdateNamedPostRequest request) { //TODO : 첨부파일 필드 추가
-        Long accountId = 5234058023853L; //TODO : accountId 어떻게?
+    public ResponseEntity<?> updatePost(@PathVariable Long postId, @Validated @RequestBody UpdatePostRequest request) { //TODO : 첨부파일 필드 추가
+        String loginId = SecurityUtils.getLoginId();
 
         /**
          * TODO : required 필드 null 체크
@@ -140,26 +124,22 @@ public class PostController {
          *    존재하지 않는 categoryId
          *    제목 또는 본문이 비어있거나 길이 초과
          */
-        postAppService.editPost(
-                request.toCommand(postId, accountId)
+        Long id = postAppService.editPost(
+                request.toCommand(postId, loginId)
         );
 
-        return new ResponseEntity<>(MessageResponse.of(""), HttpStatus.OK);
+        return ResponseEntity.ok(CreateAndUpdateMessage.of(id, "게시글 수정 성공"));
     }
 
     @Parameter(name = "postId", description = "삭제할 게시글의 pk")
     @Operation(summary = "게시글 삭제", description = "사용자는 본인이 실명으로 작성한 게시물을 삭제한다")
     @DeleteMapping("/{postId}")
     public ResponseEntity<?> deletePost(@PathVariable Long postId) {
-        /**
-         * TODO : jwt 확인
-         *    권한 처리
-         */
-        Long accountId = 5234058023853L; //TODO : accountId 어떻게?
+        String loginId = SecurityUtils.getLoginId();
 
-        postAppService.removePost(postId, accountId);
+        postAppService.removePost(postId, loginId);
 
-        return new ResponseEntity<>(MessageResponse.of(""), HttpStatus.OK);
+        return ResponseEntity.ok(CreateAndUpdateMessage.of(postId, "게시글 삭제 성공"));
     }
 
     @Parameters(
@@ -175,15 +155,14 @@ public class PostController {
             @PathVariable Long postId,
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "25") Integer perPage) {
-
-        Long accountId = 5234058023853L; //TODO : jwt에서 추출
+        String loginId = SecurityUtils.getLoginId();
 
         CommentListResponse commentListResponse = commentAppService.retrieveCommentList(
-                CommentCommand.CommentListFindCommand.builder()
+                CommentListFindCommand.builder()
                         .postId(postId)
                         .page(page)
                         .perPage(perPage)
-                        .accountId(accountId)
+                        .loginId(loginId)
                         .build()
         );
 
