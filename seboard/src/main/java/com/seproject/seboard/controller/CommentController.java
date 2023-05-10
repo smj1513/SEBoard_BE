@@ -60,15 +60,10 @@ public class CommentController {
     @Operation(summary = "댓글 삭제", description = "사용자는 자신이 작성한 댓글을 삭제한다")
     @DeleteMapping("/{commentId}")
     public ResponseEntity<?> deleteNamedComment(@PathVariable Long commentId) {
-        Long accountId = 5234058023853L;
+        String loginId = SecurityUtils.getLoginId();
 
-        /**
-         * TODO : jwt
-         *  댓글 수정 권한이 없을때
-         *  존재하지 않는 commentId
-         */
-        commentAppService.removeComment(commentId, accountId);
+        commentAppService.removeComment(commentId, loginId);
 
-        return new ResponseEntity<>(commentId, HttpStatus.OK);
+        return ResponseEntity.ok(MessageResponse.of("댓글 삭제 성공"));
     }
 }

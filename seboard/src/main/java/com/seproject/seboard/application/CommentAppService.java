@@ -179,12 +179,14 @@ public class CommentAppService {
         reply.changeOnlyReadByAuthor(command.isOnlyReadByAuthor());
     }
 
-    public void removeComment(Long commentId, Long accountId) {
-        Comment comment = findByIdOrThrow(commentId, commentRepository, "");
+    public void removeComment(Long commentId, String loginId) {
+        Account account = accountRepository.findByLoginId(loginId);
 
-        //TODO : 추후 주석 해제 필요
-        if (!comment.isWrittenBy(accountId)) { //TODO : 관리자 권한의 경우 생각
-            throw new IllegalArgumentException();
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_COMMENT));
+
+        if (!comment.isWrittenBy(account.getAccountId())) { //TODO : 관리자 권한의 경우 생각
+            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 
         comment.delete();
