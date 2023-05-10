@@ -16,7 +16,7 @@ public class CommentRequest {
         @NotNull
         private String contents;
         @NotNull
-        @JsonProperty("isAnonymous")
+        @JsonProperty("anonymous")
         private boolean isAnonymous;
         @NotNull
         @JsonProperty("isReadOnlyAuthor")
