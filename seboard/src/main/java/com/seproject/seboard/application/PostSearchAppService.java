@@ -42,7 +42,11 @@ public class PostSearchAppService {
     private final AccountRepository accountRepository;
 
     public RetrievePostDetailResponse findPrivacyPost(Long postId, String password, String loginId){
-        Account account = accountRepository.findByLoginId(loginId);
+        //TODO : 추후 변경 필요
+        Account account = null;
+        if(loginId!=null){
+            account = accountRepository.findByLoginId(loginId);
+        }
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
@@ -79,7 +83,11 @@ public class PostSearchAppService {
     }
 
     public RetrievePostDetailResponse findPostDetail(Long postId, String loginId){
-        Account account = accountRepository.findByLoginId(loginId);
+        //TODO : 변경 필요
+        Account account = null;
+        if(loginId!=null){
+            account = accountRepository.findByLoginId(loginId);
+        }
 
         //TODO : 권한 처리 추가 필요
 
