@@ -136,6 +136,8 @@ public class CommentAppService {
     }
 
     public CommentListResponse retrieveCommentList(CommentListFindCommand command) {
+        Account account = accountRepository.findByLoginId(command.getLoginId());
+
         Page<Comment> commentPage = commentSearchRepository.findCommentListByPostId(command.getPostId(), PageRequest.of(command.getPage(), command.getPerPage()));
         long totalReplySize = commentSearchRepository.countReplyByPostId(command.getPostId());
 
@@ -144,9 +146,9 @@ public class CommentAppService {
                             List<ReplyResponse> subComments = commentSearchRepository.findReplyListByCommentId(comment.getCommentId())
                                     .stream()
                                     .map(
-                                            reply -> ReplyResponse.toDto(reply, reply.isWrittenBy(command.getAccountId()))
+                                            reply -> ReplyResponse.toDto(reply, reply.isWrittenBy(account.getAccountId()), reply.getPost().isWrittenBy(account.getAccountId()))
                                     ).collect(Collectors.toList());
-                    return CommentListElement.toDto(comment, comment.isWrittenBy(command.getAccountId()), subComments);
+                    return CommentListElement.toDto(comment, comment.isWrittenBy(account.getAccountId()),comment.getPost().isWrittenBy(account.getAccountId()), subComments);
                 }).collect(Collectors.toList());
 
 

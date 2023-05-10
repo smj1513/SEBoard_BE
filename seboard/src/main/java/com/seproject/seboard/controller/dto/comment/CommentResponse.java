@@ -44,12 +44,15 @@ public class CommentResponse {
         private boolean isReadOnlyAuthor;
         private List<ReplyResponse> subComments;
 
-        public static CommentListElement toDto(Comment comment, boolean isEditable, List<ReplyResponse> subComments){
+        public static CommentListElement toDto(Comment comment, boolean isAuthor, boolean isPostAuthor, List<ReplyResponse> subComments){
             UserResponse userResponse = null;
             String contents = null;
             //TODO : dto에 로직이 들어가는게 맞나?
             if(comment.isDeleted()){
                 contents = "삭제된 댓글입니다.";
+                userResponse = new UserResponse(null, "(알수 없음)");
+            }else if(comment.isOnlyReadByAuthor() && !isAuthor && !isPostAuthor){
+                contents = "글 작성자만 볼 수 있는 댓글 입니다.";
                 userResponse = new UserResponse(null, "(알수 없음)");
             }else{
                 contents = comment.getContents();
@@ -62,8 +65,8 @@ public class CommentResponse {
                     .createdAt(comment.getBaseTime().getCreatedAt())
                     .modifiedAt(comment.getBaseTime().getModifiedAt())
                     .contents(contents)
-                    .isEditable(isEditable)
-                    .isActive(!comment.isDeleted()) //TODO : 작성자만 읽을 수 있는 경우 추가 필요
+                    .isEditable(isAuthor)
+                    .isActive(!comment.isDeleted() && ((comment.isOnlyReadByAuthor() && isAuthor) || !comment.isOnlyReadByAuthor()) ) //TODO : 작성자만 읽을 수 있는 경우 추가 필요
                     .isReadOnlyAuthor(comment.isOnlyReadByAuthor())
                     .subComments(subComments)
                     .build();

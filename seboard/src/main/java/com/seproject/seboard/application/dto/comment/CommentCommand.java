@@ -27,7 +27,7 @@ public class CommentCommand {
     @Builder
     public static class CommentListFindCommand {
         private Long postId;
-        private Long accountId;
+        private String loginId;
         private Integer page;
         private Integer perPage;
     }

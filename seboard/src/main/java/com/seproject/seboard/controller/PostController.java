@@ -28,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+import static com.seproject.seboard.application.dto.comment.CommentCommand.*;
 import static com.seproject.seboard.controller.dto.MessageResponse.*;
 import static com.seproject.seboard.controller.dto.comment.CommentResponse.*;
 import static com.seproject.seboard.controller.dto.post.PostRequest.*;
@@ -154,15 +155,14 @@ public class PostController {
             @PathVariable Long postId,
             @RequestParam(defaultValue = "1") Integer page,
             @RequestParam(defaultValue = "25") Integer perPage) {
-
-        Long accountId = 5234058023853L; //TODO : jwt에서 추출
+        String loginId = SecurityUtils.getLoginId();
 
         CommentListResponse commentListResponse = commentAppService.retrieveCommentList(
-                CommentCommand.CommentListFindCommand.builder()
+                CommentListFindCommand.builder()
                         .postId(postId)
                         .page(page)
                         .perPage(perPage)
-                        .accountId(accountId)
+                        .loginId(loginId)
                         .build()
         );
 
