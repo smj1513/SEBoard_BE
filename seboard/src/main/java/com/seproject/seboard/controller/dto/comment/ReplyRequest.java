@@ -41,13 +41,15 @@ public class ReplyRequest {
 
     @Data
     public static class UpdateReplyRequest {
+        @NotNull
         private String contents;
+        @NotNull
         @JsonProperty("isReadOnlyAuthor")
         private boolean isReadOnlyAuthor;
 
-        public ReplyEditCommand toCommand(Long replyId, Long accountId) {
+        public ReplyEditCommand toCommand(Long replyId, String loginId) {
             return ReplyEditCommand.builder()
-                    .accountId(accountId)
+                    .loginId(loginId)
                     .replyId(replyId)
                     .contents(contents)
                     .isOnlyReadByAuthor(isReadOnlyAuthor)

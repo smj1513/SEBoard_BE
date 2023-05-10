@@ -20,7 +20,7 @@ public class ReplyCommand {
     @Builder
     public static class ReplyEditCommand{
         private Long replyId;
-        private Long accountId;
+        private String loginId;
         private String contents;
         private boolean isOnlyReadByAuthor;
     }

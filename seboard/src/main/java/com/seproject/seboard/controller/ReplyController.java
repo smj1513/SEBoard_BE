@@ -44,17 +44,12 @@ public class ReplyController {
     )
     @Operation(summary = "답글 수정", description = "답글을 수정한다")
     @PutMapping("/{replyId}")
-    public ResponseEntity<?> updateReply(@PathVariable Long replyId , @RequestBody UpdateReplyRequest request) {
-        Long accountId = 5234058023853L; //TODO : jwt
+    public ResponseEntity<?> updateReply(@PathVariable Long replyId , @Validated @RequestBody UpdateReplyRequest request) {
+        String loginId = SecurityUtils.getLoginId();
 
-        /**
-         * TODO : 비밀번호가 다른 경우
-         *      contents가 비어있음
-         *      존재하지 않는 replyId
-         */
-        commentAppService.editReply(request.toCommand(replyId, accountId));
+        Long id = commentAppService.editReply(request.toCommand(replyId, loginId));
 
-        return new ResponseEntity<>(of("") ,HttpStatus.OK);
+        return ResponseEntity.ok(CreateAndUpdateMessage.of(id, "답글 수정 완료"));
     }
 
     @Parameters(

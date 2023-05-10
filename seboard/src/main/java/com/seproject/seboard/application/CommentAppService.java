@@ -176,16 +176,19 @@ public class CommentAppService {
         return comment.getCommentId();
     }
 
-    public void editReply(ReplyEditCommand command) {
-        Reply reply = findByIdOrThrow(command.getReplyId(), replyRepository, "");
+    public Long editReply(ReplyEditCommand command) {
+        Account account = accountRepository.findByLoginId(command.getLoginId());
+        Reply reply = replyRepository.findById(command.getReplyId())
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_COMMENT));
 
-        //TODO : 추후 주석 해제 필요
-        if (!reply.isWrittenBy(command.getAccountId())) { //TODO : 관리자 권한의 경우 생각
-            throw new IllegalArgumentException();
+        if (!reply.isWrittenBy(account.getAccountId())) { //TODO : 관리자 권한의 경우 생각
+            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 
         reply.changeContents(command.getContents());
         reply.changeOnlyReadByAuthor(command.isOnlyReadByAuthor());
+
+        return reply.getCommentId();
     }
 
     public void removeComment(Long commentId, String loginId) {
