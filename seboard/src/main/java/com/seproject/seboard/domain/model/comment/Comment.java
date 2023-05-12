@@ -13,11 +13,12 @@ import javax.persistence.*;
 @SuperBuilder
 @NoArgsConstructor
 @Entity
-@Inheritance(strategy = InheritanceType.JOINED)
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "comment_type")
+@DiscriminatorValue("comment")
 @Table(name = "comments")
 public class Comment {
-    private static final int CONTENTS_MAX_SIZE = 1000;
-    private static final int CONTENTS_MIN_SIZE = 10;
+    private static final int CONTENTS_MIN_SIZE = 1;
 
     @Id @GeneratedValue
     private Long commentId;
@@ -83,7 +84,7 @@ public class Comment {
 
 
     private boolean isValidContents(String contents) {
-        return CONTENTS_MIN_SIZE < contents.length() && contents.length() <= CONTENTS_MAX_SIZE;
+        return CONTENTS_MIN_SIZE < contents.length();
     }
 
     public void delete() {

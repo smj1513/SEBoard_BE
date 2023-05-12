@@ -5,6 +5,7 @@ import com.seproject.seboard.application.dto.comment.CommentCommand.CommentEditC
 import com.seproject.seboard.application.dto.comment.CommentCommand.CommentWriteCommand;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
 public class CommentRequest {
@@ -13,10 +14,10 @@ public class CommentRequest {
     public static class CreateCommentRequest {
         @NotNull
         private Long postId;
-        @NotNull
+        @NotBlank
         private String contents;
         @NotNull
-        @JsonProperty("anonymous")
+        @JsonProperty("isAnonymous")
         private boolean isAnonymous;
         @NotNull
         @JsonProperty("isReadOnlyAuthor")
