@@ -249,8 +249,11 @@ public class CommentAppService {
         reply.delete();
     }
 
-    @Transactional
     protected Anonymous getAnonymous(Long accountId, Long postId, Post post) {
+        if(post.isWrittenBy(accountId)){
+            return anonymousRepository.findById(post.getAuthor().getBoardUserId()).get();
+        }
+
         Anonymous author = commentRepository.findByPostId(postId).stream()
                 .filter(comment -> comment.getAuthor().isAnonymous())
                 .map(comment -> (Anonymous) comment.getAuthor())

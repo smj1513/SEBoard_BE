@@ -10,9 +10,10 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface CommentSearchJpaRepository extends CommentSearchRepository {
-    @Query("select c from Comment c where c.post.postId = :postId")
+//    @Query("select c from Comment c where c.post.postId = :postId order by c.baseTime.createdAt desc")
+    @Query(value = "select * from comments as c where c.post_id = :postId and c.comment_type='comment' order by c.created_at asc", nativeQuery = true)
     Page<Comment> findCommentListByPostId(Long postId, Pageable pagingInfo);
-    @Query("select r from Reply r where r.superComment.commentId = :commentId")
+    @Query("select r from Reply r where r.superComment.commentId = :commentId order by r.baseTime.createdAt asc")
     List<Reply> findReplyListByCommentId(Long commentId);
     @Query("select count(r) from Reply r where r.post.postId = :postId")
     int countReplyByPostId(Long postId);

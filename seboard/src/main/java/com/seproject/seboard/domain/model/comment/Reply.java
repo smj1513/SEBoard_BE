@@ -12,7 +12,7 @@ import javax.persistence.*;
 @NoArgsConstructor
 @Getter
 @Entity
-@Table(name = "replies")
+@DiscriminatorValue("reply")
 @SuperBuilder
 public class Reply extends Comment {
 
