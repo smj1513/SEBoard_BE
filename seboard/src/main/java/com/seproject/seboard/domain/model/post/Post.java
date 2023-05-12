@@ -24,10 +24,8 @@ import java.util.Set;
 @Builder
 @Table(name = "posts")
 public class Post {
-    private static final Integer TITLE_MAX_SIZE = 50;
-    private static final Integer TITLE_MIN_SIZE = 4;
-    private static final Integer CONTENTS_MAX_SIZE = 1000;
-    private static final Integer CONTENTS_MIN_SIZE = 10;
+    private static final Integer TITLE_MAX_SIZE = 100;
+    private static final Integer TITLE_MIN_SIZE = 1;
     @Id @GeneratedValue
     @Column(name = "post_id")
     private Long postId;
@@ -56,10 +54,6 @@ public class Post {
                 boolean pined, BaseTime baseTime, Category category,
                 BoardUser author, ExposeOption exposeOption,  Set<FileMetaData> attachments,  int anonymousCount, boolean isDeleted) {
         if(!isValidTitle(title)) {
-            throw new IllegalArgumentException();
-        }
-
-        if(!isValidContents(contents)) {
             throw new IllegalArgumentException();
         }
 
@@ -112,10 +106,6 @@ public class Post {
     }
 
     public void changeContents(String contents) {
-        if(!isValidContents(contents)) {
-            throw new IllegalArgumentException();
-        }
-
         this.contents = contents;
     }
 
@@ -141,10 +131,6 @@ public class Post {
 
     private boolean isValidTitle(String title) {
         return TITLE_MIN_SIZE < title.length() && title.length() <= TITLE_MAX_SIZE;
-    }
-
-    private boolean isValidContents(String contents) {
-        return CONTENTS_MIN_SIZE < contents.length() && contents.length() <= CONTENTS_MAX_SIZE;
     }
 
     public void removeAttachment(FileMetaData attachment){
