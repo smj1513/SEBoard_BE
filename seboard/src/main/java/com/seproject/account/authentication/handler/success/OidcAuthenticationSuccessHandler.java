@@ -27,7 +27,7 @@ import java.util.UUID;
 @Component
 public class OidcAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
-    private static final String REDIRECT_URL = "http://202.31.202.9";
+    private static final String REDIRECT_URL = "http://seboard2.site";
 
     private final JwtProvider jwtProvider;
     private final OAuthAccountRepository oAuthAccountRepository;

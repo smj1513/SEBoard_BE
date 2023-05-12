@@ -1,5 +1,6 @@
 package com.seproject.seboard.controller.dto.post;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.seproject.seboard.application.dto.post.PostCommand.PostWriteCommand;
 import com.seproject.seboard.domain.model.post.exposeOptions.ExposeState;
 import lombok.*;
@@ -46,6 +47,7 @@ public class PostRequest {
         @NotNull
         private ExposeOptionRequest exposeOption;
         @NotNull
+        @JsonProperty("anonymous")
         private boolean isAnonymous;
 
         public PostWriteCommand toCommand(String loginId) {

@@ -13,7 +13,7 @@ public class LogoutAppService {
     private String clientId;
     private static final String LOGOUT_URL = "https://kauth.kakao.com/oauth/logout?client_id=";
     private static final String X_WWW_FORM_URLENCODED = "application/x-www-form-urlencoded";
-    private static final String REDIRECT_PATH = "&logout_redirect_uri=http://202.31.202.9";
+    private static final String REDIRECT_PATH = "&logout_redirect_uri=http://seboard2.site/login";
     private final String KEY = "Authorization";
 
 
