@@ -1,5 +1,9 @@
 package com.seproject.seboard.application;
 
+import com.seproject.account.model.Account;
+import com.seproject.account.repository.AccountRepository;
+import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.NoSuchResourceException;
 import com.seproject.seboard.domain.model.post.Bookmark;
 import com.seproject.seboard.domain.model.post.Post;
 import com.seproject.seboard.domain.model.user.Member;
@@ -23,11 +27,16 @@ public class BookmarkAppService {
     private final BookmarkRepository bookmarkRepository;
     private final PostRepository postRepository;
     private final MemberRepository memberRepository;
+    private final AccountRepository accountRepository;
 
-    public void enrollBookmark(Long postId, Long accountId) {
+    public void enrollBookmark(Long postId, String loginId) {
+        Account account = accountRepository.findByLoginId(loginId);
+
         //TODO : member 없을 때 처리 필요, member 생성 or error?
-        Member member = memberRepository.findByAccountId(accountId).orElseThrow(NoSuchElementException::new);
-        Post post = findByIdOrThrow(postId, postRepository, "");
+        Member member = memberRepository.findByAccountId(account.getAccountId())
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_MEMBER));
+        Post post = postRepository.findById(postId)
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
 
         boolean existBookmark = bookmarkRepository.existsByPostIdAndMemberId(postId, member.getBoardUserId());
 
@@ -41,13 +50,15 @@ public class BookmarkAppService {
         }
     }
 
-    public void cancelBookmark(Long postId, Long accountId) {
+    public void cancelBookmark(Long postId, String loginId) {
+        Account account = accountRepository.findByLoginId(loginId);
         //TODO : member 없을 때 처리 필요, member 생성 or error?
-        Member member = memberRepository.findByAccountId(accountId).orElseThrow(NoSuchElementException::new);
+        Member member = memberRepository.findByAccountId(account.getAccountId())
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_MEMBER));
 
         Optional<Bookmark> bookmarkBox = bookmarkRepository.findByPostIdAndMemberId(postId, member.getBoardUserId());
 
-        if(!bookmarkBox.isEmpty()){
+        if(bookmarkBox.isPresent()){
             bookmarkRepository.delete(bookmarkBox.get());
         }
     }
