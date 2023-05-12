@@ -24,6 +24,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
@@ -41,6 +42,7 @@ public class PostSearchAppService {
     private final BookmarkRepository bookmarkRepository;
     private final AccountRepository accountRepository;
 
+    @Transactional
     public RetrievePostDetailResponse findPrivacyPost(Long postId, String password, String loginId){
         //TODO : 추후 변경 필요
         Account account = null;
@@ -78,10 +80,12 @@ public class PostSearchAppService {
         postDetailResponse.setEditable(isEditable);
         postDetailResponse.setBookmarked(isBookmarked);
 
-        return postDetailResponse;
+        post.increaseViews();
 
+        return postDetailResponse;
     }
 
+    @Transactional
     public RetrievePostDetailResponse findPostDetail(Long postId, String loginId){
         //TODO : 변경 필요
         Account account = null;
@@ -121,8 +125,9 @@ public class PostSearchAppService {
             }
         }
 
-        return postDetailResponse;
+        post.increaseViews();
 
+        return postDetailResponse;
     }
 
     public List<RetrievePostListResponseElement> findPinedPostList(Long categoryId){

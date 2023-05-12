@@ -153,6 +153,10 @@ public class Post {
         this.isDeleted = true;
     }
 
+    public void increaseViews() {
+        this.views++;
+    }
+
     public boolean checkPassword(String password) {
         if(exposeOption.getExposeState()==ExposeState.PRIVACY){
             return ((Privacy)exposeOption).checkPassword(password);
