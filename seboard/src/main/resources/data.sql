@@ -5,6 +5,10 @@ INSERT INTO accounts(account_id,login_id,name,nickname,password,created_at) valu
 INSERT INTO accounts(account_id,login_id,name,nickname,password,created_at) values (5234058023852,'professor','professor','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','2023-04-26');
 INSERT INTO accounts(account_id,login_id,name,nickname,password,created_at) values (5234058023853,'kumoh','maanjong','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','2023-04-26');
 INSERT INTO roles (role_id, name) values (5234058023850, 'ROLE_USER'),(5234058023851, 'ROLE_ADMIN'),(5234058023852, 'ROLE_PROFESSOR'),(5234058023853, 'ROLE_KUMOH');
+INSERT INTO public.accounts(account_id, created_at, login_id, name, nickname, password)
+VALUES (5234058023854, '2023-05-13 17:35:53.152235', 'alswhd1113@gmail.com', '김민종', '312', '$2a$10$NEg.I3iB2foXjjY4fXXgS.Zeu9HJlxdVnO9n2GTK1hga1l8.2Vkd6');
+INSERT INTO public.oauth_accounts(id, provider, sub, account_id) VALUES (2, 'kakao', '2732852527', 5234058023854);
+
 
 INSERT INTO authorities(account_id,role_id) values(5234058023850,5234058023850);
 INSERT INTO authorities(account_id,role_id) values(5234058023851,5234058023851);

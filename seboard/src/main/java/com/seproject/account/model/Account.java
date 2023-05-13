@@ -55,6 +55,11 @@ public class Account implements UserDetails {
         return this;
     }
 
+    public String changePassword(String password) {
+        this.password = password;
+        return password;
+    }
+
     public String getUsername() {
         return loginId;
     }

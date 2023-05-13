@@ -19,25 +19,28 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import javax.transaction.Transactional;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.seproject.admin.dto.AccountDTO.*;
+import static com.seproject.account.controller.dto.AccountDTO.*;
 import static com.seproject.account.controller.dto.RegisterDTO.*;
 
 @Slf4j
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 @Service
 public class AccountService implements UserDetailsService {
 
     private final AccountRepository accountRepository;
     private final OAuthAccountRepository oAuthAccountRepository;
     private final RoleRepository roleRepository;
-    private final PasswordEncoder passwordEncoder;
+    private final BCryptPasswordEncoder passwordEncoder;
     private final RegisterEmailService registerEmailService;
     private final MemberRepository memberRepository;
 
@@ -205,6 +208,19 @@ public class AccountService implements UserDetailsService {
         }
 
         return account;
+    }
+
+    @Transactional
+    public PasswordResponse changePassword(PasswordRequest passwordRequest) {
+        String email = passwordRequest.getEmail();
+        String newPassword = passwordRequest.getPassword();
+        Account account = accountRepository.findByLoginId(email);
+        if(account == null) {
+            throw new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null);
+        }
+        account.changePassword(passwordEncoder.encode(newPassword));
+
+        return PasswordResponse.toDTO(account);
     }
 
 }

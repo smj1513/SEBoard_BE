@@ -4,8 +4,10 @@ import com.seproject.account.application.LogoutAppService;
 import com.seproject.account.controller.dto.LogoutDTO;
 import com.seproject.account.jwt.JwtDecoder;
 import com.seproject.account.service.AccountService;
-import com.seproject.account.service.email.RegisterEmailService;
+import com.seproject.account.service.email.PasswordChangeEmailService;
 import com.seproject.account.service.TokenService;
+import com.seproject.error.Error;
+import com.seproject.error.errorCode.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
@@ -14,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -30,7 +33,7 @@ public class AccountController {
     private final AccountService accountService;
     private final TokenService tokenService;
     private final JwtDecoder jwtDecoder;
-    private final RegisterEmailService registerEmailService;
+    private final PasswordChangeEmailService passwordChangeEmailService;
 
     @Operation(summary = "로그아웃", description = "로그아웃")
     @GetMapping("/logoutProc")
@@ -58,14 +61,11 @@ public class AccountController {
     @PostMapping("/password")
     public ResponseEntity<?> findLoginId(@RequestBody PasswordRequest passwordRequest) {
 
-        String email = passwordRequest.getEmail();
-
-        if(!accountService.isExist(email)) {
-            return new ResponseEntity<>("해당 이메일로 가입한 계정이 존재하지 않습니다.",HttpStatus.NOT_FOUND);
+        if(!passwordChangeEmailService.isConfirmed(passwordRequest.getEmail())) {
+            return Error.toResponseEntity(ErrorCode.EMAIL_NOT_FOUNT);
         }
 
-        registerEmailService.send(email);
-        return new ResponseEntity<>("해당 이메일로 비밀번호 변경을 위한 url을 전송하였습니다.",HttpStatus.OK);
+        return new ResponseEntity<>(accountService.changePassword(passwordRequest),HttpStatus.OK);
     }
 
     private void doLogout(String accessToken){
