@@ -7,6 +7,7 @@ import com.seproject.account.service.AccountService;
 import com.seproject.account.service.email.KumohEmailService;
 import com.seproject.account.service.email.PasswordChangeEmailService;
 import com.seproject.account.service.TokenService;
+import com.seproject.account.utils.SecurityUtils;
 import com.seproject.error.Error;
 import com.seproject.error.errorCode.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
@@ -80,6 +81,17 @@ public class AccountController {
         }
 
         return new ResponseEntity<>(accountService.grantKumohAuth(kumohAuthRequest),HttpStatus.OK);
+    }
+
+    @Operation(summary = "내 정보 조회", description = "마이페이지에 필요한 정보 조회")
+    @GetMapping("/mypage")
+    public ResponseEntity<?> findUserInfo() {
+
+        String loginId = SecurityUtils.getLoginId();
+
+        if(loginId == null) return Error.toResponseEntity(ErrorCode.NOT_LOGIN);
+
+        return new ResponseEntity<>(accountService.findMyInfo(loginId),HttpStatus.OK);
     }
 
     private void doLogout(String accessToken){

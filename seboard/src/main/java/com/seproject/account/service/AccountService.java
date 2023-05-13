@@ -23,7 +23,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.seproject.admin.dto.AccountDTO.*;
@@ -239,6 +242,27 @@ public class AccountService implements UserDetailsService {
         }
 
         return KumohAuthResponse.toDTO(account);
+    }
+
+    //TODO : 추가 정보가 필요
+    public Object findMyInfo(String loginId) {
+        Map<String,Object> map = new HashMap<>();
+        Account account = accountRepository.findByLoginId(loginId);
+        if(account == null) throw new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null);
+        map.put("email",account.getLoginId());
+        map.put("nickname",account.getNickname());
+        map.put("name",account.getName());
+        map.put("authorities",account.getAuthorities().stream()
+                .map(Role::toString)
+                .collect(Collectors.toList()));
+
+        Optional<OAuthAccount> byLoginId = oAuthAccountRepository.findByLoginId(loginId);
+        if(byLoginId.isPresent()) {
+            OAuthAccount oAuthAccount = byLoginId.get();
+            map.put("provider",oAuthAccount.getProvider());
+        }
+
+        return map;
     }
 
 }

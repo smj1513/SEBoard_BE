@@ -31,4 +31,15 @@ public class Role implements GrantedAuthority {
     public String getAuthority() {
         return name;
     }
+
+    @Override
+    public String toString() {
+        switch (name) {
+            case ROLE_ADMIN: return "관리자";
+            case ROLE_KUMOH: return "정회원";
+            case ROLE_USER: return "준회원";
+        }
+
+        return "무직";
+    }
 }
