@@ -1,19 +1,13 @@
 package com.seproject.account.service.email;
 
-import com.seproject.account.model.email.AccountRegisterConfirmedEmail;
-import com.seproject.account.model.email.AccountRegisterEmail;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
 import org.apache.commons.mail.DefaultAuthenticator;
-import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.NoSuchElementException;
-import java.util.Optional;
 
 public abstract class EmailService {
 
@@ -39,9 +33,44 @@ public abstract class EmailService {
         return email.matches(KUMOH_EMAIL_REGEX);
     }
 
-    public abstract void send(String email) ;
-    public abstract void confirm(String email,String token) ;
+    public void send(String email) {
+        if(!isEmail(email)) {
+            throw new CustomIllegalArgumentException(ErrorCode.INVALID_MAIL,null);
+        }
 
-    public abstract boolean isConfirmed(String email);
+        SimpleEmail simpleEmail = new SimpleEmail();
+        simpleEmail.setHostName(host);
+        simpleEmail.setSmtpPort(port);
+        simpleEmail.setCharset("euc-kr"); // 인코딩 설정(utf-8, euc-kr)
+        simpleEmail.setAuthenticator(new DefaultAuthenticator(username, password));
+        simpleEmail.setTLS(true);
 
+        try {
+            simpleEmail.setFrom("jongjong159@naver.com");
+
+            send(email,simpleEmail);
+
+        } catch (EmailException e) {
+            throw new RuntimeException(e);
+        }
+
+
+    }
+    protected abstract void send(String email,SimpleEmail simpleEmail) throws EmailException;
+    public void confirm(String email,String token) {
+        if(!isEmail(email)) {
+            throw new CustomIllegalArgumentException(ErrorCode.INVALID_MAIL,null);
+        }
+
+        confirmEmail(email,token);
+    }
+
+    @Transactional
+    protected abstract void confirmEmail(String email,String token);
+
+    public boolean isConfirmed(String email) {
+        return isEmail(email) && isConfirmedEmail(email);
+    }
+
+    protected abstract boolean isConfirmedEmail(String email);
 }
