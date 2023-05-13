@@ -5,6 +5,4 @@ import org.springframework.data.repository.CrudRepository;
 
 public interface AccountRegisterConfirmedEmailRepository
         extends CrudRepository<AccountRegisterConfirmedEmail,String> {
-
-    boolean existsByEmail(String email);
 }
