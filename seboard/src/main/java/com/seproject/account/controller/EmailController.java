@@ -1,7 +1,7 @@
 package com.seproject.account.controller;
 
 import com.seproject.account.service.AccountService;
-import com.seproject.account.service.EmailService;
+import com.seproject.account.service.email.RegisterEmailService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -28,7 +28,7 @@ import static com.seproject.account.controller.dto.EmailDTO.*;
 public class EmailController {
 
     private final AccountService accountService;
-    private final EmailService emailService;
+    private final RegisterEmailService registerEmailService;
 
     @Parameters(
             {
@@ -44,14 +44,14 @@ public class EmailController {
     @PostMapping("/email/auth")
     public ResponseEntity<?> sendEmail(@RequestBody EmailAuthenticationRequest request) {
         String email = request.getEmail();
-        if(!emailService.isEmail(email)){
+        if(!registerEmailService.isEmail(email)){
             return new ResponseEntity<>("잘못된 이메일 형식입니다.", HttpStatus.BAD_REQUEST);
         }
         if(accountService.isExist(email)) {
             return new ResponseEntity<>("이미 인증된 이메일입니다." , HttpStatus.BAD_REQUEST);
         }
 
-        emailService.send(email);
+        registerEmailService.send(email);
         return new ResponseEntity<>("입력한 이메일로 인증 코드를 전송했습니다.",HttpStatus.OK);
     }
 
@@ -69,7 +69,7 @@ public class EmailController {
     @PostMapping("/email/confirm")
     public ResponseEntity<?> confirmAuthCode(@RequestBody EmailConfirmRequest emailConfirmDTO) {
         try {
-            emailService.confirm(emailConfirmDTO.getEmail(), emailConfirmDTO.getAuthToken());
+            registerEmailService.confirm(emailConfirmDTO.getEmail(), emailConfirmDTO.getAuthToken());
             return new ResponseEntity<>("인증 성공",HttpStatus.OK);
         }
         catch (NoSuchElementException e) {
@@ -93,11 +93,11 @@ public class EmailController {
 
         String email = request.getEmail();
 
-        if(!emailService.isKumohMail(email)){
+        if(!registerEmailService.isKumohMail(email)){
             return new ResponseEntity<>("잘못된 이메일 형식입니다.", HttpStatus.BAD_REQUEST);
         }
 
-        emailService.send(email);
+        registerEmailService.send(email);
         return new ResponseEntity<>("입력한 이메일로 인증 코드를 전송했습니다.",HttpStatus.OK);
     }
 
@@ -115,7 +115,7 @@ public class EmailController {
     @PostMapping("/kumohEmail/confirm")
     public ResponseEntity<?> confirmKumohAuthCode(@RequestBody EmailConfirmRequest emailConfirmDTO) {
         try {
-            emailService.confirm(emailConfirmDTO.getEmail(), emailConfirmDTO.getAuthToken());
+            registerEmailService.confirm(emailConfirmDTO.getEmail(), emailConfirmDTO.getAuthToken());
             return new ResponseEntity<>("인증 성공",HttpStatus.OK);
         }
         catch (NoSuchElementException e) {

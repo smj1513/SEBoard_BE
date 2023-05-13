@@ -1,4 +1,4 @@
-package com.seproject.account.service;
+package com.seproject.account.service.email;
 
 import com.seproject.account.model.email.AccountRegisterConfirmedEmail;
 import com.seproject.account.model.email.AccountRegisterEmail;
@@ -11,44 +11,20 @@ import org.apache.commons.mail.DefaultAuthenticator;
 import org.apache.commons.mail.Email;
 import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
 @EnableAsync
-public class EmailService {
+public class RegisterEmailService extends EmailService{
     private final AccountRegisterEmailRepository accountRegisterEmailRepository;
     private final AccountRegisterConfirmedEmailRepository accountRegisterConfirmedEmailRepository;
-
-    @Value("${mail.host}")
-    private String host;
-
-    @Value("${mail.port}")
-    private int port;
-
-    @Value("${mail.username}")
-    private String username;
-
-    @Value("${mail.password}")
-    private String password;
-
-    private static final String EMAIL_REGEX = "[0-9a-zA-Z]+(.[_a-z0-9-]+)*@(?:\\w+\\.)+\\w+$";
-    private static final String KUMOH_EMAIL_REGEX = "\\w+@kumoh.ac.kr";
-    public boolean isEmail(String email) {
-        return email.matches(EMAIL_REGEX);
-    }
-
-    public boolean isKumohMail(String email) {
-        return email.matches(KUMOH_EMAIL_REGEX);
-    }
 
     @Async
     public void send(String email) {

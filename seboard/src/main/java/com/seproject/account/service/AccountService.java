@@ -2,6 +2,7 @@ package com.seproject.account.service;
 
 import com.seproject.account.model.social.OAuthAccount;
 import com.seproject.account.repository.social.OAuthAccountRepository;
+import com.seproject.account.service.email.RegisterEmailService;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
 import com.seproject.error.exception.CustomUserNotFoundException;
@@ -37,7 +38,7 @@ public class AccountService implements UserDetailsService {
     private final OAuthAccountRepository oAuthAccountRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-    private final EmailService emailService;
+    private final RegisterEmailService registerEmailService;
     private final MemberRepository memberRepository;
 
     public boolean isExist(String loginId){
@@ -53,9 +54,9 @@ public class AccountService implements UserDetailsService {
 
     private Role mapEmailToRole(String email) {
 
-        if(emailService.isKumohMail(email)){
+        if(registerEmailService.isKumohMail(email)){
             return roleRepository.findByName("ROLE_KUMOH").orElseThrow();
-        } else if(emailService.isEmail(email)) {
+        } else if(registerEmailService.isEmail(email)) {
             return roleRepository.findByName("ROLE_USER").orElseThrow();
         }
 

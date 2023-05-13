@@ -4,7 +4,7 @@ import com.seproject.account.application.LogoutAppService;
 import com.seproject.account.controller.dto.LogoutDTO;
 import com.seproject.account.jwt.JwtDecoder;
 import com.seproject.account.service.AccountService;
-import com.seproject.account.service.EmailService;
+import com.seproject.account.service.email.RegisterEmailService;
 import com.seproject.account.service.TokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -30,7 +30,7 @@ public class AccountController {
     private final AccountService accountService;
     private final TokenService tokenService;
     private final JwtDecoder jwtDecoder;
-    private final EmailService emailService;
+    private final RegisterEmailService registerEmailService;
 
     @Operation(summary = "로그아웃", description = "로그아웃")
     @GetMapping("/logoutProc")
@@ -64,7 +64,7 @@ public class AccountController {
             return new ResponseEntity<>("해당 이메일로 가입한 계정이 존재하지 않습니다.",HttpStatus.NOT_FOUND);
         }
 
-        emailService.send(email);
+        registerEmailService.send(email);
         return new ResponseEntity<>("해당 이메일로 비밀번호 변경을 위한 url을 전송하였습니다.",HttpStatus.OK);
     }
 
