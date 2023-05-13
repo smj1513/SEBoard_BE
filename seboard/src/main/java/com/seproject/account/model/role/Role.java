@@ -1,10 +1,15 @@
 package com.seproject.account.model.role;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
+import java.util.List;
 
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 @Entity
 @Table(name = "roles")
@@ -13,6 +18,8 @@ public class Role implements GrantedAuthority {
     public static final String ROLE_ADMIN = "ROLE_ADMIN";
     public static final String ROLE_USER = "ROLE_USER";
     public static final String ROLE_KUMOH = "ROLE_KUMOH";
+
+    private static final List<String> IMMUTABLE_ROLES = List.of(ROLE_ADMIN,ROLE_USER,ROLE_KUMOH);
     @Id
     @GeneratedValue
     private Long roleId;
@@ -20,9 +27,8 @@ public class Role implements GrantedAuthority {
     @Column(nullable=false, unique=true)
     private String name;
 
-    public Role(String name) {
-        this.name = name;
-    }
+    private String description;
+    private String alias;
 
     public Long getId() {
         return roleId;
@@ -32,14 +38,23 @@ public class Role implements GrantedAuthority {
         return name;
     }
 
+    public String getDescription() {return description;}
+
     @Override
     public String toString() {
-        switch (name) {
-            case ROLE_ADMIN: return "관리자";
-            case ROLE_KUMOH: return "정회원";
-            case ROLE_USER: return "준회원";
-        }
-
-        return "무직";
+        return alias;
     }
+
+    public boolean isImmutable() {
+        return IMMUTABLE_ROLES.contains(name);
+    }
+
+    public Role update(String name, String description, String alias) {
+        this.name = name;
+        this.description = description;
+        this.alias = alias;
+
+        return this;
+    }
+
 }
