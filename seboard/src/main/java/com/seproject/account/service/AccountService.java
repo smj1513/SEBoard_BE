@@ -20,7 +20,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -221,6 +220,25 @@ public class AccountService implements UserDetailsService {
         account.changePassword(passwordEncoder.encode(newPassword));
 
         return PasswordResponse.toDTO(account);
+    }
+
+    @Transactional
+    public KumohAuthResponse grantKumohAuth(KumohAuthRequest kumohAuthRequest) {
+        String email = kumohAuthRequest.getEmail();
+        Account account = accountRepository.findByLoginId(email);
+        List<Role> authorities = account.getAuthorities();
+
+        boolean flag = false;
+        for (Role authority : authorities) {
+            flag |= authority.getAuthority().equals(Role.ROLE_KUMOH);
+        }
+
+        if(!flag) {
+            Role kumoh = roleRepository.findByName(Role.ROLE_KUMOH).get();
+            authorities.add(kumoh);
+        }
+
+        return KumohAuthResponse.toDTO(account);
     }
 
 }

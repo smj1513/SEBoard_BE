@@ -4,6 +4,7 @@ import com.seproject.account.application.LogoutAppService;
 import com.seproject.account.controller.dto.LogoutDTO;
 import com.seproject.account.jwt.JwtDecoder;
 import com.seproject.account.service.AccountService;
+import com.seproject.account.service.email.KumohEmailService;
 import com.seproject.account.service.email.PasswordChangeEmailService;
 import com.seproject.account.service.TokenService;
 import com.seproject.error.Error;
@@ -16,7 +17,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.User;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,6 +34,7 @@ public class AccountController {
     private final TokenService tokenService;
     private final JwtDecoder jwtDecoder;
     private final PasswordChangeEmailService passwordChangeEmailService;
+    private final KumohEmailService kumohEmailService;
 
     @Operation(summary = "로그아웃", description = "로그아웃")
     @GetMapping("/logoutProc")
@@ -66,6 +67,19 @@ public class AccountController {
         }
 
         return new ResponseEntity<>(accountService.changePassword(passwordRequest),HttpStatus.OK);
+    }
+
+    @Operation(summary = "금오인 인증", description = "금오 이메일 인증 후 전환")
+    @PostMapping("/kumoh")
+    public ResponseEntity<?> findLoginId(@RequestBody KumohAuthRequest kumohAuthRequest) {
+
+        String email = kumohAuthRequest.getEmail();
+
+        if(!kumohEmailService.isConfirmed(email)) {
+            return Error.toResponseEntity(ErrorCode.EMAIL_NOT_FOUNT);
+        }
+
+        return new ResponseEntity<>(accountService.grantKumohAuth(kumohAuthRequest),HttpStatus.OK);
     }
 
     private void doLogout(String accessToken){
