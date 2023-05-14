@@ -1,5 +1,6 @@
 package com.seproject.account.model.role;
 
+import com.seproject.account.model.role.auth.Authorization;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
