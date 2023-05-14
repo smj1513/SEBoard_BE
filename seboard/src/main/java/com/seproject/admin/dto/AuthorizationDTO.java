@@ -1,8 +1,9 @@
 package com.seproject.admin.dto;
 
-import com.seproject.account.model.role.Authorization;
 import com.seproject.account.model.role.Role;
 import com.seproject.account.model.role.RoleAuthorization;
+import com.seproject.account.model.role.auth.CategoryAuthorization;
+import com.seproject.seboard.domain.model.category.Category;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -14,106 +15,56 @@ public class AuthorizationDTO {
 
     @Data
     @Builder(access = AccessLevel.PRIVATE)
-    public static class RetrieveAuthorizationResponse {
-        private Long id;
-        private String path;
-        private String method;
-        private int priority;
+    public static class CategoryAuthorizationRetrieveResponse {
+        private Long categoryId;
+        private String urlInfo;
+        private String accessType;
         private List<String> roles;
 
-
-        public static RetrieveAuthorizationResponse toDTO(Authorization authorization) {
+        public static CategoryAuthorizationRetrieveResponse toDTO(CategoryAuthorization categoryAuthorization) {
+            Category category = categoryAuthorization.getCategory();
+            List<RoleAuthorization> roleAuthorizations = categoryAuthorization.getRoleAuthorizations();
+            List<String> roles = roleAuthorizations.stream().map(RoleAuthorization::getRole)
+                    .map(Role::toString)
+                    .collect(Collectors.toList());
             return builder()
-                    .id(authorization.getId())
-                    .path(authorization.getPath())
-                    .method(authorization.getMethod())
-                    .priority(authorization.getPriority())
-                    .roles(authorization.getRoleAuthorizations().stream()
-                            .map(RoleAuthorization::getRole)
-                            .map(Role::getAuthority)
-                            .collect(Collectors.toList()))
+                    .categoryId(categoryAuthorization.getId())
+                    .urlInfo(category.getUrlInfo())
+                    .accessType(categoryAuthorization.getAccessType().toString())
+                    .roles(roles)
                     .build();
         }
     }
 
     @Data
     @Builder(access = AccessLevel.PRIVATE)
-    public static class RetrieveAllAuthorizationResponse {
-        private List<RetrieveAuthorizationResponse> authorizations;
+    public static class CategoryAuthorizationRetrieveResponses {
+        private List<CategoryAuthorizationRetrieveResponse> categoryAuthorizations;
 
-
-        public static RetrieveAllAuthorizationResponse toDTO(List<Authorization> authorizations) {
+        public static CategoryAuthorizationRetrieveResponses toDTO(List<CategoryAuthorization> categoryAuthorizations) {
             return builder()
-                    .authorizations(authorizations.stream()
-                            .map(RetrieveAuthorizationResponse::toDTO)
+                    .categoryAuthorizations(categoryAuthorizations.stream()
+                            .map(CategoryAuthorizationRetrieveResponse::toDTO)
                             .collect(Collectors.toList()))
                     .build();
         }
+
     }
 
     @Data
-    public static class CreateAuthorizationRequest{
+    public static class AddRoleToCategoryAuthorizationRequest {
+        private Long roleId;
+        private Long categoryId;
+    }
 
-        private String path;
-        private String method;
-        private int priority;
+
+    @Data
+    @Builder(access = AccessLevel.PRIVATE)
+    public static class AddRoleToCategoryAuthorizationResponse {
         private String role;
-
-    }
-
-    @Data
-    @Builder(access = AccessLevel.PRIVATE)
-    public static class CreateAuthorizationResponse{
-
-        private Long id;
-        private String path;
-        private String method;
-        private int priority;
-        private List<String> roles;
-
-
-        public static CreateAuthorizationResponse toDTO(Authorization authorization) {
+        public static AddRoleToCategoryAuthorizationResponse toDTO(RoleAuthorization roleAuthorization) {
             return builder()
-                    .id(authorization.getId())
-                    .path(authorization.getPath())
-                    .method(authorization.getMethod())
-                    .priority(authorization.getPriority())
-                    .roles(authorization.getRoleAuthorizations().stream()
-                            .map(RoleAuthorization::getRole)
-                            .map(Role::getAuthority)
-                            .collect(Collectors.toList()))
-                    .build();
-        }
-    }
-
-    @Data
-    public static class DeleteAuthorizationRequest {
-
-        private Long id;
-
-    }
-
-    @Data
-    @Builder(access = AccessLevel.PRIVATE)
-    public static class DeleteAuthorizationResponse{
-
-        private Long id;
-        private String path;
-        private String method;
-        private int priority;
-        private List<String> roles;
-
-
-        public static DeleteAuthorizationResponse toDTO(Authorization authorization) {
-            return builder()
-                    .id(authorization.getId())
-                    .path(authorization.getPath())
-                    .method(authorization.getMethod())
-                    .priority(authorization.getPriority())
-                    .roles(authorization.getRoleAuthorizations().stream()
-                            .map(RoleAuthorization::getRole)
-                            .map(Role::getAuthority)
-                            .collect(Collectors.toList()))
+                    .role(roleAuthorization.getRole().getAuthority())
                     .build();
         }
     }
