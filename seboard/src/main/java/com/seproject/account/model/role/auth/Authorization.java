@@ -1,27 +1,32 @@
-package com.seproject.account.model.role;
+package com.seproject.account.model.role.auth;
 
+import com.seproject.account.model.role.RoleAuthorization;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import javax.persistence.*;
 import java.util.List;
 import java.util.Objects;
 
-@Builder
+@SuperBuilder
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
+@Inheritance(strategy = InheritanceType.JOINED)
+@DiscriminatorColumn(name="dtype")
 @Entity
 @Table(name = "authorizations")
-public class Authorization {
+public abstract class Authorization {
     @GeneratedValue @Id
     private Long id;
 
     private String path;
     private String method;
-    private int priority;
 
     @OneToMany(fetch = FetchType.EAGER,mappedBy = "authorization",cascade = CascadeType.ALL)
     private List<RoleAuthorization> roleAuthorizations;
+
+    public abstract String getType();
 
     @Override
     public boolean equals(Object o) {
