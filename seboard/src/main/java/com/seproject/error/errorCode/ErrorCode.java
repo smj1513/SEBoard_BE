@@ -34,6 +34,7 @@ public enum ErrorCode {
     NOT_EXIST_ATTACHMENT(HttpStatus.NOT_FOUND, 302, "존재하지 않는 첨부파일입니다."),
     NOT_EXIST_COMMENT(HttpStatus.NOT_FOUND, 303, "존재하지 않는 댓글/답글입니다."),
     NOT_EXIST_MEMBER(HttpStatus.NOT_FOUND, 304, "존재하지 않는 회원입니다."),
+    NOT_ENROLLED_ROLE(HttpStatus.NOT_FOUND, 304, "등록되지 않은 권한 설정입니다."),
     ;
 
     ErrorCode(HttpStatus httpStatus, int code,String message) {

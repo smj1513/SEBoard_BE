@@ -1,5 +1,6 @@
 package com.seproject.account.service;
 
+import com.seproject.account.model.role.auth.AccessType;
 import com.seproject.account.model.role.auth.Authorization;
 import com.seproject.account.model.role.Role;
 import com.seproject.account.model.role.RoleAuthorization;
@@ -60,7 +61,7 @@ public class AuthorizationService {
     }
 
     @Transactional
-    public RoleAuthorization addRoleToCategoryReadable(Long roleId, Long categoryId) {
+    public Role addReadabilityToCategory(Long roleId, Long categoryId) {
 
         Role role = roleRepository.findById(roleId).orElseThrow(
                 () -> new CustomIllegalArgumentException(ErrorCode.ROLE_NOT_FOUND,null));
@@ -84,7 +85,83 @@ public class AuthorizationService {
         roleAuthorizationRepository.save(roleAuthorization);
         roleAuthorizations.add(roleAuthorization);
 
-        return roleAuthorization;
+        return role;
+    }
+
+    @Transactional
+    public Role deleteReadabilityToCategory(Long roleId, Long categoryId) {
+
+        Role role = roleRepository.findById(roleId).orElseThrow(
+                () -> new CustomIllegalArgumentException(ErrorCode.ROLE_NOT_FOUND,null));
+        CategoryAuthorization categoryAuthorization = categoryAuthorizationRepository.findByCategoryIdAndMethod(categoryId, "GET");
+
+        List<RoleAuthorization> roleAuthorizations = categoryAuthorization.getRoleAuthorizations();
+        for (RoleAuthorization roleAuthorization : roleAuthorizations) {
+            if(roleAuthorization.getRole().equals(role)) {
+                roleAuthorizations.remove(roleAuthorization);
+                roleAuthorizationRepository.delete(roleAuthorization);
+                return role;
+            }
+        }
+
+        throw new CustomIllegalArgumentException(ErrorCode.NOT_ENROLLED_ROLE,null);
+    }
+
+    @Transactional
+    public Role addWritabilityToCategory(Long roleId, Long categoryId) {
+
+        Role role = roleRepository.findById(roleId).orElseThrow(
+                () -> new CustomIllegalArgumentException(ErrorCode.ROLE_NOT_FOUND,null));
+
+        List<CategoryAuthorization> writableCategoryAuthorizations = categoryAuthorizationRepository.findByCategoryIdAndAccessType(categoryId);
+        writableCategoryAuthorizations.forEach(categoryAuthorization -> {
+            List<RoleAuthorization> roleAuthorizations = categoryAuthorization.getRoleAuthorizations();
+            boolean flag = false;
+            for (RoleAuthorization roleAuthorization : roleAuthorizations) {
+                flag |= roleAuthorization.getRole().equals(role);
+            }
+
+            if(!flag) {
+               RoleAuthorization roleAuthorization = RoleAuthorization.builder()
+                       .role(role)
+                       .authorization(categoryAuthorization)
+                       .build();
+
+               roleAuthorizations.add(roleAuthorization);
+               roleAuthorizationRepository.save(roleAuthorization);
+            }
+        });
+        return role;
+    }
+
+
+    @Transactional
+    public Role deleteWritabilityToCategory(Long roleId, Long categoryId) {
+
+        Role role = roleRepository.findById(roleId).orElseThrow(
+                () -> new CustomIllegalArgumentException(ErrorCode.ROLE_NOT_FOUND,null));
+        List<CategoryAuthorization> writableCategoryAuthorizations = categoryAuthorizationRepository.findByCategoryIdAndAccessType(categoryId);
+
+
+        writableCategoryAuthorizations.forEach(categoryAuthorization -> {
+            List<RoleAuthorization> removes = new ArrayList<>();
+            List<RoleAuthorization> roleAuthorizations = categoryAuthorization.getRoleAuthorizations();
+            for (RoleAuthorization roleAuthorization : roleAuthorizations) {
+                if(roleAuthorization.getRole().equals(role)) {
+                    removes.add(roleAuthorization);
+                }
+            }
+            roleAuthorizations.removeAll(removes);
+            roleAuthorizationRepository.deleteAll(removes);
+        });
+
+//            if(removes.size() != 3) {
+//                throw new CustomIllegalArgumentException(ErrorCode.NOT_ENROLLED_ROLE,null);
+//            }
+
+
+
+        return role;
     }
 
 

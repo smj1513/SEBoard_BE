@@ -52,7 +52,7 @@ public class AuthorizationDTO {
     }
 
     @Data
-    public static class AddRoleToCategoryAuthorizationRequest {
+    public static class AddRoleToCategoryRequest {
         private Long roleId;
         private Long categoryId;
     }
@@ -60,12 +60,34 @@ public class AuthorizationDTO {
 
     @Data
     @Builder(access = AccessLevel.PRIVATE)
-    public static class AddRoleToCategoryAuthorizationResponse {
+    public static class AddRoleToCategoryResponse {
         private String role;
-        public static AddRoleToCategoryAuthorizationResponse toDTO(RoleAuthorization roleAuthorization) {
+        public static AddRoleToCategoryResponse toDTO(Role role) {
             return builder()
-                    .role(roleAuthorization.getRole().getAuthority())
+                    .role(role.getAuthority())
                     .build();
         }
     }
+
+    @Data
+    public static class DeleteRoleToCategoryRequest {
+        private Long roleId;
+        private Long categoryId;
+    }
+
+
+    @Data
+    @Builder(access = AccessLevel.PRIVATE)
+    public static class DeleteRoleToCategoryResponse {
+        private String role;
+        public static DeleteRoleToCategoryResponse toDTO(Role role) {
+            return builder()
+                    .role(role.getAuthority())
+                    .build();
+        }
+    }
+
+
+
+
 }

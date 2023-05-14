@@ -13,4 +13,7 @@ public interface CategoryAuthorizationRepository extends JpaRepository<CategoryA
 
     @Query("select c from CategoryAuthorization c where c.category.menuId = :categoryId and c.method = :method")
     CategoryAuthorization findByCategoryIdAndMethod(Long categoryId,String method);
+
+    @Query("select c from CategoryAuthorization c where c.category.menuId = :categoryId and c.accessType != 'READ'")
+    List<CategoryAuthorization> findByCategoryIdAndAccessType(Long categoryId);
 }
