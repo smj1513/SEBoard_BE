@@ -2,6 +2,7 @@ package com.seproject.seboard.application;
 
 import com.seproject.account.model.Account;
 import com.seproject.account.repository.AccountRepository;
+import com.seproject.account.utils.SecurityUtils;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.InvalidAuthorizationException;
 import com.seproject.error.exception.NoSuchResourceException;
@@ -17,6 +18,7 @@ import com.seproject.seboard.controller.dto.comment.ReplyResponse;
 import com.seproject.seboard.domain.model.comment.Comment;
 import com.seproject.seboard.domain.model.comment.Reply;
 import com.seproject.seboard.domain.model.post.Post;
+import com.seproject.seboard.domain.model.post.exposeOptions.ExposeState;
 import com.seproject.seboard.domain.model.user.Anonymous;
 import com.seproject.seboard.domain.model.user.Member;
 import com.seproject.seboard.domain.repository.comment.CommentRepository;
@@ -136,7 +138,22 @@ public class CommentAppService {
     }
 
     public CommentListResponse retrieveCommentList(CommentListFindCommand command) {
-        //TODO : 추후 변경필요
+        //TODO : 리팩토링 필요
+        Post post = postRepository.findById(command.getPostId()).orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
+
+        //TODO : 비밀글일 때는?
+        if(post.getExposeOption().getExposeState() == ExposeState.KUMOH){
+            if(command.getLoginId()==null){
+                throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
+            }else{
+                boolean isKumoh = SecurityUtils.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_KUMOH"));
+
+                if(!isKumoh){
+                    throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
+                }
+            }
+        }
+
         if(command.getLoginId()==null){
             Page<Comment> commentPage = commentSearchRepository.findCommentListByPostId(command.getPostId(), PageRequest.of(command.getPage(), command.getPerPage()));
             long totalReplySize = commentSearchRepository.countReplyByPostId(command.getPostId());
