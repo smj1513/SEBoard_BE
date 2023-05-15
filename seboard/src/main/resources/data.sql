@@ -5,9 +5,9 @@ INSERT INTO accounts(account_id,login_id,name,nickname,password,created_at) valu
 INSERT INTO accounts(account_id,login_id,name,nickname,password,created_at) values (5234058023852,'professor','professor','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','2023-04-26');
 INSERT INTO accounts(account_id,login_id,name,nickname,password,created_at) values (5234058023853,'kumoh','maanjong','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','2023-04-26');
 INSERT INTO roles (role_id, name,description,alias) values (5234058023850, 'ROLE_USER','일반 사용자,일부 게시글에 접근 가능','준회원'),
-                                      (5234058023851, 'ROLE_ADMIN', '최고 관리 권한을 가짐','관리자'),
-                                      (5234058023852, 'ROLE_PROFESSOR','교수 권한','교수'),
-                                      (5234058023853, 'ROLE_KUMOH','금오공대 이메일 인증을 하여 금오인에게 공개된 게시글에 접근 가능','금오인');
+                                                           (5234058023851, 'ROLE_ADMIN', '최고 관리 권한을 가짐','관리자'),
+                                                           (5234058023852, 'ROLE_PROFESSOR','교수 권한','교수'),
+                                                           (5234058023853, 'ROLE_KUMOH','금오공대 이메일 인증을 하여 금오인에게 공개된 게시글에 접근 가능','금오인');
 INSERT INTO public.accounts(account_id, created_at, login_id, name, nickname, password)
 VALUES (5234058023854, '2023-05-13 17:35:53.152235', 'alswhd1113@gmail.com', '김민종', '312', '$2a$10$NEg.I3iB2foXjjY4fXXgS.Zeu9HJlxdVnO9n2GTK1hga1l8.2Vkd6');
 INSERT INTO public.oauth_accounts(id, provider, sub, account_id) VALUES (2, 'kakao', '2732852527', 5234058023854);
@@ -19,16 +19,16 @@ INSERT INTO authorities(account_id,role_id) values(5234058023853,5234058023853);
 INSERT INTO authorities(account_id,role_id) values(5234058023854,5234058023850);
 
 INSERT INTO menus(menu_id, super_menu_id, name, description, depth, url_info, menu_type) VALUES
-                (43214231, null, '공지사항', '공지임니둥', 0, 'notice', 'BOARD'),
-                (43214232, 43214231, '일반', '공지임니둥', 1, 'notice_normal', 'CATEGORY'),
-                (43214233, 43214231, '수업', '공지임니둥', 1, 'class', 'CATEGORY'),
-                (43214234, 43214231, '장학금', '공지임니둥', 1, 'money', 'CATEGORY'),
-                (43214235, 43214231, '학사', '공지임니둥', 1, 'student', 'CATEGORY'),
-                (43214238, null, '자유게시판', '자유이니둥', 0, 'freeboard', 'BOARD'),
-                (43214239, 43214238, '일반', '자유이니둥', 1, 'freeboard_normal', 'BOARD'),
-                (43214240, 43214238, '전공지식', '자유이니둥', 1, 'knwoledge', 'BOARD'),
-                (43214236, null, '채용', '채용임니둥', 0, 'https://cs.kumoh.ac.kr/cs/sub0602.do', 'EXTERNAL'),
-                (43214237, null, '학사', '학사임니둥', 0, 'https://cs.kumoh.ac.kr/cs/sub0601.do', 'EXTERNAL');
+                                                                                             (43214231, null, '공지사항', '공지임니둥', 0, 'notice', 'BOARD'),
+                                                                                             (43214232, 43214231, '일반', '공지임니둥', 1, 'notice_normal', 'CATEGORY'),
+                                                                                             (43214233, 43214231, '수업', '공지임니둥', 1, 'class', 'CATEGORY'),
+                                                                                             (43214234, 43214231, '장학금', '공지임니둥', 1, 'money', 'CATEGORY'),
+                                                                                             (43214235, 43214231, '학사', '공지임니둥', 1, 'student', 'CATEGORY'),
+                                                                                             (43214238, null, '자유게시판', '자유이니둥', 0, 'freeboard', 'BOARD'),
+                                                                                             (43214239, 43214238, '일반', '자유이니둥', 1, 'freeboard_normal', 'BOARD'),
+                                                                                             (43214240, 43214238, '전공지식', '자유이니둥', 1, 'knwoledge', 'BOARD'),
+                                                                                             (43214236, null, '채용', '채용임니둥', 0, 'https://cs.kumoh.ac.kr/cs/sub0602.do', 'EXTERNAL'),
+                                                                                             (43214237, null, '학사', '학사임니둥', 0, 'https://cs.kumoh.ac.kr/cs/sub0601.do', 'EXTERNAL');
 
 INSERT INTO public.authorizations(id, method, path,dtype) VALUES (1543, 'GET', '/admin/**','ADMIN');
 INSERT INTO public.authorizations(id, method, path,dtype) VALUES (1544, 'POST', '/admin/**','ADMIN');
@@ -132,20 +132,20 @@ INSERT INTO public.comments(
     comment_id, created_at, modified_at, contents, is_deleted, board_user_id, is_only_read_by_author, post_id, comment_type)
 VALUES (2342343,'2023-04-13', '2023-04-14', '이충엽씨 축하드립니다~', FALSE, 3421244, FALSE, 1234879892103, 'comment');
 
-    INSERT INTO public.comments(
-        comment_id, created_at, modified_at, contents, is_deleted, board_user_id, is_only_read_by_author, post_id, super_comment_id, tag_comment_id, comment_type)
-    VALUES (2342345,'2023-04-14', '2023-04-14', '앞으로의 행보 응원합니다!', FALSE, 3421246, FALSE, 1234879892103, 2342343, 2342343, 'reply');
+INSERT INTO public.comments(
+    comment_id, created_at, modified_at, contents, is_deleted, board_user_id, is_only_read_by_author, post_id, super_comment_id, tag_comment_id, comment_type)
+VALUES (2342345,'2023-04-14', '2023-04-14', '앞으로의 행보 응원합니다!', FALSE, 3421246, FALSE, 1234879892103, 2342343, 2342343, 'reply');
 
-    INSERT INTO public.comments(
-        comment_id, created_at, modified_at, contents, is_deleted, board_user_id, is_only_read_by_author, post_id, super_comment_id, tag_comment_id, comment_type)
-    VALUES (2342346,'2023-04-15', '2023-04-15', '응원 감사합니다!', FALSE, 3421243, FALSE, 1234879892103, 2342343, 2342345, 'reply');
+INSERT INTO public.comments(
+    comment_id, created_at, modified_at, contents, is_deleted, board_user_id, is_only_read_by_author, post_id, super_comment_id, tag_comment_id, comment_type)
+VALUES (2342346,'2023-04-15', '2023-04-15', '응원 감사합니다!', FALSE, 3421243, FALSE, 1234879892103, 2342343, 2342345, 'reply');
 
 INSERT INTO public.comments(
     comment_id, created_at, modified_at, contents, is_deleted, board_user_id, is_only_read_by_author, post_id, comment_type)
 VALUES (2342344,'2023-04-13', '2023-04-13', '축하해 충엽아~ 휴학계 잊지말고~', FALSE, 3421245, TRUE, 1234879892103, 'comment');
-    INSERT INTO public.comments(
-        comment_id, created_at, modified_at, contents, is_deleted, board_user_id, is_only_read_by_author, post_id, super_comment_id, tag_comment_id, comment_type)
-    VALUES (2342347,'2023-04-14', '2023-04-14', '네 꼭 챙기겠습니다~', FALSE, 3421243, TRUE, 1234879892103, 2342344, 2342344, 'reply');
+INSERT INTO public.comments(
+    comment_id, created_at, modified_at, contents, is_deleted, board_user_id, is_only_read_by_author, post_id, super_comment_id, tag_comment_id, comment_type)
+VALUES (2342347,'2023-04-14', '2023-04-14', '네 꼭 챙기겠습니다~', FALSE, 3421243, TRUE, 1234879892103, 2342344, 2342344, 'reply');
 
 INSERT INTO public.comments(
     comment_id, created_at, modified_at, contents, is_deleted, board_user_id, is_only_read_by_author, post_id, comment_type)
