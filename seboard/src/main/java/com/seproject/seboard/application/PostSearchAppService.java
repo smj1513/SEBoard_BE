@@ -121,7 +121,7 @@ public class PostSearchAppService {
             if(account!=null && post.isWrittenBy(account.getAccountId())){
                 return postDetailResponse;
             }else{
-                throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
+                throw new InvalidAuthorizationException(ErrorCode.NOT_POST_AUTHOR);
             }
         }
 
