@@ -1,8 +1,7 @@
 package com.seproject.account.filter;
 
-import com.nimbusds.oauth2.sdk.token.AccessToken;
 import com.seproject.account.authentication.handler.failure.CustomAuthenticationFailureHandler;
-import com.seproject.account.service.TokenService;
+import com.seproject.account.repository.token.LogoutTokenRepository;
 import com.seproject.account.jwt.JwtDecoder;
 import com.seproject.error.exception.CustomAuthenticationException;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +24,7 @@ public class JwtFilter extends OncePerRequestFilter {
     private final JwtDecoder jwtDecoder;
 
     private final CustomAuthenticationFailureHandler failureHandler;
-    private final TokenService tokenService;
+    private final LogoutTokenRepository logoutTokenRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -37,9 +36,10 @@ public class JwtFilter extends OncePerRequestFilter {
         try {
             if(StringUtils.hasText(jwt)) {
 
-                //TODO: 로그아웃된 토큰인지 확인
-                Authentication authentication = jwtDecoder.getAuthentication(jwt);
-                SecurityContextHolder.getContext().setAuthentication(authentication);
+                if(!logoutTokenRepository.existsById(jwt)) {
+                    Authentication authentication = jwtDecoder.getAuthentication(jwt);
+                    SecurityContextHolder.getContext().setAuthentication(authentication);
+                }
             }
             filterChain.doFilter(request,response);
         } catch (CustomAuthenticationException e) {
