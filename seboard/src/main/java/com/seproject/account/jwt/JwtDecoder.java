@@ -29,7 +29,7 @@ public class JwtDecoder {
 
     @Value("${jwt.secret}")
     private String secret;
-    private final RoleRepository roleRepository;
+    private final AccountRepository accountRepository;
     public String getAccessToken() {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         return getAccessToken(request);
@@ -75,9 +75,8 @@ public class JwtDecoder {
             Claims claims = getClaims(jwt);
             Object authoritiesValue = claims.get(JWTProperties.AUTHORITIES);
             if(authoritiesValue == null) throw new CustomAuthenticationException(ErrorCode.INVALID_JWT,null);
-            Collection<? extends GrantedAuthority> authorities = roleRepository.findByNameIn((List<String>)authoritiesValue);
-            User principal = new User(claims.getSubject(), "", authorities);
-            return new UsernamePasswordAuthenticationToken(principal, jwt, authorities);
+            Account account = accountRepository.findByLoginId(claims.getSubject());
+            return new UsernamePasswordAuthenticationToken(account, jwt, account.getAuthorities());
         } catch (ClassCastException e) {
             throw new CustomAuthenticationException(ErrorCode.INVALID_JWT,e);
         }

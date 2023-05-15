@@ -1,5 +1,6 @@
 package com.seproject.account.utils;
 
+import com.seproject.account.model.Account;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -33,18 +34,18 @@ public class SecurityUtils {
 
 
     public static String getLoginId(){
-        User user = getUser();
-        if(user == null) return null;
-        return user.getUsername();
+        Account account = getAccount();
+        if(account == null) return null;
+        return account.getUsername();
     }
 
     public static Collection<? extends GrantedAuthority> getAuthorities(){
-        User user = getUser();
-        if(user == null) return null;
-        return user.getAuthorities();
+        Account account = getAccount();
+        if(account == null) return null;
+        return account.getAuthorities();
     }
 
-    private static User getUser() {
+    public static Account getAccount() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(authentication == null) return null;
 
@@ -53,6 +54,6 @@ public class SecurityUtils {
         }
 
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = (UsernamePasswordAuthenticationToken) authentication;
-        return (User)usernamePasswordAuthenticationToken.getPrincipal();
+        return (Account)usernamePasswordAuthenticationToken.getPrincipal();
     }
 }
