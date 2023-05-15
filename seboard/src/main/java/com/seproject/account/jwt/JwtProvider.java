@@ -30,6 +30,12 @@ public class JwtProvider {
     @Value("${jwt.expiration_time}")
     private int expirationTime;
 
+    public JWT createLargeToken(UsernamePasswordAuthenticationToken token){
+        String accessToken = createJWT(token);
+        String refreshToken = createLargeRefreshToken(token);
+        JWT jwt = new JWT(accessToken,refreshToken);
+        return jwt;
+    }
 
     public JWT createToken(UsernamePasswordAuthenticationToken token){
         String accessToken = createJWT(token);
@@ -52,6 +58,20 @@ public class JwtProvider {
         return jwt;
     }
 
+    private String createLargeRefreshToken(AbstractAuthenticationToken token) {
+        Instant instant = Instant.now().truncatedTo(ChronoUnit.SECONDS);
+        Instant expiredDate = instant.plus(JWTProperties.LARGE_REFRESH_TOKEN_EXPIRE, ChronoUnit.SECONDS);
+        String refreshToken = Jwts.builder()
+                .setHeaderParam(JWTProperties.TYPE, JWTProperties.LARGE_REFRESH_TOKEN)
+                .setHeaderParam(JWTProperties.ALGORITHM, JWTProperties.HS256)
+                .setSubject(token.getPrincipal().toString())
+                .setIssuedAt(Date.from(instant))
+                .setExpiration(Date.from(expiredDate))
+                .signWith(SignatureAlgorithm.HS256, secret)
+                .compact();
+
+        return refreshToken;
+    }
 
     private String createRefreshToken(AbstractAuthenticationToken token) {
         Instant instant = Instant.now().truncatedTo(ChronoUnit.SECONDS);
