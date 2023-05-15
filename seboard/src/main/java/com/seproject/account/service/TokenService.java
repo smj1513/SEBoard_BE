@@ -1,16 +1,14 @@
 package com.seproject.account.service;
 
-import com.nimbusds.oauth2.sdk.token.AccessToken;
-import com.nimbusds.oauth2.sdk.token.RefreshToken;
 import com.seproject.account.jwt.JWT;
 import com.seproject.account.jwt.JwtDecoder;
 import com.seproject.account.jwt.JwtProvider;
 import com.seproject.account.model.Account;
 import com.seproject.account.repository.AccountRepository;
+import com.seproject.account.repository.token.LogoutRefreshTokenRepository;
 import com.seproject.error.errorCode.ErrorCode;
-import com.seproject.error.exception.RefreshTokenNotFoundException;
+import com.seproject.error.exception.CustomAuthenticationException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -29,6 +27,8 @@ public class TokenService {
     private final JwtProvider jwtProvider;
     private final JwtDecoder jwtDecoder;
 
+    private final LogoutRefreshTokenRepository logoutRefreshTokenRepository;
+
 
     @Transactional
     public AccessTokenRefreshResponse refresh(String refreshToken){
@@ -36,7 +36,12 @@ public class TokenService {
         JWT jwt = new JWT("empty",refreshToken);
         refreshToken = jwt.getRefreshToken();
 
-        //TODO : 로그아웃된 토큰인지 확인
+        //TODO : largeRefreshToken
+        if(logoutRefreshTokenRepository.existsById(refreshToken)) {
+            throw new CustomAuthenticationException(ErrorCode.TOKEN_EXPIRED,null);
+        }
+
+
         String subject = jwtDecoder.getSubject(refreshToken);
         Account account = accountRepository.findByLoginId(subject);
 
