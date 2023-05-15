@@ -1,7 +1,7 @@
 package com.seproject.account.controller;
 
-import com.seproject.account.application.LogoutAppService;
-import com.seproject.account.controller.dto.LogoutDTO;
+import com.seproject.account.jwt.JWT;
+import com.seproject.account.service.LogoutService;
 import com.seproject.account.jwt.JwtDecoder;
 import com.seproject.account.service.AccountService;
 import com.seproject.account.service.email.KumohEmailService;
@@ -24,13 +24,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 
 import static com.seproject.account.controller.dto.AccountDTO.*;
+import static com.seproject.account.controller.dto.LogoutDTO.*;
 
 @Tag(name = "계정 시스템 API", description = "계정(Account) 관련 API")
 @AllArgsConstructor
 @Controller
 public class AccountController {
 
-    private final LogoutAppService logoutAppService;
+    private final LogoutService logoutService;
     private final AccountService accountService;
     private final TokenService tokenService;
     private final JwtDecoder jwtDecoder;
@@ -38,26 +39,27 @@ public class AccountController {
     private final KumohEmailService kumohEmailService;
 
     @Operation(summary = "로그아웃", description = "로그아웃")
-    @GetMapping("/logoutProc")
-    public ResponseEntity<?> logout(Authentication authentication) {
+    @PostMapping("/logoutProc")
+    public ResponseEntity<?> logout(Authentication authentication, @RequestBody LogoutRequestDTO request) {
 
         if(authentication == null) {
             return new ResponseEntity<>("로그인 상태가 아닙니다.",HttpStatus.BAD_REQUEST);
         }
 
+        String accessToken = jwtDecoder.getAccessToken();
+        String refreshToken = request.getRefreshToken();
+        JWT jwt = new JWT(accessToken,refreshToken);
+
+        logoutService.logout(jwt);
+
         User user = (User)authentication.getPrincipal();
         String principal = user.getUsername();
-        String accessToken = jwtDecoder.getAccessToken();
-
-        //TODO: 로그아웃시 redis에 토큰 추가 로직
-        doLogout(accessToken);
-
         if(!StringUtils.isEmpty(principal) && accountService.isOAuthUser(principal)) {
-            String redirectURL = logoutAppService.getRedirectURL();
-            return new ResponseEntity<>(new LogoutDTO(true,redirectURL), HttpStatus.OK);
+            String redirectURL = logoutService.getRedirectURL();
+            return new ResponseEntity<>(new LogoutResponseDTO(true,redirectURL), HttpStatus.OK);
         }
-        return new ResponseEntity<>(new LogoutDTO(false,""), HttpStatus.OK);
 
+        return new ResponseEntity<>(new LogoutResponseDTO(false,""), HttpStatus.OK);
     }
 
     @Operation(summary = "비밀번호 찾기", description = "아이디를 이용하여 비밀번호 변경")
@@ -94,11 +96,5 @@ public class AccountController {
 
         return new ResponseEntity<>(accountService.findMyInfo(loginId),HttpStatus.OK);
     }
-
-    private void doLogout(String accessToken){
-
-    }
-
-
 
 }
