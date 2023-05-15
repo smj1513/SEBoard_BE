@@ -4,8 +4,12 @@ import com.seproject.account.application.LogoutAppService;
 import com.seproject.account.controller.dto.LogoutDTO;
 import com.seproject.account.jwt.JwtDecoder;
 import com.seproject.account.service.AccountService;
-import com.seproject.account.service.EmailService;
+import com.seproject.account.service.email.KumohEmailService;
+import com.seproject.account.service.email.PasswordChangeEmailService;
 import com.seproject.account.service.TokenService;
+import com.seproject.account.utils.SecurityUtils;
+import com.seproject.error.Error;
+import com.seproject.error.errorCode.ErrorCode;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
@@ -30,7 +34,8 @@ public class AccountController {
     private final AccountService accountService;
     private final TokenService tokenService;
     private final JwtDecoder jwtDecoder;
-    private final EmailService emailService;
+    private final PasswordChangeEmailService passwordChangeEmailService;
+    private final KumohEmailService kumohEmailService;
 
     @Operation(summary = "로그아웃", description = "로그아웃")
     @GetMapping("/logoutProc")
@@ -58,14 +63,35 @@ public class AccountController {
     @PostMapping("/password")
     public ResponseEntity<?> findLoginId(@RequestBody PasswordRequest passwordRequest) {
 
-        String email = passwordRequest.getEmail();
-
-        if(!accountService.isExist(email)) {
-            return new ResponseEntity<>("해당 이메일로 가입한 계정이 존재하지 않습니다.",HttpStatus.NOT_FOUND);
+        if(!passwordChangeEmailService.isConfirmed(passwordRequest.getEmail())) {
+            return Error.toResponseEntity(ErrorCode.EMAIL_NOT_FOUNT);
         }
 
-        emailService.send(email);
-        return new ResponseEntity<>("해당 이메일로 비밀번호 변경을 위한 url을 전송하였습니다.",HttpStatus.OK);
+        return new ResponseEntity<>(accountService.changePassword(passwordRequest),HttpStatus.OK);
+    }
+
+    @Operation(summary = "금오인 인증", description = "금오 이메일 인증 후 전환")
+    @PostMapping("/kumoh")
+    public ResponseEntity<?> findLoginId(@RequestBody KumohAuthRequest kumohAuthRequest) {
+
+        String email = kumohAuthRequest.getEmail();
+
+        if(!kumohEmailService.isConfirmed(email)) {
+            return Error.toResponseEntity(ErrorCode.EMAIL_NOT_FOUNT);
+        }
+
+        return new ResponseEntity<>(accountService.grantKumohAuth(kumohAuthRequest),HttpStatus.OK);
+    }
+
+    @Operation(summary = "내 정보 조회", description = "마이페이지에 필요한 정보 조회")
+    @GetMapping("/mypage")
+    public ResponseEntity<?> findUserInfo() {
+
+        String loginId = SecurityUtils.getLoginId();
+
+        if(loginId == null) return Error.toResponseEntity(ErrorCode.NOT_LOGIN);
+
+        return new ResponseEntity<>(accountService.findMyInfo(loginId),HttpStatus.OK);
     }
 
     private void doLogout(String accessToken){

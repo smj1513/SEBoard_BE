@@ -2,11 +2,14 @@ package com.seproject.admin.service;
 
 import com.seproject.account.model.role.Role;
 import com.seproject.account.repository.role.RoleRepository;
+import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.CustomIllegalArgumentException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -19,32 +22,63 @@ public class RoleService {
     private final RoleRepository roleRepository;
 
     public RetrieveAllRoleResponse findAll(int page, int perPage) {
-        Pageable pageable = PageRequest.of(page,perPage);
+        try {
+            Pageable pageable = PageRequest.of(page,perPage);
 
-        Page<Role> all = roleRepository.findAll(pageable);
-        List<Role> roles = all.toList();
-        int total = all.getTotalPages();
-        int nowPage = all.getNumber();
+            Page<Role> all = roleRepository.findAll(pageable);
+            List<Role> roles = all.toList();
+            int total = all.getTotalPages();
+            int nowPage = all.getNumber();
 
-        return RetrieveAllRoleResponse.toDTO(roles,total,nowPage,perPage);
+            return RetrieveAllRoleResponse.toDTO(roles,total,nowPage,perPage);
+        } catch (IllegalArgumentException e) {
+            throw new CustomIllegalArgumentException(ErrorCode.INVALID_PAGINATION,e);
+        }
     }
 
-    public CreateRoleResponse createRole(String roleName) {
+    public CreateRoleResponse createRole(CreateRoleRequest createRoleRequest) {
+        String roleName = createRoleRequest.getName();
+
         if(roleRepository.existsByName(roleName)){
-            throw new IllegalArgumentException("이미 존재하는 권한");
+            throw new CustomIllegalArgumentException(ErrorCode.ALREADY_EXIST_ROLE,null);
         }
 
-        Role role = new Role(roleName);
+        Role role = Role.builder()
+                .name(roleName)
+                .description(createRoleRequest.getDescription())
+                .alias(createRoleRequest.getAlias())
+                .build();
+
         Role savedRole = roleRepository.save(role);
         return CreateRoleResponse.toDTO(savedRole);
     }
 
     public DeleteRoleResponse deleteRole(Long roleId) {
 
-        Role role = roleRepository.findById(roleId).orElseThrow();
+        Role role = roleRepository.findById(roleId).orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.ROLE_NOT_FOUND,null));
+
+        if(role.isImmutable()) {
+            throw new CustomIllegalArgumentException(ErrorCode.IMMUTABLE_ROLE,null);
+        }
+
         roleRepository.delete(role);
 
         return DeleteRoleResponse.toDTO(role);
+    }
+
+    @Transactional
+    public UpdateRoleResponse updateRole(Long roleId,UpdateRoleRequest updateRoleRequest) {
+        Role role = roleRepository.findById(roleId).orElseThrow(() ->
+            new CustomIllegalArgumentException(ErrorCode.ROLE_NOT_FOUND,null)
+        );
+        String roleName = updateRoleRequest.getName();
+
+        if(role.isImmutable() && !role.getAuthority().equals(roleName)) {
+            throw new CustomIllegalArgumentException(ErrorCode.IMMUTABLE_ROLE,null);
+        }
+
+        role.update(roleName,updateRoleRequest.getDescription(),updateRoleRequest.getAlias());
+        return UpdateRoleResponse.toDTO(role);
     }
 
 }

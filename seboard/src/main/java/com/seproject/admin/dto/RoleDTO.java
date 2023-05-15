@@ -20,11 +20,15 @@ public class RoleDTO {
     public static class RetrieveRoleResponse {
         private Long roleId;
         private String name;
+        private String description;
+        private String alias;
 
         public static RetrieveRoleResponse toDTO(Role role) {
             return builder()
                     .roleId(role.getId())
                     .name(role.getAuthority())
+                    .description(role.getDescription())
+                    .alias(role.toString())
                     .build();
         }
 
@@ -53,6 +57,8 @@ public class RoleDTO {
     @Data
     public static class CreateRoleRequest {
         private String name;
+        private String description;
+        private String alias;
     }
 
     @Builder
@@ -60,11 +66,41 @@ public class RoleDTO {
     public static class CreateRoleResponse {
         private Long roleId;
         private String name;
+        private String description;
+        private String alias;
 
         public static CreateRoleResponse toDTO(Role role) {
             return builder()
                     .roleId(role.getId())
                     .name(role.getAuthority())
+                    .description(role.getDescription())
+                    .alias(role.toString())
+                    .build();
+        }
+
+    }
+
+    @Data
+    public static class UpdateRoleRequest {
+        private String name;
+        private String description;
+        private String alias;
+    }
+
+    @Builder
+    @Data
+    public static class UpdateRoleResponse {
+        private Long roleId;
+        private String name;
+        private String description;
+        private String alias;
+
+        public static UpdateRoleResponse toDTO(Role role) {
+            return builder()
+                    .roleId(role.getId())
+                    .name(role.getAuthority())
+                    .description(role.getDescription())
+                    .alias(role.toString())
                     .build();
         }
 
@@ -80,11 +116,15 @@ public class RoleDTO {
     public static class DeleteRoleResponse {
         private Long roleId;
         private String name;
+        private String description;
+        private String alias;
 
         public static DeleteRoleResponse toDTO(Role role) {
             return builder()
                     .roleId(role.getId())
                     .name(role.getAuthority())
+                    .description(role.getDescription())
+                    .alias(role.toString())
                     .build();
         }
 
