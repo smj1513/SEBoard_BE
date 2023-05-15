@@ -2,8 +2,11 @@ package com.seproject.account.service;
 
 
 import com.seproject.account.jwt.JWT;
+import com.seproject.account.jwt.JwtDecoder;
+import com.seproject.account.model.token.LogoutLargeRefreshToken;
 import com.seproject.account.model.token.LogoutRefreshToken;
 import com.seproject.account.model.token.LogoutToken;
+import com.seproject.account.repository.token.LogoutLargeRefreshTokenRepository;
 import com.seproject.account.repository.token.LogoutRefreshTokenRepository;
 import com.seproject.account.repository.token.LogoutTokenRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,7 +24,8 @@ public class LogoutService {
 
     private final LogoutTokenRepository logoutTokenRepository;
     private final LogoutRefreshTokenRepository logoutRefreshTokenRepository;
-
+    private final LogoutLargeRefreshTokenRepository logoutLargeRefreshTokenRepository;
+    private final JwtDecoder jwtDecoder;
 
     public String getRedirectURL() {
         return LOGOUT_URL + clientId + REDIRECT_PATH;
@@ -31,7 +35,13 @@ public class LogoutService {
         String accessToken = jwt.getAccessToken();
         String refreshToken = jwt.getRefreshToken();
         logoutTokenRepository.save(new LogoutToken(accessToken));
-        logoutRefreshTokenRepository.save(new LogoutRefreshToken(refreshToken));
+
+        if(jwtDecoder.isLargeToken(refreshToken)) {
+            logoutLargeRefreshTokenRepository.save(new LogoutLargeRefreshToken(refreshToken));
+        } else {
+            logoutRefreshTokenRepository.save(new LogoutRefreshToken(refreshToken));
+        }
+
     }
 
 }

@@ -5,6 +5,7 @@ import com.seproject.account.jwt.JwtDecoder;
 import com.seproject.account.jwt.JwtProvider;
 import com.seproject.account.model.Account;
 import com.seproject.account.repository.AccountRepository;
+import com.seproject.account.repository.token.LogoutLargeRefreshTokenRepository;
 import com.seproject.account.repository.token.LogoutRefreshTokenRepository;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomAuthenticationException;
@@ -28,7 +29,12 @@ public class TokenService {
     private final JwtDecoder jwtDecoder;
 
     private final LogoutRefreshTokenRepository logoutRefreshTokenRepository;
+    private final LogoutLargeRefreshTokenRepository logoutLargeRefreshTokenRepository;
 
+
+    private boolean existRefreshToken(String refreshToken) {
+        return logoutRefreshTokenRepository.existsById(refreshToken) || logoutLargeRefreshTokenRepository.existsById(refreshToken);
+    }
 
     @Transactional
     public AccessTokenRefreshResponse refresh(String refreshToken){
@@ -36,8 +42,7 @@ public class TokenService {
         JWT jwt = new JWT("empty",refreshToken);
         refreshToken = jwt.getRefreshToken();
 
-        //TODO : largeRefreshToken
-        if(logoutRefreshTokenRepository.existsById(refreshToken)) {
+        if(existRefreshToken(refreshToken)) {
             throw new CustomAuthenticationException(ErrorCode.TOKEN_EXPIRED,null);
         }
 
