@@ -1,6 +1,6 @@
-package com.seproject.account.repository.role;
+package com.seproject.account.repository.role.auth;
 
-import com.seproject.account.model.role.Authorization;
+import com.seproject.account.model.role.auth.Authorization;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -9,7 +9,7 @@ import java.util.List;
 public interface AuthorizationRepository extends JpaRepository<Authorization,Long> {
 
 //    @Query(value = "select * from authorizations join authorization_metadata on authorizations.id = authorization_metadata.authorization_id order by priority desc", nativeQuery = true)
-    @Query("select distinct data from Authorization data join fetch data.roleAuthorizations order by data.priority desc")
+    @Query("select distinct data from Authorization data join fetch data.roleAuthorizations order by data.id desc ")
     List<Authorization> findAllAuthorization();
     Authorization findAuthorizationByPathAndMethod(String path, String method);
 

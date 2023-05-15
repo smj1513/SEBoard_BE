@@ -21,7 +21,9 @@ public enum ErrorCode {
     NOT_POST_AUTHOR(HttpStatus.BAD_REQUEST,113,"비밀 게시글 작성자가 아닙니다."),
     INCORRECT_POST_PASSWORD(HttpStatus.BAD_REQUEST,114,"게시글 비밀번호가 일치하지 않습니다."),
     EXCEED_WRITING_COUNT(HttpStatus.BAD_REQUEST,115,"게시글 및 댓글 작성 횟수 초과입니다."),
-
+    EMAIL_NOT_FOUNT(HttpStatus.NOT_FOUND,116,"일치하는 이메일 인증 정보가 없습니다."),
+    ALREADY_EXIST_ROLE(HttpStatus.BAD_REQUEST,117,"이미 존재하는 권한 정보입니다."),
+    IMMUTABLE_ROLE(HttpStatus.BAD_REQUEST,118,"삭제할수 없는 권한 정보입니다."),
 
     INVALID_PAGINATION(HttpStatus.BAD_REQUEST,200, "올바르지 않은 페이지 정보를 전송하였습니다."),
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, 201, "올바르지 않은 형식의 요청입니다."),
@@ -32,6 +34,7 @@ public enum ErrorCode {
     NOT_EXIST_ATTACHMENT(HttpStatus.NOT_FOUND, 302, "존재하지 않는 첨부파일입니다."),
     NOT_EXIST_COMMENT(HttpStatus.NOT_FOUND, 303, "존재하지 않는 댓글/답글입니다."),
     NOT_EXIST_MEMBER(HttpStatus.NOT_FOUND, 304, "존재하지 않는 회원입니다."),
+    NOT_ENROLLED_ROLE(HttpStatus.NOT_FOUND, 304, "등록되지 않은 권한 설정입니다."),
     ;
 
     ErrorCode(HttpStatus httpStatus, int code,String message) {

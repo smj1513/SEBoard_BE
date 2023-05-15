@@ -8,7 +8,7 @@ import com.seproject.account.model.social.UserToken;
 import com.seproject.account.repository.social.TemporalUserInfoRepository;
 import com.seproject.account.repository.social.UserTokenRepository;
 import com.seproject.account.service.AccountService;
-import com.seproject.account.service.EmailService;
+import com.seproject.account.service.email.RegisterEmailService;
 import com.seproject.account.service.TokenService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -39,7 +39,7 @@ import static com.seproject.account.controller.dto.RegisterDTO.*;
 public class RegisterController {
 
     private final AccountService accountService;
-    private final EmailService emailService;
+    private final RegisterEmailService registerEmailService;
     private final TemporalUserInfoRepository temporalUserInfoRepository;
     private final UserTokenRepository userTokenRepository;
     private final TokenService tokenService;
@@ -54,7 +54,7 @@ public class RegisterController {
 
         String email = oAuth2RegisterRequest.getEmail();
 
-        boolean confirmed = emailService.isConfirmed(email);
+        boolean confirmed = registerEmailService.isConfirmed(email);
         boolean isDuplicateUser = accountService.isExistByNickname(oAuth2RegisterRequest.getNickname());
 
         if(!confirmed) return new ResponseEntity<>("인증되지 않은 이메일입니다.",HttpStatus.BAD_REQUEST);
@@ -101,7 +101,7 @@ public class RegisterController {
 
         String id = formRegisterRequest.getId();
 
-        boolean confirmed = emailService.isConfirmed(id);
+        boolean confirmed = registerEmailService.isConfirmed(id);
         boolean isDuplicateUser = accountService.isExistByNickname(formRegisterRequest.getNickname());
 
         if(!confirmed) return new ResponseEntity<>("인증되지 않은 이메일입니다.",HttpStatus.BAD_REQUEST);
