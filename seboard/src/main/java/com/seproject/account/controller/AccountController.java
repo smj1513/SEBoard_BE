@@ -1,6 +1,7 @@
 package com.seproject.account.controller;
 
 import com.seproject.account.jwt.JWT;
+import com.seproject.account.model.Account;
 import com.seproject.account.service.LogoutService;
 import com.seproject.account.jwt.JwtDecoder;
 import com.seproject.account.service.AccountService;
@@ -52,8 +53,8 @@ public class AccountController {
 
         logoutService.logout(jwt);
 
-        User user = (User)authentication.getPrincipal();
-        String principal = user.getUsername();
+        Account account = (Account)authentication.getPrincipal();
+        String principal = account.getUsername();
         if(!StringUtils.isEmpty(principal) && accountService.isOAuthUser(principal)) {
             String redirectURL = logoutService.getRedirectURL();
             return new ResponseEntity<>(new LogoutResponseDTO(true,redirectURL), HttpStatus.OK);
