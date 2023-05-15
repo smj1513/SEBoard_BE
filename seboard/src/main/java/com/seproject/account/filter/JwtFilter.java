@@ -1,9 +1,8 @@
 package com.seproject.account.filter;
 
+import com.nimbusds.oauth2.sdk.token.AccessToken;
 import com.seproject.account.authentication.handler.failure.CustomAuthenticationFailureHandler;
-import com.seproject.account.model.token.AccessToken;
 import com.seproject.account.service.TokenService;
-import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.account.jwt.JwtDecoder;
 import com.seproject.error.exception.CustomAuthenticationException;
 import lombok.RequiredArgsConstructor;
@@ -38,17 +37,9 @@ public class JwtFilter extends OncePerRequestFilter {
         try {
             if(StringUtils.hasText(jwt)) {
 
-//                if(jwtDecoder.isTemporalToken(jwt)) {
-//                    throw new CustomAuthenticationException(ErrorCode.NOT_REGISTERED_USER,null);
-//                }
-
-                AccessToken accessToken = tokenService.findAccessToken(jwt);
-
-                if(accessToken != null) {
-                    Authentication authentication = jwtDecoder.getAuthentication(accessToken);
-                    SecurityContextHolder.getContext().setAuthentication(authentication);
-                }
-
+                //TODO: 로그아웃된 토큰인지 확인
+                Authentication authentication = jwtDecoder.getAuthentication(jwt);
+                SecurityContextHolder.getContext().setAuthentication(authentication);
             }
             filterChain.doFilter(request,response);
         } catch (CustomAuthenticationException e) {

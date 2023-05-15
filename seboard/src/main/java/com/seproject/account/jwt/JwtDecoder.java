@@ -1,9 +1,14 @@
 package com.seproject.account.jwt;
 
-import com.seproject.account.model.token.AccessToken;
+import com.nimbusds.oauth2.sdk.token.AccessToken;
+import com.seproject.account.model.Account;
+import com.seproject.account.repository.AccountRepository;
+import com.seproject.account.repository.role.RoleRepository;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomAuthenticationException;
 import io.jsonwebtoken.*;
+import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -16,13 +21,15 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.Collection;
+import java.util.List;
 
+@RequiredArgsConstructor
 @Component
 public class JwtDecoder {
 
     @Value("${jwt.secret}")
     private String secret;
-
+    private final RoleRepository roleRepository;
     public String getAccessToken() {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         return getAccessToken(request);
@@ -62,33 +69,17 @@ public class JwtDecoder {
         Claims claims = getClaims(token);
         return claims.getSubject();
     }
-    public Authentication getAuthentication(AccessToken accessToken) {
-        String jwt = accessToken.getAccessToken();
-        Claims claims = getClaims(jwt);
-        Collection<? extends GrantedAuthority> authorities = accessToken.getAuthorities();
 
-        User principal = new User(claims.getSubject(), "", authorities);
-        return new UsernamePasswordAuthenticationToken(principal, jwt, authorities);
-    }
-
-    public boolean isTemporalToken(String accessToken) {
+    public Authentication getAuthentication(String jwt) {
         try{
-
-            if (StringUtils.hasText(accessToken) && accessToken.startsWith(JWTProperties.TOKEN_PREFIX)) {
-                accessToken = accessToken.substring(7);
-            }
-
-            String type = (String)Jwts.parser()
-                    .setSigningKey(secret)
-                    .parse(accessToken)
-                    .getHeader().get(JWTProperties.TYPE);
-            return type.equals(JWTProperties.TEMPORAL_TOKEN);
-        }
-        catch (ExpiredJwtException e) {
-            throw new CustomAuthenticationException(ErrorCode.TOKEN_EXPIRED,e);
-        }
-        catch (JwtException e) {
-            throw new CustomAuthenticationException(ErrorCode.INVALID_JWT, e);
+            Claims claims = getClaims(jwt);
+            Object authoritiesValue = claims.get(JWTProperties.AUTHORITIES);
+            if(authoritiesValue == null) throw new CustomAuthenticationException(ErrorCode.INVALID_JWT,null);
+            Collection<? extends GrantedAuthority> authorities = roleRepository.findByNameIn((List<String>)authoritiesValue);
+            User principal = new User(claims.getSubject(), "", authorities);
+            return new UsernamePasswordAuthenticationToken(principal, jwt, authorities);
+        } catch (ClassCastException e) {
+            throw new CustomAuthenticationException(ErrorCode.INVALID_JWT,e);
         }
     }
 }

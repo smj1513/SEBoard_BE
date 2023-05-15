@@ -69,8 +69,6 @@ public class RegisterController {
             String accessToken = jwt.getAccessToken();
             String refreshToken = jwt.getRefreshToken();
 
-            tokenService.addToken(jwt,account.getAuthorities());
-
             LoginResponseDTO responseDTO = LoginResponseDTO.builder()
                     .accessToken(accessToken)
                     .refreshToken(refreshToken)
@@ -112,7 +110,6 @@ public class RegisterController {
 
         String accessToken = token.getAccessToken();
         String refreshToken = token.getRefreshToken();
-        tokenService.addToken(token,account.getAuthorities());
 
         LoginResponseDTO responseDTO = LoginResponseDTO.builder()
                 .accessToken(accessToken)
@@ -149,7 +146,6 @@ public class RegisterController {
 
         Account account = userToken.getAccount();
         JWT token = tokenService.createToken(account);
-        tokenService.addToken(token,account.getAuthorities());
 
         LoginResponseDTO loginResponseDTO = LoginResponseDTO.builder()
                 .accessToken(token.getAccessToken())

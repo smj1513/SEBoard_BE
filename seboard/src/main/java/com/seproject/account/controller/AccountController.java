@@ -49,6 +49,7 @@ public class AccountController {
         String principal = user.getUsername();
         String accessToken = jwtDecoder.getAccessToken();
 
+        //TODO: 로그아웃시 redis에 토큰 추가 로직
         doLogout(accessToken);
 
         if(!StringUtils.isEmpty(principal) && accountService.isOAuthUser(principal)) {
@@ -95,9 +96,7 @@ public class AccountController {
     }
 
     private void doLogout(String accessToken){
-        if (accessToken != null){
-            tokenService.deleteAccessToken(accessToken);
-        }
+
     }
 
 
