@@ -1,6 +1,5 @@
 package com.seproject.account.jwt;
 
-import com.seproject.account.service.TokenService;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +8,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
@@ -57,7 +55,7 @@ public class JwtProvider {
 
     private String createRefreshToken(AbstractAuthenticationToken token) {
         Instant instant = Instant.now().truncatedTo(ChronoUnit.SECONDS);
-        Instant expiredDate = instant.plus(6, ChronoUnit.HOURS);
+        Instant expiredDate = instant.plus(JWTProperties.REFRESH_TOKEN_EXPIRE, ChronoUnit.SECONDS);
         String refreshToken = Jwts.builder()
                 .setHeaderParam(JWTProperties.TYPE, JWTProperties.REFRESH_TOKEN)
                 .setHeaderParam(JWTProperties.ALGORITHM, JWTProperties.HS256)
@@ -72,7 +70,7 @@ public class JwtProvider {
 
     private String createJWT(AbstractAuthenticationToken token) {
         Instant instant = Instant.now().truncatedTo(ChronoUnit.SECONDS);
-        Instant expiredDate = instant.plus(30, ChronoUnit.MINUTES);
+        Instant expiredDate = instant.plus(JWTProperties.ACCESS_TOKEN_EXPIRE, ChronoUnit.SECONDS);
         String jwt = Jwts.builder()
                 .setHeaderParam(JWTProperties.TYPE, JWTProperties.ACCESS_TOKEN)
                 .setHeaderParam(JWTProperties.ALGORITHM, JWTProperties.HS256)
