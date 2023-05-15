@@ -1,27 +1,20 @@
 package com.seproject.account.jwt;
 
-import com.nimbusds.oauth2.sdk.token.AccessToken;
 import com.seproject.account.model.Account;
 import com.seproject.account.repository.AccountRepository;
-import com.seproject.account.repository.role.RoleRepository;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomAuthenticationException;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collection;
-import java.util.List;
 
 @RequiredArgsConstructor
 @Component
@@ -65,6 +58,29 @@ public class JwtDecoder {
             throw new CustomAuthenticationException(ErrorCode.INVALID_JWT, e);
         }
     }
+
+    public boolean isLargeToken(String jwt) {
+        try {
+
+            if (StringUtils.hasText(jwt) && jwt.startsWith(JWTProperties.TOKEN_PREFIX)) {
+                jwt = jwt.substring(7);
+            }
+
+            return Jwts.parser()
+                    .setSigningKey(secret)
+                    .parseClaimsJws(jwt)
+                    .getHeader()
+                    .get(JWTProperties.TYPE)
+                    .equals(JWTProperties.LARGE_REFRESH_TOKEN);
+
+        } catch (ExpiredJwtException e) {
+            throw new CustomAuthenticationException(ErrorCode.TOKEN_EXPIRED,e);
+        }
+        catch (JwtException e) {
+            throw new CustomAuthenticationException(ErrorCode.INVALID_JWT, e);
+        }
+    }
+
     public String getSubject(String token) {
         Claims claims = getClaims(token);
         return claims.getSubject();
