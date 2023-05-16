@@ -18,7 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -65,13 +64,13 @@ public class AccountController {
 
     @Operation(summary = "비밀번호 찾기", description = "아이디를 이용하여 비밀번호 변경")
     @PostMapping("/password")
-    public ResponseEntity<?> findLoginId(@RequestBody PasswordRequest passwordRequest) {
+    public ResponseEntity<?> findPassword(@RequestBody ResetPasswordRequest resetPasswordRequest) {
 
-        if(!passwordChangeEmailService.isConfirmed(passwordRequest.getEmail())) {
+        if(!passwordChangeEmailService.isConfirmed(resetPasswordRequest.getEmail())) {
             return Error.toResponseEntity(ErrorCode.EMAIL_NOT_FOUNT);
         }
 
-        return new ResponseEntity<>(accountService.changePassword(passwordRequest),HttpStatus.OK);
+        return new ResponseEntity<>(accountService.resetPassword(resetPasswordRequest),HttpStatus.OK);
     }
 
     @Operation(summary = "금오인 인증", description = "금오 이메일 인증 후 전환")
@@ -96,6 +95,13 @@ public class AccountController {
         if(loginId == null) return Error.toResponseEntity(ErrorCode.NOT_LOGIN);
 
         return new ResponseEntity<>(accountService.findMyInfo(loginId),HttpStatus.OK);
+    }
+
+    @Operation(summary = "비밀번호 변경", description = "마이페이지에서 비밀번호를 변경함")
+    @PostMapping("/mypage/password")
+    public ResponseEntity<?> changePassword(@RequestBody PasswordChangeRequest request) {
+        accountService.changePassword(request);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }
