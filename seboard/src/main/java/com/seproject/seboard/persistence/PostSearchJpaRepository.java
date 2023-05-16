@@ -30,9 +30,9 @@ public interface PostSearchJpaRepository extends PostSearchRepository {
     countQuery = "select count(p) from Post p where p.contents like %:content% and p.isDeleted = false")
     Page<RetrievePostListResponseElement> findByContents(String content, Pageable pagingInfo);
     @Query(value = "select new com.seproject.seboard.controller.dto.post.PostResponse$RetrievePostListResponseElement(p)" +
-            "from Post p where (p.title like %:title% or p.contents like %:content%) and p.isDeleted = false order by p.baseTime.createdAt desc",
-    countQuery = "select count(p) from Post p where (p.title like %:title% or p.contents like %:content%) and p.isDeleted = false")
-    Page<RetrievePostListResponseElement> findByTitleOrContents(String title, Pageable pagingInfo);
+            "from Post p where (p.title like %:query% or p.contents like %:query%) and p.isDeleted = false order by p.baseTime.createdAt desc",
+    countQuery = "select count(p) from Post p where (p.title like %:query% or p.contents like %:query%) and p.isDeleted = false")
+    Page<RetrievePostListResponseElement> findByTitleOrContents(String query, Pageable pagingInfo);
     @Query(value = "select new com.seproject.seboard.controller.dto.post.PostResponse$RetrievePostListResponseElement(p)" +
             "from Post p where p.author.name like %:authorName% and p.isDeleted = false order by p.baseTime.createdAt desc",
     countQuery = "select count(p) from Post p where p.author.name like %:authorName% and p.isDeleted = false")

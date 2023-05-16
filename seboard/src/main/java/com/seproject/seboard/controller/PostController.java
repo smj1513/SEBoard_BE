@@ -153,7 +153,7 @@ public class PostController {
     @GetMapping("/{postId}/comments")
     public ResponseEntity<CommentListResponse> retrievePostComments(
             @PathVariable Long postId,
-            @RequestParam(defaultValue = "1") Integer page,
+            @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "25") Integer perPage) {
         String loginId = SecurityUtils.getLoginId();
 

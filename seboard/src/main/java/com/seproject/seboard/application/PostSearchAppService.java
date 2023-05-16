@@ -93,8 +93,6 @@ public class PostSearchAppService {
             account = accountRepository.findByLoginId(loginId);
         }
 
-        //TODO : 권한 처리 추가 필요
-
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
 
@@ -119,14 +117,28 @@ public class PostSearchAppService {
 
         if(post.getExposeOption().getExposeState()== ExposeState.PRIVACY){
             if(account!=null && post.isWrittenBy(account.getAccountId())){
+                post.increaseViews();
                 return postDetailResponse;
+            }else{
+                throw new InvalidAuthorizationException(ErrorCode.NOT_POST_AUTHOR);
+            }
+        }else if(post.getExposeOption().getExposeState() == ExposeState.KUMOH){
+            if(account!=null){
+                Collection<? extends GrantedAuthority> authorities = SecurityUtils.getAuthorities();
+                boolean isKumoh = authorities.stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_KUMOH"));
+                if(isKumoh){
+                    post.increaseViews();
+                    return postDetailResponse;
+                }else{
+                    throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
+                }
             }else{
                 throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
             }
         }
 
-        post.increaseViews();
 
+        post.increaseViews();
         return postDetailResponse;
     }
 
