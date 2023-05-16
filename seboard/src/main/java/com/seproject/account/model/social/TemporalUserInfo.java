@@ -17,6 +17,5 @@ public class TemporalUserInfo {
     private String email;
     private String name;
     private String nickname;
-    private String accessToken;
 
 }
