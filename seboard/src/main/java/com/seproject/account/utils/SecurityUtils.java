@@ -9,6 +9,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 
 import java.util.Collection;
+import java.util.Optional;
 
 public class SecurityUtils {
 
@@ -34,18 +35,18 @@ public class SecurityUtils {
 
 
     public static String getLoginId(){
-        Account account = getAccount();
+        Account account = getAccount().get();
         if(account == null) return null;
         return account.getUsername();
     }
 
     public static Collection<? extends GrantedAuthority> getAuthorities(){
-        Account account = getAccount();
+        Account account = getAccount().get();
         if(account == null) return null;
         return account.getAuthorities();
     }
 
-    public static Account getAccount() {
+    public static Optional<Account> getAccount() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if(authentication == null) return null;
 
@@ -54,6 +55,6 @@ public class SecurityUtils {
         }
 
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = (UsernamePasswordAuthenticationToken) authentication;
-        return (Account)usernamePasswordAuthenticationToken.getPrincipal();
+        return Optional.of((Account)usernamePasswordAuthenticationToken.getPrincipal());
     }
 }
