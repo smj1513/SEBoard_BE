@@ -60,8 +60,19 @@ public class AccountDTO {
 
     @Data
     @Builder(access = AccessLevel.PRIVATE)
-    public static class PasswordChangeResponse {
-        private String nowPassword;
-        private String newPassword;
+    public static class MyInfoResponse {
+        private String nickname;
+        private String email;
+        private List<String> roles;
+
+        public static MyInfoResponse toDTO(String nickname,String email,List<String> roles) {
+            return builder()
+                    .nickname(nickname)
+                    .roles(roles)
+                    .email(email)
+                    .build();
+        }
     }
+
+
 }
