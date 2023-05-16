@@ -1,9 +1,7 @@
 package com.seproject.account.filter;
 
 import com.seproject.account.authentication.handler.failure.CustomAuthenticationFailureHandler;
-import com.seproject.account.model.token.AccessToken;
-import com.seproject.account.service.TokenService;
-import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.account.repository.token.LogoutTokenRepository;
 import com.seproject.account.jwt.JwtDecoder;
 import com.seproject.error.exception.CustomAuthenticationException;
 import lombok.RequiredArgsConstructor;
@@ -26,7 +24,7 @@ public class JwtFilter extends OncePerRequestFilter {
     private final JwtDecoder jwtDecoder;
 
     private final CustomAuthenticationFailureHandler failureHandler;
-    private final TokenService tokenService;
+    private final LogoutTokenRepository logoutTokenRepository;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request,
@@ -38,17 +36,10 @@ public class JwtFilter extends OncePerRequestFilter {
         try {
             if(StringUtils.hasText(jwt)) {
 
-//                if(jwtDecoder.isTemporalToken(jwt)) {
-//                    throw new CustomAuthenticationException(ErrorCode.NOT_REGISTERED_USER,null);
-//                }
-
-                AccessToken accessToken = tokenService.findAccessToken(jwt);
-
-                if(accessToken != null) {
-                    Authentication authentication = jwtDecoder.getAuthentication(accessToken);
+                if(!logoutTokenRepository.existsById(jwt)) {
+                    Authentication authentication = jwtDecoder.getAuthentication(jwt);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
-
             }
             filterChain.doFilter(request,response);
         } catch (CustomAuthenticationException e) {

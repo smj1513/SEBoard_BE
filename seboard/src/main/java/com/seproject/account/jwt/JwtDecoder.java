@@ -1,28 +1,28 @@
 package com.seproject.account.jwt;
 
-import com.seproject.account.model.token.AccessToken;
+import com.seproject.account.model.Account;
+import com.seproject.account.repository.AccountRepository;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomAuthenticationException;
 import io.jsonwebtoken.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.Collection;
 
+@RequiredArgsConstructor
 @Component
 public class JwtDecoder {
 
     @Value("${jwt.secret}")
     private String secret;
-
+    private final AccountRepository accountRepository;
     public String getAccessToken() {
         HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         return getAccessToken(request);
@@ -58,37 +58,43 @@ public class JwtDecoder {
             throw new CustomAuthenticationException(ErrorCode.INVALID_JWT, e);
         }
     }
-    public String getSubject(String token) {
-        Claims claims = getClaims(token);
-        return claims.getSubject();
-    }
-    public Authentication getAuthentication(AccessToken accessToken) {
-        String jwt = accessToken.getAccessToken();
-        Claims claims = getClaims(jwt);
-        Collection<? extends GrantedAuthority> authorities = accessToken.getAuthorities();
 
-        User principal = new User(claims.getSubject(), "", authorities);
-        return new UsernamePasswordAuthenticationToken(principal, jwt, authorities);
-    }
+    public boolean isLargeToken(String jwt) {
+        try {
 
-    public boolean isTemporalToken(String accessToken) {
-        try{
-
-            if (StringUtils.hasText(accessToken) && accessToken.startsWith(JWTProperties.TOKEN_PREFIX)) {
-                accessToken = accessToken.substring(7);
+            if (StringUtils.hasText(jwt) && jwt.startsWith(JWTProperties.TOKEN_PREFIX)) {
+                jwt = jwt.substring(7);
             }
 
-            String type = (String)Jwts.parser()
+            return Jwts.parser()
                     .setSigningKey(secret)
-                    .parse(accessToken)
-                    .getHeader().get(JWTProperties.TYPE);
-            return type.equals(JWTProperties.TEMPORAL_TOKEN);
-        }
-        catch (ExpiredJwtException e) {
+                    .parseClaimsJws(jwt)
+                    .getHeader()
+                    .get(JWTProperties.TYPE)
+                    .equals(JWTProperties.LARGE_REFRESH_TOKEN);
+
+        } catch (ExpiredJwtException e) {
             throw new CustomAuthenticationException(ErrorCode.TOKEN_EXPIRED,e);
         }
         catch (JwtException e) {
             throw new CustomAuthenticationException(ErrorCode.INVALID_JWT, e);
+        }
+    }
+
+    public String getSubject(String token) {
+        Claims claims = getClaims(token);
+        return claims.getSubject();
+    }
+
+    public Authentication getAuthentication(String jwt) {
+        try{
+            Claims claims = getClaims(jwt);
+            Object authoritiesValue = claims.get(JWTProperties.AUTHORITIES);
+            if(authoritiesValue == null) throw new CustomAuthenticationException(ErrorCode.INVALID_JWT,null);
+            Account account = accountRepository.findByLoginId(claims.getSubject());
+            return new UsernamePasswordAuthenticationToken(account, jwt, account.getAuthorities());
+        } catch (ClassCastException e) {
+            throw new CustomAuthenticationException(ErrorCode.INVALID_JWT,e);
         }
     }
 }
