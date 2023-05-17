@@ -30,7 +30,14 @@ public class FormLoginAuthenticationSuccessHandler implements AuthenticationSucc
 
         UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication;
 
-        JWT jwt = tokenService.createToken(token);
+        boolean largeLogin = Boolean.parseBoolean(request.getParameter("largeLogin"));
+        JWT jwt;
+
+        if(largeLogin) {
+            jwt = tokenService.createLargeToken(token);
+        } else {
+            jwt = tokenService.createToken(token);
+        }
 
         LoginResponseDTO responseDTO = LoginResponseDTO.builder()
                 .accessToken(jwt.getAccessToken())

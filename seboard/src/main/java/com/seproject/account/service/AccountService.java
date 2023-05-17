@@ -3,7 +3,9 @@ package com.seproject.account.service;
 import com.seproject.account.model.social.OAuthAccount;
 import com.seproject.account.repository.social.OAuthAccountRepository;
 import com.seproject.account.service.email.RegisterEmailService;
+import com.seproject.account.utils.SecurityUtils;
 import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.CustomAuthenticationException;
 import com.seproject.error.exception.CustomIllegalArgumentException;
 import com.seproject.error.exception.CustomUserNotFoundException;
 import com.seproject.account.repository.AccountRepository;
@@ -23,10 +25,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static com.seproject.admin.dto.AccountDTO.*;
@@ -213,16 +212,35 @@ public class AccountService implements UserDetailsService {
     }
 
     @Transactional
-    public PasswordResponse changePassword(PasswordRequest passwordRequest) {
-        String email = passwordRequest.getEmail();
-        String newPassword = passwordRequest.getPassword();
+    public ResetPasswordResponse resetPassword(ResetPasswordRequest resetPasswordRequest) {
+        String email = resetPasswordRequest.getEmail();
+        String newPassword = resetPasswordRequest.getPassword();
         Account account = accountRepository.findByLoginId(email);
+
         if(account == null) {
             throw new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null);
         }
+
         account.changePassword(passwordEncoder.encode(newPassword));
 
-        return PasswordResponse.toDTO(account);
+        return ResetPasswordResponse.toDTO(account);
+    }
+
+    @Transactional
+    public void changePassword(PasswordChangeRequest request) {
+        String loginId = SecurityUtils.getLoginId();
+        Account account = accountRepository.findByLoginId(loginId);
+
+        if(account == null) {
+            throw new CustomAuthenticationException(ErrorCode.NOT_LOGIN,null);
+        }
+
+        if(!passwordEncoder.matches(request.getNowPassword(),account.getPassword())){
+            throw new CustomIllegalArgumentException(ErrorCode.PASSWORD_INCORRECT,null);
+        }
+
+        account.changePassword(passwordEncoder.encode(request.getNewPassword()));
+
     }
 
     @Transactional
@@ -244,25 +262,15 @@ public class AccountService implements UserDetailsService {
         return KumohAuthResponse.toDTO(account);
     }
 
-    //TODO : 추가 정보가 필요
-    public Object findMyInfo(String loginId) {
+    public MyInfoResponse findMyInfo(String loginId) {
         Map<String,Object> map = new HashMap<>();
         Account account = accountRepository.findByLoginId(loginId);
         if(account == null) throw new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null);
-        map.put("email",account.getLoginId());
-        map.put("nickname",account.getNickname());
-        map.put("name",account.getName());
-        map.put("authorities",account.getAuthorities().stream()
-                .map(Role::toString)
+
+
+        return MyInfoResponse.toDTO(account.getLoginId(),account.getNickname(),account.getAuthorities().stream()
+                .map(Role::getAuthority)
                 .collect(Collectors.toList()));
-
-        Optional<OAuthAccount> byLoginId = oAuthAccountRepository.findByLoginId(loginId);
-        if(byLoginId.isPresent()) {
-            OAuthAccount oAuthAccount = byLoginId.get();
-            map.put("provider",oAuthAccount.getProvider());
-        }
-
-        return map;
     }
 
 }

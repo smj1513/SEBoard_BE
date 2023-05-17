@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class AccountDTO {
 
     @Data
-    public static class PasswordRequest {
+    public static class ResetPasswordRequest {
 
         private String email;
         private String password;
@@ -21,10 +21,10 @@ public class AccountDTO {
 
     @Builder(access = AccessLevel.PRIVATE)
     @Data
-    public static class PasswordResponse {
+    public static class ResetPasswordResponse {
         private String email;
 
-        public static PasswordResponse toDTO(Account account){
+        public static ResetPasswordResponse toDTO(Account account){
             return builder()
                     .email(account.getLoginId())
                     .build();
@@ -51,4 +51,28 @@ public class AccountDTO {
                     .build();
         }
     }
+
+    @Data
+    public static class PasswordChangeRequest {
+        private String nowPassword;
+        private String newPassword;
+    }
+
+    @Data
+    @Builder(access = AccessLevel.PRIVATE)
+    public static class MyInfoResponse {
+        private String nickname;
+        private String email;
+        private List<String> roles;
+
+        public static MyInfoResponse toDTO(String nickname,String email,List<String> roles) {
+            return builder()
+                    .nickname(nickname)
+                    .roles(roles)
+                    .email(email)
+                    .build();
+        }
+    }
+
+
 }

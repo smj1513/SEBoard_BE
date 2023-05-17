@@ -66,6 +66,17 @@ public class TokenService {
         return jwt;
     }
 
+    public JWT createLargeToken(UserDetails userDetails){
+        UsernamePasswordAuthenticationToken token =
+                new UsernamePasswordAuthenticationToken(userDetails.getUsername(),"",userDetails.getAuthorities());
+        return createLargeToken(token);
+    }
+
+    public JWT createLargeToken(UsernamePasswordAuthenticationToken token){
+        JWT jwt = jwtProvider.createLargeToken(token);
+        return jwt;
+    }
+
     public JWT createToken(UserDetails userDetails){
         UsernamePasswordAuthenticationToken token =
                 new UsernamePasswordAuthenticationToken(userDetails.getUsername(),"",userDetails.getAuthorities());
