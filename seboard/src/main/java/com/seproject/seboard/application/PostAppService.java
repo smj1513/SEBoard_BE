@@ -144,7 +144,7 @@ public class PostAppService {
             throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 
-        post.delete();
+        post.delete(true);
 //        post.getAttachments().forEach(fileAppService::deleteFileFromStorage); //TODO : fileSystem에서 transactional 처리 필요
 //        postRepository.deleteById(postId);
     }
