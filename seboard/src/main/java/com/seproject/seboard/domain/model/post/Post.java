@@ -32,7 +32,7 @@ public class Post {
     @Id @GeneratedValue
     @Column(name = "post_id")
     private Long postId;
-    @Range(min = 1, max = 100)
+//    @Range(min = 1, max = 100)
     private String title;
     @Column(columnDefinition = "TEXT")
     private String contents;
