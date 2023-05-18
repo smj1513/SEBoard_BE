@@ -145,7 +145,7 @@ public class RegisterController {
         userTokenRepository.delete(userToken);
 
         Account account = userToken.getAccount();
-        JWT token = tokenService.createToken(account);
+        JWT token = tokenService.createLargeToken(account);
 
         LoginResponseDTO loginResponseDTO = LoginResponseDTO.builder()
                 .accessToken(token.getAccessToken())

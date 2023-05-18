@@ -27,7 +27,7 @@ import java.util.UUID;
 @Component
 public class OidcAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
-    private static final String REDIRECT_URL = "http://seboard2.site";
+    private static final String REDIRECT_URL = "http://localhost:3000";
 
     private final JwtProvider jwtProvider;
     private final OAuthAccountRepository oAuthAccountRepository;
@@ -54,7 +54,6 @@ public class OidcAuthenticationSuccessHandler implements AuthenticationSuccessHa
             response.sendRedirect(REDIRECT_URL + "/login?id=" + id );
         } else {
             String email = oidcUser.getEmail();
-            jwt = jwtProvider.createTemporalJWT(new UsernamePasswordAuthenticationToken(email,"",oidcUser.getAuthorities()));
 
             String id = UUID.randomUUID().toString();
 
@@ -65,7 +64,6 @@ public class OidcAuthenticationSuccessHandler implements AuthenticationSuccessHa
                     .email(email)
                     .name(oidcUser.getName())
                     .nickname(oidcUser.getNickName())
-                    .accessToken(jwt)
                     .build();
 
             temporalUserInfoRepository.save(temporalUserInfo);
