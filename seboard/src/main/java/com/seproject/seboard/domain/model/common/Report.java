@@ -2,10 +2,7 @@ package com.seproject.seboard.domain.model.common;
 
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 
 @Entity
@@ -16,6 +13,7 @@ public class Report {
     private Long reportId;
     private Long targetId; //post or comment pk
     private Long memberId;
+    @Enumerated(EnumType.STRING)
     private ReportType reportType;
 
     private Report(Long targetId, Long memberId, String reportType){
