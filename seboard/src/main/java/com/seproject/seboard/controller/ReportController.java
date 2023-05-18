@@ -22,4 +22,10 @@ public class ReportController {
         reportAppService.reportPost(postId);
         return ResponseEntity.ok(MessageResponse.of("신고 완료"));
     }
+
+    @GetMapping("/comments/{commentId}/report")
+    public ResponseEntity<MessageResponse> reportComment(@PathVariable Long commentId) {
+        reportAppService.reportComment(commentId);
+        return ResponseEntity.ok(MessageResponse.of("신고 완료"));
+    }
 }

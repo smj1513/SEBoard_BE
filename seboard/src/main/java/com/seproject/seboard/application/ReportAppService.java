@@ -6,10 +6,12 @@ import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.DuplicatedReportException;
 import com.seproject.error.exception.InvalidAuthorizationException;
 import com.seproject.error.exception.NoSuchResourceException;
+import com.seproject.seboard.domain.model.comment.Comment;
 import com.seproject.seboard.domain.model.common.Report;
 import com.seproject.seboard.domain.model.common.ReportThreshold;
 import com.seproject.seboard.domain.model.post.Post;
 import com.seproject.seboard.domain.model.user.Member;
+import com.seproject.seboard.domain.repository.comment.CommentRepository;
 import com.seproject.seboard.domain.repository.post.PostRepository;
 import com.seproject.seboard.domain.repository.report.ReportRepository;
 import com.seproject.seboard.domain.repository.report.ReportThresholdRepository;
@@ -28,8 +30,10 @@ public class ReportAppService {
     private final ReportThresholdRepository reportThresholdRepository;
     private final MemberRepository memberRepository;
     private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
     private ReportThreshold postThreshold;
     private ReportThreshold commentThreshold;
+
 
     @PostConstruct
     protected void init(){
@@ -70,6 +74,30 @@ public class ReportAppService {
     }
 
     public void reportComment(Long commentId) {
+        Account account = SecurityUtils.getAccount()
+                .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
+
+        Member member = memberRepository.findByAccountId(account.getAccountId())
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_MEMBER));
+
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_COMMENT));
+
+        // 해당 사용자가 이전에 해당 post를 신고한 적이 있는지 확인
+        // 신고한 적이 있다면 Exception 발생
+        reportRepository.findByCommentIdAndMemberId(commentId, member.getBoardUserId())
+                .ifPresent(report -> {
+                    throw new DuplicatedReportException(ErrorCode.DUPLICATED_REPORT);
+                });
+
+
+        // 신고한 적이 없다면 report 테이블에 추가
+        Report report = Report.of(commentId, member.getBoardUserId(), "COMMENT");
+        reportRepository.save(report);
+
+        // 신고한 적이 없다면 신고 횟수를 1 증가시키고, 신고 횟수가 threshold를 넘었는지 확인
+        // threshold를 넘었다면 post 상태 변경
+        comment.increaseReportCount(commentThreshold);
     }
 
     public void setReportThreshold(int threshold, String thresholdType) {

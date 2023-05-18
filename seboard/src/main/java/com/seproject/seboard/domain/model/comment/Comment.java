@@ -1,6 +1,8 @@
 package com.seproject.seboard.domain.model.comment;
 
 import com.seproject.seboard.domain.model.common.BaseTime;
+import com.seproject.seboard.domain.model.common.ReportThreshold;
+import com.seproject.seboard.domain.model.common.Status;
 import com.seproject.seboard.domain.model.post.Post;
 import com.seproject.seboard.domain.model.user.BoardUser;
 import lombok.Getter;
@@ -26,7 +28,6 @@ public class Comment {
     @Column(columnDefinition = "TEXT")
     private String contents;
 
-    private boolean isDeleted;
     @Embedded
     private BaseTime baseTime;
     @ManyToOne
@@ -36,23 +37,9 @@ public class Comment {
     @JoinColumn(name = "board_user_id")
     private BoardUser author;
     private boolean isOnlyReadByAuthor;
-
-
-    private Comment(Long commentId, String contents, boolean isDeleted,
-                   BaseTime baseTime, Post post, BoardUser author, boolean isOnlyReadByAuthor) {
-
-        if(!isValidContents(contents)) {
-            throw new IllegalArgumentException();
-        }
-
-        this.commentId = commentId;
-        this.contents = contents;
-        this.isDeleted = isDeleted;
-        this.baseTime = baseTime;
-        this.post = post;
-        this.author = author;
-        this.isOnlyReadByAuthor = isOnlyReadByAuthor;
-    }
+    @Enumerated(EnumType.STRING)
+    private Status status;
+    private int reportCount;
 
     public Reply writeReply(String contents, Comment taggedComment, BoardUser author, boolean isOnlyReadByAuthor){
         return Reply.builder()
@@ -70,6 +57,9 @@ public class Comment {
         return author.isOwnAccountId(accountId);
     }
 
+    public boolean isDeleted(){
+        return status == Status.PERMANENT_DELETED || status == Status.TEMP_DELETED;
+    }
     public void changeContents(String contents) {
         if(!isValidContents(contents)){
             throw new IllegalArgumentException();
@@ -87,8 +77,20 @@ public class Comment {
         return CONTENTS_MIN_SIZE < contents.length();
     }
 
-    public void delete() {
-        this.isDeleted = true;
+    public void delete(boolean isPermanent) {
+        if(isPermanent){
+            this.status = Status.PERMANENT_DELETED;
+        }else{
+            this.status = Status.TEMP_DELETED;
+        }
     }
+
+    public void increaseReportCount(ReportThreshold reportThreshold){
+        this.reportCount++;
+        if(reportThreshold.isOverThreshold(reportCount)){
+            this.status = Status.REPORTED;
+        }
+    }
+
 
 }

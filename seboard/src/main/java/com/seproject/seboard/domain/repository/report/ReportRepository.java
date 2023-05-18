@@ -10,4 +10,7 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
 
     @Query("select r from Report r where r.targetId = :postId and r.memberId = :memberId and r.reportType = 'POST'")
     Optional<Report> findByPostIdAndMemberId(Long postId, Long memberId);
+
+    @Query("select r from Report r where r.targetId = :commentId and r.memberId = :memberId and r.reportType = 'COMMENT'")
+    Optional<Report> findByCommentIdAndMemberId(Long commentId, Long memberId);
 }
