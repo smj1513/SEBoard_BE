@@ -48,10 +48,10 @@ public class SecurityUtils {
 
     public static Optional<Account> getAccount() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication == null) return null;
+        if(authentication == null) return Optional.ofNullable(null);
 
         if (authentication instanceof AnonymousAuthenticationToken) {
-            return null;
+            return Optional.ofNullable(null);
         }
 
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = (UsernamePasswordAuthenticationToken) authentication;

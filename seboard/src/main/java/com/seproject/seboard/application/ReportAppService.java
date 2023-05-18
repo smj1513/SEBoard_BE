@@ -73,14 +73,32 @@ public class ReportAppService {
     }
 
     public void setReportThreshold(int threshold, String thresholdType) {
+        Account account = SecurityUtils.getAccount()
+                .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
+
+
+        boolean isAdmin = account.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+
+        if(!isAdmin){
+            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
+        }
+
         if(thresholdType.equals("POST")){
-            reportThresholdRepository.findPostThreshold().ifPresent(reportThresholdRepository::delete);
-            postThreshold = ReportThreshold.of(threshold, thresholdType);
+            postThreshold = reportThresholdRepository.findPostThreshold().orElseGet(()->
+                    ReportThreshold.of(threshold, thresholdType)
+            );
+
+            postThreshold.setThreshold(threshold);
+
             reportThresholdRepository.save(postThreshold);
         }
         else if(thresholdType.equals("COMMENT")){
-            reportThresholdRepository.findCommentThreshold().ifPresent(reportThresholdRepository::delete);
-            commentThreshold = ReportThreshold.of(threshold, thresholdType);
+            commentThreshold = reportThresholdRepository.findCommentThreshold().orElseGet(()->
+                    ReportThreshold.of(threshold, thresholdType)
+            );
+
+            commentThreshold.setThreshold(threshold);
+
             reportThresholdRepository.save(commentThreshold);
         }
     }

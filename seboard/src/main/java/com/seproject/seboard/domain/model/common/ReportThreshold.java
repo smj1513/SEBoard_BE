@@ -27,4 +27,8 @@ public class ReportThreshold {
     public boolean isOverThreshold(int reportCount){
         return reportCount >= threshold;
     }
+
+    public void setThreshold(int threshold){
+        this.threshold = threshold;
+    }
 }
