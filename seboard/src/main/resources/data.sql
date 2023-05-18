@@ -129,31 +129,31 @@ VALUES (1234879892103, 1, '2023-04-24', '2023-04-26','<div class="document_91563
 INSERT INTO public.bookmarks(bookmark_id, post_id, member_id) VALUES (534453, 1234879892103, 3421243);
 
 INSERT INTO public.comments(
-    comment_id, created_at, modified_at, contents, is_deleted, board_user_id, is_only_read_by_author, post_id, comment_type)
-VALUES (2342343,'2023-04-13', '2023-04-14', '이충엽씨 축하드립니다~', FALSE, 3421244, FALSE, 1234879892103, 'comment');
+    comment_id, created_at, modified_at, contents, status, board_user_id, is_only_read_by_author, post_id, comment_type, report_count)
+VALUES (2342343,'2023-04-13', '2023-04-14', '이충엽씨 축하드립니다~', 'NORMAL', 3421244, FALSE, 1234879892103, 'comment', 0);
 
 INSERT INTO public.comments(
-    comment_id, created_at, modified_at, contents, is_deleted, board_user_id, is_only_read_by_author, post_id, super_comment_id, tag_comment_id, comment_type)
-VALUES (2342345,'2023-04-14', '2023-04-14', '앞으로의 행보 응원합니다!', FALSE, 3421246, FALSE, 1234879892103, 2342343, 2342343, 'reply');
+    comment_id, created_at, modified_at, contents, status, board_user_id, is_only_read_by_author, post_id, super_comment_id, tag_comment_id, comment_type, report_count)
+VALUES (2342345,'2023-04-14', '2023-04-14', '앞으로의 행보 응원합니다!', 'NORMAL', 3421246, FALSE, 1234879892103, 2342343, 2342343, 'reply', 0);
 
 INSERT INTO public.comments(
-    comment_id, created_at, modified_at, contents, is_deleted, board_user_id, is_only_read_by_author, post_id, super_comment_id, tag_comment_id, comment_type)
-VALUES (2342346,'2023-04-15', '2023-04-15', '응원 감사합니다!', FALSE, 3421243, FALSE, 1234879892103, 2342343, 2342345, 'reply');
+    comment_id, created_at, modified_at, contents, status, board_user_id, is_only_read_by_author, post_id, super_comment_id, tag_comment_id, comment_type, report_count)
+VALUES (2342346,'2023-04-15', '2023-04-15', '응원 감사합니다!', 'NORMAL', 3421243, FALSE, 1234879892103, 2342343, 2342345, 'reply', 0);
 
 INSERT INTO public.comments(
-    comment_id, created_at, modified_at, contents, is_deleted, board_user_id, is_only_read_by_author, post_id, comment_type)
-VALUES (2342344,'2023-04-13', '2023-04-13', '축하해 충엽아~ 휴학계 잊지말고~', FALSE, 3421245, TRUE, 1234879892103, 'comment');
+    comment_id, created_at, modified_at, contents, status, board_user_id, is_only_read_by_author, post_id, comment_type, report_count)
+VALUES (2342344,'2023-04-13', '2023-04-13', '축하해 충엽아~ 휴학계 잊지말고~', 'NORMAL', 3421245, TRUE, 1234879892103, 'comment', 0);
 INSERT INTO public.comments(
-    comment_id, created_at, modified_at, contents, is_deleted, board_user_id, is_only_read_by_author, post_id, super_comment_id, tag_comment_id, comment_type)
-VALUES (2342347,'2023-04-14', '2023-04-14', '네 꼭 챙기겠습니다~', FALSE, 3421243, TRUE, 1234879892103, 2342344, 2342344, 'reply');
+    comment_id, created_at, modified_at, contents, status, board_user_id, is_only_read_by_author, post_id, super_comment_id, tag_comment_id, comment_type, report_count)
+VALUES (2342347,'2023-04-14', '2023-04-14', '네 꼭 챙기겠습니다~', 'NORMAL', 3421243, TRUE, 1234879892103, 2342344, 2342344, 'reply', 0);
 
 INSERT INTO public.comments(
-    comment_id, created_at, modified_at, contents, is_deleted, board_user_id, is_only_read_by_author, post_id, comment_type)
-VALUES (2342348,'2023-04-16', '2023-04-16', 'ㅎㅇ 난 삭제된 댓글', TRUE, 3421245, FALSE, 1234879892103, 'comment');
+    comment_id, created_at, modified_at, contents, status, board_user_id, is_only_read_by_author, post_id, comment_type, report_count)
+VALUES (2342348,'2023-04-16', '2023-04-16', 'ㅎㅇ 난 삭제된 댓글', 'NORMAL', 3421245, FALSE, 1234879892103, 'comment', 0);
 
 INSERT INTO public.comments(
-    comment_id, created_at, modified_at, contents, is_deleted, board_user_id, is_only_read_by_author, post_id, comment_type)
-VALUES (2342349,'2023-04-17', '2023-04-17', 'ㅎㅇ 난 비밀 댓글', FALSE, 3421245, FALSE, 1234879892103, 'comment');
+    comment_id, created_at, modified_at, contents, status, board_user_id, is_only_read_by_author, post_id, comment_type, report_count)
+VALUES (2342349,'2023-04-17', '2023-04-17', 'ㅎㅇ 난 비밀 댓글', 'NORMAL', 3421245, FALSE, 1234879892103, 'comment', 0);
 
 
 INSERT INTO public.posts(
@@ -163,8 +163,8 @@ VALUES (1234879892104, 1, '2023-04-25', '2023-04-28','<div class="document_91563
         true, '옥계 참숯고기 어떤가요?', 9999,3421244 , 43214232, 28822822, 'NORMAL', 0);
 
 INSERT INTO public.comments(
-    comment_id, created_at, modified_at, contents, is_deleted, board_user_id, is_only_read_by_author, post_id, comment_type)
-VALUES (2342350,'2023-04-27', '2023-04-27', '전 괜찮은데 금슐랭 박형준씨는 별로 안좋아하더라구요', FALSE, 3421245, FALSE, 1234879892104, 'comment');
+    comment_id, created_at, modified_at, contents, status, board_user_id, is_only_read_by_author, post_id, comment_type, report_count)
+VALUES (2342350,'2023-04-27', '2023-04-27', '전 괜찮은데 금슐랭 박형준씨는 별로 안좋아하더라구요', 'NORMAL', 3421245, FALSE, 1234879892104, 'comment', 0);
 
 
 INSERT INTO public.posts(
