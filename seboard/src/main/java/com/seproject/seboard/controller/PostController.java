@@ -46,9 +46,8 @@ public class PostController {
 
     @PostMapping("/{postId}/auth")
     public ResponseEntity<?> retrievePrivacyPost(@RequestBody RetrievePrivacyPostRequest request, @PathVariable Long postId){
-        String loginId = SecurityUtils.getLoginId();
 
-        RetrievePostDetailResponse privacyPost = postSearchAppService.findPrivacyPost(postId, request.getPassword(), loginId);
+        RetrievePostDetailResponse privacyPost = postSearchAppService.findPrivacyPost(postId, request.getPassword());
         return ResponseEntity.ok(privacyPost);
     }
 
@@ -89,10 +88,8 @@ public class PostController {
             @ApiResponse(content = @Content(schema = @Schema(implementation = MessageResponse.class)), responseCode = "404", description = "해당 pk를 가진 게시물이 없음")
     })
     @GetMapping("/{postId}")
-    public ResponseEntity<RetrievePostDetailResponse> retrievePost(@PathVariable("postId") Long postId) { // TODO : accountId는 jwt에서 추출
-        String loginId = SecurityUtils.getLoginId();
-
-        RetrievePostDetailResponse postDetailRes = postSearchAppService.findPostDetail(postId, loginId);
+    public ResponseEntity<RetrievePostDetailResponse> retrievePost(@PathVariable("postId") Long postId) {
+        RetrievePostDetailResponse postDetailRes = postSearchAppService.findPostDetail(postId);
         return ResponseEntity.ok(postDetailRes);
     }
 
