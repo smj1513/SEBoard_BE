@@ -7,19 +7,24 @@ import com.seproject.error.exception.InvalidAuthorizationException;
 import com.seproject.error.exception.NoSuchResourceException;
 import com.seproject.seboard.domain.model.user.BoardUser;
 import com.seproject.seboard.domain.model.post.Post;
+import com.seproject.seboard.domain.repository.report.ReportRepository;
 import com.seproject.seboard.domain.repository.user.BoardUserRepository;
 import com.seproject.seboard.domain.repository.post.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import static com.seproject.seboard.application.utils.AppServiceHelper.findByIdOrThrow;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class AdminPostAppService {
 
     private final PostRepository postRepository;
+    private final ReportRepository reportRepository;
     private final BoardUserRepository boardUserRepository;
+
 
     public void enrollPin(Long accountId, Long postId) {
         BoardUser requestUser = findByIdOrThrow(accountId, boardUserRepository, "");
@@ -51,5 +56,6 @@ public class AdminPostAppService {
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
 
         post.restore();
+        reportRepository.deleteAllByPostId(post.getPostId());
     }
 }
