@@ -92,5 +92,10 @@ public class Comment {
         }
     }
 
-
+    public void restore() {
+        if(status!=Status.NORMAL){
+            this.status = Status.NORMAL;
+            reportCount = 0;
+        }
+    }
 }
