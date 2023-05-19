@@ -98,4 +98,11 @@ public class Comment {
             reportCount = 0;
         }
     }
+
+    public boolean isReported() {
+        if(status == Status.REPORTED){
+            return true;
+        }
+        return false;
+    }
 }

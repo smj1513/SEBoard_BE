@@ -35,13 +35,13 @@ public class SecurityUtils {
 
 
     public static String getLoginId(){
-        Account account = getAccount().get();
+        Account account = getAccount().orElse(null);
         if(account == null) return null;
         return account.getUsername();
     }
 
     public static Collection<? extends GrantedAuthority> getAuthorities(){
-        Account account = getAccount().get();
+        Account account = getAccount().orElse(null);
         if(account == null) return null;
         return account.getAuthorities();
     }
