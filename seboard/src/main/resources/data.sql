@@ -39,15 +39,27 @@ INSERT INTO public.authorizations(id, method, path,dtype) VALUES (1548, 'POST', 
 INSERT INTO public.authorizations(id, method, path,dtype) VALUES (1549, 'PUT', '/category/notice_normal/posts/**','CATEGORY');
 INSERT INTO public.authorizations(id, method, path,dtype) VALUES (1550, 'DELETE', '/category/notice_normal/posts/**','CATEGORY');
 
+INSERT INTO public.authorizations(id, method, path,dtype) VALUES (1551, 'GET', '/admin/category/notice_normal/**','CATEGORY');
+INSERT INTO public.authorizations(id, method, path,dtype) VALUES (1552, 'POST', '/admin/category/notice_normal/**','CATEGORY');
+INSERT INTO public.authorizations(id, method, path,dtype) VALUES (1553, 'PUT', '/admin/category/notice_normal/**','CATEGORY');
+INSERT INTO public.authorizations(id, method, path,dtype) VALUES (1554, 'DELETE', '/admin/category/notice_normal/**','CATEGORY');
+
 INSERT INTO public.admin_authorizations(id) VALUES (1543);
 INSERT INTO public.admin_authorizations(id) VALUES (1544);
 INSERT INTO public.admin_authorizations(id) VALUES (1545);
 INSERT INTO public.admin_authorizations(id) VALUES (1546);
 
-INSERT INTO public.category_authorizations(access_type, id, category_id) VALUES ('READ', 1547, 43214232);
-INSERT INTO public.category_authorizations(access_type, id, category_id) VALUES ('CREATE', 1548, 43214232);
-INSERT INTO public.category_authorizations(access_type, id, category_id) VALUES ('UPDATE', 1549, 43214232);
-INSERT INTO public.category_authorizations(access_type, id, category_id) VALUES ('DELETE', 1550, 43214232);
+INSERT INTO public.category_authorizations(id, category_id) VALUES (1547, 43214232);
+INSERT INTO public.category_authorizations(id, category_id) VALUES (1548, 43214232);
+INSERT INTO public.category_authorizations(id, category_id) VALUES (1549, 43214232);
+INSERT INTO public.category_authorizations(id, category_id) VALUES (1550, 43214232);
+
+
+INSERT INTO public.category_manager_authorizations(id,category_id) VALUES (1551,43214232);
+INSERT INTO public.category_manager_authorizations(id,category_id) VALUES (1552,43214232);
+INSERT INTO public.category_manager_authorizations(id,category_id) VALUES (1553,43214232);
+INSERT INTO public.category_manager_authorizations(id,category_id) VALUES (1554,43214232);
+
 
 INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243124,1543, 5234058023851);
 INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243125,1544, 5234058023851);

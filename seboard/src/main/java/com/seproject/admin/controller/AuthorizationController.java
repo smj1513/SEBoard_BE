@@ -1,10 +1,12 @@
 package com.seproject.admin.controller;
 
 import com.seproject.account.authorize.url.UrlFilterInvocationSecurityMetaDataSource;
-import com.seproject.account.model.role.Role;
 import com.seproject.account.model.role.auth.CategoryAuthorization;
 import com.seproject.account.service.AuthorizationService;
+
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -38,100 +40,29 @@ public class AuthorizationController {
         return new ResponseEntity<>(CategoryAuthorizationRetrieveResponses.toDTO(byCategory), HttpStatus.OK);
     }
 
-    @Operation(summary = "카테고리에 게시글 접근(조회) 권한 추가", description = "카테고리에 접근 권한을 추가한다.")
-    @ApiResponses({
-            @ApiResponse(content = @Content(schema = @Schema(implementation = AddRoleToCategoryResponse.class)), responseCode = "200", description = "권한 추가 성공"),
-    })
-    @PostMapping("/authorization/category/read")
-    public ResponseEntity<?> addReadabilityToCategory(@RequestBody AddRoleToCategoryRequest request) {
-        Long categoryId = request.getCategoryId();
-        Long roleId = request.getRoleId();
-        Role role = authorizationService.addReadabilityToCategory(roleId, categoryId);
-        try {
-            urlFilterInvocationSecurityMetaDataSource.reset();
-            return new ResponseEntity<>(AddRoleToCategoryResponse.toDTO(role),HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e,HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    @Operation(summary = "카테고리에 게시글 접근(조회) 권한 삭제", description = "카테고리에 접근 권한을 삭제한다.")
-    @ApiResponses({
-            @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "200", description = "권한 삭제 성공"),
-    })
-    @DeleteMapping("/authorization/category/read")
-    public ResponseEntity<?> deleteReadabilityToCategory(@RequestBody DeleteRoleToCategoryRequest request) {
-        Long categoryId = request.getCategoryId();
-        Long roleId = request.getRoleId();
-        Role role = authorizationService.deleteReadabilityToCategory(roleId, categoryId);
-        try {
-            urlFilterInvocationSecurityMetaDataSource.reset();
-            return new ResponseEntity<>(DeleteRoleToCategoryResponse.toDTO(role),HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e,HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
-
-    @Operation(summary = "카테고리에 게시글 글 작성(생성, 수정, 삭제) 권한 추가", description = "카테고리에 글 작성 권한을 추가한다.")
-    @ApiResponses({
-            @ApiResponse(content = @Content(schema = @Schema(implementation = AddRoleToCategoryResponse.class)), responseCode = "200", description = "권한 추가 성공"),
-    })
-    @PostMapping("/authorization/category/write")
-    public ResponseEntity<?> addWritabilityToCategory(@RequestBody AddRoleToCategoryRequest request) {
-        Long categoryId = request.getCategoryId();
-        Long roleId = request.getRoleId();
-        Role role = authorizationService.addWritabilityToCategory(roleId, categoryId);
-        try {
-            urlFilterInvocationSecurityMetaDataSource.reset();
-            return new ResponseEntity<>(AddRoleToCategoryResponse.toDTO(role),HttpStatus.OK);
-        } catch (Exception e) {
-            return new ResponseEntity<>(e,HttpStatus.INTERNAL_SERVER_ERROR);
-        }
-    }
-
     @Operation(summary = "카테고리에 게시글 작성(생성, 수정, 삭제) 권한 삭제", description = "카테고리에 글 작성 권한을 삭제한다.")
-    @ApiResponses({
-            @ApiResponse(content = @Content(schema = @Schema(implementation = DeleteRoleToCategoryResponse.class)), responseCode = "200", description = "권한 삭제 성공"),
+    @Parameters(value = {
+            @Parameter(name = "categoyId" , schema = @Schema(implementation = Long.class)),
+            @Parameter(name = "requestBody" , schema = @Schema(implementation = CategoryAccessUpdateRequest.class),
+                    description = "접근 권한(access), 글 작성 권한(write), 메뉴 노출 대상(menu), 게시판 관리 권한(manager)\n" +
+                            "roles : [roleId, roleId, roleId]")
     })
-    @DeleteMapping("/authorization/category/write")
-    public ResponseEntity<?> deleteWritabilityToCategory(@RequestBody DeleteRoleToCategoryRequest request) {
-        Long categoryId = request.getCategoryId();
-        Long roleId = request.getRoleId();
-        Role role = authorizationService.deleteWritabilityToCategory(roleId, categoryId);
-        try {
+    @ApiResponses({
+            @ApiResponse(content = @Content(schema = @Schema(implementation = CategoryAuthorizationRetrieveResponses.class)), responseCode = "200", description = "권한 수정가 성공"),
+    })
+    @PostMapping("/authorization/category/{categoryId}")
+    public ResponseEntity<?> updateCategoryAccess(@PathVariable long categoryId,@RequestBody CategoryAccessUpdateRequest request) {
+
+        authorizationService.update(categoryId,request);
+
+        try{
             urlFilterInvocationSecurityMetaDataSource.reset();
-            return new ResponseEntity<>(DeleteRoleToCategoryResponse.toDTO(role),HttpStatus.OK);
         } catch (Exception e) {
-            return new ResponseEntity<>(e,HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);
         }
+
+        List<CategoryAuthorization> byCategory = authorizationService.findByCategory(categoryId);
+        return new ResponseEntity<>(CategoryAuthorizationRetrieveResponses.toDTO(byCategory),HttpStatus.OK);
     }
 
-//    @Operation(summary = "카테고리 접근 권한 추가", description = "카테고리에 접근 권한을 새로 추가한다.")
-//    @ApiResponses({
-//            @ApiResponse(content = @Content(schema = @Schema(implementation = CreateAuthorizationResponse.class)), responseCode = "200", description = "추가 성공"),
-//    })
-//    @PostMapping("/authorization")
-//    public ResponseEntity<?> createAuthorization(@RequestBody CreateAuthorizationRequest createAuthorizationRequest) {
-//        long menuId = createAuthorizationRequest.getMenuId();
-//        long roleId = createAuthorizationRequest.getRoleId();
-//        //        authorizationService.addAuthorization(menuId,roleId);
-//        return null;
-//    }
-
-//    @Operation(summary = "접근 권한 삭제", description = "접근 권한을 삭제.")
-//    @ApiResponses({
-//            @ApiResponse(content = @Content(schema = @Schema(implementation = DeleteAuthorizationResponse.class)), responseCode = "200", description = "삭제 성공"),
-//    })
-//    @DeleteMapping("/authorization/{authorizationId}")
-//    public ResponseEntity<?> deleteAuthorization(@PathVariable Long authorizationId) {
-//        DeleteAuthorizationResponse deleteAuthorizationResponse = authorizationService.deleteAuthorization(authorizationId);
-//        try{
-//            //TODO : 옵저버
-//            urlFilterInvocationSecurityMetaDataSource.reset();
-//        } catch (Exception e) {
-//            return new ResponseEntity<>("reload 실패하였습니다.", HttpStatus.SERVICE_UNAVAILABLE);
-//        }
-//        return new ResponseEntity<>(deleteAuthorizationResponse,HttpStatus.OK);
-//    }
 }
