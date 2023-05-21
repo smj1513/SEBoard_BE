@@ -24,6 +24,7 @@ public enum ErrorCode {
     EMAIL_NOT_FOUNT(HttpStatus.NOT_FOUND,116,"일치하는 이메일 인증 정보가 없습니다."),
     ALREADY_EXIST_ROLE(HttpStatus.BAD_REQUEST,117,"이미 존재하는 권한 정보입니다."),
     IMMUTABLE_ROLE(HttpStatus.BAD_REQUEST,118,"삭제할수 없는 권한 정보입니다."),
+    LOGIN_PREVENT_USER(HttpStatus.BAD_REQUEST,119,"일시적으로 로그인이 금지되었습니다."),
 
     INVALID_PAGINATION(HttpStatus.BAD_REQUEST,200, "올바르지 않은 페이지 정보를 전송하였습니다."),
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, 201, "올바르지 않은 형식의 요청입니다."),
