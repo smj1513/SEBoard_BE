@@ -43,12 +43,9 @@ public class PostSearchAppService {
     private final AccountRepository accountRepository;
 
     @Transactional
-    public RetrievePostDetailResponse findPrivacyPost(Long postId, String password, String loginId){
+    public RetrievePostDetailResponse findPrivacyPost(Long postId, String password){
         //TODO : 추후 변경 필요
-        Account account = null;
-        if(loginId!=null){
-            account = accountRepository.findByLoginId(loginId);
-        }
+        Account account = SecurityUtils.getAccount().orElse(null);
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
@@ -57,7 +54,7 @@ public class PostSearchAppService {
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
 
         if(post.getExposeOption().getExposeState()!=ExposeState.PRIVACY){
-            return findPostDetail(postId, loginId);
+            return findPostDetail(postId);
         }
 
         if(!post.checkPassword(password)){
@@ -86,12 +83,9 @@ public class PostSearchAppService {
     }
 
     @Transactional
-    public RetrievePostDetailResponse findPostDetail(Long postId, String loginId){
+    public RetrievePostDetailResponse findPostDetail(Long postId){
         //TODO : 변경 필요
-        Account account = null;
-        if(loginId!=null){
-            account = accountRepository.findByLoginId(loginId);
-        }
+        Account account = SecurityUtils.getAccount().orElse(null);
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));

@@ -250,7 +250,7 @@ public class CommentAppService {
             throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 
-        comment.delete();
+        comment.delete(true);
     }
 
     public void removeReply(Long replyId, String loginId) {
@@ -263,7 +263,7 @@ public class CommentAppService {
             throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 
-        reply.delete();
+        reply.delete(true);
     }
 
     protected Anonymous getAnonymous(Long accountId, Long postId, Post post) {
