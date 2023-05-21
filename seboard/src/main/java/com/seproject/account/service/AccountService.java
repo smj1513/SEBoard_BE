@@ -4,6 +4,8 @@ import com.seproject.account.model.social.OAuthAccount;
 import com.seproject.account.repository.social.OAuthAccountRepository;
 import com.seproject.account.service.email.RegisterEmailService;
 import com.seproject.account.utils.SecurityUtils;
+import com.seproject.admin.service.BannedIdService;
+import com.seproject.admin.service.BannedNicknameService;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomAuthenticationException;
 import com.seproject.error.exception.CustomIllegalArgumentException;
@@ -18,6 +20,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -44,6 +48,9 @@ public class AccountService implements UserDetailsService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final RegisterEmailService registerEmailService;
     private final MemberRepository memberRepository;
+
+    private final BannedIdService bannedIdService;
+    private final BannedNicknameService bannedNicknameService;
 
     public boolean isExist(String loginId){
         return accountRepository.existsByLoginId(loginId);
@@ -72,6 +79,8 @@ public class AccountService implements UserDetailsService {
         String email = oAuth2RegisterRequest.getEmail();
 
         if(isExist(email)) throw new CustomIllegalArgumentException(ErrorCode.USER_ALREADY_EXIST, null);
+        if(!bannedIdService.possibleId(email)) throw new CustomIllegalArgumentException(ErrorCode.BANNED_ID,null);
+        if(!bannedNicknameService.possibleNickname(oAuth2RegisterRequest.getNickname())) throw new CustomIllegalArgumentException(ErrorCode.BANNED_NICKNAME,null);
 
         Role role = mapEmailToRole(email);
         List<Role> authorities = List.of(role);
@@ -108,7 +117,11 @@ public class AccountService implements UserDetailsService {
     public Account register(FormRegisterRequest formRegisterRequest) {
 
         String id = formRegisterRequest.getId();
+
         if(isExist(id)) throw new CustomIllegalArgumentException(ErrorCode.USER_ALREADY_EXIST,null);
+        if(!bannedIdService.possibleId(id)) throw new CustomIllegalArgumentException(ErrorCode.BANNED_ID,null);
+        if(!bannedNicknameService.possibleNickname(formRegisterRequest.getNickname())) throw new CustomIllegalArgumentException(ErrorCode.BANNED_NICKNAME,null);
+
         Role role = mapEmailToRole(id);
         List<Role> authorities = List.of(role);
 
@@ -165,10 +178,15 @@ public class AccountService implements UserDetailsService {
 
     public CreateAccountResponse createAccount(CreateAccountRequest request) {
 
+        String id = request.getId();
+        String nickname = request.getNickname();
+        if(!bannedIdService.possibleId(id)) throw new CustomIllegalArgumentException(ErrorCode.BANNED_ID,null);
+        if(!bannedNicknameService.possibleNickname(nickname)) throw new CustomIllegalArgumentException(ErrorCode.BANNED_NICKNAME,null);
+
         Account account = Account.builder()
-                .loginId(request.getId())
+                .loginId(id)
                 .password(passwordEncoder.encode(request.getPassword()))
-                .nickname(request.getNickname())
+                .nickname(nickname)
                 .name(request.getName())
                 .authorities(convertAuthorities(request.getAuthorities()))
                 .build();
@@ -181,10 +199,16 @@ public class AccountService implements UserDetailsService {
 
         Account account = accountRepository.findById(request.getAccountId()).orElseThrow();
 
+        String id = request.getId();
+        String nickname = request.getNickname();
+
+        if(!bannedIdService.possibleId(id)) throw new CustomIllegalArgumentException(ErrorCode.BANNED_ID,null);
+        if(!bannedNicknameService.possibleNickname(nickname)) throw new CustomIllegalArgumentException(ErrorCode.BANNED_NICKNAME,null);
+
         Account updateAccount = Account.builder()
-                .loginId(request.getId())
+                .loginId(id)
                 .password(passwordEncoder.encode(request.getPassword()))
-                .nickname(request.getNickname())
+                .nickname(nickname)
                 .name(request.getName())
                 .authorities(convertAuthorities(request.getAuthorities()))
                 .build();
@@ -263,7 +287,6 @@ public class AccountService implements UserDetailsService {
     }
 
     public MyInfoResponse findMyInfo(String loginId) {
-        Map<String,Object> map = new HashMap<>();
         Account account = accountRepository.findByLoginId(loginId);
         if(account == null) throw new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null);
 

@@ -25,6 +25,8 @@ public enum ErrorCode {
     ALREADY_EXIST_ROLE(HttpStatus.BAD_REQUEST,117,"이미 존재하는 권한 정보입니다."),
     IMMUTABLE_ROLE(HttpStatus.BAD_REQUEST,118,"삭제할수 없는 권한 정보입니다."),
     LOGIN_PREVENT_USER(HttpStatus.BAD_REQUEST,119,"일시적으로 로그인이 금지되었습니다."),
+    BANNED_ID(HttpStatus.BAD_REQUEST,120,"금지된 단어가 포함된 아이디입니다."),
+    BANNED_NICKNAME(HttpStatus.BAD_REQUEST,121,"금지된 닉네임 입니다."),
 
     INVALID_PAGINATION(HttpStatus.BAD_REQUEST,200, "올바르지 않은 페이지 정보를 전송하였습니다."),
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, 201, "올바르지 않은 형식의 요청입니다."),

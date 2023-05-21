@@ -20,8 +20,11 @@ public class BannedIdService {
         return RetrieveAllBannedIdResponse.toDTO(all);
     }
 
+    public String parse(String id) {
+        return id.split("@")[0];
+    }
     public boolean possibleId(String id) {
-        return !bannedIdRepository.existsByBannedId(id);
+        return !bannedIdRepository.existsByBannedId(parse(id));
     }
 
     public void banId(String id) {
