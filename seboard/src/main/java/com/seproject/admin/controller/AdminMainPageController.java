@@ -42,7 +42,7 @@ public class AdminMainPageController {
     })
     @PostMapping("/mainPageMenus")
     public ResponseEntity<?> addMainPageMenus(@RequestBody CreateMainPageMenuRequest request) {
-
+        //TODO : Menu만?
         MainPageMenu mainPageMenu = mainPageService.createMainPageMenu(request.getMenuId());
         return new ResponseEntity<>(CreateMainPageMenuResponse.toDTO(mainPageMenu),HttpStatus.OK);
     }
