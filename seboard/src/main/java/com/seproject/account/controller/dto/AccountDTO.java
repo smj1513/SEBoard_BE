@@ -65,7 +65,7 @@ public class AccountDTO {
         private String email;
         private List<String> roles;
 
-        public static MyInfoResponse toDTO(String nickname,String email,List<String> roles) {
+        public static MyInfoResponse toDTO(String email,String nickname,List<String> roles) {
             return builder()
                     .nickname(nickname)
                     .roles(roles)
