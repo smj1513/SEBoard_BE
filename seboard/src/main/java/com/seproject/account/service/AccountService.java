@@ -180,6 +180,7 @@ public class AccountService implements UserDetailsService {
 
         String id = request.getId();
         String nickname = request.getNickname();
+        if(isExist(id))  throw new CustomIllegalArgumentException(ErrorCode.USER_ALREADY_EXIST,null);
         if(!bannedIdService.possibleId(id)) throw new CustomIllegalArgumentException(ErrorCode.BANNED_ID,null);
         if(!bannedNicknameService.possibleNickname(nickname)) throw new CustomIllegalArgumentException(ErrorCode.BANNED_NICKNAME,null);
 
@@ -197,11 +198,12 @@ public class AccountService implements UserDetailsService {
 
     public UpdateAccountResponse updateAccount(UpdateAccountRequest request) {
 
-        Account account = accountRepository.findById(request.getAccountId()).orElseThrow();
+        Account account = accountRepository.findById(request.getAccountId()).orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.USER_NOT_FOUND,null));
 
         String id = request.getId();
         String nickname = request.getNickname();
 
+        //TODO : 자기 자신 빼고 이미 존재하는지 확인
         if(!bannedIdService.possibleId(id)) throw new CustomIllegalArgumentException(ErrorCode.BANNED_ID,null);
         if(!bannedNicknameService.possibleNickname(nickname)) throw new CustomIllegalArgumentException(ErrorCode.BANNED_NICKNAME,null);
 

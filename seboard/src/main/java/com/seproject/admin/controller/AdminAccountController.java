@@ -67,20 +67,8 @@ public class AdminAccountController {
     })
     @PostMapping("/accounts")
     public ResponseEntity<?> createAccountByAdmin(@RequestBody CreateAccountRequest createAccountRequest) {
-
-        String email = createAccountRequest.getEmail();
-
-        if(!email.matches("\\w+@\\w+\\.\\w+(\\.\\w+)?")) {
-            return new ResponseEntity<>("이메일 형식이 맞지 않습니다." , HttpStatus.BAD_REQUEST);
-        }
-
-       try{
            CreateAccountResponse account = accountService.createAccount(createAccountRequest);
            return new ResponseEntity<>(account,HttpStatus.OK);
-       } catch (IllegalArgumentException e) {
-           return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
-       }
-
     }
 
     @Operation(summary = "계정 수정", description = "관리자는 계정을 수정할 수 있다.")
@@ -93,19 +81,8 @@ public class AdminAccountController {
     @PutMapping("/accounts")
     public ResponseEntity<?> updateAccount(@RequestBody UpdateAccountRequest updateAccountRequest) {
 
-        String email = updateAccountRequest.getEmail();
-        if(!email.matches("\\w+@\\w+\\.\\w+(\\.\\w+)?")) {
-            return new ResponseEntity<>("이메일 형식이 맞지 않습니다." , HttpStatus.BAD_REQUEST);
-        }
-
-        try{
-            UpdateAccountResponse updateAccount = accountService.updateAccount(updateAccountRequest);
-            return new ResponseEntity<>(updateAccount,HttpStatus.OK);
-        } catch (IllegalArgumentException e) {
-            return new ResponseEntity<>(e.getMessage(),HttpStatus.BAD_REQUEST);
-        } catch (NoSuchElementException e) {
-            return new ResponseEntity<>("해당 계정을 찾을수 없습니다.",HttpStatus.BAD_REQUEST);
-        }
+        UpdateAccountResponse updateAccount = accountService.updateAccount(updateAccountRequest);
+        return new ResponseEntity<>(updateAccount,HttpStatus.OK);
 
     }
 
