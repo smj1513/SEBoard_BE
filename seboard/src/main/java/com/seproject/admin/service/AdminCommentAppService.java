@@ -38,6 +38,22 @@ public class AdminCommentAppService {
         reportRepository.deleteAllByCommentId(comment.getCommentId());
     }
 
+    public void restoreBulkComment(List<Long> commentIds) {
+        Account account = SecurityUtils.getAccount()
+                .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
+
+        boolean isAdmin = account.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+
+        if(!isAdmin){
+            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
+        }
+
+        commentRepository.findAllById(commentIds).forEach(comment -> {
+            comment.restore();
+            reportRepository.deleteAllByCommentId(comment.getCommentId());
+        });
+    }
+
     public void deleteBulkComment(List<Long> commentIds){
         Account account = SecurityUtils.getAccount()
                 .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
@@ -52,4 +68,5 @@ public class AdminCommentAppService {
             comment.delete(false);
         });
     }
+
 }

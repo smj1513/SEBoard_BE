@@ -6,7 +6,7 @@ import java.util.List;
 
 public class AdminCommentRequest {
     @Data
-    public static class BulkDeleteCommentRequest{
+    public static class BulkCommentRequest {
         private List<Long> commentIds;
     }
 }

@@ -1,6 +1,5 @@
 package com.seproject.admin.controller;
 
-import com.seproject.admin.controller.dto.comment.AdminCommentRequest;
 import com.seproject.admin.service.AdminCommentAppService;
 import com.seproject.seboard.controller.dto.MessageResponse;
 import lombok.RequiredArgsConstructor;
@@ -21,8 +20,14 @@ public class AdminCommentController {
         return ResponseEntity.ok(MessageResponse.of("댓글 복구 성공"));
     }
 
+    @PostMapping("/restore")
+    public ResponseEntity<MessageResponse> restoreBulkComment(@RequestBody BulkCommentRequest request){
+        adminCommentAppService.restoreBulkComment(request.getCommentIds());
+        return ResponseEntity.ok(MessageResponse.of("댓글 복구 성공"));
+    }
+
     @DeleteMapping()
-    public ResponseEntity<MessageResponse> deleteBulkComment(@RequestBody BulkDeleteCommentRequest request){
+    public ResponseEntity<MessageResponse> deleteBulkComment(@RequestBody BulkCommentRequest request){
         adminCommentAppService.deleteBulkComment(request.getCommentIds());
         return ResponseEntity.ok(MessageResponse.of("댓글 삭제 성공"));
     }
