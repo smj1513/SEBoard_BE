@@ -70,6 +70,22 @@ public class AdminPostAppService {
         reportRepository.deleteAllByPostId(post.getPostId());
     }
 
+    public void restoreBulkPost(List<Long> postIds) {
+        Account account = SecurityUtils.getAccount()
+                .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
+
+        boolean isAdmin = account.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+
+        if(!isAdmin){
+            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
+        }
+
+        postRepository.findAllById(postIds).forEach(post -> {
+            post.restore();
+            reportRepository.deleteAllByPostId(post.getPostId());
+        });
+    }
+
     public void deleteBulkPost(List<Long> postIds) {
         Account account = SecurityUtils.getAccount()
                 .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
@@ -84,4 +100,5 @@ public class AdminPostAppService {
             post.delete(false);
         });
     }
+
 }

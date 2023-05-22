@@ -7,7 +7,7 @@ import java.util.List;
 public class AdminPostRequest {
 
     @Data
-    public static class BulkDeletePostRequest{
+    public static class BulkPostRequest {
         private List<Long> postIds;
     }
 }
