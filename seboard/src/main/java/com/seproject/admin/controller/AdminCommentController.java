@@ -1,13 +1,13 @@
 package com.seproject.admin.controller;
 
+import com.seproject.admin.controller.dto.comment.AdminCommentRequest;
 import com.seproject.admin.service.AdminCommentAppService;
 import com.seproject.seboard.controller.dto.MessageResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import static com.seproject.admin.controller.dto.comment.AdminCommentRequest.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -19,6 +19,12 @@ public class AdminCommentController {
     public ResponseEntity<MessageResponse> restoreComment(@PathVariable Long commentId){
         adminCommentAppService.restoreComment(commentId);
         return ResponseEntity.ok(MessageResponse.of("댓글 복구 성공"));
+    }
+
+    @DeleteMapping()
+    public ResponseEntity<MessageResponse> deleteBulkComment(@RequestBody BulkDeleteCommentRequest request){
+        adminCommentAppService.deleteBulkComment(request.getCommentIds());
+        return ResponseEntity.ok(MessageResponse.of("댓글 삭제 성공"));
     }
 
 }
