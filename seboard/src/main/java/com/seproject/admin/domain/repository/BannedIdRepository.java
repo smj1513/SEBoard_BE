@@ -1,4 +1,4 @@
-package com.seproject.admin.repository;
+package com.seproject.admin.domain.repository;
 
 import com.seproject.admin.domain.BannedId;
 import org.springframework.data.jpa.repository.JpaRepository;

@@ -1,7 +1,7 @@
 package com.seproject.admin.service;
 
 import com.seproject.admin.domain.BannedNickname;
-import com.seproject.admin.repository.BannedNicknameRepository;
+import com.seproject.admin.domain.repository.BannedNicknameRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
