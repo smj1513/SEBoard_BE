@@ -3,6 +3,8 @@ package com.seproject.admin.controller;
 
 import com.seproject.account.service.AccountService;
 import com.seproject.account.jwt.JwtDecoder;
+import com.seproject.admin.controller.dto.post.AdminPostRequest;
+import com.seproject.admin.controller.dto.post.AdminPostRequest.BulkDeletePostRequest;
 import com.seproject.admin.service.AdminPostAppService;
 import com.seproject.seboard.application.PostAppService;
 import com.seproject.seboard.application.dto.post.PostCommand;
@@ -41,13 +43,23 @@ public class AdminPostController {
         return new ResponseEntity<>(MessageResponse.of("게시글 복구 성공"), HttpStatus.OK);
     }
 
+    @DeleteMapping()
+    public ResponseEntity<MessageResponse> deleteBulkPost(@RequestBody BulkDeletePostRequest request){
+        adminPostAppService.deleteBulkPost(request.getPostIds());
+        return new ResponseEntity<>(MessageResponse.of("게시글 삭제 성공"), HttpStatus.OK);
+    }
+
     @Operation(summary = "게시글 목록 조회", description = "등록된 게시글 목록들을 조회한다.")
     @ApiResponses({
             @ApiResponse(content = @Content(schema = @Schema(implementation = RetrievePostListResponse.class)), responseCode = "200", description = "게시글 목록 조회 성공"),
             @ApiResponse(content = @Content(schema = @Schema(implementation = Error.class)), responseCode = "200", description = "잘못된 페이징 정보")
     })
     @GetMapping("/posts")
-    public ResponseEntity<?> retrieveAllPost(@RequestBody RetrievePostListRequest retrievePostListRequest) {
+    public ResponseEntity<?> retrieveAllPost(@ModelAttribute AdminPostRequest request) {
+
+
+        return null;
+    }
 //
 //        PostListFindCommand command = PostCommand.PostListFindCommand.builder()
 //                .categoryId(retrievePostListRequest.getCategoryId())
@@ -58,8 +70,6 @@ public class AdminPostController {
 //        RetrievePostListResponse postList = postAppService.findPostList(command, false);
 //
 //        return new ResponseEntity<>(postList, HttpStatus.OK);
-        return null;
-    }
 
 //    //TODO: 예외 추가
 //    @Operation(summary = "게시글 삭제", description = "관리자는 게시글을 삭제한다.")
