@@ -10,11 +10,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 
-@RequiredArgsConstructor
 @Repository
 public class FileStorageRepository implements FileRepository {
     @Value("${storage.urlRootPath}")
-    private final String urlRootPath;
+    private String urlRootPath;
 
     @Override
     public FileMetaData save(MultipartFile file) {
