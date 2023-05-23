@@ -10,17 +10,15 @@ import javax.persistence.*;
 @SuperBuilder
 @Getter
 @NoArgsConstructor
-@DiscriminatorValue("CATEGORY")
+@DiscriminatorValue("CATEGORY_MANAGER")
 @Entity
-@Table(name = "category_authorizations")
-public class CategoryAuthorization extends Authorization {
+@Table(name = "category_manager_authorizations")
+public class CategoryManagerAuthorization extends Authorization {
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
 
-
     @Override
-    public String getType() {
-        return "CATEGORY";
-    }
+    public String getType() {return "CATEGORY_MANAGER";}
 }

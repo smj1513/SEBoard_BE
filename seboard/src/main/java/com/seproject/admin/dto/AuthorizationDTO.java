@@ -30,7 +30,6 @@ public class AuthorizationDTO {
             return builder()
                     .categoryId(categoryAuthorization.getId())
                     .urlInfo(category.getUrlInfo())
-                    .accessType(categoryAuthorization.getAccessType().toString())
                     .roles(roles)
                     .build();
         }
@@ -85,6 +84,19 @@ public class AuthorizationDTO {
                     .role(role.getAuthority())
                     .build();
         }
+    }
+
+    @Data
+    public static class CategoryAccessUpdateRequest {
+        private CategoryAccessUpdateRequestElement access;
+        private CategoryAccessUpdateRequestElement write;
+        private CategoryAccessUpdateRequestElement manager;
+        private CategoryAccessUpdateRequestElement menu;
+    }
+
+    @Data
+    public static class CategoryAccessUpdateRequestElement {
+        private List<Long> roles;
     }
 
 

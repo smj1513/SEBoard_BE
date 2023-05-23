@@ -28,6 +28,10 @@ public abstract class Authorization {
 
     public abstract String getType();
 
+    public void setRoleAuthorizations(List<RoleAuthorization> roleAuthorizations) {
+        this.roleAuthorizations = roleAuthorizations;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

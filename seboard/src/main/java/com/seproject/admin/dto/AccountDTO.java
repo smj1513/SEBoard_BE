@@ -69,10 +69,8 @@ public class AccountDTO {
     public static class CreateAccountRequest{
         private String id;
         private String password;
-        private String email;
         private String name;
         private String nickname;
-        private String profile;
         private List<String> authorities;
 
     }
@@ -81,10 +79,8 @@ public class AccountDTO {
     @Data
     public static class CreateAccountResponse{
         private String id;
-        private String email;
         private String name;
         private String nickname;
-        private String profile;
         private List<Role> authorities;
 
         public static CreateAccountResponse toDTO(Account account){
@@ -102,8 +98,6 @@ public class AccountDTO {
         private Long accountId;
         private String id;
         private String password;
-        private String email;
-        private String profile;
         private String name;
         private String nickname;
         private List<String> authorities;
@@ -114,10 +108,8 @@ public class AccountDTO {
     @Data
     public static class UpdateAccountResponse{
         private String id;
-        private String email;
         private String name;
         private String nickname;
-        private String profile;
         private List<Role> authorities;
 
         public static UpdateAccountResponse toDTO(Account account){
@@ -139,10 +131,8 @@ public class AccountDTO {
     @Data
     public static class DeleteAccountResponse{
         private String id;
-        private String email;
         private String name;
         private String nickname;
-        private String profile;
         private List<Role> authorities;
 
         public static DeleteAccountResponse toDTO(Account account){
