@@ -18,7 +18,7 @@ import java.util.List;
 
 import static com.seproject.admin.dto.MainPageDTO.*;
 
-@Tag(name = "게시글 관리 API", description = "관리자 시스템의 게시글 관리 API")
+@Tag(name = "메인페이지 관리 API", description = "관리자 시스템의 메인페이지 관리 API")
 @AllArgsConstructor
 @RequestMapping(value = "/admin")
 @Controller
