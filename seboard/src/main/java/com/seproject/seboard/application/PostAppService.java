@@ -18,6 +18,7 @@ import com.seproject.seboard.domain.model.user.Member;
 import com.seproject.seboard.domain.repository.category.CategoryRepository;
 import com.seproject.seboard.domain.repository.comment.CommentRepository;
 import com.seproject.seboard.domain.repository.commons.FileMetaDataRepository;
+import com.seproject.seboard.domain.repository.commons.FileRepository;
 import com.seproject.seboard.domain.repository.post.BookmarkRepository;
 import com.seproject.seboard.domain.repository.post.PostRepository;
 import com.seproject.seboard.domain.repository.post.PostSearchRepository;
@@ -47,6 +48,7 @@ public class PostAppService {
     private final BookmarkRepository bookmarkRepository;
     private final FileAppService fileAppService;
     private final AccountRepository accountRepository;
+    private final FileRepository fileRepository;
 
     public Long writePost(PostWriteCommand command){
         Account account = accountRepository.findByLoginId(command.getLoginId());
@@ -122,7 +124,7 @@ public class PostAppService {
         Set<FileMetaData> removalAttachments = post.getAttachments();
         removalAttachments.removeAll(attachments); //요청으로 들어온 PK와 기존의 PK를 비교하고, 새로온 PK에 없는 것은 삭제 대상
 
-        removalAttachments.forEach(fileAppService::deleteFileFromStorage); //file 삭제
+        removalAttachments.forEach(fileMetaData -> fileRepository.delete(fileMetaData.getFilePath())); //file 삭제
         removalAttachments.forEach(fileMetaData -> post.removeAttachment(fileMetaData)); //db에서 정보 삭제
 
         attachments.forEach(fileMetaData -> post.addAttachment(fileMetaData));
