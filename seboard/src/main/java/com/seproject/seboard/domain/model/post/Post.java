@@ -149,4 +149,11 @@ public class Post {
             return false;
         }
     }
+
+    public void restore() {
+        if(status!=Status.NORMAL){
+            status = Status.NORMAL;
+            reportCount = 0;
+        }
+    }
 }
