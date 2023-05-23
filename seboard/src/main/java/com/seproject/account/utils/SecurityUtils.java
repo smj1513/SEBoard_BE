@@ -35,21 +35,23 @@ public class SecurityUtils {
 
 
     public static String getLoginId(){
-        Optional<Account> account = getAccount();
-        return account.map(Account::getLoginId).orElse(null);
+        Account account = getAccount().get();
+        if(account == null) return null;
+        return account.getUsername();
     }
 
     public static Collection<? extends GrantedAuthority> getAuthorities(){
-        Optional<Account> account = getAccount();
-        return account.map(Account::getAuthorities).orElse(null);
+        Account account = getAccount().get();
+        if(account == null) return null;
+        return account.getAuthorities();
     }
 
     public static Optional<Account> getAccount() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if(authentication == null) return Optional.empty();
+        if(authentication == null) return Optional.ofNullable(null);
 
         if (authentication instanceof AnonymousAuthenticationToken) {
-            return Optional.empty();
+            return Optional.ofNullable(null);
         }
 
         UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = (UsernamePasswordAuthenticationToken) authentication;
