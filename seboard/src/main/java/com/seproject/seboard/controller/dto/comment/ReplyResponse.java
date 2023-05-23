@@ -36,6 +36,9 @@ public class ReplyResponse {
         }else if(reply.isOnlyReadByAuthor() && !isAuthor && !isPostAuthor){
             contents = "글 작성자만 볼 수 있는 댓글 입니다.";
             userResponse = new UserResponse(null, "(알수 없음)");
+        }else if(reply.isReported()){
+            contents = "신고된 댓글입니다.";
+            userResponse = new UserResponse(null, "(알수 없음)");
         }else{
             contents = reply.getContents();
             userResponse = new UserResponse(reply.getAuthor());
@@ -49,7 +52,7 @@ public class ReplyResponse {
                 .modifiedAt(reply.getBaseTime().getModifiedAt())
                 .contents(contents)
                 .isEditable(isAuthor)
-                .isActive(!reply.isDeleted() && ((reply.isOnlyReadByAuthor() && isAuthor) || !reply.isOnlyReadByAuthor())) //TODO : 작성자만 읽을 수 있는 경우 추가 필요
+                .isActive(!reply.isReported() && !reply.isDeleted() && ((reply.isOnlyReadByAuthor() && isAuthor) || !reply.isOnlyReadByAuthor())) //TODO : 작성자만 읽을 수 있는 경우 추가 필요
                 .isReadOnlyAuthor(reply.isOnlyReadByAuthor())
                 .build();
     }
