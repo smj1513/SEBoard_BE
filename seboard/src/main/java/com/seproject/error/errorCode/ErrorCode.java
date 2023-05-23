@@ -35,6 +35,7 @@ public enum ErrorCode {
     NOT_EXIST_COMMENT(HttpStatus.NOT_FOUND, 303, "존재하지 않는 댓글/답글입니다."),
     NOT_EXIST_MEMBER(HttpStatus.NOT_FOUND, 304, "존재하지 않는 회원입니다."),
     NOT_ENROLLED_ROLE(HttpStatus.NOT_FOUND, 304, "등록되지 않은 권한 설정입니다."),
+    NOT_EXIST_EXTENSION(HttpStatus.NOT_FOUND, 305, "사용가능하지 않은 확장자입니다."),
 
     DUPLICATED_REPORT(HttpStatus.BAD_REQUEST, 400, "이미 신고하였습니다."),
     ;
