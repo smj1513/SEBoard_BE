@@ -42,11 +42,20 @@ public class MenuExposeService {
     }
 
     @Transactional
-    public MenuExpose updateRoleInMenuExpose(Long id,Long roleId){
-        MenuExpose menuExpose = menuExposeRepository.findById(id).orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.NOT_EXIST_CATEGORY, null));
-        Role role = roleRepository.findById(roleId).orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.NOT_EXIST_CATEGORY, null));
-        menuExpose.changeRole(role);
-        return menuExpose;
+    public List<MenuExpose> updateMenuExpose(Menu menu,List<Role> roles) {
+
+        List<MenuExpose> newMenuExposes = roles.stream().map((role) -> MenuExpose.builder()
+                        .menu(menu)
+                        .role(role)
+                        .build())
+                .collect(Collectors.toList());
+
+        List<MenuExpose> menuExposes = menuExposeRepository.findAllByMenuId(menu.getMenuId());
+
+        menuExposeRepository.deleteAllInBatch(menuExposes);
+        menuExposeRepository.saveAll(newMenuExposes);
+
+        return newMenuExposes;
     }
 
     public Map<Menu,List<Menu>> retrieveMenuByRole(List<Role> authorities) {
@@ -76,7 +85,7 @@ public class MenuExposeService {
         //TODO : MENU -> 최상위 메뉴인지 확인하는 메소드로 변경
         if(menu.getSuperMenu() != null) throw new CustomIllegalArgumentException(ErrorCode.CATEGORY_NOT_EXIST_EXPOSE_OPTION,null);
 
-        List<Role> findRolesByMenuId = menuExposeRepository.findAllByMenuId(menuId);
+        List<Role> findRolesByMenuId = menuExposeRepository.findAllRoleByMenuId(menuId);
         return findRolesByMenuId;
     }
 

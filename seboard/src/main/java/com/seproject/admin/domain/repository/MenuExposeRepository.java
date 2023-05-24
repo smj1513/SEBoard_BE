@@ -15,9 +15,13 @@ public interface MenuExposeRepository extends JpaRepository<MenuExpose,Long> {
     List<Menu> findAllByRoleId(List<Long> roleIds);
 
     @Query("select distinct menuExpose.role from MenuExpose menuExpose where menuExpose.menu.menuId = :menuId")
-    List<Role> findAllByMenuId(Long menuId);
+    List<Role> findAllRoleByMenuId(Long menuId);
 
 
     @Query("select distinct menu from Menu menu where menu.depth = 0 and menu.menuId not in (select menuExpose.menu from MenuExpose  menuExpose)")
     List<Menu> findAllNotExposeSetting();
+
+    @Query("select distinct menuExpose from MenuExpose menuExpose where menuExpose.menu.menuId = :menuId")
+    List<MenuExpose> findAllByMenuId(Long menuId);
+
 }
