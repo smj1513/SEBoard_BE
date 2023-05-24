@@ -54,6 +54,10 @@ public class Menu {
         }
     }
 
+    public boolean isRootMenu() {
+        return depth == 0;
+    }
+
     public boolean isRemovable(CategoryService categoryService){
         return !categoryService.hasSubCategory(menuId);
     }
