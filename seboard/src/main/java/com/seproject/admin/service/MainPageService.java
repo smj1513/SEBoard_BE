@@ -1,7 +1,7 @@
 package com.seproject.admin.service;
 
 import com.seproject.admin.domain.MainPageMenu;
-import com.seproject.admin.repository.MainPageMenuRepository;
+import com.seproject.admin.domain.repository.MainPageMenuRepository;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
 import com.seproject.seboard.domain.model.category.Menu;
