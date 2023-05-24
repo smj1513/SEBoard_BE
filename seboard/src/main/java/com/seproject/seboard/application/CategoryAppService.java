@@ -92,8 +92,8 @@ public class CategoryAppService {
     }
 
     public void updateCategory(CategoryUpdateCommand command){
-        //TODO : superCategory 수정?
-        Menu targetMenu = findByIdOrThrow(command.getCategoryId(), categoryRepository, "");
+        //TODO : superCategory 수정? -> 여기 categoryRepository가 맞나요 menuRepository가 맞나요
+        Menu targetMenu = findByIdOrThrow(command.getCategoryId(), menuRepository, "");
 
         targetMenu.changeName(command.getName());
         targetMenu.changeDescription(command.getDescription());
