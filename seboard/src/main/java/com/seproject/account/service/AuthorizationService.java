@@ -12,9 +12,16 @@ import com.seproject.account.repository.role.RoleAuthorizationRepository;
 import com.seproject.account.repository.role.RoleRepository;
 import com.seproject.account.repository.role.auth.CategoryAuthorizationRepository;
 import com.seproject.account.repository.role.auth.CategoryManagerAuthorizationRepository;
+import com.seproject.admin.controller.MenuAccessOption;
 import com.seproject.admin.dto.AuthorizationDTO;
+import com.seproject.admin.service.MenuExposeService;
+import com.seproject.admin.service.RoleService;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
+import com.seproject.seboard.domain.model.category.BoardMenu;
+import com.seproject.seboard.domain.model.category.Category;
+import com.seproject.seboard.domain.model.category.ExternalSiteMenu;
+import com.seproject.seboard.domain.model.category.Menu;
 import com.seproject.seboard.domain.repository.category.MenuRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.ConfigAttribute;
@@ -29,6 +36,8 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.seproject.admin.dto.AuthorizationDTO.*;
+
 @RequiredArgsConstructor
 @Service
 public class AuthorizationService {
@@ -41,6 +50,9 @@ public class AuthorizationService {
     private final RoleAuthorizationRepository roleAuthorizationRepository;
     private final MenuRepository menuRepository;
     private final RoleRepository roleRepository;
+
+    private final MenuExposeService menuExposeService;
+    private final RoleService roleService;
 
     public LinkedHashMap<RequestMatcher, List<ConfigAttribute>> getUrlRequestMap() {
         LinkedHashMap<RequestMatcher,List<ConfigAttribute>> requestMap = new LinkedHashMap<>();
@@ -65,22 +77,55 @@ public class AuthorizationService {
     }
 
     @Transactional
-    public void update(Long categoryId, AuthorizationDTO.CategoryAccessUpdateRequest request) {
+    public void update(Long categoryId, CategoryAccessUpdateRequest request) {
+        Menu menu = menuRepository.findById(categoryId).orElseThrow(()->new CustomIllegalArgumentException(ErrorCode.ROLE_NOT_FOUND,null));
+        Class<? extends Menu> menuClass = menu.getClass();
+        if(menuClass == Menu.class) {
+            CategoryAccessUpdateRequestElement menuExpose = request.getMenuExpose();
 
-        // 1
-        CategoryAuthorization writeCategoryAuthorization = categoryAuthorizationRepository.findByCategoryIdAndMethod(categoryId,"POST");
-        updateWrite(writeCategoryAuthorization,request.getWrite().getRoles());
+            if(menuExpose == null)
+                throw new CustomIllegalArgumentException(ErrorCode.INVALID_MENU_REQUEST,null);
 
-        // 2
-        List<CategoryAuthorization> categoryAuthorizations = categoryAuthorizationRepository.findByCategoryId(categoryId);
-        updateAccess(categoryAuthorizations,request.getAccess().getRoles());
+            updateMenuExpose(menu,menuExpose);
+        } else if(menuClass == BoardMenu.class) {
+            CategoryAccessUpdateRequestElement access = request.getAccess();
+            CategoryAccessUpdateRequestElement menuExpose = request.getMenuExpose();
 
-        List<CategoryManagerAuthorization> categoryManagerAuthorizations = categoryManagerAuthorizationRepository.findByCategoryId(categoryId);
-        updateManager(categoryManagerAuthorizations,request.getManager().getRoles());
-//        updateMenu(authorizations,request.getMenu().getRoles());
+            if(access == null || menuExpose == null)
+                throw new CustomIllegalArgumentException(ErrorCode.INVALID_MENU_REQUEST,null);
+
+            updateAccess(categoryId,access.getRoles());
+            updateMenuExpose(menu,menuExpose);
+        } else if(menuClass == ExternalSiteMenu.class) {
+            CategoryAccessUpdateRequestElement menuExpose = request.getMenuExpose();
+
+            if(menuExpose == null) throw new CustomIllegalArgumentException(ErrorCode.INVALID_MENU_REQUEST,null);
+
+            updateMenuExpose(menu,menuExpose);
+        } else if(menuClass == Category.class){
+            CategoryAccessUpdateRequestElement write = request.getWrite();
+            CategoryAccessUpdateRequestElement manager = request.getManage();
+
+            if(write == null || manager == null) throw new CustomIllegalArgumentException(ErrorCode.INVALID_MENU_REQUEST,null);
+
+            updateWrite(categoryId,write.getRoles());
+            updateManager(categoryId,request.getManage().getRoles());
+        } else {
+            throw new CustomIllegalArgumentException(ErrorCode.ILLEGAL_MENU_TYPE,null);
+        }
     }
 
-    private void updateAccess(List<CategoryAuthorization> authorizations, List<Long> roleIds) {
+    private void updateMenuExpose(Menu menu,CategoryAccessUpdateRequestElement menuExpose) {
+        //TODO : 어딘가에 저장
+        String option = menuExpose.getOption();
+        MenuAccessOption menuAccessOption = MenuAccessOption.of(option);
+
+        List<Role> roles = roleService.convertRoles(menuAccessOption);
+        menuExposeService.updateMenuExpose(menu,roles);
+    }
+
+    private void updateAccess(Long categoryId, List<Long> roleIds) {
+        List<CategoryAuthorization> authorizations = categoryAuthorizationRepository.findByCategoryId(categoryId);
         for (CategoryAuthorization authorization : authorizations) {
             List<RoleAuthorization> roleAuthorizations = roleIds.stream()
                     .map(roleRepository :: findById)
@@ -97,7 +142,9 @@ public class AuthorizationService {
         }
     }
 
-    private void updateWrite(CategoryAuthorization authorization, List<Long> roleIds) {
+    private void updateWrite(Long categoryId, List<Long> roleIds) {
+        CategoryAuthorization authorization = categoryAuthorizationRepository.findByCategoryIdAndMethod(categoryId, "POST");
+
         List<RoleAuthorization> roleAuthorizations = roleIds.stream()
                 .map(roleRepository :: findById)
                 .map((role) -> role.orElseThrow(()->new CustomIllegalArgumentException(ErrorCode.ROLE_NOT_FOUND,null)))
@@ -112,7 +159,9 @@ public class AuthorizationService {
         roleAuthorizationRepository.saveAll(roleAuthorizations);
     }
 
-    private void updateManager(List<CategoryManagerAuthorization> authorizations, List<Long> roleIds) {
+    private void updateManager(Long categoryId, List<Long> roleIds) {
+        List<CategoryManagerAuthorization> authorizations = categoryManagerAuthorizationRepository.findByCategoryId(categoryId);
+
         for (CategoryManagerAuthorization authorization : authorizations) {
             List<RoleAuthorization> roleAuthorizations = roleIds.stream()
                     .map(roleRepository :: findById)
@@ -128,10 +177,5 @@ public class AuthorizationService {
             roleAuthorizationRepository.saveAll(roleAuthorizations);
         }
     }
-
-    private void updateMenu(List<CategoryAuthorization> authorizations, List<Long> roleIds) {
-
-    }
-
 
 }

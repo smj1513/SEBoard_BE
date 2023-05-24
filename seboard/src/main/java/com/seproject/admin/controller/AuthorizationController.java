@@ -4,6 +4,7 @@ import com.seproject.account.authorize.url.UrlFilterInvocationSecurityMetaDataSo
 import com.seproject.account.model.role.auth.CategoryAuthorization;
 import com.seproject.account.service.AuthorizationService;
 
+import com.seproject.seboard.application.CategoryAppService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -20,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 import static com.seproject.admin.dto.AuthorizationDTO.*;
+import static com.seproject.seboard.application.dto.category.CategoryCommand.*;
 
 @Tag(name = "접근 권한 관리 API", description = "기능을 사용할 수 있는 권한을 관리하는 API")
 @RequiredArgsConstructor
@@ -27,6 +29,7 @@ import static com.seproject.admin.dto.AuthorizationDTO.*;
 @RestController
 public class AuthorizationController {
 
+    private final CategoryAppService categoryAppService;
     private final AuthorizationService authorizationService;
     private final UrlFilterInvocationSecurityMetaDataSource urlFilterInvocationSecurityMetaDataSource;
 
@@ -52,10 +55,10 @@ public class AuthorizationController {
     })
     @PostMapping("/authorization/category/{categoryId}")
     public ResponseEntity<?> updateCategoryAccess(@PathVariable long categoryId,@RequestBody CategoryAccessUpdateRequest request) {
-
+        CategoryUpdateCommand command = new CategoryUpdateCommand(categoryId,request.getName(), request.getDescription(),request.getUrlId(),request.getExternalUrl());
+        categoryAppService.updateCategory(command);
         authorizationService.update(categoryId,request);
-
-        try{
+        try {
             urlFilterInvocationSecurityMetaDataSource.reset();
         } catch (Exception e) {
             return new ResponseEntity<>(e, HttpStatus.INTERNAL_SERVER_ERROR);

@@ -27,6 +27,8 @@ public enum ErrorCode {
     LOGIN_PREVENT_USER(HttpStatus.BAD_REQUEST,119,"일시적으로 로그인이 금지되었습니다."),
     BANNED_ID(HttpStatus.BAD_REQUEST,120,"금지된 단어가 포함된 아이디입니다."),
     BANNED_NICKNAME(HttpStatus.BAD_REQUEST,121,"금지된 닉네임 입니다."),
+    ILLEGAL_MENU_TYPE(HttpStatus.BAD_REQUEST,122,"일치하는 Menu 타입이 없습니다."),
+    INVALID_MENU_REQUEST(HttpStatus.BAD_REQUEST,123,"Menu가 필요로하는 정보가 전달되지 않았습니다."),
 
     INVALID_PAGINATION(HttpStatus.BAD_REQUEST,200, "올바르지 않은 페이지 정보를 전송하였습니다."),
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, 201, "올바르지 않은 형식의 요청입니다."),
@@ -40,6 +42,7 @@ public enum ErrorCode {
     NOT_ENROLLED_ROLE(HttpStatus.NOT_FOUND, 304, "등록되지 않은 권한 설정입니다."),
     NOT_EXIST_EXTENSION(HttpStatus.NOT_FOUND, 305, "사용가능하지 않은 확장자입니다."),
     CATEGORY_NOT_EXIST_EXPOSE_OPTION(HttpStatus.NOT_FOUND, 306, "소분류 카테고리에는 메뉴 노출 설정이 존재하지 않습니다."),
+    CANNOT_FOUND_OPTION(HttpStatus.NOT_FOUND, 307, "찾을 수 없는 카테고리 접근 제한 옵션입니다."),
     DUPLICATED_REPORT(HttpStatus.BAD_REQUEST, 400, "이미 신고하였습니다."),
     ;
 

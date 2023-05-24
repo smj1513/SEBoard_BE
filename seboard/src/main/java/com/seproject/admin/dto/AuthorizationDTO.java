@@ -19,6 +19,7 @@ public class AuthorizationDTO {
         private Long categoryId;
         private String urlInfo;
         private String accessType;
+        private String option;
         private List<String> roles;
 
         public static CategoryAuthorizationRetrieveResponse toDTO(CategoryAuthorization categoryAuthorization) {
@@ -88,14 +89,19 @@ public class AuthorizationDTO {
 
     @Data
     public static class CategoryAccessUpdateRequest {
+        private String name;
+        private String description;
+        private String externalUrl;
+        private String urlId;
         private CategoryAccessUpdateRequestElement access;
         private CategoryAccessUpdateRequestElement write;
-        private CategoryAccessUpdateRequestElement manager;
-        private CategoryAccessUpdateRequestElement menu;
+        private CategoryAccessUpdateRequestElement manage;
+        private CategoryAccessUpdateRequestElement menuExpose;
     }
 
     @Data
     public static class CategoryAccessUpdateRequestElement {
+        private String option;
         private List<Long> roles;
     }
 
