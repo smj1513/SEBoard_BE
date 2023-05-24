@@ -13,4 +13,8 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
     List<Menu> findBySuperMenu(Long superMenuId);
     @Query("select case when count(m) > 0 then true else false end from Menu m where m.superMenu.menuId = :menuId")
     boolean existsSubMenuById(Long menuId);
+
+
+    @Query("select menu from Menu menu where menu.superMenu.menuId in :superMenuIds")
+    List<Menu> findAllBySuperMenuIds(List<Long> superMenuIds);
 }
