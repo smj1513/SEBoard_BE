@@ -94,7 +94,7 @@ public class AuthorizationService {
             if(access == null || menuExpose == null)
                 throw new CustomIllegalArgumentException(ErrorCode.INVALID_MENU_REQUEST,null);
 
-            updateAccess(categoryId,access.getRoles());
+            updateAccess(categoryId,access);
             updateMenuExpose(menu,menuExpose);
         } else if(menuClass == ExternalSiteMenu.class) {
             CategoryAccessUpdateRequestElement menuExpose = request.getMenuExpose();
@@ -108,14 +108,14 @@ public class AuthorizationService {
 
             if(write == null || manager == null) throw new CustomIllegalArgumentException(ErrorCode.INVALID_MENU_REQUEST,null);
 
-            updateWrite(categoryId,write.getRoles());
-            updateManager(categoryId,request.getManage().getRoles());
+            updateWrite(categoryId,write);
+            updateManager(categoryId,manager);
         } else {
             throw new CustomIllegalArgumentException(ErrorCode.ILLEGAL_MENU_TYPE,null);
         }
     }
 
-    private void updateMenuExpose(Menu menu,CategoryAccessUpdateRequestElement menuExpose) {
+    protected void updateMenuExpose(Menu menu,CategoryAccessUpdateRequestElement menuExpose) {
         //TODO : 어딘가에 저장
         String option = menuExpose.getOption();
         MenuAccessOption menuAccessOption = MenuAccessOption.of(option);
@@ -124,12 +124,13 @@ public class AuthorizationService {
         menuExposeService.updateMenuExpose(menu,roles);
     }
 
-    private void updateAccess(Long categoryId, List<Long> roleIds) {
+    protected void updateAccess(Long categoryId, CategoryAccessUpdateRequestElement access) {
+        MenuAccessOption option = MenuAccessOption.of(access.getOption());
+        List<Role> roles = option == MenuAccessOption.SELECT ? roleRepository.findAllById(access.getRoles()) : roleService.convertRoles(option);
+
         List<CategoryAuthorization> authorizations = categoryAuthorizationRepository.findByCategoryId(categoryId);
         for (CategoryAuthorization authorization : authorizations) {
-            List<RoleAuthorization> roleAuthorizations = roleIds.stream()
-                    .map(roleRepository :: findById)
-                    .map((role) -> role.orElseThrow(()->new CustomIllegalArgumentException(ErrorCode.ROLE_NOT_FOUND,null)))
+            List<RoleAuthorization> roleAuthorizations = roles.stream()
                     .map((role) -> RoleAuthorization.builder()
                             .authorization(authorization)
                             .role(role)
@@ -142,12 +143,12 @@ public class AuthorizationService {
         }
     }
 
-    private void updateWrite(Long categoryId, List<Long> roleIds) {
+    private void updateWrite(Long categoryId, CategoryAccessUpdateRequestElement write) {
         CategoryAuthorization authorization = categoryAuthorizationRepository.findByCategoryIdAndMethod(categoryId, "POST");
+        MenuAccessOption option = MenuAccessOption.of(write.getOption());
+        List<Role> roles = option == MenuAccessOption.SELECT ? roleRepository.findAllById(write.getRoles()) : roleService.convertRoles(option);
 
-        List<RoleAuthorization> roleAuthorizations = roleIds.stream()
-                .map(roleRepository :: findById)
-                .map((role) -> role.orElseThrow(()->new CustomIllegalArgumentException(ErrorCode.ROLE_NOT_FOUND,null)))
+        List<RoleAuthorization> roleAuthorizations = roles.stream()
                 .map((role) -> RoleAuthorization.builder()
                         .authorization(authorization)
                         .role(role)
@@ -159,13 +160,14 @@ public class AuthorizationService {
         roleAuthorizationRepository.saveAll(roleAuthorizations);
     }
 
-    private void updateManager(Long categoryId, List<Long> roleIds) {
+    private void updateManager(Long categoryId, CategoryAccessUpdateRequestElement manager) {
         List<CategoryManagerAuthorization> authorizations = categoryManagerAuthorizationRepository.findByCategoryId(categoryId);
 
+        MenuAccessOption option = MenuAccessOption.of(manager.getOption());
+        List<Role> roles = option == MenuAccessOption.SELECT ? roleRepository.findAllById(manager.getRoles()) : roleService.convertRoles(option);
+
         for (CategoryManagerAuthorization authorization : authorizations) {
-            List<RoleAuthorization> roleAuthorizations = roleIds.stream()
-                    .map(roleRepository :: findById)
-                    .map((role) -> role.orElseThrow(()->new CustomIllegalArgumentException(ErrorCode.ROLE_NOT_FOUND,null)))
+            List<RoleAuthorization> roleAuthorizations = roles.stream()
                     .map((role) -> RoleAuthorization.builder()
                             .authorization(authorization)
                             .role(role)

@@ -90,19 +90,25 @@ public class RoleService {
 
             case OVER_USER: {
                 roleNames = List.of(Role.ROLE_USER,Role.ROLE_KUMOH,Role.ROLE_ADMIN);
-                break;
+                return roleRepository.findByNameIn(roleNames);
             }
             case OVER_KUMOH: {
                 roleNames = List.of(Role.ROLE_KUMOH,Role.ROLE_ADMIN);
-                break;
+                return roleRepository.findByNameIn(roleNames);
             }
             case ONLY_ADMIN: {
                 roleNames = List.of(Role.ROLE_ADMIN);
-                break;
+                return roleRepository.findByNameIn(roleNames);
             }
-            default: roleNames = List.of();
+            case ALL: {
+                return List.of();
+            }
+            case SELECT: {
+                return new ArrayList<>();
+            }
         }
-        return roleRepository.findByNameIn(roleNames);
+
+        throw new CustomIllegalArgumentException(ErrorCode.INVALID_MENU_REQUEST,null);
     }
 
 }
