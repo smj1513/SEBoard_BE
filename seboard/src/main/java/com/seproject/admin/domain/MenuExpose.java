@@ -1,6 +1,7 @@
 package com.seproject.admin.domain;
 
 import com.seproject.account.model.role.Role;
+import com.seproject.admin.controller.AccessOption;
 import com.seproject.seboard.domain.model.category.Menu;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -27,6 +28,9 @@ public class MenuExpose {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "role_id")
     private Role role;
+
+    @Enumerated(EnumType.STRING)
+    private AccessOption accessOption;
 
     public void changeRole(Role role) {
         this.role = role;
