@@ -11,6 +11,7 @@ import java.util.List;
 
 @NoRepositoryBean
 public interface CommentSearchRepository extends Repository<Comment, Long> {
+    Integer countsCommentByLoginId(String loginId);
     Page<Comment> findCommentListByPostId(Long postId, Pageable pagingInfo);
     List<Reply> findReplyListByCommentId(Long commentId);
     int countReplyByPostId(Long postId);

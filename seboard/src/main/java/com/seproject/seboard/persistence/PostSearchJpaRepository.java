@@ -11,6 +11,28 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PostSearchJpaRepository extends PostSearchRepository {
+    @Query(nativeQuery = true, value =
+            "select count(*)\n" +
+                    "from posts\n" +
+                    "where posts.board_user_id=(\n" +
+                    "select board_user_id\n" +
+                    "from (\n" +
+                    "(select board_user_id, account_id\n" +
+                    "from board_users join members\n" +
+                    "on board_users.board_user_id=members.member_id )\n" +
+                    "UNION ALL\n" +
+                    "(select board_user_id, account_id\n" +
+                    "from board_users join anonymous\n" +
+                    "on board_users.board_user_id=anonymous.anonymous_id\n" +
+                    ")) u\n" +
+                    "where u.account_id=(\n" +
+                    "select account_id\n" +
+                    "from accounts\n" +
+                    "where accounts.login_id=:loginId\n" +
+                    "))"
+
+    )
+    Integer countsPostByLoginId(String loginId);
     @Query("select new com.seproject.seboard.controller.dto.post.PostResponse$RetrievePostDetailResponse(p)" +
             "from Post p where p.postId = :id and p.status = 'NORMAL'")
     Optional<PostResponse.RetrievePostDetailResponse> findPostDetailById(Long id);
