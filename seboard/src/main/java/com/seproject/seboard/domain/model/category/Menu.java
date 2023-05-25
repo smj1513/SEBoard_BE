@@ -1,11 +1,15 @@
 package com.seproject.seboard.domain.model.category;
 
+import com.seproject.admin.domain.MenuAuthorization;
 import com.seproject.seboard.domain.service.CategoryService;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
+import java.util.Collection;
+import java.util.List;
 
 @NoArgsConstructor
 @Entity
@@ -29,6 +33,9 @@ public class Menu {
     private String description;
     private int depth;
     protected String urlInfo;
+
+    @OneToMany(mappedBy = "menu",fetch = FetchType.LAZY , cascade = CascadeType.ALL)
+    private List<MenuAuthorization> menuAuthorizations;
 
     public Menu(Long menuId, Menu superMenu, String name, String description) {
         if(isValidName(name)){
@@ -54,6 +61,10 @@ public class Menu {
         }
     }
 
+    public boolean isRootMenu() {
+        return depth == 0;
+    }
+
     public boolean isRemovable(CategoryService categoryService){
         return !categoryService.hasSubCategory(menuId);
     }
@@ -70,7 +81,45 @@ public class Menu {
         return MIN_NAME_LENGTH < name.length() && name.length() < MAX_NAME_LENGTH;
     }
 
+    public void updateMenuAuthorizations(List<MenuAuthorization> menuAuthorizations) {
+        this.menuAuthorizations = menuAuthorizations;
+    }
+
     public void changeDescription(String description) {
         this.description = description;
+    }
+
+    public boolean writable(Collection<? extends GrantedAuthority> authorities) {
+        if(menuAuthorizations.size() == 0) return true;
+        boolean flag = false;
+
+        for (MenuAuthorization menuAuthorization : menuAuthorizations) {
+            flag |= menuAuthorization.writable(authorities);
+        }
+
+        return flag;
+    }
+
+    public boolean manageable(Collection<? extends GrantedAuthority> authorities) {
+        if(menuAuthorizations.size() == 0) return true;
+        boolean flag = false;
+
+        for (MenuAuthorization menuAuthorization : menuAuthorizations) {
+            flag |= menuAuthorization.manageable(authorities);
+        }
+
+        return flag;
+    }
+
+    public boolean exposable(Collection<? extends GrantedAuthority> authorities) {
+
+        if(menuAuthorizations.size() == 0) return true;
+        boolean flag = false;
+
+        for (MenuAuthorization menuAuthorization : menuAuthorizations) {
+            flag |= menuAuthorization.exposable(authorities);
+        }
+
+        return flag;
     }
 }
