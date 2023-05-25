@@ -12,21 +12,15 @@ import java.util.Objects;
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
-@Inheritance(strategy = InheritanceType.JOINED)
-@DiscriminatorColumn(name="dtype")
 @Entity
 @Table(name = "authorizations")
-public abstract class Authorization {
-    @GeneratedValue @Id
+public class Authorization {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-
     private String path;
-    private String method;
 
     @OneToMany(fetch = FetchType.EAGER,mappedBy = "authorization",cascade = CascadeType.ALL)
     private List<RoleAuthorization> roleAuthorizations;
-
-    public abstract String getType();
 
     public void setRoleAuthorizations(List<RoleAuthorization> roleAuthorizations) {
         this.roleAuthorizations = roleAuthorizations;

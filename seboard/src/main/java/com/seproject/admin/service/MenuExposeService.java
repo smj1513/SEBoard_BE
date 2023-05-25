@@ -1,11 +1,9 @@
 package com.seproject.admin.service;
 
 import com.seproject.account.model.role.Role;
-import com.seproject.account.repository.role.RoleRepository;
-import com.seproject.admin.domain.MenuExpose;
-import com.seproject.admin.repository.MenuExposeRepository;
-import com.seproject.error.errorCode.ErrorCode;
-import com.seproject.error.exception.CustomIllegalArgumentException;
+import com.seproject.admin.domain.SelectOption;
+import com.seproject.admin.domain.MenuAuthorization;
+import com.seproject.admin.domain.repository.MenuExposeRepository;
 import com.seproject.seboard.domain.model.category.Menu;
 import com.seproject.seboard.domain.repository.category.MenuRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,40 +20,25 @@ import java.util.stream.Collectors;
 @Service
 public class MenuExposeService {
     private final MenuExposeRepository menuExposeRepository;
-    private final RoleRepository roleRepository;
+    private final RoleService roleService;
     private final MenuRepository menuRepository;
 
-    public MenuExpose createMenuExpose(Long menuId,Long roleId){
-        Menu menu = menuRepository.findById(menuId).orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.NOT_EXIST_CATEGORY, null));
-        Role role = roleRepository.findById(roleId).orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.NOT_EXIST_CATEGORY, null));
-
-        //TODO : MENU -> 최상위 메뉴인지 확인하는 메소드로 변경
-        if(menu.getSuperMenu() != null) throw new CustomIllegalArgumentException(ErrorCode.CATEGORY_NOT_EXIST_EXPOSE_OPTION,null);
-        MenuExpose menuExpose = MenuExpose.builder()
-                .menu(menu)
-                .role(role)
-                .build();
-
-        menuExposeRepository.save(menuExpose);
-
-        return menuExpose;
-    }
-
     @Transactional
-    public List<MenuExpose> updateMenuExpose(Menu menu,List<Role> roles) {
-
-        List<MenuExpose> newMenuExposes = roles.stream().map((role) -> MenuExpose.builder()
+    public List<MenuAuthorization> updateMenuExpose(Menu menu, SelectOption selectOption) {
+        List<Role> roles = roleService.convertRoles(selectOption);
+        List<MenuAuthorization> newMenuAuthorizations = roles.stream().map((role) -> MenuAuthorization.builder()
                         .menu(menu)
                         .role(role)
+                        .selectOption(selectOption)
                         .build())
                 .collect(Collectors.toList());
 
-        List<MenuExpose> menuExposes = menuExposeRepository.findAllByMenuId(menu.getMenuId());
+        List<MenuAuthorization> menuAuthorizations = menuExposeRepository.findAllByMenuId(menu.getMenuId());
 
-        menuExposeRepository.deleteAllInBatch(menuExposes);
-        menuExposeRepository.saveAll(newMenuExposes);
+        menuExposeRepository.deleteAllInBatch(menuAuthorizations);
+        menuExposeRepository.saveAll(newMenuAuthorizations);
 
-        return newMenuExposes;
+        return newMenuAuthorizations;
     }
 
     public Map<Menu,List<Menu>> retrieveMenuByRole(List<Role> authorities) {
@@ -80,18 +63,9 @@ public class MenuExposeService {
         return menuHierarchical;
     }
 
-    public List<Role> retrieveMenuExposeByMenuId(Long menuId) {
-        Menu menu = menuRepository.findById(menuId).orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.NOT_EXIST_CATEGORY, null));
-        //TODO : MENU -> 최상위 메뉴인지 확인하는 메소드로 변경
-        if(menu.getSuperMenu() != null) throw new CustomIllegalArgumentException(ErrorCode.CATEGORY_NOT_EXIST_EXPOSE_OPTION,null);
-
-        List<Role> findRolesByMenuId = menuExposeRepository.findAllRoleByMenuId(menuId);
-        return findRolesByMenuId;
+    public List<MenuAuthorization> retrieveMenuExposeByMenuId(Long menuId) {
+        return menuExposeRepository.findAllByMenuId(menuId);
     }
 
-    public MenuExpose deleteMenuExpose(Long id){
-        MenuExpose menuExpose = menuExposeRepository.findById(id).orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.NOT_EXIST_CATEGORY,null));
-        menuExposeRepository.delete(menuExpose);
-        return menuExpose;
-    }
+
 }

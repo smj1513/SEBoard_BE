@@ -34,7 +34,7 @@ public class Menu {
     private int depth;
     protected String urlInfo;
 
-    @OneToMany(mappedBy = "menu",fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "menu",fetch = FetchType.LAZY , cascade = CascadeType.ALL)
     private List<MenuAuthorization> menuAuthorizations;
 
     public Menu(Long menuId, Menu superMenu, String name, String description) {
@@ -79,6 +79,10 @@ public class Menu {
 
     private boolean isValidName(String name) {
         return MIN_NAME_LENGTH < name.length() && name.length() < MAX_NAME_LENGTH;
+    }
+
+    public void updateMenuAuthorizations(List<MenuAuthorization> menuAuthorizations) {
+        this.menuAuthorizations = menuAuthorizations;
     }
 
     public void changeDescription(String description) {

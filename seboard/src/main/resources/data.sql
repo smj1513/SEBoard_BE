@@ -38,90 +38,19 @@ INSERT INTO public.menu_authorization(id, menu_id, role_id, access_option,select
 INSERT INTO public.menu_authorization(id, menu_id, role_id, access_option,select_option) VALUES (99999905, 43214236, 5234058023851,'EXPOSE','OVER_KUMOH');
 INSERT INTO public.menu_authorization(id, menu_id, role_id, access_option,select_option) VALUES (99999906, 43214237, 5234058023851,'EXPOSE','OVER_KUMOH');
 
-INSERT INTO public.authorizations(id, method, path,dtype) VALUES (1543, 'GET', '/admin/**','ADMIN');
-INSERT INTO public.authorizations(id, method, path,dtype) VALUES (1544, 'POST', '/admin/**','ADMIN');
-INSERT INTO public.authorizations(id, method, path,dtype) VALUES (1545, 'PUT', '/admin/**','ADMIN');
-INSERT INTO public.authorizations(id, method, path,dtype) VALUES (1546, 'DELETE', '/admin/**','ADMIN');
-INSERT INTO public.authorizations(id, method, path,dtype) VALUES (1547, 'GET', '/category/notice_normal/posts/**','CATEGORY');
-INSERT INTO public.authorizations(id, method, path,dtype) VALUES (1548, 'POST', '/category/notice_normal/posts/**','CATEGORY');
-INSERT INTO public.authorizations(id, method, path,dtype) VALUES (1549, 'PUT', '/category/notice_normal/posts/**','CATEGORY');
-INSERT INTO public.authorizations(id, method, path,dtype) VALUES (1550, 'DELETE', '/category/notice_normal/posts/**','CATEGORY');
+INSERT INTO public.authorizations(id, path) VALUES (1543, '/admin/**');
+INSERT INTO public.authorizations(id, path) VALUES (1544, '/category/notice_normal/posts/**');
 
-INSERT INTO public.authorizations(id, method, path,dtype) VALUES (1551, 'GET', '/admin/category/notice_normal/**','CATEGORY');
-INSERT INTO public.authorizations(id, method, path,dtype) VALUES (1552, 'POST', '/admin/category/notice_normal/**','CATEGORY');
-INSERT INTO public.authorizations(id, method, path,dtype) VALUES (1553, 'PUT', '/admin/category/notice_normal/**','CATEGORY');
-INSERT INTO public.authorizations(id, method, path,dtype) VALUES (1554, 'DELETE', '/admin/category/notice_normal/**','CATEGORY');
-
-INSERT INTO public.admin_authorizations(id) VALUES (1543);
-INSERT INTO public.admin_authorizations(id) VALUES (1544);
-INSERT INTO public.admin_authorizations(id) VALUES (1545);
-INSERT INTO public.admin_authorizations(id) VALUES (1546);
-
-INSERT INTO public.category_authorizations(id, category_id) VALUES (1547, 43214232);
-INSERT INTO public.category_authorizations(id, category_id) VALUES (1548, 43214232);
-INSERT INTO public.category_authorizations(id, category_id) VALUES (1549, 43214232);
-INSERT INTO public.category_authorizations(id, category_id) VALUES (1550, 43214232);
-
-
-INSERT INTO public.category_manager_authorizations(id,category_id) VALUES (1551,43214232);
-INSERT INTO public.category_manager_authorizations(id,category_id) VALUES (1552,43214232);
-INSERT INTO public.category_manager_authorizations(id,category_id) VALUES (1553,43214232);
-INSERT INTO public.category_manager_authorizations(id,category_id) VALUES (1554,43214232);
-
+INSERT INTO public.authorizations(id, path) VALUES (1545, '/admin/category/notice_normal/**');
 
 INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243124,1543, 5234058023851);
-INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243125,1544, 5234058023851);
-INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243126,1545, 5234058023851);
-INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243127,1546, 5234058023851);
 
+INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243125,1544, 5234058023850);
+INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243126,1544, 5234058023851);
+INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243127,1544, 5234058023852);
+INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243128,1544, 5234058023853);
 
-INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243128,1547, 5234058023851);
-
-INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243129,1548, 5234058023850);
-INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243130,1548, 5234058023851);
-
-INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243131,1549, 5234058023851);
-
-INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243132,1550, 5234058023850);
-INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243133,1550, 5234058023851);
-
-
-
--- INSERT INTO public.authorizations(id, method, path, priority) VALUES (1547, 'POST', '/posts/**', 9999);
--- INSERT INTO public.authorizations(id, method, path, priority) VALUES (1548, 'PUT', '/posts/**', 9999);
--- INSERT INTO public.authorizations(id, method, path, priority) VALUES (1549, 'DELETE', '/posts/**', 9999);
---
--- INSERT INTO public.authorizations(id, method, path, priority) VALUES (1550, 'POST', '/comments/**', 9999);
--- INSERT INTO public.authorizations(id, method, path, priority) VALUES (1551, 'PUT', '/comments/**', 9999);
--- INSERT INTO public.authorizations(id, method, path, priority) VALUES (1552, 'DELETE', '/comments/**', 9999);
-
-
-
---
--- INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243128,1547, 5234058023850);
--- INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243129,1547, 5234058023851);
--- INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243130,1547, 5234058023853);
---
--- INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243131,1548, 5234058023850);
--- INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243132,1548, 5234058023851);
--- INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243133,1548, 5234058023853);
---
--- INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243134,1549, 5234058023850);
--- INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243135,1549, 5234058023851);
--- INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243136,1549, 5234058023853);
---
--- INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243137,1550, 5234058023850);
--- INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243138,1550, 5234058023851);
--- INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243139,1550, 5234058023853);
---
--- INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243140,1551, 5234058023850);
--- INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243141,1551, 5234058023851);
--- INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243142,1551, 5234058023853);
---
--- INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243143,1552, 5234058023850);
--- INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243144,1552, 5234058023851);
--- INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243145,1552, 5234058023853);
-
+INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243129,1545, 5234058023851);
 
 INSERT INTO public.board_users(board_user_id, name) VALUES (3421243, '이충엽');
 INSERT INTO public.members(member_id, account_id) VALUES (3421243, 5234058023853);
