@@ -10,25 +10,29 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface CommentSearchJpaRepository extends CommentSearchRepository {
-    @Query(nativeQuery = true, value =
-    "select count(*)\n" +
-            "from comments\n" +
-            "where comments.board_user_id=(\n" +
-            "select board_user_id\n" +
-            "from (\n" +
-            "(select board_user_id, account_id\n" +
-            "from board_users join members\n" +
-            "on board_users.board_user_id=members.member_id )\n" +
-            "UNION ALL\n" +
-            "(select board_user_id, account_id\n" +
-            "from board_users join anonymous\n" +
-            "on board_users.board_user_id=anonymous.anonymous_id\n" +
-            ")) u\n" +
-            "where u.account_id=(\n" +
-            "select account_id\n" +
-            "from accounts\n" +
-            "where accounts.login_id=:loginId\n" +
-            "))")
+//    @Query(nativeQuery = true, value =
+//    "select count(*)\n" +
+//            "from comments\n" +
+//            "where comments.board_user_id=(\n" +
+//            "select board_user_id\n" +
+//            "from (\n" +
+//            "(select board_user_id, account_id\n" +
+//            "from board_users join members\n" +
+//            "on board_users.board_user_id=members.member_id )\n" +
+//            "UNION ALL\n" +
+//            "(select board_user_id, account_id\n" +
+//            "from board_users join anonymous\n" +
+//            "on board_users.board_user_id=anonymous.anonymous_id\n" +
+//            ")) u\n" +
+//            "where u.account_id=(\n" +
+//            "select account_id\n" +
+//            "from accounts\n" +
+//            "where accounts.login_id=:loginId\n" +
+//            "))")
+//    Integer countsCommentByLoginId(String loginId);
+
+
+    @Query("select count(c) from Comment c where c.post.author.account.loginId = :loginId")
     Integer countsCommentByLoginId(String loginId);
 //    @Query("select c from Comment c where c.post.postId = :postId order by c.baseTime.createdAt desc")
     @Query(value = "select * from comments as c where c.post_id = :postId and c.comment_type='comment' order by c.created_at asc", nativeQuery = true)

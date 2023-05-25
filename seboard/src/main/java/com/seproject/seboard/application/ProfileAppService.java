@@ -4,6 +4,8 @@ import com.seproject.account.model.Account;
 import com.seproject.account.utils.SecurityUtils;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.NoSuchResourceException;
+import com.seproject.seboard.controller.dto.post.PostResponse;
+import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostListResponseElement;
 import com.seproject.seboard.controller.dto.profile.ProfileResponse;
 import com.seproject.seboard.controller.dto.profile.ProfileResponse.ProfileInfoResponse;
 import com.seproject.seboard.domain.repository.comment.CommentSearchRepository;
@@ -11,6 +13,9 @@ import com.seproject.seboard.domain.repository.post.BookmarkRepository;
 import com.seproject.seboard.domain.repository.post.PostSearchRepository;
 import com.seproject.seboard.domain.repository.user.MemberRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -38,5 +43,17 @@ public class ProfileAppService {
                 .commentCount(commentCount)
                 .bookmarkCount(bookmarkCount)
                 .build();
+    }
+
+    public Page<RetrievePostListResponseElement> retrieveMyPost(String loginId, int page, int perPage){
+        Account account = SecurityUtils.getAccount().orElse(null);
+
+        if(account == null || !account.getLoginId().equals(loginId)){
+            //TODO : 쿼리로 변경필요
+            return postSearchRepository.findMemberPostByLoginId(loginId, PageRequest.of(page, perPage));
+        }else{
+            return postSearchRepository.findPostByLoginId(loginId, PageRequest.of(page, perPage));
+        }
+
     }
 }
