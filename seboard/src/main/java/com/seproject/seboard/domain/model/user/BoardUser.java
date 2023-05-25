@@ -2,6 +2,7 @@ package com.seproject.seboard.domain.model.user;
 
 
 
+import com.seproject.account.model.Account;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -19,10 +20,17 @@ public abstract class BoardUser {
     @Column(name = "board_user_id")
     protected Long boardUserId;
     protected String name;
+    @JoinColumn(name = "account_id")
+    @OneToOne
+    protected Account account;
 
     public abstract boolean isAnonymous();
 
-    public abstract boolean isOwnAccountId(Long accountId);
+    public boolean isOwnAccountId(Long accountId){
+        return account.getAccountId().equals(accountId);
+    }
 
-    public abstract String getLoginId();
+    public String getLoginId(){
+        return account.getLoginId();
+    }
 }

@@ -10,26 +10,14 @@ import javax.persistence.PrimaryKeyJoinColumn;
 import javax.persistence.Table;
 
 @SuperBuilder
-@NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name="anonymous")
 @PrimaryKeyJoinColumn(name="anonymous_id")
 public class Anonymous extends BoardUser {
-    private Long accountId; //TODO : 암호화
 
     @Override
     public boolean isAnonymous() {
         return true;
-    }
-
-    @Override
-    public boolean isOwnAccountId(Long accountId) {
-        return this.accountId.equals(accountId);
-    }
-
-    @Override
-    public String getLoginId() {
-        return null;
     }
 }
