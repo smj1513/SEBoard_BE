@@ -1,5 +1,6 @@
 package com.seproject.seboard.application;
 
+import com.seproject.account.model.role.Role;
 import com.seproject.seboard.application.dto.category.CategoryCommand.CategoryCreateCommand;
 import com.seproject.seboard.application.dto.category.CategoryCommand.CategoryUpdateCommand;
 import com.seproject.seboard.controller.dto.post.CategoryResponse;
@@ -15,9 +16,7 @@ import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static com.seproject.seboard.application.utils.AppServiceHelper.findByIdOrThrow;
 
@@ -183,5 +182,19 @@ public class CategoryAppService {
         }
 
         return res;
+    }
+
+    public Map<Menu,List<Menu>> retrieveAllMenu(List<Role> roles) {
+        List<Menu> menus = menuRepository.findByDepth(0);
+        Map<Menu,List<Menu>> response = new HashMap<>();
+
+        for (Menu menu : menus) {
+            if(menu.exposable(roles)) {
+                List<Menu> subMenus = menuRepository.findBySuperMenu(menu.getMenuId());
+                response.put(menu,subMenus);
+            }
+        }
+
+        return response;
     }
 }

@@ -1,9 +1,9 @@
-package com.seproject.admin.controller;
+package com.seproject.admin.domain;
 
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
 
-public enum AccessOption {
+public enum SelectOption {
     ALL("all"),
     OVER_USER("overUser"),
     OVER_KUMOH("overKumoh"),
@@ -13,12 +13,12 @@ public enum AccessOption {
 
 
     private String name;
-    AccessOption(String name) {
+    SelectOption(String name) {
         this.name = name;
     }
 
 
-    public static AccessOption of(String name) {
+    public static SelectOption of(String name) {
         switch (name) {
             case "all" : return ALL;
             case "overUser" : return OVER_USER;

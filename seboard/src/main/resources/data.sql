@@ -32,11 +32,11 @@ INSERT INTO menus(menu_id, super_menu_id, name, description, depth, url_info, me
                                                                                              (43214237, null, '학사', '학사임니둥', 0, 'https://cs.kumoh.ac.kr/cs/sub0601.do', 'EXTERNAL');
 
 
-INSERT INTO public.menu_expose(id, menu_id, role_id, access_option) VALUES (99999909, 43214236, 5234058023853,'OVER_KUMOH');
-INSERT INTO public.menu_expose(id, menu_id, role_id, access_option) VALUES (99999910, 43214237, 5234058023853,'OVER_KUMOH');
+INSERT INTO public.menu_authorization(id, menu_id, role_id, access_option,select_option) VALUES (99999909, 43214236, 5234058023853,'EXPOSE','OVER_KUMOH');
+INSERT INTO public.menu_authorization(id, menu_id, role_id, access_option,select_option) VALUES (99999910, 43214237, 5234058023853,'EXPOSE','OVER_KUMOH');
 
-INSERT INTO public.menu_expose(id, menu_id, role_id, access_option) VALUES (99999905, 43214236, 5234058023851,'OVER_KUMOH');
-INSERT INTO public.menu_expose(id, menu_id, role_id, access_option) VALUES (99999906, 43214237, 5234058023851,'OVER_KUMOH');
+INSERT INTO public.menu_authorization(id, menu_id, role_id, access_option,select_option) VALUES (99999905, 43214236, 5234058023851,'EXPOSE','OVER_KUMOH');
+INSERT INTO public.menu_authorization(id, menu_id, role_id, access_option,select_option) VALUES (99999906, 43214237, 5234058023851,'EXPOSE','OVER_KUMOH');
 
 INSERT INTO public.authorizations(id, method, path,dtype) VALUES (1543, 'GET', '/admin/**','ADMIN');
 INSERT INTO public.authorizations(id, method, path,dtype) VALUES (1544, 'POST', '/admin/**','ADMIN');
@@ -57,16 +57,16 @@ INSERT INTO public.admin_authorizations(id) VALUES (1544);
 INSERT INTO public.admin_authorizations(id) VALUES (1545);
 INSERT INTO public.admin_authorizations(id) VALUES (1546);
 
-INSERT INTO public.category_authorizations(id, category_id, access_option) VALUES (1547, 43214232,'ONLY_ADMIN');
-INSERT INTO public.category_authorizations(id, category_id, access_option) VALUES (1548, 43214232,'ONLY_ADMIN');
-INSERT INTO public.category_authorizations(id, category_id, access_option) VALUES (1549, 43214232,'ONLY_ADMIN');
-INSERT INTO public.category_authorizations(id, category_id, access_option) VALUES (1550, 43214232,'ONLY_ADMIN');
+INSERT INTO public.category_authorizations(id, category_id) VALUES (1547, 43214232);
+INSERT INTO public.category_authorizations(id, category_id) VALUES (1548, 43214232);
+INSERT INTO public.category_authorizations(id, category_id) VALUES (1549, 43214232);
+INSERT INTO public.category_authorizations(id, category_id) VALUES (1550, 43214232);
 
 
-INSERT INTO public.category_manager_authorizations(id,category_id, access_option) VALUES (1551,43214232,'ONLY_ADMIN');
-INSERT INTO public.category_manager_authorizations(id,category_id, access_option) VALUES (1552,43214232,'ONLY_ADMIN');
-INSERT INTO public.category_manager_authorizations(id,category_id, access_option) VALUES (1553,43214232,'ONLY_ADMIN');
-INSERT INTO public.category_manager_authorizations(id,category_id, access_option) VALUES (1554,43214232,'ONLY_ADMIN');
+INSERT INTO public.category_manager_authorizations(id,category_id) VALUES (1551,43214232);
+INSERT INTO public.category_manager_authorizations(id,category_id) VALUES (1552,43214232);
+INSERT INTO public.category_manager_authorizations(id,category_id) VALUES (1553,43214232);
+INSERT INTO public.category_manager_authorizations(id,category_id) VALUES (1554,43214232);
 
 
 INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243124,1543, 5234058023851);

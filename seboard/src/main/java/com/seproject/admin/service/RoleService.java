@@ -2,7 +2,7 @@ package com.seproject.admin.service;
 
 import com.seproject.account.model.role.Role;
 import com.seproject.account.repository.role.RoleRepository;
-import com.seproject.admin.controller.AccessOption;
+import com.seproject.admin.domain.SelectOption;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
 import lombok.RequiredArgsConstructor;
@@ -84,9 +84,9 @@ public class RoleService {
     }
 
 
-    public List<Role> convertRoles(AccessOption accessOption) {
+    public List<Role> convertRoles(SelectOption selectOption) {
         List<String> roleNames;
-        switch (accessOption){
+        switch (selectOption){
 
             case OVER_USER: {
                 roleNames = List.of(Role.ROLE_USER,Role.ROLE_KUMOH,Role.ROLE_ADMIN);

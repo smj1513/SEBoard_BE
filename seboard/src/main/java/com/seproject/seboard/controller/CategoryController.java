@@ -59,7 +59,7 @@ public class CategoryController {
         Optional<Account> account = SecurityUtils.getAccount();
         List<Role> roles = account.isPresent() ? account.get().getAuthorities() : List.of();
 
-        Map<Menu, List<Menu>> menuHierarchical = menuExposeService.retrieveMenuByRole(roles);
+        Map<Menu, List<Menu>> menuHierarchical = categoryAppService.retrieveAllMenu(roles);
 
         List<CategoryResponse> categoryResponses = new ArrayList<>();
 
