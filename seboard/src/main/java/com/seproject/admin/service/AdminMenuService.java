@@ -65,8 +65,8 @@ public class AdminMenuService {
             List<RoleAuthorization> roleAuthorizations = auth.getRoleAuthorizations();
 
             List<Role> roles = roleAuthorizations.stream().map(RoleAuthorization::getRole).collect(Collectors.toList());
-
-            AccessResponse accessResponse = AccessResponse.toDTO(roles);
+            SelectOption selectOption = auth.getSelectOption();
+            AccessResponse accessResponse = AccessResponse.toDTO(roles,selectOption);
             return CategoryAccessOptionResponse.toDTO(menu,accessResponse,writeResponse,manageResponse,exposeResponse);
         } else {
             return CategoryAccessOptionResponse.toDTO(menu,null,writeResponse,manageResponse,exposeResponse);
@@ -148,6 +148,7 @@ public class AdminMenuService {
                         .build()).collect(Collectors.toList());
 
         authorization.setRoleAuthorizations(collect);
+        authorization.setSelectOption(selectOption);
 
         authorizationRepository.save(authorization);
     }

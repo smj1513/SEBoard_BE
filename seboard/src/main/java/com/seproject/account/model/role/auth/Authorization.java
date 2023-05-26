@@ -1,6 +1,8 @@
 package com.seproject.account.model.role.auth;
 
 import com.seproject.account.model.role.RoleAuthorization;
+import com.seproject.admin.domain.AccessOption;
+import com.seproject.admin.domain.SelectOption;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -19,11 +21,18 @@ public class Authorization {
     private Long id;
     private String path;
 
+    @Enumerated(EnumType.STRING)
+    private SelectOption selectOption;
+
     @OneToMany(fetch = FetchType.EAGER,mappedBy = "authorization",cascade = CascadeType.ALL)
     private List<RoleAuthorization> roleAuthorizations;
 
     public void setRoleAuthorizations(List<RoleAuthorization> roleAuthorizations) {
         this.roleAuthorizations = roleAuthorizations;
+    }
+
+    public void setSelectOption(SelectOption selectOption) {
+        this.selectOption = selectOption;
     }
 
     @Override

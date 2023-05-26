@@ -128,8 +128,7 @@ public class AuthorizationDTO {
         private String option;
         private List<String> roles;
 
-        public static AccessResponse toDTO(List<Role> roles) {
-            SelectOption selectOption = roles.size() == 0 ? SelectOption.ALL : SelectOption.SELECT;
+        public static AccessResponse toDTO(List<Role> roles,SelectOption selectOption) {
             return builder()
                     .option(selectOption.name())
                     .roles(roles.stream().map(Role::toString).collect(Collectors.toList()))
