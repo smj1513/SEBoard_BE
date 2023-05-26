@@ -188,6 +188,14 @@ public class AccountService implements UserDetailsService {
                 .build();
 
         Account savedAccount = accountRepository.save(account);
+
+        Member member = Member.builder()
+                .name(account.getNickname())
+                .account(account)
+                .build();
+
+        memberRepository.save(member);
+
         return CreateAccountResponse.toDTO(savedAccount);
     }
 
