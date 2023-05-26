@@ -82,4 +82,9 @@ public class IndexController {
 
         return new ResponseEntity<>(map,HttpStatus.OK);
     }
+
+    @RequestMapping("/category/{categoryId}")
+    public ResponseEntity<?> foo() {
+        return new ResponseEntity<>(HttpStatus.OK);
+    }
 }

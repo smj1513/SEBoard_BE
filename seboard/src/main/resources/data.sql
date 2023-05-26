@@ -38,10 +38,10 @@ INSERT INTO public.menu_authorization(id, menu_id, role_id, access_option,select
 INSERT INTO public.menu_authorization(id, menu_id, role_id, access_option,select_option) VALUES (99999905, 43214236, 5234058023851,'EXPOSE','OVER_KUMOH');
 INSERT INTO public.menu_authorization(id, menu_id, role_id, access_option,select_option) VALUES (99999906, 43214237, 5234058023851,'EXPOSE','OVER_KUMOH');
 
-INSERT INTO public.authorizations(id, path) VALUES (1543, '/admin/**');
-INSERT INTO public.authorizations(id, path) VALUES (1544, '/category/notice_normal/posts/**');
+INSERT INTO public.authorizations(id, path,select_option) VALUES (1543, '/admin/**','ONLY_ADMIN');
+INSERT INTO public.authorizations(id, path,select_option) VALUES (1544, '/category/notice_normal/posts/**','OVER_USER');
 
-INSERT INTO public.authorizations(id, path) VALUES (1545, '/admin/category/notice_normal/**');
+INSERT INTO public.authorizations(id, path,select_option) VALUES (1545, '/admin/category/notice_normal/**','ONLY_ADMIN');
 
 INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243124,1543, 5234058023851);
 
