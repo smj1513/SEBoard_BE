@@ -267,6 +267,9 @@ public class CommentAppService {
     }
 
     protected Anonymous getAnonymous(Long accountId, Long postId, Post post) {
+        //TODO : 리팩토링 필요
+        Account account = accountRepository.findById(accountId).get();
+
         if(post.isWrittenBy(accountId)){
             return anonymousRepository.findById(post.getAuthor().getBoardUserId()).get();
         }
@@ -283,7 +286,7 @@ public class CommentAppService {
                             .filter(anonymous -> anonymous.isOwnAccountId(accountId))
                             .findFirst()
                             .orElseGet(() -> {
-                                Anonymous createdAnonymous = post.createAnonymous(accountId);
+                                Anonymous createdAnonymous = post.createAnonymous(account);
                                 anonymousRepository.save(createdAnonymous);
                                 return createdAnonymous;
                             });

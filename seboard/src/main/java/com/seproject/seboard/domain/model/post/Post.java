@@ -1,5 +1,6 @@
 package com.seproject.seboard.domain.model.post;
 
+import com.seproject.account.model.Account;
 import com.seproject.seboard.domain.model.category.Category;
 import com.seproject.seboard.domain.model.category.Menu;
 import com.seproject.seboard.domain.model.comment.Comment;
@@ -54,6 +55,7 @@ public class Post {
     private int anonymousCount;
     private int reportCount;
     @Enumerated(EnumType.STRING)
+    @Builder.Default
     private Status status = Status.NORMAL;
     public boolean isNamed() {
         return !author.isAnonymous();
@@ -63,10 +65,10 @@ public class Post {
         return author.isOwnAccountId(accountId);
     }
 
-    public Anonymous createAnonymous(Long accountId) {
+    public Anonymous createAnonymous(Account account) {
         return Anonymous.builder()
                 .name(String.format("익명%d", ++anonymousCount))
-                .accountId(accountId)
+                .account(account)
                 .build();
     }
 

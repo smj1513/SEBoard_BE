@@ -9,7 +9,6 @@ import lombok.experimental.SuperBuilder;
 import javax.persistence.*;
 
 @Getter
-@NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder
 @Entity
@@ -17,23 +16,9 @@ import javax.persistence.*;
 @PrimaryKeyJoinColumn(name="member_id")
 public class Member extends BoardUser{
 
-    @JoinColumn(name="account_id")
-    @OneToOne
-    private Account account;
-
 
     @Override
     public boolean isAnonymous() {
         return false;
-    }
-
-    @Override
-    public boolean isOwnAccountId(Long accountId) {
-        return account.getAccountId().equals(accountId);
-    }
-
-    @Override
-    public String getLoginId() {
-        return account.getLoginId();
     }
 }

@@ -54,16 +54,16 @@ public class PostAppService {
         Account account = accountRepository.findByLoginId(command.getLoginId());
 
         if(command.isAnonymous()){
-            return writeUnnamedPost(command, account.getAccountId());
+            return writeUnnamedPost(command, account);
         }else{
             return writeNamedPost(command, account.getAccountId());
         }
     }
 
-    protected Long writeUnnamedPost(PostWriteCommand command, Long accountId) {
+    protected Long writeUnnamedPost(PostWriteCommand command, Account account) {
         Anonymous anonymous = Anonymous.builder()
                 .name("익명") //TODO : 익명 이름 다양하게?
-                .accountId(accountId)
+                .account(account)
                 .build();
 
         anonymousRepository.save(anonymous);

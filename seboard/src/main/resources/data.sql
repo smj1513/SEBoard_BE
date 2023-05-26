@@ -52,16 +52,16 @@ INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (
 
 INSERT INTO public.authorization_metadata(id,authorization_id, role_id) VALUES (3121243129,1545, 5234058023851);
 
-INSERT INTO public.board_users(board_user_id, name) VALUES (3421243, '이충엽');
-INSERT INTO public.members(member_id, account_id) VALUES (3421243, 5234058023853);
-INSERT INTO public.board_users(board_user_id, name) VALUES (3421244, '익명의 사나이');
-INSERT INTO public.anonymous(account_id, anonymous_id) VALUES (5234058023852, 3421244);
+INSERT INTO public.board_users(board_user_id, name, account_id) VALUES (3421243, '이충엽', 5234058023853);
+INSERT INTO public.members(member_id) VALUES (3421243);
+INSERT INTO public.board_users(board_user_id, name, account_id) VALUES (3421244, '익명의 사나이', 5234058023852);
+INSERT INTO public.anonymous(anonymous_id) VALUES (3421244);
 
-INSERT INTO public.board_users(board_user_id, name) VALUES (3421245, '이한나');
-INSERT INTO public.members(member_id, account_id) VALUES (3421245, 5234058023851);
+INSERT INTO public.board_users(board_user_id, name, account_id) VALUES (3421245, '이한나', 5234058023851);
+INSERT INTO public.members(member_id) VALUES (3421245);
 
-INSERT INTO public.board_users(board_user_id, name) VALUES (3421246, '멋지다 충엽아');
-INSERT INTO public.anonymous(account_id, anonymous_id) VALUES (5234058023850, 3421246);
+INSERT INTO public.board_users(board_user_id, name, account_id) VALUES (3421246, '멋지다 충엽아', 5234058023850);
+INSERT INTO public.anonymous(anonymous_id) VALUES (3421246);
 
 INSERT INTO expose_options(expose_option_id, expose_type) VALUES (28822821, 'PUBLIC');
 INSERT INTO expose_options(expose_option_id, expose_type) VALUES (28822822, 'KUMOH');
