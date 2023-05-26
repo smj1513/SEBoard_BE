@@ -3,7 +3,7 @@ package com.seproject.account.service;
 import com.seproject.account.jwt.JWT;
 import com.seproject.account.jwt.JwtDecoder;
 import com.seproject.account.jwt.JwtProvider;
-import com.seproject.account.model.Account;
+import com.seproject.account.model.account.Account;
 import com.seproject.account.repository.AccountRepository;
 import com.seproject.account.repository.token.LogoutLargeRefreshTokenRepository;
 import com.seproject.account.repository.token.LogoutRefreshTokenRepository;

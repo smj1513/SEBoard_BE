@@ -1,15 +1,13 @@
 package com.seproject.account.controller;
 
 import com.seproject.account.jwt.JWT;
-import com.seproject.account.model.Account;
+import com.seproject.account.model.account.Account;
 import com.seproject.account.service.LogoutService;
 import com.seproject.account.jwt.JwtDecoder;
 import com.seproject.account.service.AccountService;
 import com.seproject.account.service.email.KumohEmailService;
 import com.seproject.account.service.email.PasswordChangeEmailService;
-import com.seproject.account.service.TokenService;
 import com.seproject.account.utils.SecurityUtils;
-import com.seproject.admin.dto.AccountDTO;
 import com.seproject.error.Error;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomAuthenticationException;
@@ -19,14 +17,11 @@ import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-
-import java.util.Optional;
 
 import static com.seproject.account.controller.dto.AccountDTO.*;
 import static com.seproject.account.controller.dto.LogoutDTO.*;

@@ -1,18 +1,18 @@
 package com.seproject.account.service;
 
-import com.seproject.account.model.social.OAuthAccount;
+import com.seproject.account.model.account.FormAccount;
+import com.seproject.account.model.account.OAuthAccount;
 import com.seproject.account.repository.social.OAuthAccountRepository;
 import com.seproject.account.service.email.RegisterEmailService;
 import com.seproject.account.utils.SecurityUtils;
 import com.seproject.admin.service.BannedIdService;
 import com.seproject.admin.service.BannedNicknameService;
 import com.seproject.error.errorCode.ErrorCode;
-import com.seproject.error.exception.CustomAuthenticationException;
 import com.seproject.error.exception.CustomIllegalArgumentException;
 import com.seproject.error.exception.CustomUserNotFoundException;
 import com.seproject.account.repository.AccountRepository;
 import com.seproject.account.repository.role.RoleRepository;
-import com.seproject.account.model.Account;
+import com.seproject.account.model.account.Account;
 import com.seproject.account.model.role.Role;
 import com.seproject.seboard.domain.model.user.Member;
 import com.seproject.seboard.domain.repository.user.MemberRepository;
@@ -20,8 +20,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -59,7 +57,9 @@ public class AccountService implements UserDetailsService {
         return accountRepository.existsByNickname(nickname);
     }
     public boolean isOAuthUser(String loginId) {
-        return oAuthAccountRepository.findByLoginId(loginId).isPresent();
+        Account account = accountRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
+        return account.getClass() == OAuthAccount.class;
     }
 
 
@@ -85,27 +85,21 @@ public class AccountService implements UserDetailsService {
         Role role = mapEmailToRole(email);
         List<Role> authorities = List.of(role);
 
-        Account account = Account.builder()
+        OAuthAccount oAuthAccount = OAuthAccount.builder()
                 .loginId(email)
                 .name(oAuth2RegisterRequest.getName())
                 .nickname(oAuth2RegisterRequest.getNickname())
                 .password(passwordEncoder.encode(oAuth2RegisterRequest.getPassword()))
                 .authorities(authorities)
-                .build();
-
-        accountRepository.save(account);
-
-        OAuthAccount oAuthAccount = OAuthAccount.builder()
                 .sub(oAuth2RegisterRequest.getSubject())
                 .provider(oAuth2RegisterRequest.getProvider())
-                .account(account)
                 .build();
 
         oAuthAccountRepository.save(oAuthAccount);
 
         Member member = Member.builder()
-                .name(account.getNickname())
-                .account(account)
+                .name(oAuthAccount.getNickname())
+                .account(oAuthAccount)
                 .build();
 
         memberRepository.save(member);
@@ -125,7 +119,7 @@ public class AccountService implements UserDetailsService {
         Role role = mapEmailToRole(id);
         List<Role> authorities = List.of(role);
 
-        Account account = Account.builder()
+        FormAccount account = FormAccount.builder()
                 .loginId(id)
                 .name(formRegisterRequest.getName())
                 .nickname(formRegisterRequest.getNickname())
@@ -185,7 +179,7 @@ public class AccountService implements UserDetailsService {
         if(!bannedIdService.possibleId(id)) throw new CustomIllegalArgumentException(ErrorCode.BANNED_ID,null);
         if(!bannedNicknameService.possibleNickname(nickname)) throw new CustomIllegalArgumentException(ErrorCode.BANNED_NICKNAME,null);
 
-        Account account = Account.builder()
+        FormAccount account = FormAccount.builder()
                 .loginId(id)
                 .password(passwordEncoder.encode(request.getPassword()))
                 .nickname(nickname)
@@ -200,7 +194,8 @@ public class AccountService implements UserDetailsService {
     @Transactional
     public UpdateAccountResponse updateAccount(UpdateAccountRequest request) {
 
-        Account account = accountRepository.findById(request.getAccountId()).orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.USER_NOT_FOUND,null));
+        Account account = accountRepository.findById(request.getAccountId())
+                .orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.USER_NOT_FOUND,null));
 
         String id = request.getId();
         String nickname = request.getNickname();
@@ -209,15 +204,13 @@ public class AccountService implements UserDetailsService {
         if(!bannedIdService.possibleId(id)) throw new CustomIllegalArgumentException(ErrorCode.BANNED_ID,null);
         if(!bannedNicknameService.possibleNickname(nickname)) throw new CustomIllegalArgumentException(ErrorCode.BANNED_NICKNAME,null);
 
-        Account updateAccount = Account.builder()
-                .loginId(id)
-                .password(passwordEncoder.encode(request.getPassword()))
-                .nickname(nickname)
-                .name(request.getName())
-                .authorities(convertAuthorities(request.getAuthorities()))
-                .build();
+        Account update = account.update(id,
+                passwordEncoder.encode(request.getPassword()),
+                request.getName(),
+                nickname,
+                convertAuthorities(request.getAuthorities()));
 
-        return UpdateAccountResponse.toDTO(account.update(updateAccount));
+        return UpdateAccountResponse.toDTO(update);
     }
 
     @Transactional

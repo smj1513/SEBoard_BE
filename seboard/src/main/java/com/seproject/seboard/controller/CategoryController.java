@@ -1,6 +1,6 @@
 package com.seproject.seboard.controller;
 
-import com.seproject.account.model.Account;
+import com.seproject.account.model.account.Account;
 import com.seproject.account.model.role.Role;
 import com.seproject.account.utils.SecurityUtils;
 import com.seproject.admin.service.MenuExposeService;

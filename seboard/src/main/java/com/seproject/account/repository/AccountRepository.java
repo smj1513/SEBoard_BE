@@ -1,9 +1,8 @@
 package com.seproject.account.repository;
 
-import com.seproject.account.model.Account;
+import com.seproject.account.model.account.Account;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
-import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 

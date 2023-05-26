@@ -1,6 +1,6 @@
 package com.seproject.account.controller.dto;
 
-import com.seproject.account.model.Account;
+import com.seproject.account.model.account.Account;
 import com.seproject.account.model.role.Role;
 import lombok.AccessLevel;
 import lombok.Builder;
