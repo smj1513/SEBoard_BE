@@ -74,5 +74,36 @@ public class AccountDTO {
         }
     }
 
+    @Data
+    public static class WithDrawAccountRequest {
+        private String refreshToken;
+
+    }
+
+    @Data
+    @Builder(access = AccessLevel.PRIVATE)
+    public static class WithDrawAccountResponse {
+        private boolean requiredRedirect;
+        private String url;
+
+        private Long accountId;
+        private String loginId;
+        private List<String> roles;
+        private String nickname;
+        private String name;
+        public static WithDrawAccountResponse toDTO(Account account,boolean requiredRedirect,String url) {
+            return builder()
+                    .requiredRedirect(requiredRedirect)
+                    .url(url)
+                    .accountId(account.getAccountId())
+                    .loginId(account.getLoginId())
+                    .roles(account.getAuthorities().stream().map(Role::toString).collect(Collectors.toList()))
+                    .nickname(account.getNickname())
+                    .name(account.getName())
+                    .build();
+        }
+
+    }
+
 
 }

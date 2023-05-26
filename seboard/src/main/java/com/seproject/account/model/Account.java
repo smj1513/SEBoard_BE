@@ -14,28 +14,26 @@ import java.util.List;
 @Table(name = "accounts")
 public class Account implements UserDetails {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long accountId;
 
-    @Column(name = "login_id",unique = true)
     private String loginId;
     private String name;
     private String nickname;
     private String password;
-
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name="authorities",
             joinColumns={@JoinColumn(name="account_id", referencedColumnName="accountId")},
             inverseJoinColumns={@JoinColumn(name="role_id", referencedColumnName="roleId")})
     private List<Role> authorities;
-
     private LocalDateTime createdAt;
+    private boolean isDeleted;
 
     @Builder
     public Account(Long accountId, String loginId,
                    String name, String nickname,
-                   String password, List<Role> authorities, LocalDateTime createdAt) {
+                   String password, List<Role> authorities) {
         this.accountId = accountId;
         this.loginId = loginId;
         this.name = name;
@@ -43,6 +41,7 @@ public class Account implements UserDetails {
         this.password = password;
         this.authorities = authorities;
         this.createdAt = LocalDateTime.now();
+        this.isDeleted = false;
     }
 
     public Account update(Account account) {
@@ -58,6 +57,10 @@ public class Account implements UserDetails {
     public String changePassword(String password) {
         this.password = password;
         return password;
+    }
+
+    public void delete() {
+        this.isDeleted = true;
     }
 
     public String getUsername() {

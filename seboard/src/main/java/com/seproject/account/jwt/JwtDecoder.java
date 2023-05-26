@@ -4,6 +4,7 @@ import com.seproject.account.model.Account;
 import com.seproject.account.repository.AccountRepository;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomAuthenticationException;
+import com.seproject.error.exception.CustomUserNotFoundException;
 import io.jsonwebtoken.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -91,7 +92,10 @@ public class JwtDecoder {
             Claims claims = getClaims(jwt);
             Object authoritiesValue = claims.get(JWTProperties.AUTHORITIES);
             if(authoritiesValue == null) throw new CustomAuthenticationException(ErrorCode.INVALID_JWT,null);
-            Account account = accountRepository.findByLoginId(claims.getSubject());
+
+            Account account = accountRepository.findByLoginId(claims.getSubject())
+                    .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
+
             return new UsernamePasswordAuthenticationToken(account, jwt, account.getAuthorities());
         } catch (ClassCastException e) {
             throw new CustomAuthenticationException(ErrorCode.INVALID_JWT,e);

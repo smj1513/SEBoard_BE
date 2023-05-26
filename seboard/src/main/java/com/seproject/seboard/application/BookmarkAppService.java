@@ -3,6 +3,7 @@ package com.seproject.seboard.application;
 import com.seproject.account.model.Account;
 import com.seproject.account.repository.AccountRepository;
 import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.CustomUserNotFoundException;
 import com.seproject.error.exception.NoSuchResourceException;
 import com.seproject.seboard.domain.model.post.Bookmark;
 import com.seproject.seboard.domain.model.post.Post;
@@ -30,7 +31,8 @@ public class BookmarkAppService {
     private final AccountRepository accountRepository;
 
     public void enrollBookmark(Long postId, String loginId) {
-        Account account = accountRepository.findByLoginId(loginId);
+        Account account = accountRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
 
         //TODO : member 없을 때 처리 필요, member 생성 or error?
         Member member = memberRepository.findByAccountId(account.getAccountId())
@@ -51,7 +53,8 @@ public class BookmarkAppService {
     }
 
     public void cancelBookmark(Long postId, String loginId) {
-        Account account = accountRepository.findByLoginId(loginId);
+        Account account = accountRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
         //TODO : member 없을 때 처리 필요, member 생성 or error?
         Member member = memberRepository.findByAccountId(account.getAccountId())
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_MEMBER));

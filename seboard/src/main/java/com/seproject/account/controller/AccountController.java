@@ -9,8 +9,10 @@ import com.seproject.account.service.email.KumohEmailService;
 import com.seproject.account.service.email.PasswordChangeEmailService;
 import com.seproject.account.service.TokenService;
 import com.seproject.account.utils.SecurityUtils;
+import com.seproject.admin.dto.AccountDTO;
 import com.seproject.error.Error;
 import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.CustomAuthenticationException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
@@ -19,9 +21,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+
+import java.util.Optional;
 
 import static com.seproject.account.controller.dto.AccountDTO.*;
 import static com.seproject.account.controller.dto.LogoutDTO.*;
@@ -33,18 +38,15 @@ public class AccountController {
 
     private final LogoutService logoutService;
     private final AccountService accountService;
-    private final TokenService tokenService;
     private final JwtDecoder jwtDecoder;
     private final PasswordChangeEmailService passwordChangeEmailService;
     private final KumohEmailService kumohEmailService;
 
     @Operation(summary = "로그아웃", description = "로그아웃")
     @PostMapping("/logoutProc")
-    public ResponseEntity<?> logout(Authentication authentication, @RequestBody LogoutRequestDTO request) {
+    public ResponseEntity<?> logout( @RequestBody LogoutRequestDTO request) {
 
-        if(authentication == null) {
-            return new ResponseEntity<>("로그인 상태가 아닙니다.",HttpStatus.BAD_REQUEST);
-        }
+        Account account = SecurityUtils.getAccount().orElseThrow(() -> new CustomAuthenticationException(ErrorCode.NOT_LOGIN,null));
 
         String accessToken = jwtDecoder.getAccessToken();
         String refreshToken = request.getRefreshToken();
@@ -52,7 +54,6 @@ public class AccountController {
 
         logoutService.logout(jwt);
 
-        Account account = (Account)authentication.getPrincipal();
         String principal = account.getUsername();
         if(!StringUtils.isEmpty(principal) && accountService.isOAuthUser(principal)) {
             String redirectURL = logoutService.getRedirectURL();
@@ -102,6 +103,29 @@ public class AccountController {
     public ResponseEntity<?> changePassword(@RequestBody PasswordChangeRequest request) {
         accountService.changePassword(request);
         return new ResponseEntity<>(HttpStatus.OK);
+    }
+
+    @Operation(summary = "회원 탈퇴", description = "회원 탈퇴를 시도")
+    @DeleteMapping("/withdraw")
+    public ResponseEntity<?> withdraw(@RequestBody  WithDrawAccountRequest request) {
+        Account account = SecurityUtils.getAccount().orElseThrow(() -> new CustomAuthenticationException(ErrorCode.NOT_LOGIN,null));
+
+        String accessToken = jwtDecoder.getAccessToken();
+        String refreshToken = request.getRefreshToken();
+        JWT jwt = new JWT(accessToken,refreshToken);
+
+        logoutService.logout(jwt);
+
+        String principal = account.getUsername();
+
+
+        if(!StringUtils.isEmpty(principal) && accountService.isOAuthUser(principal)) {
+            String redirectURL = logoutService.getRedirectURL();
+            accountService.deleteAccount(account.getAccountId());
+            return new ResponseEntity<>(WithDrawAccountResponse.toDTO(account,true,redirectURL), HttpStatus.OK);
+        }
+        accountService.deleteAccount(account.getAccountId());
+        return new ResponseEntity<>(WithDrawAccountResponse.toDTO(account,false,null),HttpStatus.OK);
     }
 
 }

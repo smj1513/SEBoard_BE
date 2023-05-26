@@ -9,6 +9,7 @@ import com.seproject.account.repository.token.LogoutLargeRefreshTokenRepository;
 import com.seproject.account.repository.token.LogoutRefreshTokenRepository;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomAuthenticationException;
+import com.seproject.error.exception.CustomUserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
@@ -48,7 +49,8 @@ public class TokenService {
 
 
         String subject = jwtDecoder.getSubject(refreshToken);
-        Account account = accountRepository.findByLoginId(subject);
+        Account account = accountRepository.findByLoginId(subject)
+                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
 
         Collection<? extends GrantedAuthority> authorities = account.getAuthorities();
         UsernamePasswordAuthenticationToken newToken

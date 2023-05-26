@@ -17,7 +17,7 @@ import javax.persistence.*;
 @Table(name="oauth_accounts")
 public class OAuthAccount {
 
-    @Id @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String provider;

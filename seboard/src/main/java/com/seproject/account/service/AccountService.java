@@ -176,6 +176,7 @@ public class AccountService implements UserDetailsService {
         return convertedAuthorities;
     }
 
+    @Transactional
     public CreateAccountResponse createAccount(CreateAccountRequest request) {
 
         String id = request.getId();
@@ -196,6 +197,7 @@ public class AccountService implements UserDetailsService {
         return CreateAccountResponse.toDTO(savedAccount);
     }
 
+    @Transactional
     public UpdateAccountResponse updateAccount(UpdateAccountRequest request) {
 
         Account account = accountRepository.findById(request.getAccountId()).orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.USER_NOT_FOUND,null));
@@ -218,22 +220,27 @@ public class AccountService implements UserDetailsService {
         return UpdateAccountResponse.toDTO(account.update(updateAccount));
     }
 
+    @Transactional
     public DeleteAccountResponse deleteAccount(Long accountId) {
 
-        Account account = accountRepository.findById(accountId).orElseThrow();
-        accountRepository.delete(account);
+        Account account = accountRepository.findById(accountId).orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
+
+        if(isOAuthUser(account.getLoginId())) {
+            OAuthAccount oAuthAccount = oAuthAccountRepository.findByLoginId(account.getLoginId())
+                    .orElseThrow(() -> new RuntimeException("oAuth 유저 체크는 통과했으나 찾을수 없는 경우"));
+
+            oAuthAccountRepository.delete(oAuthAccount);
+        }
+
+        account.delete();
 
         return DeleteAccountResponse.toDTO(account);
     }
     
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Account account = accountRepository.findByLoginId(username);
-
-        if(account == null) {
-            throw new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null);
-        }
-
+        Account account = accountRepository.findByLoginId(username)
+                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
         return account;
     }
 
@@ -241,7 +248,8 @@ public class AccountService implements UserDetailsService {
     public ResetPasswordResponse resetPassword(ResetPasswordRequest resetPasswordRequest) {
         String email = resetPasswordRequest.getEmail();
         String newPassword = resetPasswordRequest.getPassword();
-        Account account = accountRepository.findByLoginId(email);
+        Account account = accountRepository.findByLoginId(email)
+                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
 
         if(account == null) {
             throw new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null);
@@ -255,11 +263,8 @@ public class AccountService implements UserDetailsService {
     @Transactional
     public void changePassword(PasswordChangeRequest request) {
         String loginId = SecurityUtils.getLoginId();
-        Account account = accountRepository.findByLoginId(loginId);
-
-        if(account == null) {
-            throw new CustomAuthenticationException(ErrorCode.NOT_LOGIN,null);
-        }
+        Account account = accountRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
 
         if(!passwordEncoder.matches(request.getNowPassword(),account.getPassword())){
             throw new CustomIllegalArgumentException(ErrorCode.PASSWORD_INCORRECT,null);
@@ -272,7 +277,8 @@ public class AccountService implements UserDetailsService {
     @Transactional
     public KumohAuthResponse grantKumohAuth(KumohAuthRequest kumohAuthRequest) {
         String email = kumohAuthRequest.getEmail();
-        Account account = accountRepository.findByLoginId(email);
+        Account account = accountRepository.findByLoginId(email)
+                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
         List<Role> authorities = account.getAuthorities();
 
         boolean flag = false;
@@ -289,9 +295,8 @@ public class AccountService implements UserDetailsService {
     }
 
     public MyInfoResponse findMyInfo(String loginId) {
-        Account account = accountRepository.findByLoginId(loginId);
-        if(account == null) throw new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null);
-
+        Account account = accountRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
 
         return MyInfoResponse.toDTO(account.getLoginId(),account.getNickname(),account.getAuthorities().stream()
                 .map(Role::getAuthority)
