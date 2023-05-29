@@ -16,7 +16,7 @@ import java.util.Optional;
 @NoRepositoryBean
 public interface PostSearchRepository extends Repository<Post, Long> {
     Integer countsPostByLoginId(String loginId);
-
+    Page<RetrievePostListResponseElement> findBookmarkPostByLoginId(String loginId, Pageable pagingInfo);
     Page<RetrievePostListResponseElement> findMemberPostByLoginId(String loginId, Pageable pagingInfo);
     Page<RetrievePostListResponseElement> findPostByLoginId(String loginId, Pageable pagingInfo);
     Optional<RetrievePostDetailResponse> findPostDetailById(Long id);

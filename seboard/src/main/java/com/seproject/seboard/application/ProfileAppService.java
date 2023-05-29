@@ -3,6 +3,7 @@ package com.seproject.seboard.application;
 import com.seproject.account.model.Account;
 import com.seproject.account.utils.SecurityUtils;
 import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.InvalidAuthorizationException;
 import com.seproject.error.exception.NoSuchResourceException;
 import com.seproject.seboard.controller.dto.post.PostResponse;
 import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostListResponseElement;
@@ -54,6 +55,16 @@ public class ProfileAppService {
         }else{
             return postSearchRepository.findPostByLoginId(loginId, PageRequest.of(page, perPage));
         }
-
     }
+
+    public Page<RetrievePostListResponseElement> retrieveBookmarkPost(String loginId, int page, int perPage){
+        Account account = SecurityUtils.getAccount().orElse(null);
+
+        if(account == null){
+            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
+        }
+
+        return postSearchRepository.findBookmarkPostByLoginId(loginId, PageRequest.of(page, perPage));
+    }
+
 }

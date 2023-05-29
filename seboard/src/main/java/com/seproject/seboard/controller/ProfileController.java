@@ -23,9 +23,14 @@ public class ProfileController {
     }
 
     @GetMapping("/{loginId}/posts")
-    public ResponseEntity<Page<RetrievePostListResponseElement>> retrieveProfileInfo(@PathVariable String loginId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int perPage){
+    public ResponseEntity<Page<RetrievePostListResponseElement>> retrieveMyPosts(@PathVariable String loginId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int perPage){
         Page<RetrievePostListResponseElement> res = profileAppService.retrieveMyPost(loginId, page, perPage);
         return ResponseEntity.ok().body(res);
     }
 
+    @GetMapping("/{loginId}/bookmarks")
+    public ResponseEntity<Page<RetrievePostListResponseElement>> retrieveBookmarkPost(@PathVariable String loginId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int perPage){
+        Page<RetrievePostListResponseElement> res = profileAppService.retrieveBookmarkPost(loginId, page, perPage);
+        return ResponseEntity.ok().body(res);
+    }
 }
