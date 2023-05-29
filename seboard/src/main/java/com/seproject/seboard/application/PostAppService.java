@@ -1,8 +1,9 @@
 package com.seproject.seboard.application;
 
-import com.seproject.account.model.Account;
+import com.seproject.account.model.account.Account;
 import com.seproject.account.repository.AccountRepository;
 import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.CustomUserNotFoundException;
 import com.seproject.error.exception.InvalidAuthorizationException;
 import com.seproject.error.exception.NoSuchResourceException;
 import com.seproject.seboard.application.dto.post.PostCommand.PostEditCommand;
@@ -51,7 +52,8 @@ public class PostAppService {
     private final FileRepository fileRepository;
 
     public Long writePost(PostWriteCommand command){
-        Account account = accountRepository.findByLoginId(command.getLoginId());
+        Account account = accountRepository.findByLoginId(command.getLoginId())
+                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
 
         if(command.isAnonymous()){
             return writeUnnamedPost(command, account);
@@ -103,7 +105,8 @@ public class PostAppService {
 
 
     public Long editPost(PostEditCommand command) {
-        Account account = accountRepository.findByLoginId(command.getLoginId());
+        Account account = accountRepository.findByLoginId(command.getLoginId())
+                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
 
         Post post = postRepository.findById(command.getPostId())
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
@@ -137,7 +140,8 @@ public class PostAppService {
     }
 
     public void removePost(Long postId, String loginId) {
-        Account account = accountRepository.findByLoginId(loginId);
+        Account account = accountRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
 
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));

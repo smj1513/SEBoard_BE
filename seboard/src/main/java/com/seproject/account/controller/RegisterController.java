@@ -1,8 +1,8 @@
 package com.seproject.account.controller;
 
 import com.seproject.account.jwt.JWT;
-import com.seproject.account.model.Account;
-import com.seproject.account.model.social.OAuthAccount;
+import com.seproject.account.model.account.Account;
+import com.seproject.account.model.account.OAuthAccount;
 import com.seproject.account.model.social.TemporalUserInfo;
 import com.seproject.account.model.social.UserToken;
 import com.seproject.account.repository.social.TemporalUserInfoRepository;
@@ -63,8 +63,7 @@ public class RegisterController {
         try{
             OAuthAccount oAuthAccount = accountService.register(oAuth2RegisterRequest);
 
-            Account account = oAuthAccount.getAccount();
-            JWT jwt  = tokenService.createToken(account);
+            JWT jwt  = tokenService.createToken(oAuthAccount);
 
             String accessToken = jwt.getAccessToken();
             String refreshToken = jwt.getRefreshToken();

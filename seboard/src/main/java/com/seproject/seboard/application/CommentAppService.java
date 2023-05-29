@@ -1,9 +1,10 @@
 package com.seproject.seboard.application;
 
-import com.seproject.account.model.Account;
+import com.seproject.account.model.account.Account;
 import com.seproject.account.repository.AccountRepository;
 import com.seproject.account.utils.SecurityUtils;
 import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.CustomUserNotFoundException;
 import com.seproject.error.exception.InvalidAuthorizationException;
 import com.seproject.error.exception.NoSuchResourceException;
 import com.seproject.seboard.application.dto.comment.CommentCommand.CommentEditCommand;
@@ -35,10 +36,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.stream.Collectors;
-
-import static com.seproject.seboard.application.utils.AppServiceHelper.findByIdOrThrow;
 
 @Service
 @RequiredArgsConstructor
@@ -54,7 +52,8 @@ public class CommentAppService {
     private final AccountRepository accountRepository;
 
     public Long writeComment(CommentWriteCommand command){
-        Account account = accountRepository.findByLoginId(command.getLoginId());
+        Account account = accountRepository.findByLoginId(command.getLoginId())
+                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
 
         if(command.isAnonymous()){
             return writeUnnamedComment(command, account.getAccountId());
@@ -90,7 +89,8 @@ public class CommentAppService {
     }
 
     public Long writeReply(ReplyWriteCommand command){
-        Account account = accountRepository.findByLoginId(command.getLoginId());
+        Account account = accountRepository.findByLoginId(command.getLoginId())
+                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
 
         if(command.isAnonymous()){
             return writeUnnamedReply(command, account.getAccountId());
@@ -180,7 +180,8 @@ public class CommentAppService {
 
 
         }else{
-            Account account = accountRepository.findByLoginId(command.getLoginId());
+            Account account = accountRepository.findByLoginId(command.getLoginId())
+                    .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
 
 
             Page<Comment> commentPage = commentSearchRepository.findCommentListByPostId(command.getPostId(), PageRequest.of(command.getPage(), command.getPerPage()));
@@ -210,7 +211,8 @@ public class CommentAppService {
     }
 
     public Long editComment(CommentEditCommand command) {
-        Account account = accountRepository.findByLoginId(command.getLoginId());
+        Account account = accountRepository.findByLoginId(command.getLoginId())
+                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
 
         Comment comment = commentRepository.findById(command.getCommentId())
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_COMMENT));
@@ -226,7 +228,8 @@ public class CommentAppService {
     }
 
     public Long editReply(ReplyEditCommand command) {
-        Account account = accountRepository.findByLoginId(command.getLoginId());
+        Account account = accountRepository.findByLoginId(command.getLoginId())
+                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
         Reply reply = replyRepository.findById(command.getReplyId())
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_COMMENT));
 
@@ -241,7 +244,8 @@ public class CommentAppService {
     }
 
     public void removeComment(Long commentId, String loginId) {
-        Account account = accountRepository.findByLoginId(loginId);
+        Account account = accountRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
 
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_COMMENT));
@@ -254,7 +258,8 @@ public class CommentAppService {
     }
 
     public void removeReply(Long replyId, String loginId) {
-        Account account = accountRepository.findByLoginId(loginId);
+        Account account = accountRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
 
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_COMMENT));

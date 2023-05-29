@@ -1,4 +1,4 @@
-package com.seproject.account.model;
+package com.seproject.account.model.account;
 
 import com.seproject.account.model.role.Role;
 import lombok.*;
@@ -10,47 +10,48 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
+@DiscriminatorColumn(name = "dtype")
+@Inheritance(strategy = InheritanceType.JOINED)
 @Entity
 @Table(name = "accounts")
-public class Account implements UserDetails {
+public abstract class Account implements UserDetails {
 
-    @Id @GeneratedValue
-    private Long accountId;
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    protected Long accountId;
 
-    @Column(name = "login_id",unique = true)
-    private String loginId;
-    private String name;
-    private String nickname;
-    private String password;
-
+    protected String loginId;
+    protected String name;
+    protected String nickname;
+    protected String password;
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(
             name="authorities",
             joinColumns={@JoinColumn(name="account_id", referencedColumnName="accountId")},
             inverseJoinColumns={@JoinColumn(name="role_id", referencedColumnName="roleId")})
-    private List<Role> authorities;
+    protected List<Role> authorities;
+    protected LocalDateTime createdAt;
+    protected boolean isDeleted;
 
-    private LocalDateTime createdAt;
+//    @Builder
+//    public Account(Long accountId, String loginId,
+//                   String name, String nickname,
+//                   String password, List<Role> authorities) {
+//        this.accountId = accountId;
+//        this.loginId = loginId;
+//        this.name = name;
+//        this.nickname = nickname;
+//        this.password = password;
+//        this.authorities = authorities;
+//        this.createdAt = LocalDateTime.now();
+//        this.isDeleted = false;
+//    }
 
-    @Builder
-    public Account(Long accountId, String loginId,
-                   String name, String nickname,
-                   String password, List<Role> authorities, LocalDateTime createdAt) {
-        this.accountId = accountId;
+    public Account update(String loginId,String password,String name,String nickname,List<Role> authorities) {
         this.loginId = loginId;
+        this.password = password;
         this.name = name;
         this.nickname = nickname;
-        this.password = password;
         this.authorities = authorities;
-        this.createdAt = LocalDateTime.now();
-    }
-
-    public Account update(Account account) {
-        loginId = account.loginId;
-        password = account.password;
-        name = account.name;
-        nickname = account.nickname;
-        authorities = account.authorities;
 
         return this;
     }
@@ -58,6 +59,10 @@ public class Account implements UserDetails {
     public String changePassword(String password) {
         this.password = password;
         return password;
+    }
+
+    public void delete() {
+        this.isDeleted = true;
     }
 
     public String getUsername() {

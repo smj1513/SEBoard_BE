@@ -2,7 +2,7 @@ package com.seproject.seboard.domain.model.user;
 
 
 
-import com.seproject.account.model.Account;
+import com.seproject.account.model.account.Account;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
