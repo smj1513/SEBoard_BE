@@ -13,6 +13,7 @@ import java.util.List;
 
 @NoRepositoryBean
 public interface CommentSearchRepository extends Repository<Comment, Long> {
+    Integer countsMemberCommentByLoginId(String loginId);
 
     Page<RetrieveCommentProfileElement> findMemberCommentByLoginId(String loginId, Pageable pagingInfo);
     Page<RetrieveCommentProfileElement> findCommentByLoginId(String loginId, Pageable pagingInfo);

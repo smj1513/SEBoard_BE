@@ -31,13 +31,18 @@ public class ProfileAppService {
     public ProfileInfoResponse retrieveProfileInfo(String loginId){
         Account account = SecurityUtils.getAccount().orElse(null);
         //TODO : SQL 쿼리 변경 필요
-        Integer postCount = postSearchRepository.countsPostByLoginId(loginId);
-        Integer commentCount = commentSearchRepository.countsCommentByLoginId(loginId);
+        Integer postCount = null;
+        Integer commentCount = null;
         Integer bookmarkCount = null;
         String nickname = memberRepository.findByLoginId(loginId).orElseThrow(()-> new NoSuchResourceException(ErrorCode.NOT_EXIST_MEMBER)).getName();
 
         if(account != null && account.getLoginId().equals(loginId)){
+            postCount = postSearchRepository.countsPostByLoginId(loginId);
+            commentCount = commentSearchRepository.countsCommentByLoginId(loginId);
             bookmarkCount = bookmarkRepository.countsBookmarkByLoginId(loginId);
+        }else{
+            postCount = postSearchRepository.countsMemberPostByLoginId(loginId);
+            commentCount = commentSearchRepository.countsMemberCommentByLoginId(loginId);
         }
 
         return ProfileInfoResponse.builder()

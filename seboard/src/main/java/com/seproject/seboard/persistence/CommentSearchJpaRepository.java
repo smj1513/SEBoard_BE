@@ -12,6 +12,8 @@ import java.util.List;
 
 public interface CommentSearchJpaRepository extends CommentSearchRepository {
 
+    @Query("select count(c) from Comment c join Member m on c.author.boardUserId=m.boardUserId where c.author.account.loginId = :loginId and c.isOnlyReadByAuthor = false and c.status= 'NORMAL'")
+    Integer countsMemberCommentByLoginId(String loginId);
 
     @Query(value = "select new com.seproject.seboard.controller.dto.comment.CommentResponse$RetrieveCommentProfileElement(c)" +
             "from Comment c join Member m on c.author.boardUserId=m.boardUserId where c.author.account.loginId = :loginId and c.isOnlyReadByAuthor = false and c.status= 'NORMAL'",
