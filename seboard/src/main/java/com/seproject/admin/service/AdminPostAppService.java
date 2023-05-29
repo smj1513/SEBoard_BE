@@ -3,6 +3,7 @@ package com.seproject.admin.service;
 import com.seproject.account.model.Account;
 import com.seproject.account.utils.SecurityUtils;
 import com.seproject.admin.controller.dto.post.AdminPostRequest;
+import com.seproject.admin.controller.dto.post.AdminPostRequest.AdminPostRetrieveCondition;
 import com.seproject.admin.controller.dto.post.AdminPostResponse;
 import com.seproject.admin.domain.repository.AdminPostSearchRepository;
 import com.seproject.error.errorCode.ErrorCode;
@@ -15,6 +16,7 @@ import com.seproject.seboard.domain.repository.user.BoardUserRepository;
 import com.seproject.seboard.domain.repository.post.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,11 +32,19 @@ public class AdminPostAppService {
     private final PostRepository postRepository;
     private final ReportRepository reportRepository;
     private final BoardUserRepository boardUserRepository;
-//    private final AdminPostSearchRepository adminPostSearchRepository;
+    private final AdminPostSearchRepository adminPostSearchRepository;
 
-    public Page<AdminPostResponse> findPostList(int page, int size, Long categoryId, String exposeOption, boolean isReported, String searchType, String query) {
+    public Page<AdminPostResponse> findPostList(AdminPostRetrieveCondition condition, int page, int perPage) {
+        Account account = SecurityUtils.getAccount()
+                .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
 
-        return null;
+        boolean isAdmin = account.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+
+        if(!isAdmin){
+            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
+        }
+
+        return adminPostSearchRepository.findPostListByCondition(condition, PageRequest.of(page, perPage));
     }
 
     public void enrollPin(Long accountId, Long postId) {
