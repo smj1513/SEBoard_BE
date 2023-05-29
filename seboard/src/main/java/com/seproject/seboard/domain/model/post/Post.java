@@ -1,8 +1,7 @@
 package com.seproject.seboard.domain.model.post;
 
-import com.seproject.account.model.Account;
+import com.seproject.account.model.account.Account;
 import com.seproject.seboard.domain.model.category.Category;
-import com.seproject.seboard.domain.model.category.Menu;
 import com.seproject.seboard.domain.model.comment.Comment;
 import com.seproject.seboard.domain.model.common.BaseTime;
 import com.seproject.seboard.domain.model.common.FileMetaData;
@@ -17,7 +16,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.validator.constraints.Range;
 
 import javax.persistence.*;
 import java.util.HashSet;

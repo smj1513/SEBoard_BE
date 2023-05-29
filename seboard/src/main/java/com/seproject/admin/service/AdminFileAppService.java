@@ -1,8 +1,7 @@
 package com.seproject.admin.service;
 
-import com.seproject.account.model.Account;
+import com.seproject.account.model.account.Account;
 import com.seproject.account.utils.SecurityUtils;
-import com.seproject.admin.controller.dto.file.FileResponse;
 import com.seproject.admin.controller.dto.file.FileResponse.FileExtensionResponse;
 import com.seproject.admin.domain.FileExtension;
 import com.seproject.admin.domain.repository.FileExtensionRepository;

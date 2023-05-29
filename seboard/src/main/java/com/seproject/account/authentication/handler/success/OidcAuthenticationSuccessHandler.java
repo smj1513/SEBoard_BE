@@ -1,16 +1,15 @@
 package com.seproject.account.authentication.handler.success;
 
 import com.seproject.account.jwt.JwtProvider;
-import com.seproject.account.model.Account;
+import com.seproject.account.model.account.Account;
 import com.seproject.account.model.social.KakaoOidcUser;
-import com.seproject.account.model.social.OAuthAccount;
+import com.seproject.account.model.account.OAuthAccount;
 import com.seproject.account.model.social.TemporalUserInfo;
 import com.seproject.account.model.social.UserToken;
 import com.seproject.account.repository.social.OAuthAccountRepository;
 import com.seproject.account.repository.social.TemporalUserInfoRepository;
 import com.seproject.account.repository.social.UserTokenRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -20,6 +19,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 import java.util.UUID;
 
 
@@ -40,14 +40,14 @@ public class OidcAuthenticationSuccessHandler implements AuthenticationSuccessHa
         OAuth2AuthenticationToken oAuth2AuthenticationToken = (OAuth2AuthenticationToken)authentication;
         KakaoOidcUser oidcUser = (KakaoOidcUser) oAuth2AuthenticationToken.getPrincipal();
 
-        if(oAuthAccountRepository.existsBySubAndProvider(oidcUser.getId(),oidcUser.getProvider())) {
-            OAuthAccount oAuthAccount = oAuthAccountRepository.findOAuthAccountBySubAndProvider(oidcUser.getId(),oidcUser.getProvider());
-            Account account = oAuthAccount.getAccount();
+        Optional<OAuthAccount> oAuthAccountBySubAndProvider = oAuthAccountRepository.findOAuthAccountBySubAndProvider(oidcUser.getId(), oidcUser.getProvider());
+        if(oAuthAccountBySubAndProvider.isPresent()) {
 
+            OAuthAccount oAuthAccount = oAuthAccountBySubAndProvider.get();
             String id = UUID.randomUUID().toString();
             UserToken userToken = UserToken.builder()
                     .id(id)
-                    .account(account)
+                    .account(oAuthAccount)
                     .build();
 
             userTokenRepository.save(userToken);

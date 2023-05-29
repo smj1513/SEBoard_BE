@@ -2,6 +2,7 @@ package com.seproject.admin.service;
 
 import com.seproject.account.model.role.Role;
 import com.seproject.account.repository.role.RoleRepository;
+import com.seproject.admin.domain.SelectOption;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.seproject.admin.dto.RoleDTO.*;
@@ -79,6 +81,34 @@ public class RoleService {
 
         role.update(roleName,updateRoleRequest.getDescription(),updateRoleRequest.getAlias());
         return UpdateRoleResponse.toDTO(role);
+    }
+
+
+    public List<Role> convertRoles(SelectOption selectOption) {
+        List<String> roleNames;
+        switch (selectOption){
+
+            case OVER_USER: {
+                roleNames = List.of(Role.ROLE_USER,Role.ROLE_KUMOH,Role.ROLE_ADMIN);
+                return roleRepository.findByNameIn(roleNames);
+            }
+            case OVER_KUMOH: {
+                roleNames = List.of(Role.ROLE_KUMOH,Role.ROLE_ADMIN);
+                return roleRepository.findByNameIn(roleNames);
+            }
+            case ONLY_ADMIN: {
+                roleNames = List.of(Role.ROLE_ADMIN);
+                return roleRepository.findByNameIn(roleNames);
+            }
+            case ALL: {
+                return List.of();
+            }
+            case SELECT: {
+                return new ArrayList<>();
+            }
+        }
+
+        throw new CustomIllegalArgumentException(ErrorCode.INVALID_MENU_REQUEST,null);
     }
 
 }

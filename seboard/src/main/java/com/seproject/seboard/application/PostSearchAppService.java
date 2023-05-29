@@ -1,7 +1,6 @@
 package com.seproject.seboard.application;
 
-import com.seproject.account.model.Account;
-import com.seproject.account.model.role.Role;
+import com.seproject.account.model.account.Account;
 import com.seproject.account.repository.AccountRepository;
 import com.seproject.account.utils.SecurityUtils;
 import com.seproject.error.errorCode.ErrorCode;
@@ -28,7 +27,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 @AllArgsConstructor
 @Service

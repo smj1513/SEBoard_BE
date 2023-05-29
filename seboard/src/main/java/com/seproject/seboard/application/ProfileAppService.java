@@ -1,15 +1,12 @@
 package com.seproject.seboard.application;
 
-import com.seproject.account.model.Account;
+import com.seproject.account.model.account.Account;
 import com.seproject.account.utils.SecurityUtils;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.InvalidAuthorizationException;
 import com.seproject.error.exception.NoSuchResourceException;
-import com.seproject.seboard.controller.dto.comment.CommentResponse;
 import com.seproject.seboard.controller.dto.comment.CommentResponse.RetrieveCommentProfileElement;
-import com.seproject.seboard.controller.dto.post.PostResponse;
 import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostListResponseElement;
-import com.seproject.seboard.controller.dto.profile.ProfileResponse;
 import com.seproject.seboard.controller.dto.profile.ProfileResponse.ProfileInfoResponse;
 import com.seproject.seboard.domain.repository.comment.CommentSearchRepository;
 import com.seproject.seboard.domain.repository.post.BookmarkRepository;
@@ -18,7 +15,6 @@ import com.seproject.seboard.domain.repository.user.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 @Service

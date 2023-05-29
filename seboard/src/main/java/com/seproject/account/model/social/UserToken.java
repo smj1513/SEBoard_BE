@@ -1,6 +1,6 @@
 package com.seproject.account.model.social;
 
-import com.seproject.account.model.Account;
+import com.seproject.account.model.account.Account;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;

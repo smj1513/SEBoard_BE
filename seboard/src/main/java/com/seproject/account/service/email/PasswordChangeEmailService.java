@@ -1,8 +1,5 @@
 package com.seproject.account.service.email;
 
-import com.seproject.account.model.Account;
-import com.seproject.account.model.email.AccountRegisterConfirmedEmail;
-import com.seproject.account.model.email.AccountRegisterEmail;
 import com.seproject.account.model.email.PasswordChangeConfirmedEmail;
 import com.seproject.account.model.email.PasswordChangeEmail;
 import com.seproject.account.repository.AccountRepository;
@@ -17,7 +14,6 @@ import org.apache.commons.mail.SimpleEmail;
 import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
 
-import java.util.NoSuchElementException;
 import java.util.Optional;
 
 @RequiredArgsConstructor

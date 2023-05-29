@@ -1,8 +1,7 @@
 package com.seproject.admin.service;
 
-import com.seproject.account.model.Account;
+import com.seproject.account.model.account.Account;
 import com.seproject.account.utils.SecurityUtils;
-import com.seproject.admin.controller.dto.post.AdminPostRequest;
 import com.seproject.admin.controller.dto.post.AdminPostRequest.AdminPostRetrieveCondition;
 import com.seproject.admin.controller.dto.post.AdminPostResponse;
 import com.seproject.admin.domain.repository.AdminPostSearchRepository;
