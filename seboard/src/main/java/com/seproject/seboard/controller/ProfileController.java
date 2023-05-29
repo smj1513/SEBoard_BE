@@ -1,6 +1,8 @@
 package com.seproject.seboard.controller;
 
 import com.seproject.seboard.application.ProfileAppService;
+import com.seproject.seboard.controller.dto.comment.CommentResponse;
+import com.seproject.seboard.controller.dto.comment.CommentResponse.RetrieveCommentProfileElement;
 import com.seproject.seboard.controller.dto.post.PostResponse;
 import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostListResponseElement;
 import com.seproject.seboard.controller.dto.profile.ProfileResponse;
@@ -31,6 +33,14 @@ public class ProfileController {
     @GetMapping("/{loginId}/bookmarks")
     public ResponseEntity<Page<RetrievePostListResponseElement>> retrieveBookmarkPost(@PathVariable String loginId, @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "10") int perPage){
         Page<RetrievePostListResponseElement> res = profileAppService.retrieveBookmarkPost(loginId, page, perPage);
+        return ResponseEntity.ok().body(res);
+    }
+
+    @GetMapping("/{loginId}/comments")
+    public ResponseEntity<Page<RetrieveCommentProfileElement>> retrieveMyComments(
+            @PathVariable String loginId, @RequestParam(defaultValue ="0") int page,
+            @RequestParam(defaultValue = "10") int perPage){
+        Page<RetrieveCommentProfileElement> res = profileAppService.retrieveMyComment(loginId, page, perPage);
         return ResponseEntity.ok().body(res);
     }
 }

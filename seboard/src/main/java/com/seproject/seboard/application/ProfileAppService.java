@@ -5,6 +5,8 @@ import com.seproject.account.utils.SecurityUtils;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.InvalidAuthorizationException;
 import com.seproject.error.exception.NoSuchResourceException;
+import com.seproject.seboard.controller.dto.comment.CommentResponse;
+import com.seproject.seboard.controller.dto.comment.CommentResponse.RetrieveCommentProfileElement;
 import com.seproject.seboard.controller.dto.post.PostResponse;
 import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostListResponseElement;
 import com.seproject.seboard.controller.dto.profile.ProfileResponse;
@@ -50,7 +52,6 @@ public class ProfileAppService {
         Account account = SecurityUtils.getAccount().orElse(null);
 
         if(account == null || !account.getLoginId().equals(loginId)){
-            //TODO : 쿼리로 변경필요
             return postSearchRepository.findMemberPostByLoginId(loginId, PageRequest.of(page, perPage));
         }else{
             return postSearchRepository.findPostByLoginId(loginId, PageRequest.of(page, perPage));
@@ -65,6 +66,16 @@ public class ProfileAppService {
         }
 
         return postSearchRepository.findBookmarkPostByLoginId(loginId, PageRequest.of(page, perPage));
+    }
+
+    public Page<RetrieveCommentProfileElement> retrieveMyComment(String loginId, int page, int perPage){
+        Account account = SecurityUtils.getAccount().orElse(null);
+
+        if(account == null || !account.getLoginId().equals(loginId)){
+            return commentSearchRepository.findMemberCommentByLoginId(loginId, PageRequest.of(page, perPage));
+        }else{
+            return commentSearchRepository.findCommentByLoginId(loginId, PageRequest.of(page, perPage));
+        }
     }
 
 }
