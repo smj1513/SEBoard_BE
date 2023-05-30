@@ -12,6 +12,10 @@ import com.seproject.error.Error;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomAuthenticationException;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
@@ -101,6 +105,9 @@ public class AccountController {
     }
 
     @Operation(summary = "회원 탈퇴", description = "회원 탈퇴를 시도")
+    @ApiResponses(value = {
+            @ApiResponse(content = @Content(schema = @Schema(implementation = WithDrawAccountResponse.class)), responseCode = "200", description = "회원 탈퇴 성공"),
+    })
     @DeleteMapping("/withdraw")
     public ResponseEntity<?> withdraw(@RequestBody  WithDrawAccountRequest request) {
         Account account = SecurityUtils.getAccount().orElseThrow(() -> new CustomAuthenticationException(ErrorCode.NOT_LOGIN,null));
