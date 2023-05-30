@@ -4,6 +4,7 @@ package com.seproject.admin.controller;
 import com.seproject.account.service.AccountService;
 import com.seproject.account.jwt.JwtDecoder;
 import com.seproject.admin.controller.dto.post.AdminPostRequest;
+import com.seproject.admin.controller.dto.post.AdminPostRequest.AdminPostRetrieveCondition;
 import com.seproject.admin.controller.dto.post.AdminPostRequest.BulkPostRequest;
 import com.seproject.admin.service.AdminPostAppService;
 import com.seproject.seboard.application.PostAppService;
@@ -55,11 +56,11 @@ public class AdminPostController {
             @ApiResponse(content = @Content(schema = @Schema(implementation = RetrievePostListResponse.class)), responseCode = "200", description = "게시글 목록 조회 성공"),
             @ApiResponse(content = @Content(schema = @Schema(implementation = Error.class)), responseCode = "200", description = "잘못된 페이징 정보")
     })
-    @GetMapping("/posts")
-    public ResponseEntity<?> retrieveAllPost(@ModelAttribute AdminPostRequest request) {
-
-
-        return null;
+    @GetMapping
+    public ResponseEntity<?> retrieveAllPost(@ModelAttribute AdminPostRetrieveCondition request,
+                                             @RequestParam(defaultValue = "0") int page,
+                                             @RequestParam(defaultValue = "25") int perPage) {
+        return ResponseEntity.ok(adminPostAppService.findPostList(request, page, perPage));
     }
 //
 //        PostListFindCommand command = PostCommand.PostListFindCommand.builder()

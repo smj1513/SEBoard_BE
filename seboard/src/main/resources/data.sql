@@ -33,8 +33,8 @@ INSERT INTO menus(menu_id, super_menu_id, name, description, depth, url_info, me
                                                                                              (43214234, 43214231, '장학금', '공지임니둥', 1, 'money', 'CATEGORY'),
                                                                                              (43214235, 43214231, '학사', '공지임니둥', 1, 'student', 'CATEGORY'),
                                                                                              (43214238, null, '자유게시판', '자유이니둥', 0, 'freeboard', 'BOARD'),
-                                                                                             (43214239, 43214238, '일반', '자유이니둥', 1, 'freeboard_normal', 'BOARD'),
-                                                                                             (43214240, 43214238, '전공지식', '자유이니둥', 1, 'knwoledge', 'BOARD'),
+                                                                                             (43214239, 43214238, '일반', '자유이니둥', 1, 'freeboard_normal', 'CATEGORY'),
+                                                                                             (43214240, 43214238, '전공지식', '자유이니둥', 1, 'knwoledge', 'CATEGORY'),
                                                                                              (43214236, null, '채용', '채용임니둥', 0, 'https://cs.kumoh.ac.kr/cs/sub0602.do', 'EXTERNAL'),
                                                                                              (43214237, null, '학사', '학사임니둥', 0, 'https://cs.kumoh.ac.kr/cs/sub0601.do', 'EXTERNAL');
 
@@ -73,6 +73,14 @@ INSERT INTO public.anonymous(anonymous_id) VALUES (3421246);
 INSERT INTO expose_options(expose_option_id, expose_type) VALUES (28822821, 'PUBLIC');
 INSERT INTO expose_options(expose_option_id, expose_type) VALUES (28822822, 'KUMOH');
 INSERT INTO expose_options(expose_option_id, expose_type) VALUES (28822823, 'PUBLIC');
+
+INSERT INTO public.posts(
+    post_id, anonymous_count, created_at, modified_at, contents, pined, title, views, board_user_id, category_id, expose_option_id, status, report_count)
+VALUES (1234879892111, 0, '2023-04-24', '2023-04-26','<div class="document_91563_19198 xe_content"><p>&nbsp;</p>
+<p><span style="font-size:18px;">안녕하십니까&nbsp;18학번 이충엽입니다&nbsp;</span></p>
+  <p><span style="font-size:18px;">저는 5월 1일 14시부로 논산 훈련소에 입대 예정입니다.&nbsp;</span></p>
+  <p><span style="font-size:18px;">그동안 감사했습니다! 충성!</span></p></div>' ,
+        true, '자유-일반 제목입니다.', 123,3421243 , 43214239, 28822821, 'NORMAL', 0);
 
 INSERT INTO public.posts(
     post_id, anonymous_count, created_at, modified_at, contents, pined, title, views, board_user_id, category_id, expose_option_id, status, report_count)

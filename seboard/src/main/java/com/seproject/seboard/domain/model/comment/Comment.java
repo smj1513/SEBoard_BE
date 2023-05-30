@@ -5,6 +5,7 @@ import com.seproject.seboard.domain.model.common.ReportThreshold;
 import com.seproject.seboard.domain.model.common.Status;
 import com.seproject.seboard.domain.model.post.Post;
 import com.seproject.seboard.domain.model.user.BoardUser;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
@@ -37,8 +38,9 @@ public class Comment {
     @JoinColumn(name = "board_user_id")
     private BoardUser author;
     private boolean isOnlyReadByAuthor;
+    @Builder.Default
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private Status status = Status.NORMAL;
     private int reportCount;
 
     public Reply writeReply(String contents, Comment taggedComment, BoardUser author, boolean isOnlyReadByAuthor){

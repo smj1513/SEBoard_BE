@@ -11,6 +11,14 @@ import java.util.List;
 import java.util.Optional;
 
 public interface PostSearchJpaRepository extends PostSearchRepository {
+    @Query("select count(p) from Post p right join Member m on p.author.boardUserId=m.boardUserId where p.author.account.loginId = :loginId and p.status = 'NORMAL'")
+    Integer countsMemberPostByLoginId(String loginId);
+
+    @Query(value = "select new com.seproject.seboard.controller.dto.post.PostResponse$RetrievePostListResponseElement(p)" +
+            "from Post p join Bookmark b on p.postId=b.markedPost.postId where b.member.account.loginId=:loginId and p.status = 'NORMAL' order by p.baseTime.createdAt desc",
+    countQuery = "select count(p) from Post p join Bookmark b on p.postId=b.markedPost.postId where b.member.account.loginId=:loginId and p.status = 'NORMAL'")
+    Page<RetrievePostListResponseElement> findBookmarkPostByLoginId(String loginId, Pageable pagingInfo);
+
     @Query(value = "select new com.seproject.seboard.controller.dto.post.PostResponse$RetrievePostListResponseElement(p)" +
             "from Post p right join Member m on p.author.boardUserId=m.boardUserId where p.author.account.loginId = :loginId  and p.status = 'NORMAL' order by p.baseTime.createdAt desc",
     countQuery = "select count(p) from Post p right join Member m on p.author.boardUserId=m.boardUserId where p.author.account.loginId = :loginId and p.status = 'NORMAL'")

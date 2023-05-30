@@ -11,9 +11,38 @@ import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class CommentResponse {
+    @Data
+    public static class RetrieveCommentProfileElement {
+        private Long commentId;
+        private Long superCommentId;
+        private Long tagCommentId;
+        private Long postId;
+        private UserResponse author;
+        private String contents;
+        private LocalDateTime createdAt;
+        private LocalDateTime modifiedAt;
+
+        public RetrieveCommentProfileElement(Comment comment){
+            this.commentId = comment.getCommentId();
+            this.postId = comment.getPost().getPostId();
+            this.author = new UserResponse(comment.getAuthor());
+            this.contents = comment.getContents();
+            this.createdAt = comment.getBaseTime().getCreatedAt();
+            this.modifiedAt = comment.getBaseTime().getModifiedAt();
+
+            if(comment instanceof Reply){
+                Reply reply = (Reply) comment;
+                this.superCommentId = reply.getSuperComment().getCommentId();
+                this.tagCommentId = reply.getTag().getCommentId();
+            }else{
+                this.superCommentId = null;
+                this.tagCommentId = null;
+            }
+        }
+    }
+
     @Data
     @Builder(access = AccessLevel.PRIVATE)
     public static class CommentListResponse{
