@@ -1,8 +1,12 @@
 package com.seproject.admin.controller;
 
+import com.seproject.admin.controller.dto.comment.AdminCommentResponse;
+import com.seproject.admin.controller.dto.comment.AdminCommentResponse.AdminCommentListResponse;
 import com.seproject.admin.service.AdminCommentAppService;
 import com.seproject.seboard.controller.dto.MessageResponse;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +17,14 @@ import static com.seproject.admin.controller.dto.comment.AdminCommentRequest.*;
 @RequestMapping("/admin/comments")
 public class AdminCommentController {
     private final AdminCommentAppService adminCommentAppService;
+
+    @GetMapping
+    public ResponseEntity<Page<AdminCommentListResponse>> retrieveCommentList(@ModelAttribute AdminCommentRetrieveCondition condition,
+                                                                              @RequestParam(defaultValue = "0") int page,
+                                                                              @RequestParam(defaultValue = "25") int perPage){
+        Page<AdminCommentListResponse> res = adminCommentAppService.retrieveCommentList(condition, PageRequest.of(page, perPage));
+        return ResponseEntity.ok(res);
+    }
 
     @PostMapping("/{commentId}/restore")
     public ResponseEntity<MessageResponse> restoreComment(@PathVariable Long commentId){
