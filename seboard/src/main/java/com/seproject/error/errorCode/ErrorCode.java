@@ -29,6 +29,7 @@ public enum ErrorCode {
     BANNED_NICKNAME(HttpStatus.BAD_REQUEST,121,"금지된 닉네임 입니다."),
     ILLEGAL_MENU_TYPE(HttpStatus.BAD_REQUEST,122,"일치하는 Menu 타입이 없습니다."),
     INVALID_MENU_REQUEST(HttpStatus.BAD_REQUEST,123,"Menu가 필요로하는 정보가 전달되지 않았습니다."),
+    INVALID_MAIN_PAGE_MENU(HttpStatus.BAD_REQUEST,124,"메인 페이지 메뉴는 InternalSiteMenu만 가능합니다."),
 
     INVALID_PAGINATION(HttpStatus.BAD_REQUEST,200, "올바르지 않은 페이지 정보를 전송하였습니다."),
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, 201, "올바르지 않은 형식의 요청입니다."),
