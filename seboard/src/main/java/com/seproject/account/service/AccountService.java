@@ -14,12 +14,22 @@ import com.seproject.account.repository.AccountRepository;
 import com.seproject.account.repository.role.RoleRepository;
 import com.seproject.account.model.account.Account;
 import com.seproject.account.model.role.Role;
+import com.seproject.seboard.domain.model.comment.Comment;
+import com.seproject.seboard.domain.model.post.Bookmark;
+import com.seproject.seboard.domain.model.post.Post;
+import com.seproject.seboard.domain.model.user.BoardUser;
 import com.seproject.seboard.domain.model.user.Member;
+import com.seproject.seboard.domain.repository.comment.CommentRepository;
+import com.seproject.seboard.domain.repository.post.BookmarkRepository;
+import com.seproject.seboard.domain.repository.post.PostRepository;
+import com.seproject.seboard.domain.repository.post.PostSearchRepository;
+import com.seproject.seboard.domain.repository.user.BoardUserRepository;
 import com.seproject.seboard.domain.repository.user.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -49,6 +59,9 @@ public class AccountService implements UserDetailsService {
 
     private final BannedIdService bannedIdService;
     private final BannedNicknameService bannedNicknameService;
+    private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
+    private final BookmarkRepository bookmarkRepository;
 
     public boolean isExist(String loginId){
         return accountRepository.existsByLoginId(loginId);
@@ -62,7 +75,6 @@ public class AccountService implements UserDetailsService {
         return account.getClass() == OAuthAccount.class;
     }
 
-
     private Role mapEmailToRole(String email) {
 
         if(registerEmailService.isKumohMail(email)){
@@ -73,7 +85,6 @@ public class AccountService implements UserDetailsService {
 
         throw new CustomIllegalArgumentException(ErrorCode.INVALID_MAIL,null);
     }
-
     @Transactional
     public OAuthAccount register(OAuth2RegisterRequest oAuth2RegisterRequest) {
         String email = oAuth2RegisterRequest.getEmail();
@@ -106,7 +117,6 @@ public class AccountService implements UserDetailsService {
 
         return oAuthAccount;
     }
-
     @Transactional
     public Account register(FormRegisterRequest formRegisterRequest) {
 
@@ -137,8 +147,6 @@ public class AccountService implements UserDetailsService {
         memberRepository.save(member);
         return account;
     }
-
-
     public RetrieveAllAccountResponse findAllAccount(int page,int perPage) {
 
         try {
@@ -154,12 +162,10 @@ public class AccountService implements UserDetailsService {
         }
 
     }
-
     public RetrieveAccountResponse findAccount(Long accountId) {
         Account account = accountRepository.findById(accountId).orElseThrow();
         return RetrieveAccountResponse.toDTO(account);
     }
-
     private List<Role> convertAuthorities(List<String> authorities) {
         List<Role> convertedAuthorities = roleRepository.findByNameIn(authorities);
 
@@ -169,7 +175,6 @@ public class AccountService implements UserDetailsService {
 
         return convertedAuthorities;
     }
-
     @Transactional
     public CreateAccountResponse createAccount(CreateAccountRequest request) {
 
@@ -198,7 +203,6 @@ public class AccountService implements UserDetailsService {
 
         return CreateAccountResponse.toDTO(savedAccount);
     }
-
     @Transactional
     public UpdateAccountResponse updateAccount(UpdateAccountRequest request) {
 
@@ -234,6 +238,23 @@ public class AccountService implements UserDetailsService {
         }
 
         account.delete();
+
+        List<Post> writePost = postRepository.findByAccountId(accountId);
+
+        for (Post post : writePost) {
+            post.delete(true);
+        }
+
+        List<Comment> writeComment = commentRepository.findCommentsByAccountId(accountId);
+
+        for (Comment comment : writeComment) {
+            comment.delete(true);
+        }
+
+        List<Long> bookmarkIds = bookmarkRepository.findBookmarkByAccountId(accountId)
+                .stream().map(Bookmark::getBookmarkId)
+                .collect(Collectors.toList());
+        bookmarkRepository.deleteAllByIdInBatch(bookmarkIds);
 
         return DeleteAccountResponse.toDTO(account);
     }
