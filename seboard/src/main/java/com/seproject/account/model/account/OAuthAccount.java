@@ -2,6 +2,7 @@ package com.seproject.account.model.account;
 
 import com.seproject.account.model.account.Account;
 import com.seproject.account.model.role.Role;
+import com.seproject.seboard.domain.model.common.Status;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
@@ -37,7 +38,7 @@ public class OAuthAccount extends Account{
         this.password = password;
         this.authorities = authorities;
         this.createdAt = LocalDateTime.now();
-        this.isDeleted = false;
+        this.status = Status.NORMAL;
         this.provider = provider;
         this.sub = sub;
     }

@@ -237,7 +237,7 @@ public class AccountService implements UserDetailsService {
             oAuthAccountRepository.delete(oAuthAccount);
         }
 
-        account.delete();
+        account.delete(true);
 
         List<Post> writePost = postRepository.findByAccountId(accountId);
 
