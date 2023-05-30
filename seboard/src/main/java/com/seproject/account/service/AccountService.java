@@ -325,4 +325,14 @@ public class AccountService implements UserDetailsService {
                 .collect(Collectors.toList()));
     }
 
+    @Transactional
+    public Account changeNickname(String loginId,String nickname) {
+        Account account = accountRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND, null));
+
+        account.changeNickname(nickname);
+
+        return account;
+    }
+
 }

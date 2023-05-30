@@ -22,10 +22,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.*;
 
 import static com.seproject.account.controller.dto.AccountDTO.*;
 import static com.seproject.account.controller.dto.LogoutDTO.*;
@@ -96,6 +93,17 @@ public class AccountController {
 
         return new ResponseEntity<>(accountService.findMyInfo(loginId),HttpStatus.OK);
     }
+    @Operation(summary = "내정보 변경", description = "마이페이지에서 내 정보를 변경함")
+    @ApiResponses(value = {
+            @ApiResponse(content = @Content(schema = @Schema(implementation = MyInfoChangeResponse.class)), responseCode = "200", description = "회원 정보 변경 성공"),
+    })
+    @PutMapping("/mypage/info")
+    public ResponseEntity<?> changeMyInfo(@RequestBody MyInfoChangeRequest request) {
+        String loginId = SecurityUtils.getLoginId();
+        Account account = accountService.changeNickname(loginId, request.getNickname());
+        return new ResponseEntity<>(MyInfoChangeResponse.toDTO(account),HttpStatus.OK);
+    }
+
 
     @Operation(summary = "비밀번호 변경", description = "마이페이지에서 비밀번호를 변경함")
     @PostMapping("/mypage/password")

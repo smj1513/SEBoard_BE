@@ -64,6 +64,11 @@ public abstract class Account implements UserDetails {
         return password;
     }
 
+    public String changeNickname(String nickname) {
+        this.nickname = nickname;
+        return nickname;
+    }
+
     public void delete(boolean isPermanent) {
         if(isPermanent) {
             status = Status.PERMANENT_DELETED;
