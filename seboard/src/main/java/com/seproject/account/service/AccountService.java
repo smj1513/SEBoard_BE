@@ -3,11 +3,13 @@ package com.seproject.account.service;
 import com.seproject.account.model.account.FormAccount;
 import com.seproject.account.model.account.OAuthAccount;
 import com.seproject.account.repository.social.OAuthAccountRepository;
+import com.seproject.account.service.email.KumohEmailService;
 import com.seproject.account.service.email.RegisterEmailService;
 import com.seproject.account.utils.SecurityUtils;
 import com.seproject.admin.service.BannedIdService;
 import com.seproject.admin.service.BannedNicknameService;
 import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.CustomAuthenticationException;
 import com.seproject.error.exception.CustomIllegalArgumentException;
 import com.seproject.error.exception.CustomUserNotFoundException;
 import com.seproject.account.repository.AccountRepository;
@@ -62,6 +64,7 @@ public class AccountService implements UserDetailsService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
     private final BookmarkRepository bookmarkRepository;
+    private final KumohEmailService kumohEmailService;
 
     public boolean isExist(String loginId){
         return accountRepository.existsByLoginId(loginId);
@@ -299,8 +302,16 @@ public class AccountService implements UserDetailsService {
     @Transactional
     public KumohAuthResponse grantKumohAuth(KumohAuthRequest kumohAuthRequest) {
         String email = kumohAuthRequest.getEmail();
-        Account account = accountRepository.findByLoginId(email)
+        String loginId = SecurityUtils.getLoginId();
+
+        if(loginId == null)
+            throw new CustomAuthenticationException(ErrorCode.NOT_LOGIN,null);
+        if(!kumohEmailService.isConfirmed(email))
+            throw new CustomIllegalArgumentException(ErrorCode.EMAIL_NOT_FOUNT,null);
+
+        Account account = accountRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
+
         List<Role> authorities = account.getAuthorities();
 
         boolean flag = false;
