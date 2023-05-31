@@ -236,8 +236,8 @@ public class AccountService implements UserDetailsService {
         if(isOAuthUser(account.getLoginId())) {
             OAuthAccount oAuthAccount = oAuthAccountRepository.findByLoginId(account.getLoginId())
                     .orElseThrow(() -> new RuntimeException("oAuth 유저 체크는 통과했으나 찾을수 없는 경우"));
-
-            oAuthAccountRepository.delete(oAuthAccount);
+            oAuthAccount.removeSub();
+//            TODO : 외래키 제약조건 걸림 oAuthAccountRepository.delete(oAuthAccount);
         }
 
         account.delete(true);

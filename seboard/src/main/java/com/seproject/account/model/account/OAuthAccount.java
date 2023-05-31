@@ -24,7 +24,7 @@ public class OAuthAccount extends Account{
 
     private String provider;
 
-    @Column(unique = true)
+    @Column(unique = true,nullable = true)
     private String sub;
 
     @Builder
@@ -41,5 +41,9 @@ public class OAuthAccount extends Account{
         this.status = Status.NORMAL;
         this.provider = provider;
         this.sub = sub;
+    }
+
+    public void removeSub(){
+        this.sub = null;
     }
 }
