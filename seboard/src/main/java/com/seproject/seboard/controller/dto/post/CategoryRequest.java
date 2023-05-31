@@ -1,6 +1,5 @@
 package com.seproject.seboard.controller.dto.post;
 
-import com.seproject.seboard.application.dto.category.CategoryCommand;
 import lombok.Data;
 
 import static com.seproject.seboard.application.dto.category.CategoryCommand.*;
@@ -16,6 +15,11 @@ public class CategoryRequest {
         private String urlId;
         private String externalUrl;
 
+        private String manageOption;
+        private String writeOption;
+        private String exposeOption;
+        private String accessOption;
+
         public CategoryCreateCommand toCommand(String categoryType){
             return new CategoryCreateCommand(
                     this.getSuperCategoryId(),
@@ -23,7 +27,11 @@ public class CategoryRequest {
                     this.getDescription(),
                     this.getUrlId(),
                     this.getExternalUrl(),
-                    categoryType
+                    categoryType,
+                    manageOption,
+                    writeOption,
+                    exposeOption,
+                    accessOption
             );
         }
     }

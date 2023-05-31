@@ -14,14 +14,23 @@ public class CategoryCommand {
         private String urlId;
         private String externalUrl;
         private String categoryType;
+        private String manage;
+        private String write;
+        private String expose;
+        private String access;
 
-        public CategoryCreateCommand(Long superCategoryId, String name, String description, String urlId, String externalUrl, String categoryType){
+        public CategoryCreateCommand(Long superCategoryId, String name, String description, String urlId, String externalUrl, String categoryType,
+                                     String manage,String write,String expose,String access){
             this.superCategoryId = superCategoryId;
             this.name = name;
             this.description = description;
             this.urlId = urlId;
             this.externalUrl = externalUrl;
             this.categoryType = categoryType;
+            this.manage = manage;
+            this.write = write;
+            this.expose = expose;
+            this.access = access;
         }
     }
 
