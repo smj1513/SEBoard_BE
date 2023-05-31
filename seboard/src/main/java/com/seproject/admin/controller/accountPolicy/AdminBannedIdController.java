@@ -1,4 +1,4 @@
-package com.seproject.admin.controller;
+package com.seproject.admin.controller.accountPolicy;
 
 import com.seproject.admin.service.BannedIdService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,7 +17,7 @@ import static com.seproject.admin.dto.BannedIdDTO.*;
 
 @Tag(name = "금지 아이디 관리 API", description = "관리자 시스템의 금지 아이디 관리 API")
 @AllArgsConstructor
-@RequestMapping(value = "/admin")
+@RequestMapping(value = "/admin/accountPolicy/bannedId")
 @Controller
 public class AdminBannedIdController {
 
@@ -27,7 +27,7 @@ public class AdminBannedIdController {
     @ApiResponses({
             @ApiResponse(content = @Content(schema = @Schema(implementation = RetrieveAllBannedIdResponse.class)), responseCode = "200", description = "금지 아이디 목록 조회 성공"),
     })
-    @GetMapping("/bannedId")
+    @GetMapping()
     public ResponseEntity<?> retrieveAllBannedId() {
         RetrieveAllBannedIdResponse all = bannedIdService.findAll();
         return new ResponseEntity<>(all, HttpStatus.OK);
@@ -37,7 +37,7 @@ public class AdminBannedIdController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "금지 아이디 추가 성공"),
     })
-    @PostMapping("/bannedId")
+    @PostMapping()
     public ResponseEntity<?> createBannedId(@RequestBody CreateBannedIdRequest createBannedIdRequest) {
         bannedIdService.banId(createBannedIdRequest.getBannedId());
         return new ResponseEntity<>(HttpStatus.OK);
@@ -47,7 +47,7 @@ public class AdminBannedIdController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "금지 아이디 삭제 성공"),
     })
-    @DeleteMapping("/bannedId")
+    @DeleteMapping()
     public ResponseEntity<?> deleteBannedId(@RequestBody DeleteBannedIdRequest deleteBannedIdRequest) {
         bannedIdService.unbanId(deleteBannedIdRequest.getBannedId());
         return new ResponseEntity<>(HttpStatus.OK);
