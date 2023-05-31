@@ -31,22 +31,6 @@ public class CategoryController {
     private final CategoryAppService categoryAppService;
     private final MenuExposeService menuExposeService;
 
-    @Parameter(name = "request", description = "상위 카테고리, 생성할 카테고리 이름 정보")
-    @Operation(summary = "하위 카테고리 생성", description = "카테고리를 생성한다")
-    @PostMapping
-    public ResponseEntity<?> createCategory(@RequestBody CreateCategoryRequest request, @RequestParam String categoryType) {
-
-        /**
-         * TODO : jwt
-         *         존재하지 않는 상위 카테고리
-         *         이미 존재하는 카테고리 이름
-         *         권한 없음
-         */
-        categoryAppService.createCategory(request.toCommand(categoryType));
-
-        return new ResponseEntity<>(request, HttpStatus.OK);
-    }
-
     @GetMapping
     public ResponseEntity<?> retrieveAllMenu(){
 
@@ -87,50 +71,6 @@ public class CategoryController {
         CategoryResponse categoryResponse = categoryAppService.retrieveMenuById(menuId);
 
         return new ResponseEntity<>(categoryResponse, HttpStatus.OK);
-    }
-
-
-    @Parameters(
-            {
-                    @Parameter(name = "categoryId", description = "수정할 카테고리 pk"),
-                    @Parameter(name = "request", description = "수정할 대분류 카테고리 pk, 카테고리 이름 정보")
-            }
-    )
-    @Operation(summary = "하위 카테고리 수정", description = "소분류 카테고리를 수정한다")
-    @PutMapping("/{categoryId}")
-    public ResponseEntity<?> updateCategory(@PathVariable Long categoryId, @RequestBody UpdateCategoryRequest request) {
-
-        /**
-         * TODO : jwt
-         *    권한 없음
-         *    존재하지 않는 상위 카테고리
-         *    이미 존재하는 카테고리 이름
-         */
-        categoryAppService.updateCategory(request.toCommand(categoryId));
-
-        return new ResponseEntity<>(request, HttpStatus.OK);
-    }
-
-    @Parameter(name = "categoryId", description = "삭제할 카테고리 pk")
-    @Operation(summary = "하위 카테고리 삭제", description = "소분류 카테고리를 삭제한다.")
-    @DeleteMapping("/{categoryId}")
-    public ResponseEntity<?> deleteCategory(@PathVariable Long categoryId) {
-
-        /**
-         * TODO : jwt
-         *    권한 없음
-         *    대분류 삭제시 하위 카테고리 없어야함
-         */
-        categoryAppService.deleteCategory(categoryId);
-
-        return new ResponseEntity<>(categoryId, HttpStatus.OK);
-    }
-
-    @PostMapping("/migrate")
-    public ResponseEntity<?> migrateCategory(@RequestParam Long from,@RequestParam Long to){
-        categoryAppService.migrateCategory(from,to);
-
-        return new ResponseEntity<>(HttpStatus.OK);
     }
 
 }
