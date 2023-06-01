@@ -11,7 +11,7 @@ public class RefreshTokenNotFoundException extends NoSuchElementException {
     private final ErrorCode errorCode;
     public RefreshTokenNotFoundException(ErrorCode errorCode, NoSuchElementException e) {
         super(errorCode.getMessage());
-        this.errorCode = ErrorCode.REFRESH_TOKEN_NOT_FOUND;
+        this.errorCode = ErrorCode.DISABLE_REFRESH_TOKEN;
     }
 
 }
