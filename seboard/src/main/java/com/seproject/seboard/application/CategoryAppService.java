@@ -2,6 +2,7 @@ package com.seproject.seboard.application;
 
 import com.seproject.account.model.role.Role;
 import com.seproject.admin.domain.AccessOption;
+import com.seproject.admin.domain.MenuAuthorization;
 import com.seproject.admin.domain.SelectOption;
 import com.seproject.admin.service.AdminMenuService;
 import com.seproject.error.errorCode.ErrorCode;
@@ -155,7 +156,7 @@ public class CategoryAppService {
 
         //TODO : message
         if(!targetMenu.isRemovable(categoryService)){
-            throw new IllegalArgumentException();
+            throw new CustomIllegalArgumentException(ErrorCode.CANNOT_DELETE_MENU,null);
         }
 
         categoryRepository.deleteById(categoryId);
@@ -179,6 +180,12 @@ public class CategoryAppService {
         retrieveSubMenu(targetMenu, res);
 
         return res;
+    }
+
+    public List<Menu> retrieveCategoryBySuperCategoryId(Long superMenuId){
+
+        List<Menu> subMenus = menuRepository.findBySuperMenuWithAuthorization(superMenuId);
+        return subMenus;
     }
 
     protected void retrieveSubMenu(Menu targetMenu, CategoryResponse res){
@@ -240,4 +247,20 @@ public class CategoryAppService {
 
         return response;
     }
+
+    public Map<Menu,List<Menu>> retrieveAllMenuForAdmin() {
+        List<Menu> menus = menuRepository.findByDepth(0);
+        Map<Menu,List<Menu>> response = new HashMap<>();
+
+        for (Menu menu : menus) {
+            List<Menu> subMenus = Collections.emptyList();
+            if(!(menu instanceof BoardMenu)) {
+                subMenus = menuRepository.findBySuperMenu(menu.getMenuId());
+            }
+            response.put(menu,subMenus);
+        }
+
+        return response;
+    }
+
 }
