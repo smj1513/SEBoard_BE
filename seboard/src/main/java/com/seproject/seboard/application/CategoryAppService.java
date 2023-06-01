@@ -1,9 +1,7 @@
 package com.seproject.seboard.application;
 
 import com.seproject.account.model.role.Role;
-import com.seproject.admin.controller.dto.CategoryDTO;
 import com.seproject.admin.domain.AccessOption;
-import com.seproject.admin.domain.MenuAuthorization;
 import com.seproject.admin.domain.SelectOption;
 import com.seproject.admin.service.AdminMenuService;
 import com.seproject.error.errorCode.ErrorCode;
@@ -19,7 +17,6 @@ import com.seproject.seboard.domain.repository.category.MenuRepository;
 import com.seproject.seboard.domain.repository.post.PostRepository;
 import com.seproject.seboard.domain.service.CategoryService;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -183,11 +180,11 @@ public class CategoryAppService {
         return res;
     }
 
-    public SubCategoryRetrieveResponse retrieveCategoryBySuperCategoryId(Long superMenuId){
+    public CategoryRetrieveResponse retrieveCategoryBySuperCategoryId(Long superMenuId){
         Menu menu = menuRepository.findById(superMenuId).orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.NOT_EXIST_CATEGORY,null));
         List<Menu> subMenus = menuRepository.findBySuperMenuWithAuthorization(superMenuId);
 
-        return SubCategoryRetrieveResponse.toDTO(menu,subMenus);
+        return CategoryRetrieveResponse.toDTO(menu,subMenus);
     }
 
     protected void retrieveSubMenu(Menu targetMenu, CategoryResponse res){

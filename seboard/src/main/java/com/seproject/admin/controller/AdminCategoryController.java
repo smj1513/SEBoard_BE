@@ -1,7 +1,5 @@
 package com.seproject.admin.controller;
 
-import com.seproject.admin.controller.dto.CategoryDTO;
-import com.seproject.admin.dto.AccountDTO;
 import com.seproject.seboard.application.CategoryAppService;
 import com.seproject.seboard.controller.dto.post.CategoryRequest;
 import com.seproject.seboard.controller.dto.post.CategoryResponse;
@@ -20,7 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -83,6 +80,9 @@ public class AdminCategoryController {
                     @Parameter(name = "categoryId", description = "수정할 카테고리 pk"),
             }
     )
+    @ApiResponses({
+            @ApiResponse(content = @Content(schema = @Schema(implementation = CategoryRetrieveResponse.class)), responseCode = "200", description = "메뉴 목록을 조회"),
+    })
     @Operation(summary = "카테고리 정보 상세 조회", description = "카테고리 정보를 상세하게 조회한다.")
     @GetMapping("/{categoryId}")
     public ResponseEntity<?> retrieveCategoryInfo(@PathVariable Long categoryId) {

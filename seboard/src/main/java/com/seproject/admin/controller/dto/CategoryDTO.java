@@ -29,19 +29,19 @@ public class CategoryDTO {
     }
     @Data
     @Builder(access = AccessLevel.PRIVATE)
-    public static class SubCategoryRetrieveResponse {
+    public static class CategoryRetrieveResponse {
         private Long menuId;
         private String name;
         private String urlId;
-        private List<SubCategoryResponseElement> subMenus;
+        private List<CategoryResponseElement> subMenus;
 
-        public static SubCategoryRetrieveResponse toDTO(Menu menu , List<Menu> subMenus) {
+        public static CategoryRetrieveResponse toDTO(Menu menu , List<Menu> subMenus) {
             return builder()
                     .menuId(menu.getMenuId())
                     .name(menu.getName())
                     .urlId(menu.getUrlInfo())
                     .subMenus(subMenus.stream()
-                            .map(SubCategoryResponseElement::toDTO)
+                            .map(CategoryResponseElement::toDTO)
                             .collect(Collectors.toList()))
                     .build();
         }
@@ -49,7 +49,7 @@ public class CategoryDTO {
 
     @Data
     @Builder(access = AccessLevel.PRIVATE)
-    public static class SubCategoryResponseElement {
+    public static class CategoryResponseElement {
         private String name;
         private Long menuId;
         private String urlId;
@@ -57,7 +57,7 @@ public class CategoryDTO {
         private List<String> writeRole;
         private List<String> manageRole;
 
-        public static SubCategoryResponseElement toDTO(Menu menu) {
+        public static CategoryResponseElement toDTO(Menu menu) {
             List<MenuAuthorization> menuAuthorizations = menu.getMenuAuthorizations();
 
             List<String> writeRole = new ArrayList<>();
