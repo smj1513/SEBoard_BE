@@ -46,6 +46,7 @@ public class CategoryDTO {
     public static class SubCategoryResponseElement {
         private String name;
         private Long menuId;
+        private String urlId;
 
         private List<String> writeRole;
         private List<String> manageRole;
@@ -70,6 +71,7 @@ public class CategoryDTO {
             return builder()
                     .name(menu.getName())
                     .menuId(menu.getMenuId())
+                    .urlId(menu.getUrlInfo())
                     .writeRole(writeRole)
                     .manageRole(manageRole)
                     .build();
