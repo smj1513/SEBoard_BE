@@ -63,7 +63,6 @@ public class AuthorizationController {
         categoryAppService.updateCategory(
                 new CategoryCommand.CategoryUpdateCommand(categoryId,
                         request.getName(),
-                        request.getDescription(),
                         request.getUrlId(),
                         request.getExternalUrl())
         );

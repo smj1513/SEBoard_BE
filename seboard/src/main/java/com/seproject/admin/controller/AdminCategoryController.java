@@ -77,18 +77,19 @@ public class AdminCategoryController {
         return new ResponseEntity<>(AdminCategoryRetrieveResponse.toDTO(categoryResponses), HttpStatus.OK);
     }
 
-    @Parameter(name = "request", description = "관리자가 메뉴(BoardMenu 까지) 정보를 조회")
-    @Operation(summary = "관리자가 하위 카테고리 목록을 조회", description = "관리자가 하위 카테고리 목록을 조회한다")
-    @ApiResponses({
-            @ApiResponse(content = @Content(schema = @Schema(implementation = AdminCategoryRetrieveResponse.class)), responseCode = "200", description = "메뉴 목록을 조회"),
-    })
-    @GetMapping("/{categoryId}/subMenus")
-    public ResponseEntity<?> retrieveCategory(@PathVariable Long categoryId) {
-        List<Menu> menus = categoryAppService.retrieveCategoryBySuperCategoryId(categoryId);
-        return new ResponseEntity<>(SubCategoryRetrieveResponse.toDTO(menus), HttpStatus.OK);
-    }
 
     @Parameters(
+            {
+                    @Parameter(name = "categoryId", description = "수정할 카테고리 pk"),
+            }
+    )
+    @Operation(summary = "카테고리 정보 상세 조회", description = "카테고리 정보를 상세하게 조회한다.")
+    @GetMapping("/{categoryId}")
+    public ResponseEntity<?> retrieveCategoryInfo(@PathVariable Long categoryId) {
+        return new ResponseEntity<>(categoryAppService.retrieveCategoryBySuperCategoryId(categoryId), HttpStatus.OK);
+    }
+
+        @Parameters(
             {
                     @Parameter(name = "categoryId", description = "수정할 카테고리 pk"),
                     @Parameter(name = "request", description = "수정할 대분류 카테고리 pk, 카테고리 이름 정보")

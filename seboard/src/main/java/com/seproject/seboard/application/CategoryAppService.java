@@ -1,6 +1,7 @@
 package com.seproject.seboard.application;
 
 import com.seproject.account.model.role.Role;
+import com.seproject.admin.controller.dto.CategoryDTO;
 import com.seproject.admin.domain.AccessOption;
 import com.seproject.admin.domain.MenuAuthorization;
 import com.seproject.admin.domain.SelectOption;
@@ -25,6 +26,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
 
 import static com.seproject.seboard.application.utils.AppServiceHelper.findByIdOrThrow;
+import static com.seproject.admin.controller.dto.CategoryDTO.*;
 
 @Service
 @AllArgsConstructor
@@ -139,7 +141,6 @@ public class CategoryAppService {
         Menu targetMenu = findByIdOrThrow(command.getCategoryId(), menuRepository, "");
 
         targetMenu.changeName(command.getName());
-        targetMenu.changeDescription(command.getDescription());
 
         if(targetMenu instanceof InternalSiteMenu){
             InternalSiteMenu internalSiteMenu = (InternalSiteMenu) targetMenu;
@@ -182,10 +183,11 @@ public class CategoryAppService {
         return res;
     }
 
-    public List<Menu> retrieveCategoryBySuperCategoryId(Long superMenuId){
-
+    public SubCategoryRetrieveResponse retrieveCategoryBySuperCategoryId(Long superMenuId){
+        Menu menu = menuRepository.findById(superMenuId).orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.NOT_EXIST_CATEGORY,null));
         List<Menu> subMenus = menuRepository.findBySuperMenuWithAuthorization(superMenuId);
-        return subMenus;
+
+        return SubCategoryRetrieveResponse.toDTO(menu,subMenus);
     }
 
     protected void retrieveSubMenu(Menu targetMenu, CategoryResponse res){

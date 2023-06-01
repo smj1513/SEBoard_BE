@@ -40,7 +40,6 @@ public class CategoryRequest {
     public static class UpdateCategoryRequest {
 
         private String name;
-        private String description;
         private String urlId;
         private String externalUrl;
 
@@ -48,7 +47,6 @@ public class CategoryRequest {
             return new CategoryUpdateCommand(
                     categoryId,
                     this.getName(),
-                    this.getDescription(),
                     this.getUrlId(),
                     this.getExternalUrl()
             );

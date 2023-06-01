@@ -30,10 +30,16 @@ public class CategoryDTO {
     @Data
     @Builder(access = AccessLevel.PRIVATE)
     public static class SubCategoryRetrieveResponse {
+        private Long menuId;
+        private String name;
+        private String urlId;
         private List<SubCategoryResponseElement> subMenus;
 
-        public static SubCategoryRetrieveResponse toDTO(List<Menu> subMenus) {
+        public static SubCategoryRetrieveResponse toDTO(Menu menu , List<Menu> subMenus) {
             return builder()
+                    .menuId(menu.getMenuId())
+                    .name(menu.getName())
+                    .urlId(menu.getUrlInfo())
                     .subMenus(subMenus.stream()
                             .map(SubCategoryResponseElement::toDTO)
                             .collect(Collectors.toList()))
