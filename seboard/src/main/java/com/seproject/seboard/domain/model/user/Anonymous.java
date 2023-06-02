@@ -15,6 +15,10 @@ import javax.persistence.Table;
 @Table(name="anonymous")
 @PrimaryKeyJoinColumn(name="anonymous_id")
 public class Anonymous extends BoardUser {
+    @Override
+    public String getLoginId(){
+        return null;
+    }
 
     @Override
     public boolean isAnonymous() {

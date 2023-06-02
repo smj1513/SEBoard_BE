@@ -16,6 +16,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class FileAppService {
     private final FileMetaDataRepository fileMetaDataRepository;
     private final FileRepository fileRepository;

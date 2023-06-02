@@ -2,8 +2,13 @@ package com.seproject.admin.service;
 
 import com.seproject.account.model.account.Account;
 import com.seproject.account.utils.SecurityUtils;
+import com.seproject.admin.controller.dto.file.FileRequest;
+import com.seproject.admin.controller.dto.file.FileRequest.AdminFileRetrieveCondition;
+import com.seproject.admin.controller.dto.file.FileResponse;
+import com.seproject.admin.controller.dto.file.FileResponse.AdminFileRetrieveResponse;
 import com.seproject.admin.controller.dto.file.FileResponse.FileExtensionResponse;
 import com.seproject.admin.domain.FileExtension;
+import com.seproject.admin.domain.repository.AdminFileMetaDataSearchRepository;
 import com.seproject.admin.domain.repository.FileExtensionRepository;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.InvalidAuthorizationException;
@@ -11,6 +16,8 @@ import com.seproject.seboard.application.utils.FileUtils;
 import com.seproject.seboard.domain.repository.commons.FileMetaDataRepository;
 import com.seproject.seboard.domain.repository.commons.FileRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,6 +31,20 @@ public class AdminFileAppService {
     private final FileMetaDataRepository fileMetaDataRepository;
     private final FileRepository fileRepository;
     private final FileExtensionRepository fileExtensionRepository;
+    private final AdminFileMetaDataSearchRepository fileMetaDataSearchRepository;
+
+    public Page<AdminFileRetrieveResponse> retrieveFileMetaData(AdminFileRetrieveCondition condition, Pageable pageable) {
+        Account account = SecurityUtils.getAccount()
+                .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
+
+        boolean isAdmin = account.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+
+        if(!isAdmin){
+            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
+        }
+
+        return fileMetaDataSearchRepository.findFileMetaDataByCondition(condition, pageable);
+    }
 
     public void deleteBulkFile(List<Long> fileIds) {
         Account account = SecurityUtils.getAccount()
