@@ -12,4 +12,7 @@ public interface PostRepository extends JpaRepository<Post,Long> {
 
     @Query(value = "select * from posts where category_id = :categoryId", nativeQuery = true)
     List<Post> findByCategoryId(Long categoryId);
+
+    @Query(value = "select p from Post p join p.author join p.author.account where p.author.account.accountId = :accountId")
+    List<Post> findByAccountId(Long accountId);
 }

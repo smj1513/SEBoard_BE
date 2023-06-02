@@ -1,6 +1,7 @@
 package com.seproject.account.model.account;
 
 import com.seproject.account.model.role.Role;
+import com.seproject.seboard.domain.model.common.Status;
 import lombok.*;
 import org.springframework.security.core.userdetails.UserDetails;
 
@@ -30,7 +31,9 @@ public abstract class Account implements UserDetails {
             inverseJoinColumns={@JoinColumn(name="role_id", referencedColumnName="roleId")})
     protected List<Role> authorities;
     protected LocalDateTime createdAt;
-    protected boolean isDeleted;
+
+    @Enumerated(EnumType.STRING)
+    protected Status status;
 
 //    @Builder
 //    public Account(Long accountId, String loginId,
@@ -61,8 +64,17 @@ public abstract class Account implements UserDetails {
         return password;
     }
 
-    public void delete() {
-        this.isDeleted = true;
+    public String changeNickname(String nickname) {
+        this.nickname = nickname;
+        return nickname;
+    }
+
+    public void delete(boolean isPermanent) {
+        if(isPermanent) {
+            status = Status.PERMANENT_DELETED;
+        } else {
+            status = Status.TEMP_DELETED;
+        }
     }
 
     public String getUsername() {

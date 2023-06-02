@@ -2,6 +2,7 @@ package com.seproject.admin.controller;
 
 import com.seproject.admin.domain.MainPageMenu;
 import com.seproject.admin.service.MainPageService;
+import com.seproject.seboard.domain.model.category.InternalSiteMenu;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -26,7 +27,7 @@ public class AdminMainPageController {
 
     private final MainPageService mainPageService;
 
-    @Operation(summary = "메인 페이지에 보여줄 메뉴 조회", description = "메인 페이지에 보여줄 메뉴의 종류를 조회한다.")
+    @Operation(summary = "메인 페이지에 보여줄 메뉴 조회", description = "메인 페이지에 보여줄 메뉴로 설정된 정보를 조회한다.")
     @ApiResponses({
             @ApiResponse(content = @Content(schema = @Schema(implementation = RetrieveAllMainPageMenuRequest.class)), responseCode = "200", description = "목록 조회 성공"),
     })
@@ -36,13 +37,23 @@ public class AdminMainPageController {
         return new ResponseEntity<>(RetrieveAllMainPageMenuRequest.toDTO(mainPageMenus), HttpStatus.OK);
     }
 
+    @Operation(summary = "메인 페이지에 등록 가능한 메뉴 목록을 조회한다.", description = "메인 페이지에 등록 가능한 메뉴의 정보를 조회한다.(메인 페이지에 보여줄 메뉴  조회 기능과 통합될 수 있음)")
+    @ApiResponses({
+            @ApiResponse(content = @Content(schema = @Schema(implementation = AllInternalSiteMenuResponse.class)), responseCode = "200", description = "목록 조회 성공"),
+    })
+    @GetMapping("/mainPageMenus/all")
+    public ResponseEntity<?> retrieveAllInternalSiteMenu() {
+        List<InternalSiteMenu> menus = mainPageService.retrieveAllInternalSiteMenu();
+        return new ResponseEntity<>(AllInternalSiteMenuResponse.toDTO(menus), HttpStatus.OK);
+    }
+
     @Operation(summary = "메인 페이지에 보여줄 메뉴 추가", description = "메인 페이지에 보여줄 메뉴를 추가한다.")
     @ApiResponses({
             @ApiResponse(content = @Content(schema = @Schema(implementation = CreateMainPageMenuResponse.class)), responseCode = "200", description = "메뉴 추가 성공"),
     })
     @PostMapping("/mainPageMenus")
     public ResponseEntity<?> addMainPageMenus(@RequestBody CreateMainPageMenuRequest request) {
-        //TODO : Menu만?
+        //TODO : InternalSiteMenu만 적용할 수 있도록
         MainPageMenu mainPageMenu = mainPageService.createMainPageMenu(request.getMenuId());
         return new ResponseEntity<>(CreateMainPageMenuResponse.toDTO(mainPageMenu),HttpStatus.OK);
     }

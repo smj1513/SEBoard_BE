@@ -117,6 +117,15 @@ public class AdminMenuService {
 
     private void update(Menu menu ,CategoryAccessUpdateRequestElement element, AccessOption accessOption) {
         SelectOption selectOption = SelectOption.of(element.getOption());
+        update(menu,selectOption,accessOption);
+    }
+
+    private void accessUpdate(Menu menu,CategoryAccessUpdateRequestElement access) {
+        SelectOption selectOption = SelectOption.of(access.getOption());
+        accessUpdate(menu,selectOption);
+    }
+
+    public void update(Menu menu , SelectOption selectOption, AccessOption accessOption) {
         List<Role> roles = roleService.convertRoles(selectOption);
 
         List<MenuAuthorization> collect = roles.stream().map(role ->
@@ -130,27 +139,44 @@ public class AdminMenuService {
         menu.updateMenuAuthorizations(collect);
     }
 
-    private void accessUpdate(Menu menu,CategoryAccessUpdateRequestElement access) {
-        SelectOption selectOption = SelectOption.of(access.getOption());
+    public void accessUpdate(Menu menu,SelectOption selectOption) {
         List<Role> roles = roleService.convertRoles(selectOption);
         String path = "/category/" + menu.getMenuId() + "/**";
 
-        Authorization authorization = authorizationRepository.findByPath(path)
-                .orElse(Authorization.builder()
-                            .path(path)
-                            .build()
-                );
+        Optional<Authorization> optional = authorizationRepository.findByPath(path);
 
-        List<RoleAuthorization> collect = roles.stream().map(role ->
-                RoleAuthorization.builder()
-                        .role(role)
-                        .authorization(authorization)
-                        .build()).collect(Collectors.toList());
+        if(optional.isPresent()) {
+            Authorization authorization = optional.get();
 
-        authorization.setRoleAuthorizations(collect);
-        authorization.setSelectOption(selectOption);
+            List<RoleAuthorization> collect = roles.stream().map(role ->
+                    RoleAuthorization.builder()
+                            .role(role)
+                            .authorization(authorization)
+                            .build()).collect(Collectors.toList());
 
-        authorizationRepository.save(authorization);
+            authorization.setRoleAuthorizations(collect);
+            authorization.setSelectOption(selectOption);
+
+            authorizationRepository.save(authorization);
+        } else {
+
+            Authorization authorization = Authorization.builder()
+                    .path(path)
+                    .build();
+
+            List<RoleAuthorization> collect = roles.stream().map(role ->
+                    RoleAuthorization.builder()
+                            .role(role)
+                            .authorization(authorization)
+                            .build()).collect(Collectors.toList());
+
+            authorization.setRoleAuthorizations(collect);
+            authorization.setSelectOption(selectOption);
+
+            authorizationRepository.save(authorization);
+        }
+
+
     }
 
 }

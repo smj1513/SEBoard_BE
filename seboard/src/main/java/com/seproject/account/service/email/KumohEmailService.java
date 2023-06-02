@@ -4,6 +4,7 @@ import com.seproject.account.model.email.AccountRegisterConfirmedEmail;
 import com.seproject.account.model.email.AccountRegisterEmail;
 import com.seproject.account.model.email.KumohConfirmedEmail;
 import com.seproject.account.model.email.KumohEmail;
+import com.seproject.account.repository.AccountRepository;
 import com.seproject.account.repository.email.KumohConfirmedEmailRepository;
 import com.seproject.account.repository.email.KumohEmailRepository;
 import com.seproject.error.errorCode.ErrorCode;
@@ -24,6 +25,7 @@ public class KumohEmailService extends EmailService{
 
     private final KumohEmailRepository kumohEmailRepository;
     private final KumohConfirmedEmailRepository kumohConfirmedEmailRepository;
+    private final AccountRepository accountRepository;
 
     @Async
     @Override
@@ -31,6 +33,10 @@ public class KumohEmailService extends EmailService{
 
         if(!isKumohMail(email)){
             throw new CustomIllegalArgumentException(ErrorCode.INVALID_MAIL,null);
+        }
+
+        if(accountRepository.existsByLoginId(email)) {
+            throw new CustomIllegalArgumentException(ErrorCode.USER_ALREADY_EXIST,null);
         }
 
         KumohEmail kumohEmail = new KumohEmail(email);

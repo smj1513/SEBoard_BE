@@ -105,5 +105,23 @@ public class AccountDTO {
 
     }
 
+    @Data
+    public static class MyInfoChangeRequest {
+        private String nickname;
+
+    }
+
+    @Data
+    @Builder(access = AccessLevel.PRIVATE)
+    public static class MyInfoChangeResponse {
+        private String nickname;
+
+        public static MyInfoChangeResponse toDTO(Account account) {
+            return builder()
+                    .nickname(account.getNickname())
+                    .build();
+        }
+    }
+
 
 }

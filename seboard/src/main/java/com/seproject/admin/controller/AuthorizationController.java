@@ -7,6 +7,7 @@ import com.seproject.admin.domain.AccessOption;
 import com.seproject.admin.domain.MenuAuthorization;
 import com.seproject.admin.service.AdminMenuService;
 import com.seproject.seboard.application.CategoryAppService;
+import com.seproject.seboard.application.dto.category.CategoryCommand;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
@@ -33,6 +34,7 @@ import static com.seproject.admin.dto.AuthorizationDTO.*;
 public class AuthorizationController {
 
     private final AdminMenuService adminMenuService;
+    private final CategoryAppService categoryAppService;
     private final UrlFilterInvocationSecurityMetaDataSource urlFilterInvocationSecurityMetaDataSource;
 
     @Operation(summary = "카테고리에 설정된 권한 조회", description = "카테고리에 설정된 접근 권한을 보여준다.")
@@ -58,6 +60,12 @@ public class AuthorizationController {
     @PostMapping("/authorization/category/{categoryId}")
     public ResponseEntity<?> updateCategoryAccess(@PathVariable long categoryId,@RequestBody CategoryAccessUpdateRequest request) {
         adminMenuService.update(categoryId,request);
+        categoryAppService.updateCategory(
+                new CategoryCommand.CategoryUpdateCommand(categoryId,
+                        request.getName(),
+                        request.getUrlId(),
+                        request.getExternalUrl())
+        );
 
         try {
             urlFilterInvocationSecurityMetaDataSource.reset();

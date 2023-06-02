@@ -44,7 +44,7 @@ public class TokenService {
         refreshToken = jwt.getRefreshToken();
 
         if(existRefreshToken(refreshToken)) {
-            throw new CustomAuthenticationException(ErrorCode.TOKEN_EXPIRED,null);
+            throw new CustomAuthenticationException(ErrorCode.DISABLE_REFRESH_TOKEN,null);
         }
 
 

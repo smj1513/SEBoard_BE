@@ -1,6 +1,7 @@
 package com.seproject.admin.dto;
 
 import com.seproject.admin.domain.MainPageMenu;
+import com.seproject.seboard.domain.model.category.InternalSiteMenu;
 import com.seproject.seboard.domain.model.category.Menu;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -23,6 +24,42 @@ public class MainPageDTO {
                     .mainPageMenus(menus.stream()
                             .map(RetrieveMainPageMenuRequest::toDTO)
                             .collect(Collectors.toList()))
+                    .build();
+        }
+    }
+
+    @Data
+    @Builder(access = AccessLevel.PRIVATE)
+    public static class AllInternalSiteMenuResponse {
+
+        private List<InternalSiteMenuResponse> menus;
+
+        public static AllInternalSiteMenuResponse toDTO(List<InternalSiteMenu> menus) {
+
+            return builder()
+                    .menus(menus.stream()
+                            .map(InternalSiteMenuResponse::toDTO)
+                            .collect(Collectors.toList()))
+                    .build();
+        }
+    }
+
+    @Data
+    @Builder(access = AccessLevel.PRIVATE)
+    public static class InternalSiteMenuResponse {
+
+        private Long categoryId;
+        private String name;
+        private String description;
+        private String url;
+
+        public static InternalSiteMenuResponse toDTO(InternalSiteMenu internalSiteMenu) {
+
+            return builder()
+                    .categoryId(internalSiteMenu.getMenuId())
+                    .name(internalSiteMenu.getName())
+                    .description(internalSiteMenu.getDescription())
+                    .url(internalSiteMenu.getUrlInfo())
                     .build();
         }
     }

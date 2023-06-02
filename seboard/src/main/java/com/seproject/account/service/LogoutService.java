@@ -9,6 +9,8 @@ import com.seproject.account.model.token.LogoutToken;
 import com.seproject.account.repository.token.LogoutLargeRefreshTokenRepository;
 import com.seproject.account.repository.token.LogoutRefreshTokenRepository;
 import com.seproject.account.repository.token.LogoutTokenRepository;
+import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.CustomAuthenticationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -36,10 +38,14 @@ public class LogoutService {
         String refreshToken = jwt.getRefreshToken();
         logoutTokenRepository.save(new LogoutToken(accessToken));
 
-        if(jwtDecoder.isLargeToken(refreshToken)) {
-            logoutLargeRefreshTokenRepository.save(new LogoutLargeRefreshToken(refreshToken));
-        } else {
-            logoutRefreshTokenRepository.save(new LogoutRefreshToken(refreshToken));
+        try{
+            if(jwtDecoder.isLargeToken(refreshToken)) {
+                logoutLargeRefreshTokenRepository.save(new LogoutLargeRefreshToken(refreshToken));
+            } else {
+                logoutRefreshTokenRepository.save(new LogoutRefreshToken(refreshToken));
+            }
+        } catch (CustomAuthenticationException e) {
+            throw new CustomAuthenticationException(ErrorCode.DISABLE_REFRESH_TOKEN,null);
         }
 
     }
