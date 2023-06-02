@@ -28,4 +28,15 @@ public enum SelectOption {
         }
         throw new CustomIllegalArgumentException(ErrorCode.CANNOT_FOUND_OPTION,null);
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public boolean equals(SelectOption selectOption){
+        if(selectOption == null) return false;
+
+        return selectOption.name.equals(this.name);
+
+    }
 }

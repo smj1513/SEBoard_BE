@@ -3,23 +3,35 @@ package com.seproject.account.service;
 import com.seproject.account.model.account.FormAccount;
 import com.seproject.account.model.account.OAuthAccount;
 import com.seproject.account.repository.social.OAuthAccountRepository;
+import com.seproject.account.service.email.KumohEmailService;
 import com.seproject.account.service.email.RegisterEmailService;
 import com.seproject.account.utils.SecurityUtils;
 import com.seproject.admin.service.BannedIdService;
 import com.seproject.admin.service.BannedNicknameService;
 import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.CustomAuthenticationException;
 import com.seproject.error.exception.CustomIllegalArgumentException;
 import com.seproject.error.exception.CustomUserNotFoundException;
 import com.seproject.account.repository.AccountRepository;
 import com.seproject.account.repository.role.RoleRepository;
 import com.seproject.account.model.account.Account;
 import com.seproject.account.model.role.Role;
+import com.seproject.seboard.domain.model.comment.Comment;
+import com.seproject.seboard.domain.model.post.Bookmark;
+import com.seproject.seboard.domain.model.post.Post;
+import com.seproject.seboard.domain.model.user.BoardUser;
 import com.seproject.seboard.domain.model.user.Member;
+import com.seproject.seboard.domain.repository.comment.CommentRepository;
+import com.seproject.seboard.domain.repository.post.BookmarkRepository;
+import com.seproject.seboard.domain.repository.post.PostRepository;
+import com.seproject.seboard.domain.repository.post.PostSearchRepository;
+import com.seproject.seboard.domain.repository.user.BoardUserRepository;
 import com.seproject.seboard.domain.repository.user.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -49,6 +61,10 @@ public class AccountService implements UserDetailsService {
 
     private final BannedIdService bannedIdService;
     private final BannedNicknameService bannedNicknameService;
+    private final PostRepository postRepository;
+    private final CommentRepository commentRepository;
+    private final BookmarkRepository bookmarkRepository;
+    private final KumohEmailService kumohEmailService;
 
     public boolean isExist(String loginId){
         return accountRepository.existsByLoginId(loginId);
@@ -62,7 +78,6 @@ public class AccountService implements UserDetailsService {
         return account.getClass() == OAuthAccount.class;
     }
 
-
     private Role mapEmailToRole(String email) {
 
         if(registerEmailService.isKumohMail(email)){
@@ -73,7 +88,6 @@ public class AccountService implements UserDetailsService {
 
         throw new CustomIllegalArgumentException(ErrorCode.INVALID_MAIL,null);
     }
-
     @Transactional
     public OAuthAccount register(OAuth2RegisterRequest oAuth2RegisterRequest) {
         String email = oAuth2RegisterRequest.getEmail();
@@ -106,7 +120,6 @@ public class AccountService implements UserDetailsService {
 
         return oAuthAccount;
     }
-
     @Transactional
     public Account register(FormRegisterRequest formRegisterRequest) {
 
@@ -137,8 +150,6 @@ public class AccountService implements UserDetailsService {
         memberRepository.save(member);
         return account;
     }
-
-
     public RetrieveAllAccountResponse findAllAccount(int page,int perPage) {
 
         try {
@@ -154,12 +165,10 @@ public class AccountService implements UserDetailsService {
         }
 
     }
-
     public RetrieveAccountResponse findAccount(Long accountId) {
         Account account = accountRepository.findById(accountId).orElseThrow();
         return RetrieveAccountResponse.toDTO(account);
     }
-
     private List<Role> convertAuthorities(List<String> authorities) {
         List<Role> convertedAuthorities = roleRepository.findByNameIn(authorities);
 
@@ -169,7 +178,6 @@ public class AccountService implements UserDetailsService {
 
         return convertedAuthorities;
     }
-
     @Transactional
     public CreateAccountResponse createAccount(CreateAccountRequest request) {
 
@@ -198,7 +206,6 @@ public class AccountService implements UserDetailsService {
 
         return CreateAccountResponse.toDTO(savedAccount);
     }
-
     @Transactional
     public UpdateAccountResponse updateAccount(UpdateAccountRequest request) {
 
@@ -229,11 +236,28 @@ public class AccountService implements UserDetailsService {
         if(isOAuthUser(account.getLoginId())) {
             OAuthAccount oAuthAccount = oAuthAccountRepository.findByLoginId(account.getLoginId())
                     .orElseThrow(() -> new RuntimeException("oAuth 유저 체크는 통과했으나 찾을수 없는 경우"));
-
-            oAuthAccountRepository.delete(oAuthAccount);
+            oAuthAccount.removeSub();
+//            TODO : 외래키 제약조건 걸림 oAuthAccountRepository.delete(oAuthAccount);
         }
 
-        account.delete();
+        account.delete(true);
+
+        List<Post> writePost = postRepository.findByAccountId(accountId);
+
+        for (Post post : writePost) {
+            post.delete(true);
+        }
+
+        List<Comment> writeComment = commentRepository.findCommentsByAccountId(accountId);
+
+        for (Comment comment : writeComment) {
+            comment.delete(true);
+        }
+
+        List<Long> bookmarkIds = bookmarkRepository.findBookmarkByAccountId(accountId)
+                .stream().map(Bookmark::getBookmarkId)
+                .collect(Collectors.toList());
+        bookmarkRepository.deleteAllByIdInBatch(bookmarkIds);
 
         return DeleteAccountResponse.toDTO(account);
     }
@@ -278,8 +302,16 @@ public class AccountService implements UserDetailsService {
     @Transactional
     public KumohAuthResponse grantKumohAuth(KumohAuthRequest kumohAuthRequest) {
         String email = kumohAuthRequest.getEmail();
-        Account account = accountRepository.findByLoginId(email)
+        String loginId = SecurityUtils.getLoginId();
+
+        if(loginId == null)
+            throw new CustomAuthenticationException(ErrorCode.NOT_LOGIN,null);
+        if(!kumohEmailService.isConfirmed(email))
+            throw new CustomIllegalArgumentException(ErrorCode.EMAIL_NOT_FOUNT,null);
+
+        Account account = accountRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
+
         List<Role> authorities = account.getAuthorities();
 
         boolean flag = false;
@@ -302,6 +334,16 @@ public class AccountService implements UserDetailsService {
         return MyInfoResponse.toDTO(account.getLoginId(),account.getNickname(),account.getAuthorities().stream()
                 .map(Role::getAuthority)
                 .collect(Collectors.toList()));
+    }
+
+    @Transactional
+    public Account changeNickname(String loginId,String nickname) {
+        Account account = accountRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND, null));
+
+        account.changeNickname(nickname);
+
+        return account;
     }
 
 }

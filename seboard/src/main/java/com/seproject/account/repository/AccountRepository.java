@@ -8,12 +8,12 @@ import java.util.Optional;
 
 public interface AccountRepository extends JpaRepository<Account,Long> {
 
-    @Query("select a from Account a where a.loginId = :loginId and a.isDeleted = false")
+    @Query("select a from Account a where a.loginId = :loginId and a.status = 'NORMAL'")
     Optional<Account> findByLoginId(String loginId);
 
-    @Query(value = "select exists(select * from accounts where login_id = :loginId and is_deleted = false)",nativeQuery = true)
+    @Query(value = "select exists(select * from accounts where login_id = :loginId and status = 'NORMAL')",nativeQuery = true)
     boolean existsByLoginId(String loginId);
 
-    @Query(value = "select exists(select * from accounts where nickname = :nickname and is_deleted = false)",nativeQuery = true)
+    @Query(value = "select exists(select * from accounts where nickname = :nickname and status = 'NORMAL')",nativeQuery = true)
     boolean existsByNickname(String nickname);
 }

@@ -1,6 +1,11 @@
 package com.seproject.seboard.application;
 
 import com.seproject.account.model.role.Role;
+import com.seproject.admin.domain.AccessOption;
+import com.seproject.admin.domain.SelectOption;
+import com.seproject.admin.service.AdminMenuService;
+import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.CustomIllegalArgumentException;
 import com.seproject.seboard.application.dto.category.CategoryCommand.CategoryCreateCommand;
 import com.seproject.seboard.application.dto.category.CategoryCommand.CategoryUpdateCommand;
 import com.seproject.seboard.controller.dto.post.CategoryResponse;
@@ -12,13 +17,13 @@ import com.seproject.seboard.domain.repository.category.MenuRepository;
 import com.seproject.seboard.domain.repository.post.PostRepository;
 import com.seproject.seboard.domain.service.CategoryService;
 import lombok.AllArgsConstructor;
-import org.springframework.security.core.parameters.P;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
 import static com.seproject.seboard.application.utils.AppServiceHelper.findByIdOrThrow;
+import static com.seproject.admin.controller.dto.CategoryDTO.*;
 
 @Service
 @AllArgsConstructor
@@ -30,6 +35,7 @@ public class CategoryAppService {
     private final CategoryRepository categoryRepository;
     private final ExternalSiteMenuRepository externalSiteMenuRepository;
     private final PostRepository postRepository;
+    private final AdminMenuService adminMenuService;
 
     public void createCategory(CategoryCreateCommand command){
         //TODO : 상위 카테고리로 지정할 수 있는 카테고리 구분?
@@ -48,6 +54,14 @@ public class CategoryAppService {
                     .description(command.getDescription())
                     .build();
 
+            String access = command.getAccess();
+
+            if(access == null) {
+                throw new CustomIllegalArgumentException(ErrorCode.INVALID_MENU_REQUEST, null);
+            }
+
+            adminMenuService.accessUpdate(menu,SelectOption.of(access));
+
             menuRepository.save(menu);
         }else if(command.getCategoryType().equals("BOARD")){
             BoardMenu boardMenu = BoardMenu.builder()
@@ -57,7 +71,17 @@ public class CategoryAppService {
                     .urlInfo(command.getUrlId())
                     .build();
 
+            String expose = command.getExpose();
+            String access = command.getAccess();
+
+            if(access == null || expose == null) {
+                throw new CustomIllegalArgumentException(ErrorCode.INVALID_MENU_REQUEST, null);
+            }
+
             boardMenuRepository.save(boardMenu);
+
+            adminMenuService.accessUpdate(boardMenu,SelectOption.of(access));
+            adminMenuService.update(boardMenu,SelectOption.of(expose),AccessOption.EXPOSE);
 
             Category category = Category.builder()
                     .superMenu(boardMenu)
@@ -76,6 +100,20 @@ public class CategoryAppService {
                     .build();
 
             categoryRepository.save(category);
+
+            String manage = command.getManage();
+            String write = command.getWrite();
+
+            if(manage == null || write == null) {
+                throw new CustomIllegalArgumentException(ErrorCode.INVALID_MENU_REQUEST, null);
+            }
+
+            SelectOption manageSelectOption = SelectOption.of(manage);
+            SelectOption writeSelectOption = SelectOption.of(write);
+
+            adminMenuService.update(category,manageSelectOption,AccessOption.MANAGE);
+            adminMenuService.update(category,writeSelectOption,AccessOption.WRITE);
+
         }else if(command.getCategoryType().equals("EXTERNAL")){
             ExternalSiteMenu externalSiteCategory = ExternalSiteMenu.builder()
                     .superMenu(superMenu)
@@ -83,8 +121,13 @@ public class CategoryAppService {
                     .description(command.getDescription())
                     .urlInfo(command.getExternalUrl())
                     .build();
+            String expose = command.getExpose();
+            if(expose == null) {
+                throw new CustomIllegalArgumentException(ErrorCode.INVALID_MENU_REQUEST,null);
+            }
 
             externalSiteMenuRepository.save(externalSiteCategory);
+            adminMenuService.update(externalSiteCategory,SelectOption.of(expose),AccessOption.EXPOSE);
         }else{
             throw new IllegalArgumentException();
         }
@@ -95,7 +138,6 @@ public class CategoryAppService {
         Menu targetMenu = findByIdOrThrow(command.getCategoryId(), menuRepository, "");
 
         targetMenu.changeName(command.getName());
-        targetMenu.changeDescription(command.getDescription());
 
         if(targetMenu instanceof InternalSiteMenu){
             InternalSiteMenu internalSiteMenu = (InternalSiteMenu) targetMenu;
@@ -112,7 +154,7 @@ public class CategoryAppService {
 
         //TODO : message
         if(!targetMenu.isRemovable(categoryService)){
-            throw new IllegalArgumentException();
+            throw new CustomIllegalArgumentException(ErrorCode.CANNOT_DELETE_MENU,null);
         }
 
         categoryRepository.deleteById(categoryId);
@@ -136,6 +178,13 @@ public class CategoryAppService {
         retrieveSubMenu(targetMenu, res);
 
         return res;
+    }
+
+    public CategoryRetrieveResponse retrieveCategoryBySuperCategoryId(Long superMenuId){
+        Menu menu = menuRepository.findById(superMenuId).orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.NOT_EXIST_CATEGORY,null));
+        List<Menu> subMenus = menuRepository.findBySuperMenuWithAuthorization(superMenuId);
+
+        return CategoryRetrieveResponse.toDTO(menu,subMenus);
     }
 
     protected void retrieveSubMenu(Menu targetMenu, CategoryResponse res){
@@ -197,4 +246,20 @@ public class CategoryAppService {
 
         return response;
     }
+
+    public Map<Menu,List<Menu>> retrieveAllMenuForAdmin() {
+        List<Menu> menus = menuRepository.findByDepth(0);
+        Map<Menu,List<Menu>> response = new HashMap<>();
+
+        for (Menu menu : menus) {
+            List<Menu> subMenus = Collections.emptyList();
+            if(!(menu instanceof BoardMenu)) {
+                subMenus = menuRepository.findBySuperMenu(menu.getMenuId());
+            }
+            response.put(menu,subMenus);
+        }
+
+        return response;
+    }
+
 }

@@ -17,4 +17,7 @@ public interface MenuRepository extends JpaRepository<Menu, Long> {
 
     @Query("select menu from Menu menu where menu.superMenu.menuId in :superMenuIds")
     List<Menu> findAllBySuperMenuIds(List<Long> superMenuIds);
+
+    @Query("select distinct m from Menu m left outer join fetch m.menuAuthorizations auth where m.superMenu.menuId = :superMenuId")
+    List<Menu> findBySuperMenuWithAuthorization(Long superMenuId);
 }

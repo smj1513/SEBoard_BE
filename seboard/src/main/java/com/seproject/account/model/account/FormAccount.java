@@ -1,6 +1,7 @@
 package com.seproject.account.model.account;
 
 import com.seproject.account.model.role.Role;
+import com.seproject.seboard.domain.model.common.Status;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
@@ -27,6 +28,6 @@ public class FormAccount extends Account {
         this.password = password;
         this.authorities = authorities;
         this.createdAt = LocalDateTime.now();
-        this.isDeleted = false;
+        this.status = Status.NORMAL;
     }
 }

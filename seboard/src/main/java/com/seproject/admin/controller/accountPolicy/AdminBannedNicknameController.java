@@ -1,4 +1,4 @@
-package com.seproject.admin.controller;
+package com.seproject.admin.controller.accountPolicy;
 
 import com.seproject.admin.service.BannedNicknameService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -17,7 +17,7 @@ import static com.seproject.admin.dto.BannedNicknameDTO.*;
 
 @Tag(name = "금지 닉네임 관리 API", description = "관리자 시스템의 금지 닉네임 관리 API")
 @AllArgsConstructor
-@RequestMapping(value = "/admin")
+@RequestMapping(value = "/admin/accountPolicy/bannedNickname")
 @Controller
 public class AdminBannedNicknameController {
 
@@ -27,7 +27,7 @@ public class AdminBannedNicknameController {
     @ApiResponses({
             @ApiResponse(content = @Content(schema = @Schema(implementation = RetrieveAllBannedNicknameResponse.class)), responseCode = "200", description = "금지 닉네임 목록 조회 성공"),
     })
-    @GetMapping("/bannedNickname")
+    @GetMapping()
     public ResponseEntity<?> retrieveAllBannedNickname() {
         RetrieveAllBannedNicknameResponse all = bannedNicknameService.findAll();
         return new ResponseEntity<>(all,HttpStatus.OK);
@@ -37,7 +37,7 @@ public class AdminBannedNicknameController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "금지 닉네임 추가 성공"),
     })
-    @PostMapping("/bannedNickname")
+    @PostMapping()
     public ResponseEntity<?> createBannedNickname(@RequestBody CreateBannedNicknameRequest createBannedNicknameRequest) {
         bannedNicknameService.banNickname(createBannedNicknameRequest.getNickname());
         return new ResponseEntity<>(HttpStatus.OK);
@@ -47,7 +47,7 @@ public class AdminBannedNicknameController {
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "금지 닉네임 삭제 성공"),
     })
-    @DeleteMapping("/bannedNickname")
+    @DeleteMapping()
     public ResponseEntity<?> deleteBannedNickname(@RequestBody DeleteBannedNicknameRequest deleteBannedNicknameRequest) {
         bannedNicknameService.unbanNickname(deleteBannedNicknameRequest.getNickname());
         return new ResponseEntity<>(HttpStatus.OK);
