@@ -113,4 +113,10 @@ public class MainPageDTO {
                     .build();
         }
     }
+
+
+    @Data
+    public static class UpdateMainPageMenuRequest {
+        private List<Long> menuIds;
+    }
 }

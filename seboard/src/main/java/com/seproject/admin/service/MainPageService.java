@@ -51,6 +51,21 @@ public class MainPageService {
         return mainPageMenu;
     }
 
+    public List<MainPageMenu> updateMainPageMenu(List<Long> menuIds) {
+        List<MainPageMenu> allMenus = mainPageMenuRepository.findAll();
+        mainPageMenuRepository.deleteAllInBatch(allMenus);
+
+        List<MainPageMenu> newMenus = menuRepository.findAllById(menuIds)
+                .stream()
+                .map(MainPageMenu::new)
+                .collect(Collectors.toList());
+
+        mainPageMenuRepository.saveAll(newMenus);
+
+        return newMenus;
+
+    }
+
     public List<InternalSiteMenu> retrieveAllInternalSiteMenu() {
 
         return menuRepository.findAll().stream()
