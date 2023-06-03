@@ -1,9 +1,12 @@
 package com.seproject.admin.service;
 
+import com.seproject.admin.controller.dto.CategoryDTO;
 import com.seproject.admin.domain.MainPageMenu;
 import com.seproject.admin.domain.repository.MainPageMenuRepository;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
+import com.seproject.seboard.domain.model.category.Category;
+import com.seproject.seboard.domain.model.category.ExternalSiteMenu;
 import com.seproject.seboard.domain.model.category.InternalSiteMenu;
 import com.seproject.seboard.domain.model.category.Menu;
 import com.seproject.seboard.domain.repository.category.MenuRepository;
@@ -51,9 +54,19 @@ public class MainPageService {
     public List<InternalSiteMenu> retrieveAllInternalSiteMenu() {
 
         return menuRepository.findAll().stream()
-                .filter((menu) -> menu instanceof InternalSiteMenu)
+                .filter(this::possibleMainPageMenu)
                 .map(menu -> (InternalSiteMenu)menu)
                 .collect(Collectors.toList());
     }
 
+    private boolean possibleMainPageMenu(Menu menu) {
+        if(menu instanceof Category) {
+            return false;
+        } else if(menu instanceof ExternalSiteMenu) {
+            return false;
+        } else {
+            return true;
+        }
+
+    }
 }
