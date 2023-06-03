@@ -50,7 +50,6 @@ public class MainPageDTO {
 
         private Long categoryId;
         private String name;
-        private String description;
         private String url;
 
         public static InternalSiteMenuResponse toDTO(InternalSiteMenu internalSiteMenu) {
@@ -58,7 +57,6 @@ public class MainPageDTO {
             return builder()
                     .categoryId(internalSiteMenu.getMenuId())
                     .name(internalSiteMenu.getName())
-                    .description(internalSiteMenu.getDescription())
                     .url(internalSiteMenu.getUrlInfo())
                     .build();
         }
@@ -114,5 +112,11 @@ public class MainPageDTO {
                     .menuId(mainPageMenu.getMenu().getMenuId())
                     .build();
         }
+    }
+
+
+    @Data
+    public static class UpdateMainPageMenuRequest {
+        private List<Long> menuIds;
     }
 }
