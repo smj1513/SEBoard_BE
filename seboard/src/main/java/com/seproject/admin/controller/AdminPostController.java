@@ -47,8 +47,14 @@ public class AdminPostController {
 
     @DeleteMapping()
     public ResponseEntity<MessageResponse> deleteBulkPost(@RequestBody BulkPostRequest request){
-        adminPostAppService.deleteBulkPost(request.getPostIds());
+        adminPostAppService.deleteBulkPost(request.getPostIds(), false);
         return new ResponseEntity<>(MessageResponse.of("게시글 삭제 성공"), HttpStatus.OK);
+    }
+
+    @DeleteMapping("/permanent")
+    public ResponseEntity<MessageResponse> deleteBulkPostPermanent(@RequestBody BulkPostRequest request){
+        adminPostAppService.deleteBulkPost(request.getPostIds(), true);
+        return new ResponseEntity<>(MessageResponse.of("게시글 영구 삭제 성공"), HttpStatus.OK);
     }
 
     @Operation(summary = "게시글 목록 조회", description = "등록된 게시글 목록들을 조회한다.")
