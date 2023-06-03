@@ -76,7 +76,7 @@ public class AdminCommentAppService {
         });
     }
 
-    public void deleteBulkComment(List<Long> commentIds, boolean isPermanent){
+    public void deleteBulkComment(List<Long> commentIds){
         Account account = SecurityUtils.getAccount()
                 .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
 
@@ -87,7 +87,7 @@ public class AdminCommentAppService {
         }
 
         commentRepository.findAllById(commentIds).forEach(comment -> {
-            comment.delete(isPermanent);
+            comment.delete(false);
         });
     }
 
