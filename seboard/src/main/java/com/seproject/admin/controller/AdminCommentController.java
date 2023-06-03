@@ -40,8 +40,14 @@ public class AdminCommentController {
 
     @DeleteMapping()
     public ResponseEntity<MessageResponse> deleteBulkComment(@RequestBody BulkCommentRequest request){
-        adminCommentAppService.deleteBulkComment(request.getCommentIds());
+        adminCommentAppService.deleteBulkComment(request.getCommentIds(), false);
         return ResponseEntity.ok(MessageResponse.of("댓글 삭제 성공"));
+    }
+
+    @DeleteMapping("/permanent")
+    public ResponseEntity<MessageResponse> deleteBulkCommentPermanent(@RequestBody BulkCommentRequest request){
+        adminCommentAppService.deleteBulkComment(request.getCommentIds(), true);
+        return ResponseEntity.ok(MessageResponse.of("댓글 영구 삭제 성공"));
     }
 
 }
