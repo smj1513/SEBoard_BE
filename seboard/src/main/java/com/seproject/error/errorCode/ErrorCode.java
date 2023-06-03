@@ -47,6 +47,7 @@ public enum ErrorCode {
     CATEGORY_NOT_EXIST_EXPOSE_OPTION(HttpStatus.NOT_FOUND, 306, "소분류 카테고리에는 메뉴 노출 설정이 존재하지 않습니다."),
     CANNOT_FOUND_OPTION(HttpStatus.NOT_FOUND, 307, "찾을 수 없는 카테고리 접근 제한 옵션입니다."),
     NOT_EXIST_FILE(HttpStatus.NOT_FOUND, 308, "존재하지 않는 파일입니다."),
+    NOT_EXIST_BANNER(HttpStatus.NOT_FOUND, 309, "존재하지 않는 배너입니다."),
     DUPLICATED_REPORT(HttpStatus.BAD_REQUEST, 400, "이미 신고하였습니다."),
     ;
 
@@ -59,4 +60,5 @@ public enum ErrorCode {
     private final HttpStatus httpStatus;
     private final String message;
     private final int code;
+
 }

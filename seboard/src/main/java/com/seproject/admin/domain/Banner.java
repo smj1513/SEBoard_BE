@@ -28,6 +28,10 @@ public class Banner {
     private String bannerUrl;
 
     public Banner(LocalDate startDate, LocalDate endDate, FileMetaData fileMetaData, String bannerUrl) {
+        setProperties(startDate, endDate, fileMetaData, bannerUrl);
+    }
+
+    protected void setProperties(LocalDate startDate, LocalDate endDate, FileMetaData fileMetaData, String bannerUrl){
         this.startDate = startDate;
         this.endDate = endDate;
 
@@ -41,5 +45,9 @@ public class Banner {
         if(startDate.isAfter(endDate)){
             throw new InvalidDateException(ErrorCode.INVALID_DATE);
         }
+    }
+
+    public void updateBanner(LocalDate startDate, LocalDate endDate, FileMetaData fileMetaData, String bannerUrl) {
+        setProperties(startDate, endDate, fileMetaData, bannerUrl);
     }
 }
