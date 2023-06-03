@@ -68,4 +68,15 @@ public class AdminMainPageController {
         MainPageMenu mainPageMenu = mainPageService.deleteMainPageMenu(request.getId());
         return new ResponseEntity<>(DeleteMainPageMenuResponse.toDTO(mainPageMenu),HttpStatus.OK);
     }
+
+    @Operation(summary = "메인 페이지에 보여줄 메뉴 업데이트", description = "메인 페이지에 보여줄 메뉴를 수정한다.")
+    @ApiResponses({
+            @ApiResponse(content = @Content(schema = @Schema(implementation = DeleteMainPageMenuResponse.class)), responseCode = "200", description = "메뉴 추가 실패"),
+    })
+    @PutMapping("/mainPageMenus")
+    public ResponseEntity<?> updateMainPageMenus(@RequestBody UpdateMainPageMenuRequest request) {
+
+        List<MainPageMenu> mainPageMenus = mainPageService.updateMainPageMenu(request.getMenuIds());
+        return new ResponseEntity<>(RetrieveAllMainPageMenuRequest.toDTO(mainPageMenus),HttpStatus.OK);
+    }
 }

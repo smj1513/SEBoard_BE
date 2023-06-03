@@ -9,4 +9,5 @@ import java.util.List;
 public interface MainPageMenuRepository extends JpaRepository<MainPageMenu,Long> {
     @Query("select menu from MainPageMenu menu join fetch menu.menu")
     List<MainPageMenu> findAll();
+
 }
