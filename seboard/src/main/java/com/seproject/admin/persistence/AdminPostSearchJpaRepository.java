@@ -7,11 +7,8 @@ import com.seproject.admin.controller.dto.post.AdminPostRequest.AdminPostRetriev
 import com.seproject.admin.controller.dto.post.AdminPostResponse;
 import com.seproject.admin.domain.repository.AdminPostSearchRepository;
 import com.seproject.seboard.controller.PostSearchOptions;
-import com.seproject.seboard.domain.model.category.QMenu;
 import com.seproject.seboard.domain.model.common.Status;
-import com.seproject.seboard.domain.model.post.Post;
-import com.seproject.seboard.domain.model.post.QPost;
-import com.seproject.seboard.domain.model.post.exposeOptions.ExposeOption;
+import com.seproject.seboard.domain.model.post.exposeOptions.ExposeState;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -22,7 +19,6 @@ import javax.persistence.EntityManager;
 
 import java.util.List;
 
-import static com.seproject.seboard.domain.model.category.QCategory.category;
 import static com.seproject.seboard.domain.model.category.QMenu.menu;
 import static com.seproject.seboard.domain.model.post.QPost.post;
 
@@ -45,8 +41,8 @@ public class AdminPostSearchJpaRepository implements AdminPostSearchRepository {
                 .from(post)
                 .join(menu)
                 .on(post.category.eq(menu))
-                //TODO : ExposeOption 추가 필요?
                 .where(
+                        exposeOptionEq(condition.getExposeOption()),
                         categoryEq(condition.getCategoryId()),
                         reportedStatusEq(condition.getIsReported()),
                         searchOption(condition.getSearchOption(), condition.getQuery())
@@ -61,8 +57,8 @@ public class AdminPostSearchJpaRepository implements AdminPostSearchRepository {
                 .from(post)
                 .join(menu)
                 .on(post.category.eq(menu))
-                //TODO : ExposeOption 추가 필요?
                 .where(
+                        exposeOptionEq(condition.getExposeOption()),
                         categoryEq(condition.getCategoryId()),
                         reportedStatusEq(condition.getIsReported()),
                         searchOption(condition.getSearchOption(), condition.getQuery())
@@ -70,6 +66,10 @@ public class AdminPostSearchJpaRepository implements AdminPostSearchRepository {
                 .fetchOne();
 
         return new PageImpl<>(contents, pageable, count);
+    }
+
+    private BooleanExpression exposeOptionEq(String exposeOption){
+        return exposeOption != null ? post.exposeOption.exposeState.eq(ExposeState.valueOf(exposeOption)) : null;
     }
 
     private BooleanExpression searchOption(String searchOption, String query){

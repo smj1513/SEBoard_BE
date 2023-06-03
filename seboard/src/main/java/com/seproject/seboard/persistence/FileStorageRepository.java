@@ -1,6 +1,7 @@
 package com.seproject.seboard.persistence;
 
 import com.seproject.seboard.application.utils.FileUtils;
+import com.seproject.seboard.domain.model.common.BaseTime;
 import com.seproject.seboard.domain.model.common.FileMetaData;
 import com.seproject.seboard.domain.repository.commons.FileRepository;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +31,7 @@ public class FileStorageRepository implements FileRepository {
         try{
             File createdFile = new File(filePath);
             file.transferTo(createdFile);
-            fileMetaData = new FileMetaData(originalFileName, storedFileName, filePath, urlPath, fileSize);
+            fileMetaData = new FileMetaData(originalFileName, storedFileName, filePath, urlPath, fileSize, BaseTime.now());
         }catch (Exception e){
             e.printStackTrace();
         }

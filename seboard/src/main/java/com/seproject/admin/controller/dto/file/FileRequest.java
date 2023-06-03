@@ -1,10 +1,18 @@
 package com.seproject.admin.controller.dto.file;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.List;
 
 public class FileRequest {
+    @Data
+    public static class AdminFileRetrieveCondition{
+        @JsonProperty("isOrphan")
+        private Boolean isOrphan;
+        private String SearchOption;
+        private String query;
+    }
     @Data
     public static class FileExtensionRequest{
         private List<String> extensions;
