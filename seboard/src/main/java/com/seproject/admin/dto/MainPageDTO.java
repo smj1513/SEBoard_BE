@@ -50,7 +50,6 @@ public class MainPageDTO {
 
         private Long categoryId;
         private String name;
-        private String description;
         private String url;
 
         public static InternalSiteMenuResponse toDTO(InternalSiteMenu internalSiteMenu) {
@@ -58,7 +57,6 @@ public class MainPageDTO {
             return builder()
                     .categoryId(internalSiteMenu.getMenuId())
                     .name(internalSiteMenu.getName())
-                    .description(internalSiteMenu.getDescription())
                     .url(internalSiteMenu.getUrlInfo())
                     .build();
         }
