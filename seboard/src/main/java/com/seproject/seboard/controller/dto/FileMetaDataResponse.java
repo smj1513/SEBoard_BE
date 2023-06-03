@@ -29,13 +29,6 @@ public class FileMetaDataResponse {
         private String storedFileName;
         private String url;
 
-        public FileMetaDataElement(FileMetaData fileMetaData) {
-            this.fileMetaDataId = fileMetaData.getFileMetaDataId();
-            this.originalFileName = fileMetaData.getOriginalFileName();
-            this.storedFileName = fileMetaData.getStoredFileName();
-            this.url = fileMetaData.getUrlPath();
-        }
-
         public FileMetaDataElement(Long fileMetaDataId, String originalFileName, String storedFileName, String url) {
             this.fileMetaDataId = fileMetaDataId;
             this.originalFileName = originalFileName;

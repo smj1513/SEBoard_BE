@@ -95,7 +95,7 @@ public class AdminPostAppService {
         });
     }
 
-    public void deleteBulkPost(List<Long> postIds, boolean isPermanent) {
+    public void deleteBulkPost(List<Long> postIds) {
         Account account = SecurityUtils.getAccount()
                 .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
 
@@ -106,7 +106,7 @@ public class AdminPostAppService {
         }
 
         postRepository.findAllById(postIds).forEach(post -> {
-            post.delete(isPermanent);
+            post.delete(false);
         });
     }
 
