@@ -2,8 +2,11 @@ package com.seproject.seboard.application;
 
 import com.seproject.account.model.account.Account;
 import com.seproject.account.repository.AccountRepository;
+import com.seproject.admin.domain.FileConfiguration;
+import com.seproject.admin.domain.repository.FileConfigurationRepository;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomUserNotFoundException;
+import com.seproject.error.exception.ExceedFileSizeException;
 import com.seproject.error.exception.InvalidAuthorizationException;
 import com.seproject.error.exception.NoSuchResourceException;
 import com.seproject.seboard.application.dto.post.PostCommand.PostEditCommand;
@@ -29,10 +32,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Set;
+import java.util.*;
 
 
 @Service
@@ -50,6 +50,7 @@ public class PostAppService {
     private final FileAppService fileAppService;
     private final AccountRepository accountRepository;
     private final FileRepository fileRepository;
+    private final FileConfigurationRepository fileConfigurationRepository;
 
     public Long writePost(PostWriteCommand command){
         Account account = accountRepository.findByLoginId(command.getLoginId())
@@ -85,6 +86,8 @@ public class PostAppService {
 
         List<FileMetaData> fileMetaDataList =
                 fileMetaDataRepository.findAllById(command.getAttachmentIds());
+
+        validFileListSize(fileMetaDataList);
 
         Post post = Post.builder()
                 .title(command.getTitle())
@@ -132,11 +135,24 @@ public class PostAppService {
 
         attachments.forEach(fileMetaData -> post.addAttachment(fileMetaData));
 
+        validFileListSize(new ArrayList<>(post.getAttachments()));
+
         Category category = categoryRepository.findById(command.getCategoryId())
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_CATEGORY));
         post.changeCategory(category);
 
         return post.getPostId();
+    }
+
+    private void validFileListSize(List<FileMetaData> fileMetaDataList){
+        Long maxSize = fileConfigurationRepository.findAll().stream().findFirst()
+                .orElseGet(() -> new FileConfiguration(100L, 100L)).getMaxSizePerPost();
+
+        Long totalSize = fileMetaDataList.stream().mapToLong(fileMetaData -> fileMetaData.getFileSize()/(1024*1024)).sum();
+
+        if(maxSize<totalSize){
+            throw new ExceedFileSizeException(ErrorCode.INVALID_FILE_SIZE);
+        }
     }
 
     public void removePost(Long postId, String loginId) {
