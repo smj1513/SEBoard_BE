@@ -6,6 +6,8 @@ import com.seproject.account.jwt.JwtDecoder;
 import com.seproject.admin.controller.dto.post.AdminPostRequest;
 import com.seproject.admin.controller.dto.post.AdminPostRequest.AdminPostRetrieveCondition;
 import com.seproject.admin.controller.dto.post.AdminPostRequest.BulkPostRequest;
+import com.seproject.admin.controller.dto.post.AdminPostResponse;
+import com.seproject.admin.controller.dto.post.AdminPostResponse.AdminDeletedPostResponse;
 import com.seproject.admin.service.AdminPostAppService;
 import com.seproject.seboard.application.PostAppService;
 import com.seproject.seboard.controller.dto.MessageResponse;
@@ -16,6 +18,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -68,6 +72,13 @@ public class AdminPostController {
                                              @RequestParam(defaultValue = "25") int perPage) {
         return ResponseEntity.ok(adminPostAppService.findPostList(request, page, perPage));
     }
+
+    @GetMapping("/deleted")
+    public ResponseEntity<Page<AdminDeletedPostResponse>> retrieveDeletedPostList(@RequestParam(defaultValue = "0") int page,
+                                                                                  @RequestParam(defaultValue = "25") int perPage) {
+        return ResponseEntity.ok(adminPostAppService.findDeletedPostList(PageRequest.of(page, perPage)));
+    }
+
 //
 //        PostListFindCommand command = PostCommand.PostListFindCommand.builder()
 //                .categoryId(retrievePostListRequest.getCategoryId())
