@@ -8,4 +8,6 @@ import org.springframework.data.domain.Pageable;
 
 public interface AdminAccountSearchRepository {
     Page<RetrieveAccountResponse> findAllAccount(AdminRetrieveAccountCondition condition, Pageable pageable);
+    Page<RetrieveAccountResponse> findDeletedAccount(Pageable pageable);
+
 }

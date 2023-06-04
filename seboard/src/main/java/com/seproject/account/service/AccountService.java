@@ -336,4 +336,7 @@ public class AccountService implements UserDetailsService {
         return account;
     }
 
+    public Page<RetrieveAccountResponse> findDeletedAccount(Pageable pageable) {
+        return accountSearchRepository.findDeletedAccount(pageable);
+    }
 }

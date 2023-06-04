@@ -42,6 +42,12 @@ public class AdminAccountController {
         return ResponseEntity.ok(accountService.findAllAccount(condition, PageRequest.of(page, perPage)));
     }
 
+    @GetMapping("/deleted")
+    public ResponseEntity<Page<RetrieveAccountResponse>> retrieveDeletedAccount(@RequestParam(value = "page", defaultValue = "0") int page,
+                                                                                @RequestParam(value = "perPage", defaultValue = "25") int perPage) {
+        return ResponseEntity.ok(accountService.findDeletedAccount(PageRequest.of(page, perPage)));
+    }
+
 
     @Operation(summary = "등록된 계정 상세 조회", description = "계정의 상세 정보를 조회한다.")
     @ApiResponses({
