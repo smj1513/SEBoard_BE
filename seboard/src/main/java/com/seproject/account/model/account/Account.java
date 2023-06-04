@@ -33,7 +33,7 @@ public abstract class Account implements UserDetails {
     protected LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)
-    protected Status status;
+    protected Status status = Status.NORMAL;
 
 //    @Builder
 //    public Account(Long accountId, String loginId,
@@ -99,5 +99,9 @@ public abstract class Account implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public void restore() {
+        status = Status.NORMAL;
     }
 }

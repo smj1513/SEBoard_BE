@@ -347,4 +347,12 @@ public class AccountService implements UserDetailsService {
             account.delete(isPermanent);
         }
     }
+
+    public void restoreBulkAccount(List<Long> accountIds) {
+        List<Account> accounts = accountRepository.findAllById(accountIds);
+
+        for (Account account : accounts) {
+            account.restore();
+        }
+    }
 }

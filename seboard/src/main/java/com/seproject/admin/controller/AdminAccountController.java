@@ -120,4 +120,10 @@ public class AdminAccountController {
         accountService.deleteBulkAccount(request.getAccountIds(), true);
         return ResponseEntity.ok(MessageResponse.of("계정 영구 삭제 성공"));
     }
+
+    @PostMapping("/restore")
+    public ResponseEntity<MessageResponse> restoreBulkAccount(@RequestBody AdminBulkAccountRequest request){
+        accountService.restoreBulkAccount(request.getAccountIds());
+        return ResponseEntity.ok(MessageResponse.of("계정 복구 성공"));
+    }
 }
