@@ -34,6 +34,7 @@ public enum ErrorCode {
 
     INVALID_PAGINATION(HttpStatus.BAD_REQUEST,200, "올바르지 않은 페이지 정보를 전송하였습니다."),
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, 201, "올바르지 않은 형식의 요청입니다."),
+    INVALID_DATE(HttpStatus.BAD_REQUEST, 202, "올바르지 않은 날짜 정보를 전송하였습니다."),
 
 
     NOT_EXIST_POST(HttpStatus.NOT_FOUND, 300, "존재하지 않는 게시글입니다."),
@@ -45,10 +46,12 @@ public enum ErrorCode {
     NOT_EXIST_EXTENSION(HttpStatus.NOT_FOUND, 305, "사용가능하지 않은 확장자입니다."),
     CATEGORY_NOT_EXIST_EXPOSE_OPTION(HttpStatus.NOT_FOUND, 306, "소분류 카테고리에는 메뉴 노출 설정이 존재하지 않습니다."),
     CANNOT_FOUND_OPTION(HttpStatus.NOT_FOUND, 307, "찾을 수 없는 카테고리 접근 제한 옵션입니다."),
+    NOT_EXIST_FILE(HttpStatus.NOT_FOUND, 308, "존재하지 않는 파일입니다."),
+    NOT_EXIST_BANNER(HttpStatus.NOT_FOUND, 309, "존재하지 않는 배너입니다."),
     DUPLICATED_REPORT(HttpStatus.BAD_REQUEST, 400, "이미 신고하였습니다."),
     ;
 
-    ErrorCode(HttpStatus httpStatus, int code,String message) {
+    ErrorCode(HttpStatus httpStatus, int code, String message) {
         this.httpStatus = httpStatus;
         this.code = code;
         this.message = message;
@@ -57,4 +60,5 @@ public enum ErrorCode {
     private final HttpStatus httpStatus;
     private final String message;
     private final int code;
+
 }
