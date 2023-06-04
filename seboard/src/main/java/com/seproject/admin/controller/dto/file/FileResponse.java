@@ -1,5 +1,6 @@
 package com.seproject.admin.controller.dto.file;
 
+import com.seproject.admin.domain.FileConfiguration;
 import com.seproject.admin.domain.FileExtension;
 import com.seproject.seboard.controller.dto.FileMetaDataResponse;
 import com.seproject.seboard.controller.dto.FileMetaDataResponse.FileMetaDataElement;
@@ -12,6 +13,16 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class FileResponse {
+    @Data
+    public static class FileConfigurationResponse{
+        private Long maxSizePerFile;
+        private Long maxSizePerPost;
+
+        public FileConfigurationResponse(FileConfiguration fileConfiguration) {
+            this.maxSizePerFile = fileConfiguration.getMaxSizePerFile();
+            this.maxSizePerPost = fileConfiguration.getMaxSizePerPost();
+        }
+    }
     @Data
     public static class PostOfFile{
         private Long postId;
