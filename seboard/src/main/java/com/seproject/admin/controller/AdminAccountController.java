@@ -9,6 +9,8 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -21,7 +23,7 @@ import static com.seproject.admin.dto.AccountDTO.*;
 
 @Tag(name = "계정 관리 API", description = "관리자 시스템이 갖는 계정 관리 API")
 @AllArgsConstructor
-@RequestMapping(value = "/admin")
+@RequestMapping(value = "/admin/accounts")
 @Controller
 public class AdminAccountController {
 
@@ -33,14 +35,11 @@ public class AdminAccountController {
             @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "400", description = "잘못된 페이징 정보")
     })
 
-    @GetMapping("/accounts")
-    public ResponseEntity<?> retrieveAllAccount(@RequestBody RetrieveAllAccountRequest accountRequest) {
-        int page = accountRequest.getPage();
-        int perPage = accountRequest.getPerPage();
-        page = Math.max(page-1,0);
-        perPage = Math.max(perPage,1);
-        RetrieveAllAccountResponse allAccount = accountService.findAllAccount(page, perPage);
-        return new ResponseEntity<>(allAccount, HttpStatus.OK);
+    @GetMapping
+    public ResponseEntity<Page<RetrieveAccountResponse>> retrieveAllAccount(@ModelAttribute AdminRetrieveAccountCondition condition,
+                                                                            @RequestParam(value = "page", defaultValue = "0") int page,
+                                                                            @RequestParam(value = "perPage", defaultValue = "25") int perPage) {
+        return ResponseEntity.ok(accountService.findAllAccount(condition, PageRequest.of(page, perPage)));
     }
 
 
@@ -49,7 +48,7 @@ public class AdminAccountController {
             @ApiResponse(content = @Content(schema = @Schema(implementation = RetrieveAccountResponse.class)), responseCode = "200", description = "계정 상세 정보 조회 성공"),
             @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "404", description = "존재하지 않는 계정")
     })
-    @GetMapping("/accounts/{accountId}")
+    @GetMapping("/{accountId}")
     public ResponseEntity<?> retrieveAllAccount(@PathVariable Long accountId) {
         try{
             return new ResponseEntity<>(accountService.findAccount(accountId), HttpStatus.OK);
@@ -65,7 +64,7 @@ public class AdminAccountController {
             @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "400", description = "이메일 형식이 일치하지 않음"),
             @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "400", description = "존재하지 않는 권한 요청")
     })
-    @PostMapping("/accounts")
+    @PostMapping
     public ResponseEntity<?> createAccountByAdmin(@RequestBody CreateAccountRequest createAccountRequest) {
            CreateAccountResponse account = accountService.createAccount(createAccountRequest);
            return new ResponseEntity<>(account,HttpStatus.OK);
@@ -78,7 +77,7 @@ public class AdminAccountController {
             @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "400", description = "존재하지 않는 권한 요청"),
             @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "404", description = "존재하지 않는 계정")
     })
-    @PutMapping("/accounts")
+    @PutMapping
     public ResponseEntity<?> updateAccount(@RequestBody UpdateAccountRequest updateAccountRequest) {
 
         UpdateAccountResponse updateAccount = accountService.updateAccount(updateAccountRequest);
@@ -91,7 +90,7 @@ public class AdminAccountController {
             @ApiResponse(content = @Content(schema = @Schema(implementation = DeleteAccountResponse.class)), responseCode = "200", description = "계정 삭제 성공"),
             @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "404", description = "존자해지 않는 계정")
     })
-    @DeleteMapping("/accounts")
+    @DeleteMapping
     public ResponseEntity<?> deleteAccount(@RequestBody DeleteAccountRequest deleteAccountRequest) {
 
         try{

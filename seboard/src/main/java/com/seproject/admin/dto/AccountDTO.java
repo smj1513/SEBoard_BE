@@ -2,9 +2,7 @@ package com.seproject.admin.dto;
 
 import com.seproject.account.model.account.Account;
 import com.seproject.account.model.role.Role;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -13,9 +11,7 @@ import java.util.stream.Collectors;
 public class AccountDTO {
 
     @Data
-    public static class RetrieveAllAccountRequest {
-        private int page;
-        private int perPage;
+    public static class AdminRetrieveAccountCondition{
     }
 
 
@@ -40,21 +36,31 @@ public class AccountDTO {
         }
 
     }
-    @Builder(access = AccessLevel.PRIVATE)
+    @Builder
+    @AllArgsConstructor
     @Data
     public static class RetrieveAccountResponse {
         private Long accountId;
-        private String id;
+        private String loginId;
         private String name;
         private String nickname;
         private LocalDateTime registeredDate;
         private List<Role> authorities;
 
+        public RetrieveAccountResponse(Account account){
+            this.accountId = account.getAccountId();
+            this.loginId = account.getLoginId();
+            this.name = account.getName();
+            this.nickname = account.getNickname();
+            this.registeredDate = account.getCreatedAt();
+            this.authorities = account.getAuthorities();
+        }
+
 
         public static RetrieveAccountResponse toDTO(Account account) {
             return builder()
                     .accountId(account.getAccountId())
-                    .id(account.getLoginId())
+                    .loginId(account.getLoginId())
                     .name(account.getName())
                     .nickname(account.getNickname())
                     .registeredDate(account.getCreatedAt())
