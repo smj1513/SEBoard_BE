@@ -60,6 +60,27 @@ public class AdminCommentSearchJpaRepository implements AdminCommentSearchReposi
         return new PageImpl<>(contents, pageable, count);
     }
 
+    @Override
+    public Page<AdminDeletedCommentResponse> findDeletedCommentList(Pageable pageable) {
+        List<AdminDeletedCommentResponse> content = queryFactory
+                .select(Projections.constructor(AdminDeletedCommentResponse.class,
+                        comment))
+                .from(comment)
+                .where(comment.status.eq(Status.TEMP_DELETED))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(comment.baseTime.createdAt.desc())
+                .fetch();
+
+        Long count = queryFactory
+                .select(comment.count())
+                .from(comment)
+                .where(comment.status.eq(Status.TEMP_DELETED))
+                .fetchOne();
+
+        return new PageImpl<>(content, pageable, count);
+    }
+
     private BooleanExpression reportedStatusEq(Boolean isReported){
         if(isReported == null){
             return comment.status.eq(Status.NORMAL)

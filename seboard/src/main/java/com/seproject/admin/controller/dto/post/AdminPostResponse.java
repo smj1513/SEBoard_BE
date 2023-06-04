@@ -35,6 +35,7 @@ public class AdminPostResponse {
         this.exposeOption = post.getExposeOption().getExposeState().toString();
     }
 
+    @Data
     public static class AdminDeletedPostResponse{
         private Long postId;
         private String title;
