@@ -2,6 +2,7 @@ package com.seproject.admin.controller;
 
 import com.seproject.account.service.AccountService;
 import com.seproject.account.jwt.JwtDecoder;
+import com.seproject.seboard.controller.dto.MessageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -83,10 +84,10 @@ public class AdminAccountController {
             @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "400", description = "존재하지 않는 권한 요청"),
             @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "404", description = "존재하지 않는 계정")
     })
-    @PutMapping
-    public ResponseEntity<?> updateAccount(@RequestBody UpdateAccountRequest updateAccountRequest) {
+    @PutMapping("/{accountId}")
+    public ResponseEntity<?> updateAccount(@RequestBody UpdateAccountRequest updateAccountRequest, @PathVariable Long accountId) {
 
-        UpdateAccountResponse updateAccount = accountService.updateAccount(updateAccountRequest);
+        UpdateAccountResponse updateAccount = accountService.updateAccount(updateAccountRequest, accountId);
         return new ResponseEntity<>(updateAccount,HttpStatus.OK);
 
     }
@@ -96,15 +97,27 @@ public class AdminAccountController {
             @ApiResponse(content = @Content(schema = @Schema(implementation = DeleteAccountResponse.class)), responseCode = "200", description = "계정 삭제 성공"),
             @ApiResponse(content = @Content(schema = @Schema(implementation = String.class)), responseCode = "404", description = "존자해지 않는 계정")
     })
-    @DeleteMapping
-    public ResponseEntity<?> deleteAccount(@RequestBody DeleteAccountRequest deleteAccountRequest) {
+    @DeleteMapping("/{accountId}")
+    public ResponseEntity<?> deleteAccount(Long accountId) {
 
         try{
-            DeleteAccountResponse deleteAccount = accountService.deleteAccount(deleteAccountRequest.getAccountId());
+            DeleteAccountResponse deleteAccount = accountService.deleteAccount(accountId);
             return new ResponseEntity<>(deleteAccount,HttpStatus.OK);
         }  catch (NoSuchElementException e) {
             return new ResponseEntity<>("해당 계정을 찾을수 없습니다.",HttpStatus.BAD_REQUEST);
         }
 
+    }
+
+    @DeleteMapping
+    public ResponseEntity<MessageResponse> deleteBulkAccount(@RequestBody AdminBulkAccountRequest request){
+        accountService.deleteBulkAccount(request.getAccountIds(), false);
+        return ResponseEntity.ok(MessageResponse.of("계정 삭제 성공"));
+    }
+
+    @DeleteMapping("/permanent")
+    public ResponseEntity<MessageResponse> deletePermanentlyBulkAccount(@RequestBody AdminBulkAccountRequest request){
+        accountService.deleteBulkAccount(request.getAccountIds(), true);
+        return ResponseEntity.ok(MessageResponse.of("계정 영구 삭제 성공"));
     }
 }

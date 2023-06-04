@@ -197,9 +197,9 @@ public class AccountService implements UserDetailsService {
         return CreateAccountResponse.toDTO(savedAccount);
     }
     @Transactional
-    public UpdateAccountResponse updateAccount(UpdateAccountRequest request) {
+    public UpdateAccountResponse updateAccount(UpdateAccountRequest request, Long accountId) {
 
-        Account account = accountRepository.findById(request.getAccountId())
+        Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.USER_NOT_FOUND,null));
 
         String id = request.getId();
@@ -338,5 +338,13 @@ public class AccountService implements UserDetailsService {
 
     public Page<RetrieveAccountResponse> findDeletedAccount(Pageable pageable) {
         return accountSearchRepository.findDeletedAccount(pageable);
+    }
+
+    public void deleteBulkAccount(List<Long> accountIds, boolean isPermanent) {
+        List<Account> accounts = accountRepository.findAllById(accountIds);
+
+        for (Account account : accounts) {
+            account.delete(isPermanent);
+        }
     }
 }

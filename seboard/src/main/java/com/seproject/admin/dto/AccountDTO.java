@@ -11,9 +11,13 @@ import java.util.stream.Collectors;
 public class AccountDTO {
 
     @Data
-    public static class AdminRetrieveAccountCondition{
+    public static class AdminBulkAccountRequest{
+        private List<Long> accountIds;
     }
 
+    @Data
+    public static class AdminRetrieveAccountCondition{
+    }
 
     @Builder(access = AccessLevel.PRIVATE)
     @Data
@@ -101,7 +105,6 @@ public class AccountDTO {
 
     @Data
     public static class UpdateAccountRequest{
-        private Long accountId;
         private String id;
         private String password;
         private String name;
@@ -126,11 +129,6 @@ public class AccountDTO {
                     .authorities(account.getAuthorities())
                     .build();
         }
-    }
-
-    @Data
-    public static class DeleteAccountRequest{
-        private Long accountId;
     }
 
     @Builder(access = AccessLevel.PRIVATE)
