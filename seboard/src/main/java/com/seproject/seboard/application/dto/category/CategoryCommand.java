@@ -5,6 +5,8 @@ import com.seproject.seboard.controller.dto.post.CategoryRequest.CreateCategoryR
 import lombok.Builder;
 import lombok.Data;
 
+import static com.seproject.admin.dto.AuthorizationDTO.*;
+
 public class CategoryCommand {
     @Data
     public static class CategoryCreateCommand{
@@ -14,13 +16,16 @@ public class CategoryCommand {
         private String urlId;
         private String externalUrl;
         private String categoryType;
-        private String manage;
-        private String write;
-        private String expose;
-        private String access;
+        private CategoryAccessUpdateRequestElement manage;
+        private CategoryAccessUpdateRequestElement write;
+        private CategoryAccessUpdateRequestElement expose;
+        private CategoryAccessUpdateRequestElement access;
 
         public CategoryCreateCommand(Long superCategoryId, String name, String description, String urlId, String externalUrl, String categoryType,
-                                     String manage,String write,String expose,String access){
+                                     CategoryAccessUpdateRequestElement manage,
+                                     CategoryAccessUpdateRequestElement write,
+                                     CategoryAccessUpdateRequestElement expose,
+                                     CategoryAccessUpdateRequestElement access){
             this.superCategoryId = superCategoryId;
             this.name = name;
             this.description = description;

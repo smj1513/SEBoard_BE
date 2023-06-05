@@ -24,6 +24,7 @@ import java.util.*;
 
 import static com.seproject.seboard.application.utils.AppServiceHelper.findByIdOrThrow;
 import static com.seproject.admin.controller.dto.CategoryDTO.*;
+import static com.seproject.admin.dto.AuthorizationDTO.*;
 
 @Service
 @AllArgsConstructor
@@ -54,13 +55,13 @@ public class CategoryAppService {
                     .description(command.getDescription())
                     .build();
 
-            String access = command.getAccess();
+            CategoryAccessUpdateRequestElement access = command.getAccess();
 
             if(access == null) {
                 throw new CustomIllegalArgumentException(ErrorCode.INVALID_MENU_REQUEST, null);
             }
 
-            adminMenuService.accessUpdate(menu,SelectOption.of(access));
+            adminMenuService.accessUpdate(menu,access);
 
             menuRepository.save(menu);
         }else if(command.getCategoryType().equals("BOARD")){
@@ -71,8 +72,8 @@ public class CategoryAppService {
                     .urlInfo(command.getUrlId())
                     .build();
 
-            String expose = command.getExpose();
-            String access = command.getAccess();
+            CategoryAccessUpdateRequestElement expose = command.getExpose();
+            CategoryAccessUpdateRequestElement access = command.getAccess();
 
             if(access == null || expose == null) {
                 throw new CustomIllegalArgumentException(ErrorCode.INVALID_MENU_REQUEST, null);
@@ -80,8 +81,8 @@ public class CategoryAppService {
 
             boardMenuRepository.save(boardMenu);
 
-            adminMenuService.accessUpdate(boardMenu,SelectOption.of(access));
-            adminMenuService.update(boardMenu,SelectOption.of(expose),AccessOption.EXPOSE);
+            adminMenuService.accessUpdate(boardMenu,access);
+            adminMenuService.update(boardMenu,expose,AccessOption.EXPOSE);
 
             Category category = Category.builder()
                     .superMenu(boardMenu)
@@ -101,18 +102,15 @@ public class CategoryAppService {
 
             categoryRepository.save(category);
 
-            String manage = command.getManage();
-            String write = command.getWrite();
+            CategoryAccessUpdateRequestElement manage = command.getManage();
+            CategoryAccessUpdateRequestElement write = command.getWrite();
 
             if(manage == null || write == null) {
                 throw new CustomIllegalArgumentException(ErrorCode.INVALID_MENU_REQUEST, null);
             }
 
-            SelectOption manageSelectOption = SelectOption.of(manage);
-            SelectOption writeSelectOption = SelectOption.of(write);
-
-            adminMenuService.update(category,manageSelectOption,AccessOption.MANAGE);
-            adminMenuService.update(category,writeSelectOption,AccessOption.WRITE);
+            adminMenuService.update(category,manage,AccessOption.MANAGE);
+            adminMenuService.update(category,write,AccessOption.WRITE);
 
         }else if(command.getCategoryType().equals("EXTERNAL")){
             ExternalSiteMenu externalSiteCategory = ExternalSiteMenu.builder()
@@ -121,13 +119,13 @@ public class CategoryAppService {
                     .description(command.getDescription())
                     .urlInfo(command.getExternalUrl())
                     .build();
-            String expose = command.getExpose();
+            CategoryAccessUpdateRequestElement expose = command.getExpose();
             if(expose == null) {
                 throw new CustomIllegalArgumentException(ErrorCode.INVALID_MENU_REQUEST,null);
             }
 
             externalSiteMenuRepository.save(externalSiteCategory);
-            adminMenuService.update(externalSiteCategory,SelectOption.of(expose),AccessOption.EXPOSE);
+            adminMenuService.update(externalSiteCategory,expose,AccessOption.EXPOSE);
         }else{
             throw new IllegalArgumentException();
         }

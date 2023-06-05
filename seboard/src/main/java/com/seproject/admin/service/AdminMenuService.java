@@ -4,6 +4,7 @@ import com.seproject.account.model.role.Role;
 import com.seproject.account.model.role.RoleAuthorization;
 import com.seproject.account.model.role.auth.Authorization;
 import com.seproject.account.repository.role.RoleAuthorizationRepository;
+import com.seproject.account.repository.role.RoleRepository;
 import com.seproject.account.repository.role.auth.AuthorizationRepository;
 import com.seproject.admin.domain.AccessOption;
 import com.seproject.admin.domain.MenuAuthorization;
@@ -35,6 +36,7 @@ public class AdminMenuService {
     private final RoleService roleService;
     private final AuthorizationRepository authorizationRepository;
     private final MenuExposeRepository menuExposeRepository;
+    private final RoleRepository roleRepository;
 
     public CategoryAccessOptionResponse retrieve(Long menuId) {
         Menu menu = menuRepository.findById(menuId).orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.ROLE_NOT_FOUND, null));
@@ -118,19 +120,26 @@ public class AdminMenuService {
         }
     }
 
-    private void update(Menu menu ,CategoryAccessUpdateRequestElement element, AccessOption accessOption) {
+    public void update(Menu menu ,CategoryAccessUpdateRequestElement element, AccessOption accessOption) {
         SelectOption selectOption = SelectOption.of(element.getOption());
-        update(menu,selectOption,accessOption);
+        List<Role> roles;
+
+        if(selectOption == SelectOption.SELECT) {
+            List<Long> roleIds = element.getRoles();
+            roles = roleRepository.findAllById(roleIds);
+        } else {
+            roles = roleService.convertRoles(selectOption);
+        }
+
+        update(menu,selectOption,accessOption,roles);
     }
 
-    private void accessUpdate(Menu menu,CategoryAccessUpdateRequestElement access) {
+    public void accessUpdate(Menu menu,CategoryAccessUpdateRequestElement access) {
         SelectOption selectOption = SelectOption.of(access.getOption());
         accessUpdate(menu,selectOption);
     }
 
-    public void update(Menu menu , SelectOption selectOption, AccessOption accessOption) {
-        List<Role> roles = roleService.convertRoles(selectOption);
-
+    private void update(Menu menu , SelectOption selectOption, AccessOption accessOption,List<Role> roles) {
         List<MenuAuthorization> collect = roles.stream().map(role ->
                 MenuAuthorization.builder()
                         .menu(menu)
@@ -142,7 +151,7 @@ public class AdminMenuService {
         menu.updateMenuAuthorizations(collect);
     }
 
-    public void accessUpdate(Menu menu,SelectOption selectOption) {
+    private void accessUpdate(Menu menu,SelectOption selectOption) {
         List<Role> roles = roleService.convertRoles(selectOption);
         String path = "/category/" + menu.getMenuId() + "/**";
 
