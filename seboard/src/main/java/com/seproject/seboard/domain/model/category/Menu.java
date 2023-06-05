@@ -82,7 +82,7 @@ public class Menu {
     }
 
     public void updateMenuAuthorizations(List<MenuAuthorization> menuAuthorizations) {
-        this.menuAuthorizations = menuAuthorizations;
+        this.menuAuthorizations.addAll(menuAuthorizations);
     }
 
     public void changeDescription(String description) {

@@ -8,6 +8,7 @@ import com.seproject.account.repository.role.auth.AuthorizationRepository;
 import com.seproject.admin.domain.AccessOption;
 import com.seproject.admin.domain.MenuAuthorization;
 import com.seproject.admin.domain.SelectOption;
+import com.seproject.admin.domain.repository.MenuExposeRepository;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
 import com.seproject.seboard.domain.model.category.BoardMenu;
@@ -33,6 +34,7 @@ public class AdminMenuService {
     private final MenuRepository menuRepository;
     private final RoleService roleService;
     private final AuthorizationRepository authorizationRepository;
+    private final MenuExposeRepository menuExposeRepository;
 
     public CategoryAccessOptionResponse retrieve(Long menuId) {
         Menu menu = menuRepository.findById(menuId).orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.ROLE_NOT_FOUND, null));
@@ -78,6 +80,7 @@ public class AdminMenuService {
         Menu menu = menuRepository.findById(categoryId).orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.ROLE_NOT_FOUND, null));
 
         Class<? extends Menu> menuClass = menu.getClass();
+        menuExposeRepository.deleteAllInBatch(menu.getMenuAuthorizations());
         if (menuClass == Menu.class) {
             CategoryAccessUpdateRequestElement menuExpose = request.getMenuExpose();
 
