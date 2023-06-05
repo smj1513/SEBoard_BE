@@ -2,12 +2,14 @@ package com.seproject.seboard.domain.model.category;
 
 import com.seproject.admin.domain.MenuAuthorization;
 import com.seproject.seboard.domain.service.CategoryService;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -34,8 +36,9 @@ public class Menu {
     private int depth;
     protected String urlInfo;
 
+    @Builder.Default
     @OneToMany(mappedBy = "menu",fetch = FetchType.LAZY , cascade = CascadeType.ALL)
-    private List<MenuAuthorization> menuAuthorizations;
+    private List<MenuAuthorization> menuAuthorizations = new ArrayList<>();
 
     public Menu(Long menuId, Menu superMenu, String name, String description) {
         if(isValidName(name)){
@@ -47,7 +50,7 @@ public class Menu {
         this.name = name;
         this.description = description;
         this.depth = calculateDepth();
-
+        this.menuAuthorizations = new ArrayList<>();
         if(depth > 0){
             throw new IllegalArgumentException();
         }
@@ -82,7 +85,7 @@ public class Menu {
     }
 
     public void updateMenuAuthorizations(List<MenuAuthorization> menuAuthorizations) {
-        this.menuAuthorizations = menuAuthorizations;
+        this.menuAuthorizations.addAll(menuAuthorizations);
     }
 
     public void changeDescription(String description) {
