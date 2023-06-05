@@ -1,6 +1,7 @@
 package com.seproject.admin.controller.dto.comment;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.seproject.seboard.controller.dto.user.UserResponse;
 import com.seproject.seboard.domain.model.comment.Comment;
 import com.seproject.seboard.domain.model.comment.Reply;
@@ -50,7 +51,10 @@ public class AdminCommentResponse {
         private String contents;
         private LocalDateTime createdAt;
         private LocalDateTime modifiedAt;
+        @JsonProperty("isReported")
         private boolean isReported;
+        @JsonProperty("isReadOnlyAuthor")
+        private boolean isReadOnlyAuthor;
 
         public AdminCommentListResponse(Comment comment){
             this.commentId = comment.getCommentId();
@@ -60,6 +64,7 @@ public class AdminCommentResponse {
             this.createdAt = comment.getBaseTime().getCreatedAt();
             this.modifiedAt = comment.getBaseTime().getModifiedAt();
             this.isReported = (comment.getStatus()== Status.REPORTED);
+            this.isReadOnlyAuthor = comment.isOnlyReadByAuthor();
 
             if(comment instanceof Reply){
                 Reply reply = (Reply) comment;

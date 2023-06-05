@@ -42,7 +42,8 @@ public class AdminCommentSearchJpaRepository implements AdminCommentSearchReposi
                 .from(comment)
                 .where(
                         searchOption(condition.getSearchOption(), condition.getQuery()),
-                        reportedStatusEq(condition.getIsReported())
+                        reportedStatusEq(condition.getIsReported()),
+                        readOnlyAuthorEq(condition.getIsReadOnlyAuthor())
                 ).orderBy(comment.baseTime.createdAt.desc())
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -53,7 +54,8 @@ public class AdminCommentSearchJpaRepository implements AdminCommentSearchReposi
                 .from(comment)
                 .where(
                         searchOption(condition.getSearchOption(), condition.getQuery()),
-                        reportedStatusEq(condition.getIsReported())
+                        reportedStatusEq(condition.getIsReported()),
+                        readOnlyAuthorEq(condition.getIsReadOnlyAuthor())
                 )
                 .fetchOne();
 
@@ -79,6 +81,16 @@ public class AdminCommentSearchJpaRepository implements AdminCommentSearchReposi
                 .fetchOne();
 
         return new PageImpl<>(content, pageable, count);
+    }
+
+    private BooleanExpression readOnlyAuthorEq(Boolean isReadOnlyAuthor){
+        if(isReadOnlyAuthor == null){
+            return null;
+        }else if(isReadOnlyAuthor){
+            return comment.isOnlyReadByAuthor.isTrue();
+        }else{
+            return comment.isOnlyReadByAuthor.isFalse();
+        }
     }
 
     private BooleanExpression reportedStatusEq(Boolean isReported){
