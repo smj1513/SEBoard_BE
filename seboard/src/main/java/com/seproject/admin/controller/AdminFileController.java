@@ -3,10 +3,13 @@ package com.seproject.admin.controller;
 import com.seproject.admin.controller.dto.file.FileRequest;
 import com.seproject.admin.controller.dto.file.FileRequest.AdminFileRetrieveCondition;
 import com.seproject.admin.controller.dto.file.FileRequest.BulkFileRequest;
+import com.seproject.admin.controller.dto.file.FileRequest.FileConfigurationRequest;
 import com.seproject.admin.controller.dto.file.FileRequest.FileExtensionRequest;
 import com.seproject.admin.controller.dto.file.FileResponse;
 import com.seproject.admin.controller.dto.file.FileResponse.AdminFileRetrieveResponse;
+import com.seproject.admin.controller.dto.file.FileResponse.FileConfigurationResponse;
 import com.seproject.admin.controller.dto.file.FileResponse.FileExtensionResponse;
+import com.seproject.admin.domain.FileConfiguration;
 import com.seproject.admin.service.AdminFileAppService;
 import com.seproject.seboard.controller.dto.MessageResponse;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +38,18 @@ public class AdminFileController {
     public ResponseEntity<MessageResponse> deleteBulkFile(@RequestBody BulkFileRequest fileIds){
         adminFileAppService.deleteBulkFile(fileIds.getFileIds());
         return ResponseEntity.ok(MessageResponse.of("파일 삭제 완료"));
+    }
+
+    @PostMapping("/configuration")
+    public ResponseEntity<MessageResponse> setFileConfiguration(@RequestBody FileConfigurationRequest request){
+        adminFileAppService.setFileConfiguration(request.getMaxSizePerFile(), request.getMaxSizePerPost());
+        return ResponseEntity.ok(MessageResponse.of("파일 설정 변경 완료"));
+    }
+
+    @GetMapping("/configuration")
+    public ResponseEntity<FileConfigurationResponse> retrieveFileConfiguration(){
+        FileConfigurationResponse res = adminFileAppService.retrieveFileConfiguration();
+        return ResponseEntity.ok(res);
     }
 
     @PostMapping("/extension")

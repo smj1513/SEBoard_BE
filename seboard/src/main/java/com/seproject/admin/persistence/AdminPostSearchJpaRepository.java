@@ -68,6 +68,29 @@ public class AdminPostSearchJpaRepository implements AdminPostSearchRepository {
         return new PageImpl<>(contents, pageable, count);
     }
 
+    @Override
+    public Page<AdminPostResponse.AdminDeletedPostResponse> findDeletedPostList(Pageable pageable) {
+        List<AdminPostResponse.AdminDeletedPostResponse> content = queryFactory
+                .select(Projections.constructor(
+                        AdminPostResponse.AdminDeletedPostResponse.class,
+                        post
+                ))
+                .from(post)
+                .where(post.status.eq(Status.TEMP_DELETED))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(post.baseTime.createdAt.desc())
+                .fetch();
+
+        Long count = queryFactory
+                .select(post.count())
+                .from(post)
+                .where(post.status.eq(Status.TEMP_DELETED))
+                .fetchOne();
+
+        return new PageImpl<>(content, pageable, count);
+    }
+
     private BooleanExpression exposeOptionEq(String exposeOption){
         return exposeOption != null ? post.exposeOption.exposeState.eq(ExposeState.valueOf(exposeOption)) : null;
     }

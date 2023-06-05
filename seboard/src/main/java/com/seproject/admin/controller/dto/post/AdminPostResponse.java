@@ -34,4 +34,28 @@ public class AdminPostResponse {
         this.isReported = (post.getStatus()== Status.REPORTED);
         this.exposeOption = post.getExposeOption().getExposeState().toString();
     }
+
+    @Data
+    public static class AdminDeletedPostResponse{
+        private Long postId;
+        private String title;
+        private PostResponse.PostDetailCategoryResponse category;
+        private UserResponse author;
+        private Integer views;
+        private LocalDateTime createdAt;
+        private LocalDateTime modifiedAt;
+        private boolean hasAttachment;
+        private String exposeOption;
+        public AdminDeletedPostResponse(Post post){
+            this.postId = post.getPostId();
+            this.title = post.getTitle();
+            this.category = new PostResponse.PostDetailCategoryResponse(post.getCategory());
+            this.author = new UserResponse(post.getAuthor());
+            this.views = post.getViews();
+            this.createdAt = post.getBaseTime().getCreatedAt();
+            this.modifiedAt = post.getBaseTime().getModifiedAt();
+            this.hasAttachment = post.hasAttachments();
+            this.exposeOption = post.getExposeOption().getExposeState().toString();
+        }
+    }
 }

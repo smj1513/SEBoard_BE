@@ -6,6 +6,7 @@ import com.seproject.account.repository.social.OAuthAccountRepository;
 import com.seproject.account.service.email.KumohEmailService;
 import com.seproject.account.service.email.RegisterEmailService;
 import com.seproject.account.utils.SecurityUtils;
+import com.seproject.admin.domain.repository.AdminAccountSearchRepository;
 import com.seproject.admin.service.BannedIdService;
 import com.seproject.admin.service.BannedNicknameService;
 import com.seproject.error.errorCode.ErrorCode;
@@ -58,6 +59,7 @@ public class AccountService implements UserDetailsService {
     private final BCryptPasswordEncoder passwordEncoder;
     private final RegisterEmailService registerEmailService;
     private final MemberRepository memberRepository;
+    private final AdminAccountSearchRepository accountSearchRepository;
 
     private final BannedIdService bannedIdService;
     private final BannedNicknameService bannedNicknameService;
@@ -150,20 +152,8 @@ public class AccountService implements UserDetailsService {
         memberRepository.save(member);
         return account;
     }
-    public RetrieveAllAccountResponse findAllAccount(int page,int perPage) {
-
-        try {
-            PageRequest pageRequest = PageRequest.of(page,perPage);
-            Page<Account> all = accountRepository.findAll(pageRequest);
-            List<Account> accounts = all.stream().collect(Collectors.toList());
-            int total = all.getTotalPages();
-            int nowPage = all.getNumber();
-
-            return RetrieveAllAccountResponse.toDTO(total,nowPage+1,perPage,accounts);
-        } catch (IllegalArgumentException e) {
-            throw new CustomIllegalArgumentException(ErrorCode.INVALID_PAGINATION,e);
-        }
-
+    public Page<RetrieveAccountResponse> findAllAccount(AdminRetrieveAccountCondition condition, Pageable pageable) {
+        return accountSearchRepository.findAllAccount(condition, pageable);
     }
     public RetrieveAccountResponse findAccount(Long accountId) {
         Account account = accountRepository.findById(accountId).orElseThrow();
@@ -207,9 +197,9 @@ public class AccountService implements UserDetailsService {
         return CreateAccountResponse.toDTO(savedAccount);
     }
     @Transactional
-    public UpdateAccountResponse updateAccount(UpdateAccountRequest request) {
+    public UpdateAccountResponse updateAccount(UpdateAccountRequest request, Long accountId) {
 
-        Account account = accountRepository.findById(request.getAccountId())
+        Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.USER_NOT_FOUND,null));
 
         String id = request.getId();
@@ -346,4 +336,23 @@ public class AccountService implements UserDetailsService {
         return account;
     }
 
+    public Page<RetrieveAccountResponse> findDeletedAccount(Pageable pageable) {
+        return accountSearchRepository.findDeletedAccount(pageable);
+    }
+
+    public void deleteBulkAccount(List<Long> accountIds, boolean isPermanent) {
+        List<Account> accounts = accountRepository.findAllById(accountIds);
+
+        for (Account account : accounts) {
+            account.delete(isPermanent);
+        }
+    }
+
+    public void restoreBulkAccount(List<Long> accountIds) {
+        List<Account> accounts = accountRepository.findAllById(accountIds);
+
+        for (Account account : accounts) {
+            account.restore();
+        }
+    }
 }

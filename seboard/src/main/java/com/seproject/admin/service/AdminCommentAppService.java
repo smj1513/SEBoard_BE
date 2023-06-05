@@ -6,6 +6,7 @@ import com.seproject.admin.controller.dto.comment.AdminCommentRequest;
 import com.seproject.admin.controller.dto.comment.AdminCommentRequest.AdminCommentRetrieveCondition;
 import com.seproject.admin.controller.dto.comment.AdminCommentResponse;
 import com.seproject.admin.controller.dto.comment.AdminCommentResponse.AdminCommentListResponse;
+import com.seproject.admin.controller.dto.comment.AdminCommentResponse.AdminDeletedCommentResponse;
 import com.seproject.admin.domain.repository.AdminCommentSearchRepository;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.InvalidAuthorizationException;
@@ -29,6 +30,18 @@ public class AdminCommentAppService {
     private final CommentRepository commentRepository;
     private final AdminCommentSearchRepository adminCommentSearchRepository;
     private final ReportRepository reportRepository;
+    public Page<AdminDeletedCommentResponse> retrieveDeletedCommentList(Pageable pageable){
+        Account account = SecurityUtils.getAccount()
+                .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
+
+        boolean isAdmin = account.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+
+        if(!isAdmin){
+            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
+        }
+
+        return adminCommentSearchRepository.findDeletedCommentList(pageable);
+    }
 
     public Page<AdminCommentListResponse> retrieveCommentList(AdminCommentRetrieveCondition condition, Pageable pageable){
         Account account = SecurityUtils.getAccount()

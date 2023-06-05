@@ -4,6 +4,7 @@ import com.seproject.account.model.account.Account;
 import com.seproject.account.utils.SecurityUtils;
 import com.seproject.admin.controller.dto.post.AdminPostRequest.AdminPostRetrieveCondition;
 import com.seproject.admin.controller.dto.post.AdminPostResponse;
+import com.seproject.admin.controller.dto.post.AdminPostResponse.AdminDeletedPostResponse;
 import com.seproject.admin.domain.repository.AdminPostSearchRepository;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.InvalidAuthorizationException;
@@ -16,6 +17,7 @@ import com.seproject.seboard.domain.repository.post.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,6 +34,20 @@ public class AdminPostAppService {
     private final ReportRepository reportRepository;
     private final BoardUserRepository boardUserRepository;
     private final AdminPostSearchRepository adminPostSearchRepository;
+
+    public Page<AdminDeletedPostResponse> findDeletedPostList(Pageable pageable){
+        Account account = SecurityUtils.getAccount()
+                .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
+
+        boolean isAdmin = account.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+
+        if(!isAdmin){
+            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
+        }
+
+        return adminPostSearchRepository.findDeletedPostList(pageable);
+    }
+
 
     public Page<AdminPostResponse> findPostList(AdminPostRetrieveCondition condition, int page, int perPage) {
         Account account = SecurityUtils.getAccount()

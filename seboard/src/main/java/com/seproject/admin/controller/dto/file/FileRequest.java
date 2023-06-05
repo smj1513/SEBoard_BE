@@ -7,6 +7,11 @@ import java.util.List;
 
 public class FileRequest {
     @Data
+    public static class FileConfigurationRequest{
+        private Long maxSizePerFile;
+        private Long maxSizePerPost;
+    }
+    @Data
     public static class AdminFileRetrieveCondition{
         @JsonProperty("isOrphan")
         private Boolean isOrphan;
