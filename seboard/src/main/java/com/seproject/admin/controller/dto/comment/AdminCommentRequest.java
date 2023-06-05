@@ -10,6 +10,8 @@ public class AdminCommentRequest {
     public static class AdminCommentRetrieveCondition{
         @JsonProperty("isReported")
         private Boolean isReported;
+        @JsonProperty("isReadOnlyAuthor")
+        private Boolean isReadOnlyAuthor;
         private String searchOption;
         private String query;
     }
