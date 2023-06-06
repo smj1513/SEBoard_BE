@@ -1,6 +1,7 @@
 package com.seproject.admin.controller;
 
 import com.seproject.seboard.application.CategoryAppService;
+import com.seproject.seboard.controller.dto.MessageResponse;
 import com.seproject.seboard.controller.dto.post.CategoryRequest;
 import com.seproject.seboard.controller.dto.post.CategoryResponse;
 import com.seproject.seboard.domain.model.category.Menu;
@@ -126,9 +127,9 @@ public class AdminCategoryController {
     }
 
     @PostMapping("/migrate")
-    public ResponseEntity<?> migrateCategory(@RequestParam Long from,@RequestParam Long to){
-        categoryAppService.migrateCategory(from,to);
+    public ResponseEntity<MessageResponse> migrateCategory(@RequestBody MigrateCategoryRequest request) {
+        categoryAppService.migrateCategory(request.getFromBoardMenuId(), request.getToBoardMenuId());
 
-        return new ResponseEntity<>(HttpStatus.OK);
+        return ResponseEntity.ok(MessageResponse.of("카테고리 이동 완료"));
     }
 }

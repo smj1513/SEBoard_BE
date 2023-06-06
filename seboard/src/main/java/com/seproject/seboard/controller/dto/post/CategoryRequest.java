@@ -6,6 +6,11 @@ import static com.seproject.seboard.application.dto.category.CategoryCommand.*;
 import static com.seproject.admin.dto.AuthorizationDTO.*;
 
 public class CategoryRequest {
+    @Data
+    public static class MigrateCategoryRequest {
+        private Long fromBoardMenuId;
+        private Long toBoardMenuId;
+    }
 
     @Data
     public static class CreateCategoryRequest {

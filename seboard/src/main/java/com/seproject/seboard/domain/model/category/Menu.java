@@ -94,6 +94,10 @@ public class Menu {
         this.description = description;
     }
 
+    public void changeSuperMenu(Menu superMenu) {
+        this.superMenu = superMenu;
+    }
+
     public boolean writable(Collection<? extends GrantedAuthority> authorities) {
         List<MenuAuthorization> collect = menuAuthorizations.stream()
                 .filter((menuAuthorization) -> menuAuthorization.getAccessOption().equals(AccessOption.WRITE))

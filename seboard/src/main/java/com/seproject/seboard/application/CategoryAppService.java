@@ -6,6 +6,7 @@ import com.seproject.admin.domain.SelectOption;
 import com.seproject.admin.service.AdminMenuService;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
+import com.seproject.error.exception.NoSuchResourceException;
 import com.seproject.seboard.application.dto.category.CategoryCommand.CategoryCreateCommand;
 import com.seproject.seboard.application.dto.category.CategoryCommand.CategoryUpdateCommand;
 import com.seproject.seboard.controller.dto.post.CategoryResponse;
@@ -158,15 +159,15 @@ public class CategoryAppService {
         categoryRepository.deleteById(categoryId);
     }
 
-    public void migrateCategory(Long fromCategoryId, Long toCategoryId){
-        //TODO : 권한 처리 어디서?
-        Category from = findByIdOrThrow(fromCategoryId, categoryRepository, "");
-        Category to = findByIdOrThrow(toCategoryId, categoryRepository, "");
+    public void migrateCategory(Long fromMenuId, Long toMenuId){
+        BoardMenu from = boardMenuRepository.findById(fromMenuId)
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_MENU));
+        BoardMenu to = boardMenuRepository.findById(toMenuId)
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_MENU));
 
         //TODO : bulk update 적용
-        postRepository.findByCategoryId(fromCategoryId).forEach(post -> {
-            post.changeCategory(to);
-        });
+        categoryRepository.findBySuperMenu(from).stream()
+                .forEach(category -> category.changeSuperMenu(to));
     }
 
     public CategoryResponse retrieveMenuById(Long menuId){
