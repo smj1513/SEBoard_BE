@@ -5,6 +5,7 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.seproject.admin.controller.dto.post.AdminPostRequest.AdminPostRetrieveCondition;
 import com.seproject.admin.controller.dto.post.AdminPostResponse;
+import com.seproject.admin.controller.dto.post.AdminPostResponse.AdminPostRetrieveResponse;
 import com.seproject.admin.domain.repository.AdminPostSearchRepository;
 import com.seproject.seboard.controller.PostSearchOptions;
 import com.seproject.seboard.domain.model.common.Status;
@@ -32,10 +33,10 @@ public class AdminPostSearchJpaRepository implements AdminPostSearchRepository {
     }
 
     @Override
-    public Page<AdminPostResponse> findPostListByCondition(AdminPostRetrieveCondition condition, Pageable pageable) {
-        List<AdminPostResponse> contents = queryFactory
+    public Page<AdminPostRetrieveResponse> findPostListByCondition(AdminPostRetrieveCondition condition, Pageable pageable) {
+        List<AdminPostRetrieveResponse> contents = queryFactory
                 .select(Projections.constructor(
-                        AdminPostResponse.class,
+                        AdminPostRetrieveResponse.class,
                         post
                 ))
                 .from(post)
