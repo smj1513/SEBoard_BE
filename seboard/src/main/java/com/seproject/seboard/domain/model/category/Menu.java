@@ -75,9 +75,9 @@ public class Menu {
     }
 
     public void changeName(String name) {
-        if(isValidName(name)){
-            throw new IllegalArgumentException();
-        }
+//        if(isValidName(name)){
+//            throw new IllegalArgumentException();
+//        }
 
         this.name = name;
     }

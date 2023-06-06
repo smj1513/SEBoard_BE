@@ -8,9 +8,15 @@ import com.seproject.error.exception.InvalidAuthorizationException;
 import com.seproject.error.exception.NoSuchResourceException;
 import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostDetailResponse;
 import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostListResponseElement;
+import com.seproject.seboard.domain.model.category.BoardMenu;
+import com.seproject.seboard.domain.model.category.Category;
+import com.seproject.seboard.domain.model.category.Menu;
 import com.seproject.seboard.domain.model.post.Post;
 import com.seproject.seboard.domain.model.post.exposeOptions.ExposeState;
 import com.seproject.seboard.domain.model.user.Member;
+import com.seproject.seboard.domain.repository.category.BoardMenuRepository;
+import com.seproject.seboard.domain.repository.category.CategoryRepository;
+import com.seproject.seboard.domain.repository.category.MenuRepository;
 import com.seproject.seboard.domain.repository.comment.CommentRepository;
 import com.seproject.seboard.domain.repository.comment.CommentSearchRepository;
 import com.seproject.seboard.domain.repository.comment.ReplyRepository;
@@ -25,6 +31,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -39,6 +46,8 @@ public class PostSearchAppService {
     private final MemberRepository memberRepository;
     private final BookmarkRepository bookmarkRepository;
     private final AccountRepository accountRepository;
+    private final BoardMenuRepository boardMenuRepository;
+
 
     @Transactional
     public RetrievePostDetailResponse findPrivacyPost(Long postId, String password){
@@ -69,7 +78,7 @@ public class PostSearchAppService {
                     .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_MEMBER));
 
             isBookmarked = bookmarkRepository.existsByPostIdAndMemberId(postId, member.getBoardUserId());
-            isEditable = post.isWrittenBy(account.getAccountId());
+            isEditable = post.isWrittenBy(account.getAccountId()) || post.getCategory().manageable(account.getAuthorities());
         }
 
         postDetailResponse.setEditable(isEditable);
@@ -100,8 +109,7 @@ public class PostSearchAppService {
                     .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_MEMBER));
 
             isBookmarked = bookmarkRepository.existsByPostIdAndMemberId(postId, member.getBoardUserId());
-            isEditable = post.isWrittenBy(account.getAccountId());
-
+            isEditable = post.isWrittenBy(account.getAccountId()) || post.getCategory().manageable(account.getAuthorities());
         }
 
         postDetailResponse.setEditable(isEditable);
@@ -135,23 +143,60 @@ public class PostSearchAppService {
     }
 
     public List<RetrievePostListResponseElement> findPinedPostList(Long categoryId){
-        List<RetrievePostListResponseElement> pinedPosts = postSearchRepository.findPinedPostByCategoryId(categoryId);
+        BoardMenu boardMenu = boardMenuRepository.findById(categoryId)
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_CATEGORY));
 
-        pinedPosts.forEach(postDto -> {
-            int commentSize = commentRepository.countCommentsByPostId(postDto.getPostId());
-            int replySize = commentSearchRepository.countReplyByPostId(postDto.getPostId());
-            postDto.setCommentSize(commentSize+replySize);
-        });
+        List<RetrievePostListResponseElement> postPage;
 
-        return pinedPosts;
+        if(boardMenu.exposable(new ArrayList<>())){
+            postPage = postSearchRepository.findPinedPostByCategoryId(categoryId);
+
+            postPage.forEach(postDto -> {
+                int commentSize = commentRepository.countCommentsByPostId(postDto.getPostId());
+                int replySize = commentSearchRepository.countReplyByPostId(postDto.getPostId());
+                postDto.setCommentSize(commentSize+replySize);
+            });
+        }else{ //최소 로그인을 해야만 볼 수 있다
+            Account account = SecurityUtils.getAccount().orElseThrow(()-> new NoSuchResourceException(ErrorCode.NOT_LOGIN));
+
+            if(!boardMenu.exposable(account.getAuthorities())){
+                throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
+            }
+
+            postPage = postSearchRepository.findPinedPostByCategoryId(categoryId);
+
+            postPage.forEach(postDto -> {
+                int commentSize = commentRepository.countCommentsByPostId(postDto.getPostId());
+                int replySize = commentSearchRepository.countReplyByPostId(postDto.getPostId());
+                postDto.setCommentSize(commentSize+replySize);
+            });
+        }
+
+        return postPage;
     }
 
     public Page<RetrievePostListResponseElement> findPostList(Long categoryId, int page, int size){
+        BoardMenu boardMenu = boardMenuRepository.findById(categoryId)
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_CATEGORY));
+
         Page<RetrievePostListResponseElement> postPage;
 
-        postPage = postSearchRepository.findPostByCategoryId(categoryId, PageRequest.of(page, size));
+        //TODO : 리팩토링 필요
+        //노출 옵션이 ALL인지 확인(로그인 안해도 볼 수 있는지)
+        if(boardMenu.exposable(new ArrayList<>())){
+            postPage = postSearchRepository.findPostByCategoryId(categoryId, PageRequest.of(page, size));
+            setCommentSize(postPage);
+        }else{ //최소 로그인을 해야만 볼 수 있다
+            Account account = SecurityUtils.getAccount().orElseThrow(()-> new NoSuchResourceException(ErrorCode.NOT_LOGIN));
 
-        setCommentSize(postPage);
+            if(!boardMenu.exposable(account.getAuthorities())){
+                throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
+            }
+
+
+            postPage = postSearchRepository.findPostByCategoryId(categoryId, PageRequest.of(page, size));
+            setCommentSize(postPage);
+        }
 
         return postPage;
     }
