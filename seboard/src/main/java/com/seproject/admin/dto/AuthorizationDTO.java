@@ -116,7 +116,7 @@ public class AuthorizationDTO {
             SelectOption selectOption = menuAuthorizations.size() == 0 ? SelectOption.ALL : menuAuthorizations.get(0).getSelectOption();
             return builder()
                     .roles(roles.stream().map(Role::toString).collect(Collectors.toList()))
-                    .option(selectOption.name())
+                    .option(selectOption.getName())
                     .build();
         }
 
@@ -130,7 +130,7 @@ public class AuthorizationDTO {
 
         public static AccessResponse toDTO(List<Role> roles,SelectOption selectOption) {
             return builder()
-                    .option(selectOption.name())
+                    .option(selectOption.getName())
                     .roles(roles.stream().map(Role::toString).collect(Collectors.toList()))
                     .build();
         }

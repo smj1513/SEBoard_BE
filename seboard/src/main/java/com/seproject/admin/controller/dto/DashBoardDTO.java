@@ -1,5 +1,7 @@
 package com.seproject.admin.controller.dto;
 
+import com.seproject.account.model.role.Role;
+import com.seproject.account.model.role.RoleAuthorization;
 import com.seproject.account.model.role.auth.Authorization;
 import com.seproject.admin.domain.SelectOption;
 import lombok.AccessLevel;
@@ -7,6 +9,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class DashBoardDTO {
 
@@ -43,9 +46,8 @@ public class DashBoardDTO {
         private DashBoardRetrieveElement menuEdit;
 
         public static MenuSettingResponse toDTO(Authorization menuEdit) {
-            String option = getOrAll(menuEdit);
             return builder()
-                    .menuEdit(DashBoardRetrieveElement.toDTO("SE 메뉴 편집",option))
+                    .menuEdit(DashBoardRetrieveElement.toDTO("SE 메뉴 편집",menuEdit))
                     .build();
         }
     }
@@ -58,14 +60,11 @@ public class DashBoardDTO {
         private DashBoardRetrieveElement roles;
 
         public static AccountManageResponse toDTO(Authorization accountManage, Authorization accountPolicy, Authorization roleManage) {
-            String accountManageSelectOption = getOrAll(accountManage);
-            String accountPolicySelectOption = getOrAll(accountPolicy);
-            String roleManageSelectOption = getOrAll(roleManage);
 
             return builder()
-                    .accountList(DashBoardRetrieveElement.toDTO("회원 목록",accountManageSelectOption))
-                    .accountPolicy(DashBoardRetrieveElement.toDTO("회원 정책",accountPolicySelectOption))
-                    .roles(DashBoardRetrieveElement.toDTO("회원 그룹",roleManageSelectOption))
+                    .accountList(DashBoardRetrieveElement.toDTO("회원 목록",accountManage))
+                    .accountPolicy(DashBoardRetrieveElement.toDTO("회원 정책",accountPolicy))
+                    .roles(DashBoardRetrieveElement.toDTO("회원 그룹",roleManage))
                     .build();
         }
     }
@@ -83,16 +82,11 @@ public class DashBoardDTO {
                                                   Authorization fileAuth,
                                                   Authorization trashAuth
                                                   ) {
-            String postSelectOption = getOrAll(postAuth);
-            String commentSelectOption = getOrAll(commentAuth);
-            String fileSelectOption = getOrAll(fileAuth);
-            String trashSelectOption = getOrAll(trashAuth);
-
             return builder()
-                    .post(DashBoardRetrieveElement.toDTO("게시글 관리",postSelectOption))
-                    .comment(DashBoardRetrieveElement.toDTO("댓글 관리",commentSelectOption))
-                    .file(DashBoardRetrieveElement.toDTO("첨부파일 관리",fileSelectOption))
-                    .trash(DashBoardRetrieveElement.toDTO("휴지통",trashSelectOption))
+                    .post(DashBoardRetrieveElement.toDTO("게시글 관리",postAuth))
+                    .comment(DashBoardRetrieveElement.toDTO("댓글 관리",commentAuth))
+                    .file(DashBoardRetrieveElement.toDTO("첨부파일 관리",fileAuth))
+                    .trash(DashBoardRetrieveElement.toDTO("휴지통",trashAuth))
                     .build();
         }
     }
@@ -104,13 +98,9 @@ public class DashBoardDTO {
         private DashBoardRetrieveElement mainPage;
 
         public static GeneralSettingResponse toDTO(Authorization generalAuth,Authorization mainPageAuth) {
-
-            String generalSelectOption = getOrAll(generalAuth);
-            String mainPageSelectOption = getOrAll(mainPageAuth);
-
             return builder()
-                    .general(DashBoardRetrieveElement.toDTO("일반",generalSelectOption))
-                    .mainPage(DashBoardRetrieveElement.toDTO("메인 페이지 설정",mainPageSelectOption))
+                    .general(DashBoardRetrieveElement.toDTO("일반",generalAuth))
+                    .mainPage(DashBoardRetrieveElement.toDTO("메인 페이지 설정",mainPageAuth))
                     .build();
         }
     }
@@ -121,11 +111,19 @@ public class DashBoardDTO {
     public static class DashBoardRetrieveElement {
         private String name;
         private String option;
+        private List<String> roles;
 
-        public static DashBoardRetrieveElement toDTO(String name, String option) {
+        public static DashBoardRetrieveElement toDTO(String name, Authorization authorization) {
+            String option = getOrAll(authorization);
+            List<String> collect = authorization.getRoleAuthorizations()
+                    .stream()
+                    .map(RoleAuthorization::getRole)
+                    .map(Role::toString)
+                    .collect(Collectors.toList());
             return builder()
                     .name(name)
                     .option(option)
+                    .roles(collect)
                     .build();
         }
     }
