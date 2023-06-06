@@ -63,19 +63,25 @@ public class AdminMenuService {
         MenuAuthorizationResponse writeResponse = MenuAuthorizationResponse.toDTO(write);
         MenuAuthorizationResponse exposeResponse = MenuAuthorizationResponse.toDTO(expose);
         MenuAuthorizationResponse manageResponse = MenuAuthorizationResponse.toDTO(manage);
+        Authorization auth;
 
         if(authorization.isPresent()) {
-            Authorization auth = authorization.get();
-            List<RoleAuthorization> roleAuthorizations = auth.getRoleAuthorizations();
-
-            List<Role> roles = roleAuthorizations.stream().map(RoleAuthorization::getRole).collect(Collectors.toList());
-            SelectOption selectOption = auth.getSelectOption();
-            AccessResponse accessResponse = AccessResponse.toDTO(roles,selectOption);
-            return CategoryAccessOptionResponse.toDTO(menu,accessResponse,writeResponse,manageResponse,exposeResponse);
+            auth = authorization.get();
         } else {
-            return CategoryAccessOptionResponse.toDTO(menu,null,writeResponse,manageResponse,exposeResponse);
+            auth = Authorization.builder()
+                    .path("/category/" + menuId + "/**")
+                    .selectOption(SelectOption.ALL)
+                    .roleAuthorizations(new ArrayList<>())
+                    .build();
         }
 
+        List<RoleAuthorization> roleAuthorizations = auth.getRoleAuthorizations();
+
+        List<Role> roles = roleAuthorizations.stream().map(RoleAuthorization::getRole).collect(Collectors.toList());
+        SelectOption selectOption = auth.getSelectOption();
+        AccessResponse accessResponse = AccessResponse.toDTO(roles,selectOption);
+
+        return CategoryAccessOptionResponse.toDTO(menu,accessResponse,writeResponse,manageResponse,exposeResponse);
     }
 
     public void update(Long categoryId, CategoryAccessUpdateRequest request) {
