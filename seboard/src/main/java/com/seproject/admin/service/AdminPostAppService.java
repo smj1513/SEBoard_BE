@@ -10,8 +10,10 @@ import com.seproject.admin.domain.repository.AdminPostSearchRepository;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.InvalidAuthorizationException;
 import com.seproject.error.exception.NoSuchResourceException;
+import com.seproject.seboard.domain.model.category.Category;
 import com.seproject.seboard.domain.model.user.BoardUser;
 import com.seproject.seboard.domain.model.post.Post;
+import com.seproject.seboard.domain.repository.category.CategoryRepository;
 import com.seproject.seboard.domain.repository.report.ReportRepository;
 import com.seproject.seboard.domain.repository.user.BoardUserRepository;
 import com.seproject.seboard.domain.repository.post.PostRepository;
@@ -35,6 +37,7 @@ public class AdminPostAppService {
     private final ReportRepository reportRepository;
     private final BoardUserRepository boardUserRepository;
     private final AdminPostSearchRepository adminPostSearchRepository;
+    private final CategoryRepository categoryRepository;
 
     public Page<AdminDeletedPostResponse> findDeletedPostList(Pageable pageable){
         Account account = SecurityUtils.getAccount()
@@ -124,6 +127,18 @@ public class AdminPostAppService {
 
         postRepository.findAllById(postIds).forEach(post -> {
             post.delete(isPermanent);
+        });
+    }
+
+    public void migratePost(Long fromCategoryId, Long toCategoryId){
+        Category from = categoryRepository.findById(fromCategoryId)
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_CATEGORY));
+        Category to = categoryRepository.findById(toCategoryId)
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_CATEGORY));
+
+        //TODO : bulk update 적용
+        postRepository.findByCategoryId(fromCategoryId).forEach(post -> {
+            post.changeCategory(to);
         });
     }
 

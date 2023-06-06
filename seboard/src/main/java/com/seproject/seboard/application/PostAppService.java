@@ -2,6 +2,7 @@ package com.seproject.seboard.application;
 
 import com.seproject.account.model.account.Account;
 import com.seproject.account.repository.AccountRepository;
+import com.seproject.account.utils.SecurityUtils;
 import com.seproject.admin.domain.FileConfiguration;
 import com.seproject.admin.domain.repository.FileConfigurationRepository;
 import com.seproject.error.errorCode.ErrorCode;
@@ -53,17 +54,24 @@ public class PostAppService {
     private final FileConfigurationRepository fileConfigurationRepository;
 
     public Long writePost(PostWriteCommand command){
-        Account account = accountRepository.findByLoginId(command.getLoginId())
-                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
+        Account account = SecurityUtils.getAccount()
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_LOGIN));
+
+        Category category = categoryRepository.findById(command.getCategoryId())
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_CATEGORY));
+
+        if(!category.writable(account.getAuthorities())){
+            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
+        }
 
         if(command.isAnonymous()){
-            return writeUnnamedPost(command, account);
+            return writeUnnamedPost(command, account, category);
         }else{
-            return writeNamedPost(command, account.getAccountId());
+            return writeNamedPost(command, account.getAccountId(), category);
         }
     }
 
-    protected Long writeUnnamedPost(PostWriteCommand command, Account account) {
+    protected Long writeUnnamedPost(PostWriteCommand command, Account account, Category category) {
         Anonymous anonymous = Anonymous.builder()
                 .name("익명") //TODO : 익명 이름 다양하게?
                 .account(account)
@@ -71,19 +79,16 @@ public class PostAppService {
 
         anonymousRepository.save(anonymous);
 
-        return createPost(command, anonymous);
+        return createPost(command, anonymous, category);
     }
 
-    protected Long writeNamedPost(PostWriteCommand command, Long accountId) {
+    protected Long writeNamedPost(PostWriteCommand command, Long accountId, Category category) {
         Member member = memberRepository.findByAccountId(accountId).orElseThrow(NoSuchElementException::new);
 
-        return createPost(command, member);
+        return createPost(command, member, category);
     }
 
-    private Long createPost(PostWriteCommand command, BoardUser author){
-        Category category = categoryRepository.findById(command.getCategoryId())
-                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_CATEGORY));
-
+    private Long createPost(PostWriteCommand command, BoardUser author, Category category){
         List<FileMetaData> fileMetaDataList =
                 fileMetaDataRepository.findAllById(command.getAttachmentIds());
 
@@ -114,7 +119,7 @@ public class PostAppService {
         Post post = postRepository.findById(command.getPostId())
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
 
-        if(!post.isWrittenBy(account.getAccountId())){
+        if(!post.isWrittenBy(account.getAccountId()) &&  !post.getCategory().manageable(account.getAuthorities())){
             throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 
@@ -162,7 +167,7 @@ public class PostAppService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
 
-        if(!post.isWrittenBy(account.getAccountId())){ // TODO : 관리자 삭제 경우 추가해야함
+        if(!post.isWrittenBy(account.getAccountId()) &&  !post.getCategory().manageable(account.getAuthorities())){
             throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 

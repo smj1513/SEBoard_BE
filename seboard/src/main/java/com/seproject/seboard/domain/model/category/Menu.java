@@ -75,9 +75,9 @@ public class Menu {
     }
 
     public void changeName(String name) {
-        if(isValidName(name)){
-            throw new IllegalArgumentException();
-        }
+//        if(isValidName(name)){
+//            throw new IllegalArgumentException();
+//        }
 
         this.name = name;
     }
@@ -92,6 +92,10 @@ public class Menu {
 
     public void changeDescription(String description) {
         this.description = description;
+    }
+
+    public void changeSuperMenu(Menu superMenu) {
+        this.superMenu = superMenu;
     }
 
     public boolean writable(Collection<? extends GrantedAuthority> authorities) {

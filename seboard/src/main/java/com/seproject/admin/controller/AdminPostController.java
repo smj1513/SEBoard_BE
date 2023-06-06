@@ -6,6 +6,7 @@ import com.seproject.account.jwt.JwtDecoder;
 import com.seproject.admin.controller.dto.post.AdminPostRequest;
 import com.seproject.admin.controller.dto.post.AdminPostRequest.AdminPostRetrieveCondition;
 import com.seproject.admin.controller.dto.post.AdminPostRequest.BulkPostRequest;
+import com.seproject.admin.controller.dto.post.AdminPostRequest.MigratePostRequest;
 import com.seproject.admin.controller.dto.post.AdminPostResponse;
 import com.seproject.admin.controller.dto.post.AdminPostResponse.AdminDeletedPostResponse;
 import com.seproject.admin.service.AdminPostAppService;
@@ -79,31 +80,9 @@ public class AdminPostController {
         return ResponseEntity.ok(adminPostAppService.findDeletedPostList(PageRequest.of(page, perPage)));
     }
 
-//
-//        PostListFindCommand command = PostCommand.PostListFindCommand.builder()
-//                .categoryId(retrievePostListRequest.getCategoryId())
-//                .page(retrievePostListRequest.getPage())
-//                .size(retrievePostListRequest.getPerPage())
-//                .build();
-//
-//        RetrievePostListResponse postList = postAppService.findPostList(command, false);
-//
-//        return new ResponseEntity<>(postList, HttpStatus.OK);
-
-//    //TODO: 예외 추가
-//    @Operation(summary = "게시글 삭제", description = "관리자는 게시글을 삭제한다.")
-//    @ApiResponses({
-//            @ApiResponse(content = @Content(schema = @Schema(implementation = RetrievePostListResponse.class)), responseCode = "200", description = "게시글 삭제 성공"),
-//            @ApiResponse(content = @Content(schema = @Schema(implementation = Error.class)), responseCode = "200", description = "잘못된 페이징 정보")
-//    })
-//    @DeleteMapping("/posts/{postId}")
-//    public ResponseEntity<?> deletePost(@PathVariable Long postId) {
-//        UsernamePasswordAuthenticationToken authentication = (UsernamePasswordAuthenticationToken)SecurityContextHolder.getContext().getAuthentication();
-//        User user = (User)authentication.getPrincipal();
-//        String username = user.getUsername();
-//        Account account = accountService.(username);
-//
-//        postAppService.removePost(postId,account.getAccountId());
-//        return new ResponseEntity<>("게시글 삭제 성공", HttpStatus.OK);
-//    }
+    @PostMapping("/migrate")
+    public ResponseEntity<MessageResponse> migratePost(@RequestBody MigratePostRequest request){
+        adminPostAppService.migratePost(request.getFromCategoryId(), request.getToCategoryId());
+        return ResponseEntity.ok(MessageResponse.of("게시글 전체 이동 성공"));
+    }
 }

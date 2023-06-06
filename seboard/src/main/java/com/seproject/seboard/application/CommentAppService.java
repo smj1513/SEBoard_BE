@@ -154,6 +154,8 @@ public class CommentAppService {
             }
         }
 
+        //TODO : post의 접근 권한이 없을때 댓글 조회 안되야 함
+
         if(command.getLoginId()==null){
             Page<Comment> commentPage = commentSearchRepository.findCommentListByPostId(command.getPostId(), PageRequest.of(command.getPage(), command.getPerPage()));
             long totalReplySize = commentSearchRepository.countReplyByPostId(command.getPostId());
@@ -192,9 +194,12 @@ public class CommentAppService {
                         List<ReplyResponse> subComments = commentSearchRepository.findReplyListByCommentId(comment.getCommentId())
                                 .stream()
                                 .map(
-                                        reply -> ReplyResponse.toDto(reply, reply.isWrittenBy(account.getAccountId()), reply.getPost().isWrittenBy(account.getAccountId()))
+                                        reply -> ReplyResponse.toDto(reply, reply.isWrittenBy(account.getAccountId()) || post.getCategory().manageable(account.getAuthorities())
+                                                , reply.getPost().isWrittenBy(account.getAccountId()))
                                 ).collect(Collectors.toList());
-                        return CommentListElement.toDto(comment, comment.isWrittenBy(account.getAccountId()),comment.getPost().isWrittenBy(account.getAccountId()), subComments);
+                        return CommentListElement.toDto(
+                                comment, comment.isWrittenBy(account.getAccountId()) || post.getCategory().manageable(account.getAuthorities())
+                                ,comment.getPost().isWrittenBy(account.getAccountId()), subComments);
                     }).collect(Collectors.toList());
 
 
@@ -217,7 +222,7 @@ public class CommentAppService {
         Comment comment = commentRepository.findById(command.getCommentId())
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_COMMENT));
 
-        if (!comment.isWrittenBy(account.getAccountId())) { //TODO : 관리자 권한의 경우 생각
+        if (!comment.isWrittenBy(account.getAccountId()) && !comment.getPost().getCategory().manageable(account.getAuthorities())) {
             throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 
@@ -233,7 +238,7 @@ public class CommentAppService {
         Reply reply = replyRepository.findById(command.getReplyId())
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_COMMENT));
 
-        if (!reply.isWrittenBy(account.getAccountId())) { //TODO : 관리자 권한의 경우 생각
+        if (!reply.isWrittenBy(account.getAccountId()) && !reply.getPost().getCategory().manageable(account.getAuthorities())) {
             throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 
@@ -250,7 +255,7 @@ public class CommentAppService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_COMMENT));
 
-        if (!comment.isWrittenBy(account.getAccountId())) { //TODO : 관리자 권한의 경우 생각
+        if (!comment.isWrittenBy(account.getAccountId()) && !comment.getPost().getCategory().manageable(account.getAuthorities())) {
             throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 
@@ -264,7 +269,7 @@ public class CommentAppService {
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_COMMENT));
 
-        if (!reply.isWrittenBy(account.getAccountId())) { //TODO : 관리자 권한의 경우 생각
+        if (!reply.isWrittenBy(account.getAccountId()) && !reply.getPost().getCategory().manageable(account.getAuthorities())) {
             throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 
