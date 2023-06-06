@@ -97,9 +97,7 @@ public class PostController {
     @Operation(summary = "게시글 작성", description = "사용자는 실명으로 게시글을 작성한다")
     @PostMapping
     public ResponseEntity<?> createPost(@Validated @RequestBody CreatePostRequest request) {
-        String loginId = SecurityUtils.getLoginId();
-
-        Long postId = postAppService.writePost(request.toCommand(loginId));
+        Long postId = postAppService.writePost(request.toCommand());
 
         return ResponseEntity.status(HttpStatus.CREATED).body(CreateAndUpdateMessage.of(postId, "게시글 작성 성공"));
     }

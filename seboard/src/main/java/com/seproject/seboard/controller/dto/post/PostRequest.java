@@ -50,13 +50,12 @@ public class PostRequest {
         @JsonProperty("anonymous")
         private boolean isAnonymous;
 
-        public PostWriteCommand toCommand(String loginId) {
+        public PostWriteCommand toCommand() {
             return PostWriteCommand.builder()
                     .title(title)
                     .contents(getContents())
                     .categoryId(categoryId)
                     .pined(pined)
-                    .loginId(loginId)
                     .exposeState(ExposeState.valueOf(exposeOption.getName()))
                     .privatePassword(exposeOption.getPassword())
                     .anonymous(isAnonymous)
