@@ -130,7 +130,7 @@ public class AuthorizationDTO {
 
         public static AccessResponse toDTO(List<Role> roles,SelectOption selectOption) {
             return builder()
-                    .option(selectOption.name())
+                    .option(selectOption.getName())
                     .roles(roles.stream().map(Role::toString).collect(Collectors.toList()))
                     .build();
         }
