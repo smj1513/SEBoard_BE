@@ -116,7 +116,7 @@ public class PostSearchAppService {
         postDetailResponse.setBookmarked(isBookmarked);
 
         if(post.getExposeOption().getExposeState()== ExposeState.PRIVACY){
-            if(account!=null && post.isWrittenBy(account.getAccountId())){
+            if(account!=null && (post.isWrittenBy(account.getAccountId()) || post.getCategory().manageable(account.getAuthorities()))){
                 post.increaseViews();
                 return postDetailResponse;
             }else{
@@ -126,7 +126,7 @@ public class PostSearchAppService {
             if(account!=null){
                 Collection<? extends GrantedAuthority> authorities = SecurityUtils.getAuthorities();
                 boolean isKumoh = authorities.stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_KUMOH"));
-                if(isKumoh){
+                if(isKumoh || post.getCategory().manageable(account.getAuthorities())){
                     post.increaseViews();
                     return postDetailResponse;
                 }else{
