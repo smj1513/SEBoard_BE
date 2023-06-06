@@ -20,7 +20,7 @@ import org.springframework.stereotype.Service;
 public class LogoutService {
 
     private static final String LOGOUT_URL = "https://kauth.kakao.com/oauth/logout?client_id=";
-    private static final String REDIRECT_PATH = "&logout_redirect_uri=http://seboard2.site/login";
+    private static final String REDIRECT_PATH = "&logout_redirect_uri=https://seboard.site/login";
     @Value("${spring.security.oauth2.client.registration.kakao.client-id}")
     private String clientId;
 
