@@ -17,10 +17,12 @@ public class MainPageDTO {
     public static class RetrieveMainPageResponse {
         private Page<RetrievePostListResponseElement> posts;
         private String menuName;
+        private String urlId;
 
         public static RetrieveMainPageResponse toDTO(Page<RetrievePostListResponseElement> posts, Menu menu) {
             return builder()
                     .posts(posts)
+                    .urlId(menu.getUrlInfo())
                     .menuName(menu.getName())
                     .build();
         }
