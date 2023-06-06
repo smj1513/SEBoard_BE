@@ -11,15 +11,15 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import static com.seproject.account.controller.dto.TokenDTO.*;
 
 @Tag(name = "토큰 재발행 시스템 API", description = "토큰 재발행 API")
 @AllArgsConstructor
-@Controller
+@RestController
 public class RefreshTokenController {
 
     private final TokenService tokenService;

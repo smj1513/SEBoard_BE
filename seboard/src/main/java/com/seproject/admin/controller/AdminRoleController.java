@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 
@@ -23,7 +22,7 @@ import static com.seproject.admin.dto.RoleDTO.*;
 @Tag(name = "권한 관리 API", description = "관리자 시스템의 권한 관리 API")
 @AllArgsConstructor
 @RequestMapping(value = "/admin")
-@Controller
+@RestController
 public class AdminRoleController {
 
     private final RoleService roleService;

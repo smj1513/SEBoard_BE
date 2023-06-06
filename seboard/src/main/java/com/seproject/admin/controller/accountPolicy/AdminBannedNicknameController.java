@@ -10,7 +10,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import static com.seproject.admin.dto.BannedNicknameDTO.*;
@@ -18,7 +17,7 @@ import static com.seproject.admin.dto.BannedNicknameDTO.*;
 @Tag(name = "금지 닉네임 관리 API", description = "관리자 시스템의 금지 닉네임 관리 API")
 @AllArgsConstructor
 @RequestMapping(value = "/admin/accountPolicy/bannedNickname")
-@Controller
+@RestController
 public class AdminBannedNicknameController {
 
     private final BannedNicknameService bannedNicknameService;

@@ -21,11 +21,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import static com.seproject.account.controller.dto.LoginDTO.*;
 
@@ -35,7 +31,7 @@ import static com.seproject.account.controller.dto.RegisterDTO.*;
 
 @Tag(name = "회원가입 API", description = "회원가입(Register) 관련 API")
 @AllArgsConstructor
-@Controller
+@RestController
 public class RegisterController {
 
     private final AccountService accountService;

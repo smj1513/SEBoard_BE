@@ -14,7 +14,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -25,7 +24,7 @@ import static com.seproject.admin.dto.AccountDTO.*;
 @Tag(name = "계정 관리 API", description = "관리자 시스템이 갖는 계정 관리 API")
 @AllArgsConstructor
 @RequestMapping(value = "/admin/accounts")
-@Controller
+@RestController
 public class AdminAccountController {
 
     private final AccountService accountService;
