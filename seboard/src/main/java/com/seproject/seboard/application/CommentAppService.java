@@ -217,7 +217,7 @@ public class CommentAppService {
         Comment comment = commentRepository.findById(command.getCommentId())
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_COMMENT));
 
-        if (!comment.isWrittenBy(account.getAccountId())) { //TODO : 관리자 권한의 경우 생각
+        if (!comment.isWrittenBy(account.getAccountId()) && !comment.getPost().getCategory().manageable(account.getAuthorities())) {
             throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 
@@ -233,7 +233,7 @@ public class CommentAppService {
         Reply reply = replyRepository.findById(command.getReplyId())
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_COMMENT));
 
-        if (!reply.isWrittenBy(account.getAccountId())) { //TODO : 관리자 권한의 경우 생각
+        if (!reply.isWrittenBy(account.getAccountId()) && !reply.getPost().getCategory().manageable(account.getAuthorities())) {
             throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 
@@ -250,7 +250,7 @@ public class CommentAppService {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_COMMENT));
 
-        if (!comment.isWrittenBy(account.getAccountId())) { //TODO : 관리자 권한의 경우 생각
+        if (!comment.isWrittenBy(account.getAccountId()) && !comment.getPost().getCategory().manageable(account.getAuthorities())) {
             throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 
@@ -264,7 +264,7 @@ public class CommentAppService {
         Reply reply = replyRepository.findById(replyId)
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_COMMENT));
 
-        if (!reply.isWrittenBy(account.getAccountId())) { //TODO : 관리자 권한의 경우 생각
+        if (!reply.isWrittenBy(account.getAccountId()) && !reply.getPost().getCategory().manageable(account.getAuthorities())) {
             throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 
