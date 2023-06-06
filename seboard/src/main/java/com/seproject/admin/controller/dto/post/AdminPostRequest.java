@@ -19,4 +19,10 @@ public class AdminPostRequest {
     public static class BulkPostRequest {
         private List<Long> postIds;
     }
+
+    @Data
+    public static class MigratePostRequest {
+        private Long fromCategoryId;
+        private Long toCategoryId;
+    }
 }
