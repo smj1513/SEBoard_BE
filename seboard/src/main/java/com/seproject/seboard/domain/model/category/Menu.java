@@ -1,5 +1,6 @@
 package com.seproject.seboard.domain.model.category;
 
+import com.seproject.admin.domain.AccessOption;
 import com.seproject.admin.domain.MenuAuthorization;
 import com.seproject.seboard.domain.service.CategoryService;
 import lombok.Builder;
@@ -12,6 +13,7 @@ import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @NoArgsConstructor
 @Entity
@@ -93,10 +95,13 @@ public class Menu {
     }
 
     public boolean writable(Collection<? extends GrantedAuthority> authorities) {
-        if(menuAuthorizations.size() == 0) return true;
+        List<MenuAuthorization> collect = menuAuthorizations.stream()
+                .filter((menuAuthorization) -> menuAuthorization.getAccessOption().equals(AccessOption.WRITE))
+                .collect(Collectors.toList());
+        if(collect.size() == 0) return true;
         boolean flag = false;
 
-        for (MenuAuthorization menuAuthorization : menuAuthorizations) {
+        for (MenuAuthorization menuAuthorization : collect) {
             flag |= menuAuthorization.writable(authorities);
         }
 
@@ -104,10 +109,13 @@ public class Menu {
     }
 
     public boolean manageable(Collection<? extends GrantedAuthority> authorities) {
-        if(menuAuthorizations.size() == 0) return true;
+        List<MenuAuthorization> collect = menuAuthorizations.stream()
+                .filter((menuAuthorization) -> menuAuthorization.getAccessOption().equals(AccessOption.MANAGE))
+                .collect(Collectors.toList());
+        if(collect.size() == 0) return true;
         boolean flag = false;
 
-        for (MenuAuthorization menuAuthorization : menuAuthorizations) {
+        for (MenuAuthorization menuAuthorization : collect) {
             flag |= menuAuthorization.manageable(authorities);
         }
 
@@ -115,8 +123,10 @@ public class Menu {
     }
 
     public boolean exposable(Collection<? extends GrantedAuthority> authorities) {
-
-        if(menuAuthorizations.size() == 0) return true;
+        List<MenuAuthorization> collect = menuAuthorizations.stream()
+                .filter((menuAuthorization) -> menuAuthorization.getAccessOption().equals(AccessOption.EXPOSE))
+                .collect(Collectors.toList());
+        if(collect.size() == 0) return true;
         boolean flag = false;
 
         for (MenuAuthorization menuAuthorization : menuAuthorizations) {
