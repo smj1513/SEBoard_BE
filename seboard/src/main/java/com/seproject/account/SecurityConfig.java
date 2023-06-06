@@ -7,6 +7,7 @@ import com.seproject.account.authentication.handler.success.OidcAuthenticationSu
 import com.seproject.account.authorize.url.UrlFilterInvocationSecurityMetaDataSource;
 import com.seproject.account.authorize.url.UrlResourcesFactoryBean;
 import com.seproject.account.authorize.handler.CustomAccessDeniedHandler;
+import com.seproject.account.filter.CorsFilter;
 import com.seproject.account.filter.CustomFilterSecurityInterceptor;
 import com.seproject.account.filter.IpFilter;
 import com.seproject.account.service.CustomOidcUserService;
@@ -53,6 +54,7 @@ public class SecurityConfig {
     private final IpService ipService;
     private final JwtFilter jwtFilter;
     private UrlResourcesFactoryBean urlResourcesFactoryBean;
+    private final CorsFilter corsFilter;
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
@@ -97,6 +99,7 @@ public class SecurityConfig {
                 .authenticationEntryPoint(authenticationEntryPoint);
 
         http.addFilterBefore(jwtFilter,UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(corsFilter, UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(new IpFilter(ipService,accessDeniedHandler), UsernamePasswordAuthenticationFilter.class);
         http.addFilterBefore(filterSecurityInterceptor(),FilterSecurityInterceptor.class);
         return http.build();
