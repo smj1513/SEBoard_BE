@@ -115,11 +115,14 @@ public class DashBoardDTO {
 
         public static DashBoardRetrieveElement toDTO(String name, Authorization authorization) {
             String option = getOrAll(authorization);
-            List<String> collect = authorization.getRoleAuthorizations()
+
+            List<String> collect = authorization != null ?
+                    authorization.getRoleAuthorizations()
                     .stream()
                     .map(RoleAuthorization::getRole)
                     .map(Role::toString)
-                    .collect(Collectors.toList());
+                    .collect(Collectors.toList()) : null;
+
             return builder()
                     .name(name)
                     .option(option)
