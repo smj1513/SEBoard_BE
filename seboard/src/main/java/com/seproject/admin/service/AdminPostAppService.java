@@ -5,6 +5,7 @@ import com.seproject.account.utils.SecurityUtils;
 import com.seproject.admin.controller.dto.post.AdminPostRequest.AdminPostRetrieveCondition;
 import com.seproject.admin.controller.dto.post.AdminPostResponse;
 import com.seproject.admin.controller.dto.post.AdminPostResponse.AdminDeletedPostResponse;
+import com.seproject.admin.controller.dto.post.AdminPostResponse.AdminPostRetrieveResponse;
 import com.seproject.admin.domain.repository.AdminPostSearchRepository;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.InvalidAuthorizationException;
@@ -49,7 +50,7 @@ public class AdminPostAppService {
     }
 
 
-    public Page<AdminPostResponse> findPostList(AdminPostRetrieveCondition condition, int page, int perPage) {
+    public Page<AdminPostRetrieveResponse> findPostList(AdminPostRetrieveCondition condition, int page, int perPage) {
         Account account = SecurityUtils.getAccount()
                 .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
 
