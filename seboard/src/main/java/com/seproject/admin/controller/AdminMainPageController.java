@@ -12,7 +12,6 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -22,7 +21,7 @@ import static com.seproject.admin.dto.MainPageDTO.*;
 @Tag(name = "메인페이지 관리 API", description = "관리자 시스템의 메인페이지 관리 API")
 @AllArgsConstructor
 @RequestMapping(value = "/admin")
-@Controller
+@RestController
 public class AdminMainPageController {
 
     private final MainPageService mainPageService;

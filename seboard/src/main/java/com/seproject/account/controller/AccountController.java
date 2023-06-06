@@ -21,7 +21,6 @@ import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import static com.seproject.account.controller.dto.AccountDTO.*;
@@ -29,7 +28,7 @@ import static com.seproject.account.controller.dto.LogoutDTO.*;
 
 @Tag(name = "계정 시스템 API", description = "계정(Account) 관련 API")
 @AllArgsConstructor
-@Controller
+@RestController
 public class AccountController {
 
     private final LogoutService logoutService;

@@ -15,9 +15,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RestController;
 
 import java.util.NoSuchElementException;
 
@@ -26,7 +26,7 @@ import static com.seproject.account.controller.dto.EmailDTO.*;
 
 @Tag(name = "이메일 인증 API", description = "이메일 인증(Email) 관련 API")
 @AllArgsConstructor
-@Controller
+@RestController
 public class EmailController {
 
     private final RegisterEmailService registerEmailService;

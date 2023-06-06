@@ -5,18 +5,14 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
 
 import static com.seproject.admin.controller.dto.DashBoardDTO.*;
 
 @Tag(name = "관리자 대시보드 관리 API", description = "관리자 메뉴 접근 관리 관리 API")
 @AllArgsConstructor
 @RequestMapping(value = "/admin/dashboard")
-@Controller
+@RestController
 public class AdminDashBoardController {
 
     private final AdminDashBoardService adminDashBoardService;

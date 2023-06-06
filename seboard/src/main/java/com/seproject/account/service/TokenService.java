@@ -48,19 +48,23 @@ public class TokenService {
         }
 
 
-        String subject = jwtDecoder.getSubject(refreshToken);
-        Account account = accountRepository.findByLoginId(subject)
-                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
+       try {
+           String subject = jwtDecoder.getSubject(refreshToken);
+           Account account = accountRepository.findByLoginId(subject)
+                   .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
 
-        Collection<? extends GrantedAuthority> authorities = account.getAuthorities();
-        UsernamePasswordAuthenticationToken newToken
-                = new UsernamePasswordAuthenticationToken(subject,"",authorities);
-        JWT token = jwtProvider.createToken(newToken);
+           Collection<? extends GrantedAuthority> authorities = account.getAuthorities();
+           UsernamePasswordAuthenticationToken newToken
+                   = new UsernamePasswordAuthenticationToken(subject,"",authorities);
+           JWT token = jwtProvider.createToken(newToken);
 
-        String newAccessToken = token.getAccessToken();
-        String newRefreshToken = token.getRefreshToken();
+           String newAccessToken = token.getAccessToken();
+           String newRefreshToken = token.getRefreshToken();
 
-        return AccessTokenRefreshResponse.toDTO(newAccessToken,newRefreshToken);
+           return AccessTokenRefreshResponse.toDTO(newAccessToken,newRefreshToken);
+       } catch (CustomAuthenticationException e) {
+           throw new CustomAuthenticationException(ErrorCode.DISABLE_REFRESH_TOKEN,e);
+       }
     }
 
     public JWT createToken(UsernamePasswordAuthenticationToken token){
