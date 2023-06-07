@@ -280,7 +280,7 @@ public class CommentAppService {
         //TODO : 리팩토링 필요
         Account account = accountRepository.findById(accountId).get();
 
-        if(post.isWrittenBy(accountId)){
+        if(post.isWrittenBy(accountId) && post.isNamed()){
             return anonymousRepository.findById(post.getAuthor().getBoardUserId()).get();
         }
 
