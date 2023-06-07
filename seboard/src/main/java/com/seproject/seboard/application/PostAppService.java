@@ -94,13 +94,19 @@ public class PostAppService {
 
         validFileListSize(fileMetaDataList);
 
+        boolean isPined = command.isPined();
+
+        if(!category.manageable(author.getAccount().getAuthorities())){
+            isPined = false;
+        }
+
         Post post = Post.builder()
                 .title(command.getTitle())
                 .contents(command.getContents())
                 .category(category)
                 .author(author)
                 .baseTime(BaseTime.now())
-                .pined(command.isPined())
+                .pined(isPined)
                 .attachments(new HashSet<>(fileMetaDataList))
                 .exposeOption(ExposeOption.of(command.getExposeState(), command.getPrivatePassword()))
                 .build();
