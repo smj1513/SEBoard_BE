@@ -122,11 +122,13 @@ public class CategoryAppService {
             adminMenuService.update(category,write,AccessOption.WRITE);
 
         }else if(command.getCategoryType().equals("EXTERNAL")){
-            Optional<Menu> superMenuOptional = menuRepository.findById(superCategoryId);
-            Menu superMenu = superMenuOptional.orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.NOT_EXIST_CATEGORY, null));
+            if(superCategoryId != null) {
+                throw new IllegalArgumentException();
+            }
+//            Optional<Menu> superMenuOptional = menuRepository.findById(superCategoryId);
+//            Menu superMenu = superMenuOptional.orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.NOT_EXIST_CATEGORY, null));
 
             ExternalSiteMenu externalSiteCategory = ExternalSiteMenu.builder()
-                    .superMenu(superMenu)
                     .name(command.getName())
                     .description(command.getDescription())
                     .urlInfo(command.getExternalUrl())
