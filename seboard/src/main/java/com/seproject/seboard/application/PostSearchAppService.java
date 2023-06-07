@@ -153,8 +153,7 @@ public class PostSearchAppService {
 
             postPage.forEach(postDto -> {
                 int commentSize = commentRepository.countCommentsByPostId(postDto.getPostId());
-                int replySize = commentSearchRepository.countReplyByPostId(postDto.getPostId());
-                postDto.setCommentSize(commentSize+replySize);
+                postDto.setCommentSize(commentSize);
             });
         }else{ //최소 로그인을 해야만 볼 수 있다
             Account account = SecurityUtils.getAccount().orElseThrow(()-> new NoSuchResourceException(ErrorCode.NOT_LOGIN));
@@ -245,8 +244,7 @@ public class PostSearchAppService {
     private void setCommentSize(Page<RetrievePostListResponseElement> postPage){
         postPage.forEach(postDto -> {
             int commentSize = commentRepository.countCommentsByPostId(postDto.getPostId());
-            int replySize = commentSearchRepository.countReplyByPostId(postDto.getPostId());
-            postDto.setCommentSize(commentSize+replySize);
+            postDto.setCommentSize(commentSize);
         });
     }
 
