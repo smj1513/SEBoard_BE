@@ -41,11 +41,12 @@ public class CategoryAppService {
     public void createCategory(CategoryCreateCommand command){
         //TODO : 상위 카테고리로 지정할 수 있는 카테고리 구분?
         //TODO : menuRepository Id 널포익
-        Menu superMenu = menuRepository.findById(command.getSuperCategoryId()).get();
+        Long superCategoryId = command.getSuperCategoryId();
+
 
         if(command.getCategoryType().equals("MENU")){
             //TODO : urlInfo NULL일 경우 자동으로 넣는 로직 필요
-            if(superMenu!=null){
+            if(superCategoryId != null){
                 throw new IllegalArgumentException();
             }
 
@@ -65,6 +66,8 @@ public class CategoryAppService {
 
             menuRepository.save(menu);
         }else if(command.getCategoryType().equals("BOARD")){
+            Optional<Menu> superMenuOptional = menuRepository.findById(superCategoryId);
+            Menu superMenu = superMenuOptional.orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.NOT_EXIST_CATEGORY, null));
             BoardMenu boardMenu = BoardMenu.builder()
                     .superMenu(superMenu)
                     .name(command.getName())
@@ -89,15 +92,20 @@ public class CategoryAppService {
                     .name("일반")
                     .description("기본으로 생성되는 게시판 카테고리")
                     .urlInfo(null)
+                    .depth(boardMenu.getDepth()+1)
                     .build();
 
             categoryRepository.save(category);
         }else if(command.getCategoryType().equals("CATEGORY")){
+            Optional<Menu> superMenuOptional = menuRepository.findById(superCategoryId);
+            Menu superMenu = superMenuOptional.orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.NOT_EXIST_CATEGORY, null));
+
             Category category = Category.builder()
                     .superMenu(superMenu)
                     .name(command.getName())
                     .description(command.getDescription())
                     .urlInfo(command.getUrlId())
+                    .depth(superMenu.getDepth()+1)
                     .build();
 
             categoryRepository.save(category);
@@ -113,6 +121,9 @@ public class CategoryAppService {
             adminMenuService.update(category,write,AccessOption.WRITE);
 
         }else if(command.getCategoryType().equals("EXTERNAL")){
+            Optional<Menu> superMenuOptional = menuRepository.findById(superCategoryId);
+            Menu superMenu = superMenuOptional.orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.NOT_EXIST_CATEGORY, null));
+
             ExternalSiteMenu externalSiteCategory = ExternalSiteMenu.builder()
                     .superMenu(superMenu)
                     .name(command.getName())

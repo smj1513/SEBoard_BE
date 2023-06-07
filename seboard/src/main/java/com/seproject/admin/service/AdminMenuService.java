@@ -39,7 +39,7 @@ public class AdminMenuService {
     private final RoleRepository roleRepository;
 
     public CategoryAccessOptionResponse retrieve(Long menuId) {
-        Menu menu = menuRepository.findById(menuId).orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.ROLE_NOT_FOUND, null));
+        Menu menu = menuRepository.findById(menuId).orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.NOT_EXIST_CATEGORY, null));
         List<MenuAuthorization> menuAuthorizations = menu.getMenuAuthorizations();
         List<MenuAuthorization> write = new ArrayList<>();
         List<MenuAuthorization> expose = new ArrayList<>();
@@ -85,7 +85,7 @@ public class AdminMenuService {
     }
 
     public void update(Long categoryId, CategoryAccessUpdateRequest request) {
-        Menu menu = menuRepository.findById(categoryId).orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.ROLE_NOT_FOUND, null));
+        Menu menu = menuRepository.findById(categoryId).orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.NOT_EXIST_CATEGORY, null));
 
         Class<? extends Menu> menuClass = menu.getClass();
         menuExposeRepository.deleteAllInBatch(menu.getMenuAuthorizations());
