@@ -64,7 +64,7 @@ public class AuthorizationDTO {
         private CategoryAccessUpdateRequestElement access;
         private CategoryAccessUpdateRequestElement write;
         private CategoryAccessUpdateRequestElement manage;
-        private CategoryAccessUpdateRequestElement menuExpose;
+        private CategoryAccessUpdateRequestElement expose;
     }
 
     @Data

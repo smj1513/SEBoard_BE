@@ -90,7 +90,7 @@ public class AdminMenuService {
         Class<? extends Menu> menuClass = menu.getClass();
         menuExposeRepository.deleteAllInBatch(menu.getMenuAuthorizations());
         if (menuClass == Menu.class) {
-            CategoryAccessUpdateRequestElement menuExpose = request.getMenuExpose();
+            CategoryAccessUpdateRequestElement menuExpose = request.getExpose();
 
             if (menuExpose == null)
                 throw new CustomIllegalArgumentException(ErrorCode.INVALID_MENU_REQUEST, null);
@@ -98,7 +98,7 @@ public class AdminMenuService {
             update(menu,menuExpose,AccessOption.EXPOSE);
         } else if (menuClass == BoardMenu.class) {
             CategoryAccessUpdateRequestElement access = request.getAccess();
-            CategoryAccessUpdateRequestElement menuExpose = request.getMenuExpose();
+            CategoryAccessUpdateRequestElement menuExpose = request.getExpose();
 
             if (access == null || menuExpose == null)
                 throw new CustomIllegalArgumentException(ErrorCode.INVALID_MENU_REQUEST, null);
@@ -107,7 +107,7 @@ public class AdminMenuService {
             accessUpdate(menu,access);
 
         } else if (menuClass == ExternalSiteMenu.class) {
-            CategoryAccessUpdateRequestElement menuExpose = request.getMenuExpose();
+            CategoryAccessUpdateRequestElement menuExpose = request.getExpose();
 
             if (menuExpose == null) throw new CustomIllegalArgumentException(ErrorCode.INVALID_MENU_REQUEST, null);
 
