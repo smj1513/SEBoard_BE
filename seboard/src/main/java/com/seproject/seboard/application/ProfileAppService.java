@@ -8,6 +8,7 @@ import com.seproject.error.exception.NoSuchResourceException;
 import com.seproject.seboard.controller.dto.comment.CommentResponse.RetrieveCommentProfileElement;
 import com.seproject.seboard.controller.dto.post.PostResponse.RetrievePostListResponseElement;
 import com.seproject.seboard.controller.dto.profile.ProfileResponse.ProfileInfoResponse;
+import com.seproject.seboard.domain.repository.comment.CommentRepository;
 import com.seproject.seboard.domain.repository.comment.CommentSearchRepository;
 import com.seproject.seboard.domain.repository.post.BookmarkRepository;
 import com.seproject.seboard.domain.repository.post.PostSearchRepository;
@@ -21,6 +22,7 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class ProfileAppService {
     private final PostSearchRepository postSearchRepository;
+    private final CommentRepository commentRepository;
     private final CommentSearchRepository commentSearchRepository;
     private final BookmarkRepository bookmarkRepository;
     private final MemberRepository memberRepository;
@@ -51,12 +53,21 @@ public class ProfileAppService {
 
     public Page<RetrievePostListResponseElement> retrieveMyPost(String loginId, int page, int perPage){
         Account account = SecurityUtils.getAccount().orElse(null);
+        Page<RetrievePostListResponseElement> posts;
 
         if(account == null || !account.getLoginId().equals(loginId)){
-            return postSearchRepository.findMemberPostByLoginId(loginId, PageRequest.of(page, perPage));
+            posts = postSearchRepository.findMemberPostByLoginId(loginId, PageRequest.of(page, perPage));
+
         }else{
-            return postSearchRepository.findPostByLoginId(loginId, PageRequest.of(page, perPage));
+            posts = postSearchRepository.findPostByLoginId(loginId, PageRequest.of(page, perPage));
         }
+
+        posts.getContent().forEach(post -> {
+            int commentSize = commentRepository.countCommentsByPostId(post.getPostId());
+            post.setCommentSize(commentSize);
+        });
+
+        return posts;
     }
 
     public Page<RetrievePostListResponseElement> retrieveBookmarkPost(String loginId, int page, int perPage){
@@ -66,7 +77,13 @@ public class ProfileAppService {
             throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 
-        return postSearchRepository.findBookmarkPostByLoginId(loginId, PageRequest.of(page, perPage));
+        Page<RetrievePostListResponseElement> posts = postSearchRepository.findBookmarkPostByLoginId(loginId, PageRequest.of(page, perPage));
+        posts.getContent().forEach(post -> {
+            int commentSize = commentRepository.countCommentsByPostId(post.getPostId());
+            post.setCommentSize(commentSize);
+        });
+
+        return posts;
     }
 
     public Page<RetrieveCommentProfileElement> retrieveMyComment(String loginId, int page, int perPage){

@@ -116,7 +116,7 @@ public class PostSearchAppService {
         postDetailResponse.setBookmarked(isBookmarked);
 
         if(post.getExposeOption().getExposeState()== ExposeState.PRIVACY){
-            if(account!=null && post.isWrittenBy(account.getAccountId())){
+            if(account!=null && (post.isWrittenBy(account.getAccountId()) || post.getCategory().manageable(account.getAuthorities()))){
                 post.increaseViews();
                 return postDetailResponse;
             }else{
@@ -126,7 +126,7 @@ public class PostSearchAppService {
             if(account!=null){
                 Collection<? extends GrantedAuthority> authorities = SecurityUtils.getAuthorities();
                 boolean isKumoh = authorities.stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_KUMOH"));
-                if(isKumoh){
+                if(isKumoh || post.getCategory().manageable(account.getAuthorities())){
                     post.increaseViews();
                     return postDetailResponse;
                 }else{
@@ -153,8 +153,7 @@ public class PostSearchAppService {
 
             postPage.forEach(postDto -> {
                 int commentSize = commentRepository.countCommentsByPostId(postDto.getPostId());
-                int replySize = commentSearchRepository.countReplyByPostId(postDto.getPostId());
-                postDto.setCommentSize(commentSize+replySize);
+                postDto.setCommentSize(commentSize);
             });
         }else{ //최소 로그인을 해야만 볼 수 있다
             Account account = SecurityUtils.getAccount().orElseThrow(()-> new NoSuchResourceException(ErrorCode.NOT_LOGIN));
@@ -245,8 +244,7 @@ public class PostSearchAppService {
     private void setCommentSize(Page<RetrievePostListResponseElement> postPage){
         postPage.forEach(postDto -> {
             int commentSize = commentRepository.countCommentsByPostId(postDto.getPostId());
-            int replySize = commentSearchRepository.countReplyByPostId(postDto.getPostId());
-            postDto.setCommentSize(commentSize+replySize);
+            postDto.setCommentSize(commentSize);
         });
     }
 
