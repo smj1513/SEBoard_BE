@@ -21,10 +21,10 @@ public class CategoryRequest {
         private String urlId;
         private String externalUrl;
 
-        private CategoryAccessUpdateRequestElement manageOption;
-        private CategoryAccessUpdateRequestElement writeOption;
-        private CategoryAccessUpdateRequestElement exposeOption;
-        private CategoryAccessUpdateRequestElement accessOption;
+        private CategoryAccessUpdateRequestElement manage;
+        private CategoryAccessUpdateRequestElement write;
+        private CategoryAccessUpdateRequestElement expose;
+        private CategoryAccessUpdateRequestElement access;
 
         public CategoryCreateCommand toCommand(String categoryType){
             return new CategoryCreateCommand(
@@ -34,10 +34,10 @@ public class CategoryRequest {
                     this.getUrlId(),
                     this.getExternalUrl(),
                     categoryType,
-                    manageOption,
-                    writeOption,
-                    exposeOption,
-                    accessOption
+                    manage,
+                    write,
+                    expose,
+                    access
             );
         }
     }
