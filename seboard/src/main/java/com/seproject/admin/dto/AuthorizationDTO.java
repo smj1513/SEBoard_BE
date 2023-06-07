@@ -11,6 +11,7 @@ import com.seproject.seboard.domain.model.category.Menu;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
+import org.springframework.data.domain.Slice;
 
 import java.util.List;
 import java.util.Map;
@@ -112,8 +113,10 @@ public class AuthorizationDTO {
         private List<String> roles;
 
         public static MenuAuthorizationResponse toDTO(List<MenuAuthorization> menuAuthorizations) {
-            List<Role> roles = menuAuthorizations.stream().map(MenuAuthorization::getRole).collect(Collectors.toList());
             SelectOption selectOption = menuAuthorizations.size() == 0 ? SelectOption.ALL : menuAuthorizations.get(0).getSelectOption();
+
+            List<Role> roles = selectOption.equals(SelectOption.SELECT) ? menuAuthorizations.stream().map(MenuAuthorization::getRole).collect(Collectors.toList())
+                    : List.of();
             return builder()
                     .roles(roles.stream().map(Role::toString).collect(Collectors.toList()))
                     .option(selectOption.getName())
@@ -129,9 +132,11 @@ public class AuthorizationDTO {
         private List<String> roles;
 
         public static AccessResponse toDTO(List<Role> roles,SelectOption selectOption) {
+            List<String> collect = selectOption.equals(SelectOption.SELECT) ?
+                    roles.stream().map(Role::toString).collect(Collectors.toList()) : List.of();
             return builder()
                     .option(selectOption.getName())
-                    .roles(roles.stream().map(Role::toString).collect(Collectors.toList()))
+                    .roles(collect)
                     .build();
         }
     }
