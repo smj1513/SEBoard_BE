@@ -1,6 +1,6 @@
 package com.seproject.admin.dto;
 
-import com.seproject.account.model.Ip;
+import com.seproject.account.Ip.domain.Ip;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;

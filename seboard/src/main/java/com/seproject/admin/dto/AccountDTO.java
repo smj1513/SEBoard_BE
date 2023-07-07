@@ -1,7 +1,7 @@
 package com.seproject.admin.dto;
 
-import com.seproject.account.model.account.Account;
-import com.seproject.account.model.role.Role;
+import com.seproject.account.account.domain.Account;
+import com.seproject.account.role.domain.Role;
 import lombok.*;
 
 import java.time.LocalDateTime;

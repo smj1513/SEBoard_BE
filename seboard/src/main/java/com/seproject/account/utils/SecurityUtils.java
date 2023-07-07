@@ -1,6 +1,6 @@
 package com.seproject.account.utils;
 
-import com.seproject.account.model.account.Account;
+import com.seproject.account.account.domain.Account;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;

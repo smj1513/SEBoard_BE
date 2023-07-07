@@ -1,7 +1,7 @@
 package com.seproject.admin.domain;
 
-import com.seproject.account.model.role.Role;
-import com.seproject.seboard.domain.model.category.Menu;
+import com.seproject.account.role.domain.Role;
+import com.seproject.board.menu.domain.Menu;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;

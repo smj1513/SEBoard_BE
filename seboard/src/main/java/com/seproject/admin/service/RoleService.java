@@ -1,7 +1,7 @@
 package com.seproject.admin.service;
 
-import com.seproject.account.model.role.Role;
-import com.seproject.account.repository.role.RoleRepository;
+import com.seproject.account.role.domain.Role;
+import com.seproject.account.role.domain.repository.RoleRepository;
 import com.seproject.admin.domain.SelectOption;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;

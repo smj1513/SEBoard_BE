@@ -1,17 +1,17 @@
 package com.seproject.account;
 
-import com.seproject.account.authentication.entrypoint.CustomAuthenticationEntryPoint;
-import com.seproject.account.authentication.handler.failure.CustomAuthenticationFailureHandler;
-import com.seproject.account.authentication.handler.success.FormLoginAuthenticationSuccessHandler;
-import com.seproject.account.authentication.handler.success.OidcAuthenticationSuccessHandler;
-import com.seproject.account.authorize.url.UrlFilterInvocationSecurityMetaDataSource;
-import com.seproject.account.authorize.url.UrlResourcesFactoryBean;
-import com.seproject.account.authorize.handler.CustomAccessDeniedHandler;
+import com.seproject.account.common.authentication.entrypoint.CustomAuthenticationEntryPoint;
+import com.seproject.account.common.authentication.handler.failure.CustomAuthenticationFailureHandler;
+import com.seproject.account.common.authentication.handler.success.FormLoginAuthenticationSuccessHandler;
+import com.seproject.account.common.authentication.handler.success.OidcAuthenticationSuccessHandler;
+import com.seproject.account.common.authorize.url.UrlFilterInvocationSecurityMetaDataSource;
+import com.seproject.account.common.authorize.url.UrlResourcesFactoryBean;
+import com.seproject.account.common.authorize.handler.CustomAccessDeniedHandler;
 import com.seproject.account.filter.CorsFilter;
 import com.seproject.account.filter.CustomFilterSecurityInterceptor;
 import com.seproject.account.filter.IpFilter;
-import com.seproject.account.service.CustomOidcUserService;
-import com.seproject.account.service.IpService;
+import com.seproject.account.social.repository.CustomOidcUserService;
+import com.seproject.account.Ip.application.IpService;
 import com.seproject.account.utils.*;
 import com.seproject.account.filter.JwtFilter;
 import lombok.AllArgsConstructor;

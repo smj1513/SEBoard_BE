@@ -1,11 +1,11 @@
 package com.seproject.admin.service;
 
-import com.seproject.account.model.role.Role;
+import com.seproject.account.role.domain.Role;
 import com.seproject.admin.domain.SelectOption;
 import com.seproject.admin.domain.MenuAuthorization;
 import com.seproject.admin.domain.repository.MenuExposeRepository;
-import com.seproject.seboard.domain.model.category.Menu;
-import com.seproject.seboard.domain.repository.category.MenuRepository;
+import com.seproject.board.menu.domain.Menu;
+import com.seproject.board.menu.domain.repository.MenuRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

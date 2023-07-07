@@ -1,10 +1,10 @@
 package com.seproject.admin.controller;
 
-import com.seproject.account.authorize.url.UrlFilterInvocationSecurityMetaDataSource;
+import com.seproject.account.common.authorize.url.UrlFilterInvocationSecurityMetaDataSource;
 
-import com.seproject.admin.service.AdminMenuService;
-import com.seproject.seboard.application.CategoryAppService;
-import com.seproject.seboard.application.dto.category.CategoryCommand;
+import com.seproject.board.menu.application.AdminMenuService;
+import com.seproject.board.menu.application.CategoryAppService;
+import com.seproject.board.menu.application.dto.CategoryCommand;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.Parameters;
