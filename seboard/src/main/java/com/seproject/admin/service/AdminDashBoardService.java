@@ -1,11 +1,9 @@
 package com.seproject.admin.service;
 
-import com.seproject.account.model.role.Role;
-import com.seproject.account.model.role.RoleAuthorization;
-import com.seproject.account.model.role.auth.Authorization;
-import com.seproject.account.repository.role.RoleAuthorizationRepository;
-import com.seproject.account.repository.role.auth.AuthorizationRepository;
-import com.seproject.admin.controller.dto.DashBoardDTO;
+import com.seproject.account.role.domain.RoleAuthorization;
+import com.seproject.account.role.domain.Authorization;
+import com.seproject.account.role.domain.repository.RoleAuthorizationRepository;
+import com.seproject.account.role.domain.repository.AuthorizationRepository;
 import com.seproject.admin.domain.SelectOption;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -15,7 +13,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.seproject.admin.controller.dto.DashBoardDTO.*;
+import static com.seproject.account.dashboard.controller.dto.DashBoardDTO.*;
 
 @Service
 @RequiredArgsConstructor

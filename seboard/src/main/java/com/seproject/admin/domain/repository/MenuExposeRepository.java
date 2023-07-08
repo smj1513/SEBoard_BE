@@ -1,8 +1,8 @@
 package com.seproject.admin.domain.repository;
 
-import com.seproject.account.model.role.Role;
+import com.seproject.account.role.domain.Role;
 import com.seproject.admin.domain.MenuAuthorization;
-import com.seproject.seboard.domain.model.category.Menu;
+import com.seproject.board.menu.domain.Menu;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 

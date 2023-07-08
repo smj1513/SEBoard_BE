@@ -1,8 +1,7 @@
 package com.seproject.admin.dto;
 
-import com.seproject.admin.domain.MainPageMenu;
-import com.seproject.seboard.domain.model.category.InternalSiteMenu;
-import com.seproject.seboard.domain.model.category.Menu;
+import com.seproject.board.bulletin.domain.model.MainPageMenu;
+import com.seproject.board.menu.domain.InternalSiteMenu;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;

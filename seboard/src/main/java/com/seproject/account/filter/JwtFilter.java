@@ -1,8 +1,8 @@
 package com.seproject.account.filter;
 
-import com.seproject.account.authentication.handler.failure.CustomAuthenticationFailureHandler;
-import com.seproject.account.repository.token.LogoutTokenRepository;
-import com.seproject.account.jwt.JwtDecoder;
+import com.seproject.account.common.authentication.handler.failure.CustomAuthenticationFailureHandler;
+import com.seproject.account.token.domain.repository.LogoutTokenRepository;
+import com.seproject.account.token.utils.JwtDecoder;
 import com.seproject.error.exception.CustomAuthenticationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;

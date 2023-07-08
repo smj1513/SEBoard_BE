@@ -1,8 +1,7 @@
 package com.seproject.admin.controller;
 
-import com.seproject.account.model.Ip;
-import com.seproject.account.service.IpService;
-import com.seproject.admin.dto.AccountDTO;
+import com.seproject.account.Ip.domain.Ip;
+import com.seproject.account.Ip.application.IpService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;

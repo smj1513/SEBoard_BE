@@ -1,7 +1,7 @@
 package com.seproject.account.filter;
 
-import com.seproject.account.authorize.handler.CustomAccessDeniedHandler;
-import com.seproject.account.service.IpService;
+import com.seproject.account.common.authorize.handler.CustomAccessDeniedHandler;
+import com.seproject.account.Ip.application.IpService;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomAccessDeniedException;
 import lombok.RequiredArgsConstructor;

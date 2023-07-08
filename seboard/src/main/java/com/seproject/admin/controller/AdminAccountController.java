@@ -1,8 +1,7 @@
 package com.seproject.admin.controller;
 
-import com.seproject.account.service.AccountService;
-import com.seproject.account.jwt.JwtDecoder;
-import com.seproject.seboard.controller.dto.MessageResponse;
+import com.seproject.account.account.service.AccountService;
+import com.seproject.board.common.controller.dto.MessageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Schema;
@@ -16,7 +15,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.NoSuchElementException;
 
 import static com.seproject.admin.dto.AccountDTO.*;

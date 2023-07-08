@@ -1,20 +1,14 @@
 package com.seproject.admin.dto;
 
-import com.seproject.account.model.role.Role;
-import com.seproject.account.model.role.RoleAuthorization;
-import com.seproject.account.model.role.auth.Authorization;
-import com.seproject.admin.domain.AccessOption;
+import com.seproject.account.role.domain.Role;
 import com.seproject.admin.domain.MenuAuthorization;
 import com.seproject.admin.domain.SelectOption;
-import com.seproject.seboard.domain.model.category.Category;
-import com.seproject.seboard.domain.model.category.Menu;
+import com.seproject.board.menu.domain.Menu;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
-import org.springframework.data.domain.Slice;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 public class AuthorizationDTO {
