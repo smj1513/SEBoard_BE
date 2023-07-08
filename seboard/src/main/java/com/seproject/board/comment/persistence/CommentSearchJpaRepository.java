@@ -15,11 +15,11 @@ public interface CommentSearchJpaRepository extends CommentSearchRepository {
     @Query("select count(c) from Comment c join Member m on c.author.boardUserId=m.boardUserId where c.author.account.loginId = :loginId and c.isOnlyReadByAuthor = false and c.status= 'NORMAL'")
     Integer countsMemberCommentByLoginId(String loginId);
 
-    @Query(value = "select new com.seproject.board.controller.dto.comment.CommentResponse$RetrieveCommentProfileElement(c)" +
+    @Query(value = "select new com.seproject.board.comment.controller.dto.CommentResponse$RetrieveCommentProfileElement(c)" +
             "from Comment c join Member m on c.author.boardUserId=m.boardUserId where c.author.account.loginId = :loginId and c.isOnlyReadByAuthor = false and c.status= 'NORMAL'",
     countQuery = "select count(c) from Comment c join Member m on c.author.boardUserId=m.boardUserId where c.author.account.loginId = :loginId and c.isOnlyReadByAuthor = false and c.status= 'NORMAL'")
     Page<CommentResponse.RetrieveCommentProfileElement> findMemberCommentByLoginId(String loginId, Pageable pagingInfo);
-    @Query(value = "select new com.seproject.board.controller.dto.comment.CommentResponse$RetrieveCommentProfileElement(c) from Comment c where c.author.account.loginId = :loginId and c.status= 'NORMAL'",
+    @Query(value = "select new com.seproject.board.comment.controller.dto.CommentResponse$RetrieveCommentProfileElement(c) from Comment c where c.author.account.loginId = :loginId and c.status= 'NORMAL'",
     countQuery = "select count(c) from Comment c where c.author.account.loginId = :loginId and c.status= 'NORMAL'")
     Page<CommentResponse.RetrieveCommentProfileElement> findCommentByLoginId(String loginId, Pageable pagingInfo);
     @Query("select count(c) from Comment c where c.author.account.loginId = :loginId and c.status = 'NORMAL'")
