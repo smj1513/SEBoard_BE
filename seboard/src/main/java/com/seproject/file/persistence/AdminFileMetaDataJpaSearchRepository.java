@@ -17,8 +17,8 @@ import javax.persistence.EntityManager;
 import java.util.List;
 
 import static com.seproject.file.controller.dto.FileResponse.*;
-import static com.seproject.board.domain.model.common.QFileMetaData.fileMetaData;
-import static com.seproject.board.domain.model.post.QPost.post;
+import static com.seproject.file.domain.model.QFileMetaData.fileMetaData;
+import static com.seproject.board.post.domain.model.QPost.post;
 
 @Repository
 public class AdminFileMetaDataJpaSearchRepository implements AdminFileMetaDataSearchRepository {

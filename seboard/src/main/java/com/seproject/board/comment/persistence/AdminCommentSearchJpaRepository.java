@@ -18,7 +18,7 @@ import java.util.List;
 
 import static com.seproject.board.comment.controller.dto.AdminCommentRequest.*;
 import static com.seproject.board.comment.controller.dto.AdminCommentResponse.*;
-import static com.seproject.board.domain.model.comment.QComment.comment;
+import static com.seproject.board.comment.domain.model.QComment.comment;
 
 @Repository
 public class AdminCommentSearchJpaRepository implements AdminCommentSearchRepository {

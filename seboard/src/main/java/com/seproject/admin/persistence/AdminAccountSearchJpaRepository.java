@@ -16,7 +16,7 @@ import javax.persistence.EntityManager;
 
 import java.util.List;
 
-import static com.seproject.account.model.account.QAccount.account;
+import static com.seproject.account.account.domain.QAccount.account;
 
 @Repository
 public class AdminAccountSearchJpaRepository implements AdminAccountSearchRepository {
