@@ -2,7 +2,7 @@ package com.seproject.account.dashboard.controller.dto;
 
 import com.seproject.account.role.domain.Role;
 import com.seproject.account.role.domain.RoleAuthorization;
-import com.seproject.account.role.domain.Authorization;
+import com.seproject.account.authorization.domain.Authorization;
 import com.seproject.admin.domain.SelectOption;
 import lombok.AccessLevel;
 import lombok.Builder;
@@ -33,11 +33,6 @@ public class DashBoardDTO {
                    .generalSetting(generalSetting)
                    .build();
        }
-    }
-
-    private static String getOrAll(Authorization authorization) {
-
-        return authorization == null ? SelectOption.ALL.getName() : authorization.getSelectOption().getName();
     }
 
     @Data
@@ -110,12 +105,10 @@ public class DashBoardDTO {
     @Builder(access = AccessLevel.PRIVATE)
     public static class DashBoardRetrieveElement {
         private String name;
-        private String option;
+        private SelectOption option;
         private List<String> roles;
 
         public static DashBoardRetrieveElement toDTO(String name, Authorization authorization) {
-            String option = getOrAll(authorization);
-
             List<String> collect = authorization != null ?
                     authorization.getRoleAuthorizations()
                     .stream()
@@ -125,7 +118,7 @@ public class DashBoardDTO {
 
             return builder()
                     .name(name)
-                    .option(option)
+                    .option(null) // TODO : 관리자 대시보드 MenuAuthorization으로 변경하고 작업
                     .roles(collect)
                     .build();
         }

@@ -15,14 +15,18 @@ public class MyExceptionHandler {
     public ResponseEntity<Error> handleControllerValidateHandler(
             MethodArgumentNotValidException e){
 
-        return ResponseEntity.badRequest().body(Error.of(ErrorCode.INVALID_REQUEST));
+        ErrorCode errorCode = ErrorCode.INVALID_REQUEST;
+        Error error = Error.of(errorCode);
+        return new ResponseEntity<>(error,errorCode.getHttpStatus());
     }
 
     @ExceptionHandler(BusinessLogicException.class)
     public ResponseEntity<Error> handleBusinessLogicException(
             BusinessLogicException e){
 
-        return ResponseEntity.badRequest().body(Error.of(e.getErrorCode()));
+        ErrorCode errorCode = e.getErrorCode();
+        Error error = Error.of(errorCode);
+        return new ResponseEntity<>(error,errorCode.getHttpStatus());
     }
 
 }

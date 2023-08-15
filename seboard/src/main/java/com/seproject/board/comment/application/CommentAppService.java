@@ -1,33 +1,28 @@
 package com.seproject.board.comment.application;
 
 import com.seproject.account.account.domain.Account;
-import com.seproject.account.account.domain.repository.AccountRepository;
+import com.seproject.account.role.domain.Role;
 import com.seproject.account.utils.SecurityUtils;
+import com.seproject.board.comment.service.CommentService;
+import com.seproject.board.menu.domain.Category;
+import com.seproject.board.menu.domain.Menu;
+import com.seproject.board.post.domain.model.exposeOptions.ExposeOption;
+import com.seproject.board.post.service.PostService;
 import com.seproject.error.errorCode.ErrorCode;
-import com.seproject.error.exception.CustomUserNotFoundException;
-import com.seproject.error.exception.InvalidAuthorizationException;
-import com.seproject.error.exception.NoSuchResourceException;
+import com.seproject.error.exception.*;
 import com.seproject.board.comment.application.dto.CommentCommand.CommentEditCommand;
 import com.seproject.board.comment.application.dto.CommentCommand.CommentListFindCommand;
 import com.seproject.board.comment.application.dto.CommentCommand.CommentWriteCommand;
-import com.seproject.board.comment.application.dto.ReplyCommand.ReplyEditCommand;
-import com.seproject.board.comment.application.dto.ReplyCommand.ReplyWriteCommand;
 import com.seproject.board.comment.controller.dto.PaginationResponse;
 import com.seproject.board.comment.controller.dto.CommentResponse.CommentListElement;
 import com.seproject.board.comment.controller.dto.CommentResponse.CommentListResponse;
 import com.seproject.board.comment.controller.dto.ReplyResponse;
 import com.seproject.board.comment.domain.model.Comment;
-import com.seproject.board.comment.domain.model.Reply;
 import com.seproject.board.post.domain.model.Post;
-import com.seproject.board.post.domain.model.exposeOptions.ExposeState;
-import com.seproject.member.domain.Anonymous;
-import com.seproject.member.domain.Member;
-import com.seproject.board.comment.domain.repository.CommentRepository;
+import com.seproject.member.domain.BoardUser;
 import com.seproject.board.comment.domain.repository.CommentSearchRepository;
-import com.seproject.board.comment.domain.repository.ReplyRepository;
-import com.seproject.board.post.domain.repository.PostRepository;
-import com.seproject.member.domain.repository.AnonymousRepository;
-import com.seproject.member.domain.repository.MemberRepository;
+import com.seproject.member.service.AnonymousService;
+import com.seproject.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -41,267 +36,151 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-@Transactional
+@Transactional(readOnly = true)
 public class CommentAppService {
-    private final CommentRepository commentRepository;
     private final CommentSearchRepository commentSearchRepository;
-    private final ReplyRepository replyRepository;
-    private final PostRepository postRepository;
-    private final MemberRepository memberRepository;
-    private final AnonymousRepository anonymousRepository;
-    private final AccountRepository accountRepository;
+    private final AnonymousService anonymousService;
+    private final CommentService commentService;
+    private final PostService postService;
+    private final MemberService memberService;
 
+    @Transactional
     public Long writeComment(CommentWriteCommand command){
-        Account account = accountRepository.findByLoginId(command.getLoginId())
-                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
+        Account account = SecurityUtils.getAccount()
+                .orElseThrow(() -> new CustomAuthenticationException(ErrorCode.NOT_LOGIN,null));
+        List<Role> userRole = account.getRoles();
+        Long postId = command.getPostId();
+        String contents = command.getContents();
+        boolean onlyReadByAuthor = command.isOnlyReadByAuthor();
 
-        if(command.isAnonymous()){
-            return writeUnnamedComment(command, account.getAccountId());
-        }else{
-            return writeNamedComment(command, account.getAccountId());
-        }
-    }
-    protected Long writeNamedComment(CommentWriteCommand command, Long accountId){
-        Post post = postRepository.findById(command.getPostId())
-                .orElseThrow(()->new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
-        Member member = memberRepository.findByAccountId(accountId)
-                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_MEMBER));
+        Post post = postService.findById(postId);
 
-        Comment comment = post.writeComment(command.getContents(), member, command.isOnlyReadByAuthor());
+        Category category = post.getCategory();
+        Menu superMenu = category.getSuperMenu();
 
-        commentRepository.save(comment);
+        while (superMenu != null) {
+            boolean accessible = superMenu.accessible(userRole);
 
-        return comment.getCommentId();
-    }
-
-
-    protected Long writeUnnamedComment(CommentWriteCommand command, Long accountdId) {
-        Post post = postRepository.findById(command.getPostId())
-                .orElseThrow(()->new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
-
-        Anonymous author = getAnonymous(accountdId, command.getPostId(), post);
-
-        Comment comment = post.writeComment(command.getContents(), author, command.isOnlyReadByAuthor());
-
-        commentRepository.save(comment);
-
-        return comment.getCommentId();
-    }
-
-    public Long writeReply(ReplyWriteCommand command){
-        Account account = accountRepository.findByLoginId(command.getLoginId())
-                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
-
-        if(command.isAnonymous()){
-            return writeUnnamedReply(command, account.getAccountId());
-        }else{
-            return writeNamedReply(command, account.getAccountId());
-        }
-    }
-
-    protected Long writeNamedReply(ReplyWriteCommand command, Long accountId){
-        Post post = postRepository.findById(command.getPostId())
-                .orElseThrow(()->new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
-
-        Member member = memberRepository.findByAccountId(accountId)
-                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_MEMBER));
-
-        Comment superComment = commentRepository.findById(command.getSuperCommentId())
-                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_COMMENT));
-        Comment taggedComment = commentRepository.findById(command.getTagCommentId())
-                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_COMMENT));
-
-        Reply reply = superComment.writeReply(command.getContents(), taggedComment, member, command.isOnlyReadByAuthor());
-
-        commentRepository.save(reply);
-
-        return reply.getCommentId();
-    }
-
-
-    protected Long writeUnnamedReply(ReplyWriteCommand command, Long accountId) {
-        Post post = postRepository.findById(command.getPostId())
-                .orElseThrow(()->new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
-
-        Comment superComment = commentRepository.findById(command.getSuperCommentId())
-                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_COMMENT));
-        Comment taggedComment = commentRepository.findById(command.getTagCommentId())
-                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_COMMENT));
-
-        Anonymous author = getAnonymous(accountId, command.getPostId(), post);
-
-        Reply reply = superComment.writeReply(command.getContents(), taggedComment, author, command.isOnlyReadByAuthor());
-
-        replyRepository.save(reply);
-
-        return reply.getCommentId();
-    }
-
-    public CommentListResponse retrieveCommentList(CommentListFindCommand command) {
-        //TODO : 리팩토링 필요
-        Post post = postRepository.findById(command.getPostId()).orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
-
-        //TODO : 비밀글일 때는?
-        if(post.getExposeOption().getExposeState() == ExposeState.KUMOH){
-            if(command.getLoginId()==null){
-                throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
-            }else{
-                boolean isKumoh = SecurityUtils.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_KUMOH"));
-
-                if(!isKumoh){
-                    throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
-                }
+            if (!accessible) {
+                throw new CustomAccessDeniedException(ErrorCode.ACCESS_DENIED,null);
             }
+
+            superMenu = superMenu.getSuperMenu();
         }
 
-        //TODO : post의 접근 권한이 없을때 댓글 조회 안되야 함
+        List<Comment> comments = commentService.findWithAuthorByPostId(postId);
+        BoardUser author = command.isAnonymous() ?
+                anonymousService.createAnonymousInPost(account, post,comments) : memberService.findByAccountId(account.getAccountId());
 
-        if(command.getLoginId()==null){
-            Page<Comment> commentPage = commentSearchRepository.findCommentListByPostId(command.getPostId(), PageRequest.of(command.getPage(), command.getPerPage()));
-            long totalReplySize = commentSearchRepository.countReplyByPostId(command.getPostId());
-
-            List<CommentListElement> commentDtoList = commentPage.getContent().stream()
-                    .map(comment -> {
-                        List<ReplyResponse> subComments = commentSearchRepository.findReplyListByCommentId(comment.getCommentId())
-                                .stream()
-                                .map(
-                                        reply -> ReplyResponse.toDto(reply, false, false)
-                                ).collect(Collectors.toList());
-                        return CommentListElement.toDto(comment, false,false, subComments);
-                    }).collect(Collectors.toList());
-
-
-            PaginationResponse paginationResponse = PaginationResponse.builder()
-                    .totalCommentSize(commentPage.getTotalElements())
-                    .last(commentPage.isLast())
-                    .pageNum(commentPage.getNumber())
-                    .totalAllSize(commentPage.getTotalElements() + totalReplySize)
-                    .build();
-
-            return CommentListResponse.toDto(commentDtoList, paginationResponse);
-
-
-        }else{
-            Account account = accountRepository.findByLoginId(command.getLoginId())
-                    .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
-
-
-            Page<Comment> commentPage = commentSearchRepository.findCommentListByPostId(command.getPostId(), PageRequest.of(command.getPage(), command.getPerPage()));
-            long totalReplySize = commentSearchRepository.countReplyByPostId(command.getPostId());
-
-            List<CommentListElement> commentDtoList = commentPage.getContent().stream()
-                    .map(comment -> {
-                        List<ReplyResponse> subComments = commentSearchRepository.findReplyListByCommentId(comment.getCommentId())
-                                .stream()
-                                .map(
-                                        reply -> ReplyResponse.toDto(reply, reply.isWrittenBy(account.getAccountId()) || post.getCategory().manageable(account.getAuthorities())
-                                                , reply.getPost().isWrittenBy(account.getAccountId()))
-                                ).collect(Collectors.toList());
-                        return CommentListElement.toDto(
-                                comment, comment.isWrittenBy(account.getAccountId()) || post.getCategory().manageable(account.getAuthorities())
-                                ,comment.getPost().isWrittenBy(account.getAccountId()), subComments);
-                    }).collect(Collectors.toList());
-
-
-            PaginationResponse paginationResponse = PaginationResponse.builder()
-                    .totalCommentSize(commentPage.getTotalElements())
-                    .last(commentPage.isLast())
-                    .pageNum(commentPage.getNumber())
-                    .totalAllSize(commentPage.getTotalElements() + totalReplySize)
-                    .build();
-
-            return CommentListResponse.toDto(commentDtoList, paginationResponse);
-
-        }
+        Long commentId = commentService.createComment(post, author, contents, onlyReadByAuthor);
+        return commentId;
     }
 
+    @Transactional
     public Long editComment(CommentEditCommand command) {
-        Account account = accountRepository.findByLoginId(command.getLoginId())
-                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
 
-        Comment comment = commentRepository.findById(command.getCommentId())
-                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_COMMENT));
+        Long commentId = command.getCommentId();
+        Account account = SecurityUtils.getAccount()
+                .orElseThrow(() -> new CustomAuthenticationException(ErrorCode.NOT_LOGIN,null));
+        Comment comment = commentService.findWithPostAndCategory(commentId);
 
-        if (!comment.isWrittenBy(account.getAccountId()) && !comment.getPost().getCategory().manageable(account.getAuthorities())) {
+        Post post = comment.getPost();
+        Category category = post.getCategory();
+
+        Long accountId = account.getAccountId();
+        List<Role> roles = account.getRoles();
+
+        if (comment.isWrittenBy(accountId) || category.manageable(roles) || category.editable(roles)) {
+            comment.changeContents(command.getContents());
+            comment.changeOnlyReadByAuthor(command.isOnlyReadByAuthor());
+
+            return comment.getCommentId();
+        }
+
+        throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
+    }
+
+    @Transactional
+    public void removeComment(Long commentId) {
+        Account account = SecurityUtils.getAccount()
+                .orElseThrow(() -> new CustomAuthenticationException(ErrorCode.NOT_LOGIN,null));
+
+        Comment comment = commentService.findWithPostAndCategory(commentId);
+        Post post = comment.getPost();
+        Category category = post.getCategory();
+
+        if (comment.isWrittenBy(account.getAccountId()) || category.manageable(account.getRoles())) {
+            comment.delete(true);
+            return;
+        }
+
+        throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
+    }
+    public CommentListResponse retrieveCommentList(CommentListFindCommand command) {
+        Long postId = command.getPostId();
+        Post post = postService.findById(postId);
+        String password = command.getPassword();
+        Account account = SecurityUtils.getAccount().orElse(null);
+
+        List<Role> userRoles = account == null ? null : account.getRoles();
+
+        Category category = post.getCategory();
+        boolean accessible = category.accessible(userRoles);
+
+        if (!accessible) {
+            throw new CustomAccessDeniedException(ErrorCode.ACCESS_DENIED,null);
+        }
+
+        ExposeOption exposeOption = post.getExposeOption();
+        boolean pass = exposeOption.pass(userRoles, password);
+
+        if (!pass) {
             throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 
-        comment.changeContents(command.getContents());
-        comment.changeOnlyReadByAuthor(command.isOnlyReadByAuthor());
+        int page = command.getPage();
+        int perPage = command.getPerPage();
 
-        return comment.getCommentId();
+        Page<Comment> commentPage = commentSearchRepository.findCommentListByPostId(postId, PageRequest.of(page, perPage));
+        long totalReplySize = commentSearchRepository.countReplyByPostId(postId);
+        Long accountId = account == null ? null : account.getAccountId();
+
+        List<CommentListElement> commentDtoList = commentPage.getContent().stream()
+                .map(comment -> {
+                    List<ReplyResponse> subComments = commentSearchRepository.findReplyListByCommentId(comment.getCommentId())
+                            .stream()
+                            .map(reply -> ReplyResponse.toDto(reply,
+                                    accountId != null && (reply.isWrittenBy(accountId)
+                                            || userRoles!= null && post.getCategory().manageable(userRoles)),
+                                    accountId != null && reply.getPost().isWrittenBy(accountId))
+                            ).collect(Collectors.toList());
+                    return CommentListElement.toDto(
+                            comment,
+                            accountId != null && comment.isWrittenBy(accountId)
+                                    || userRoles != null && post.getCategory().manageable(userRoles),
+                            accountId != null && comment.getPost().isWrittenBy(accountId),
+                            subComments);
+                }).collect(Collectors.toList());
+
+
+        PaginationResponse paginationResponse = PaginationResponse.builder()
+                .totalCommentSize(commentPage.getTotalElements())
+                .last(commentPage.isLast())
+                .pageNum(commentPage.getNumber())
+                .totalAllSize(commentPage.getTotalElements() + totalReplySize)
+                .build();
+
+        return CommentListResponse.toDto(commentDtoList, paginationResponse);
     }
 
-    public Long editReply(ReplyEditCommand command) {
-        Account account = accountRepository.findByLoginId(command.getLoginId())
-                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
-        Reply reply = replyRepository.findById(command.getReplyId())
-                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_COMMENT));
 
-        if (!reply.isWrittenBy(account.getAccountId()) && !reply.getPost().getCategory().manageable(account.getAuthorities())) {
-            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
-        }
 
-        reply.changeContents(command.getContents());
-        reply.changeOnlyReadByAuthor(command.isOnlyReadByAuthor());
 
-        return reply.getCommentId();
-    }
 
-    public void removeComment(Long commentId, String loginId) {
-        Account account = accountRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
 
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_COMMENT));
 
-        if (!comment.isWrittenBy(account.getAccountId()) && !comment.getPost().getCategory().manageable(account.getAuthorities())) {
-            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
-        }
 
-        comment.delete(true);
-    }
 
-    public void removeReply(Long replyId, String loginId) {
-        Account account = accountRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
 
-        Reply reply = replyRepository.findById(replyId)
-                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_COMMENT));
-
-        if (!reply.isWrittenBy(account.getAccountId()) && !reply.getPost().getCategory().manageable(account.getAuthorities())) {
-            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
-        }
-
-        reply.delete(true);
-    }
-
-    protected Anonymous getAnonymous(Long accountId, Long postId, Post post) {
-        //TODO : 리팩토링 필요
-        Account account = accountRepository.findById(accountId).get();
-
-        if(post.isWrittenBy(accountId) && !post.isNamed()){
-            return anonymousRepository.findById(post.getAuthor().getBoardUserId()).get();
-        }
-
-        Anonymous author = commentRepository.findByPostId(postId).stream()
-                .filter(comment -> comment.getAuthor().isAnonymous())
-                .map(comment -> (Anonymous) comment.getAuthor())
-                .filter(anonymous -> anonymous.isOwnAccountId(accountId))
-                .findFirst()
-                .orElseGet(() -> {
-                    return replyRepository.findByPostId(postId).stream()
-                            .filter(reply -> reply.getAuthor().isAnonymous())
-                            .map(reply -> (Anonymous) reply.getAuthor())
-                            .filter(anonymous -> anonymous.isOwnAccountId(accountId))
-                            .findFirst()
-                            .orElseGet(() -> {
-                                Anonymous createdAnonymous = post.createAnonymous(account);
-                                anonymousRepository.save(createdAnonymous);
-                                return createdAnonymous;
-                            });
-                });
-        return author;
-    }
 
 }

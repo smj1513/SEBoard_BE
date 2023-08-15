@@ -2,39 +2,7 @@ package com.seproject.board.menu.application.dto;
 
 import lombok.Data;
 
-import static com.seproject.admin.dto.AuthorizationDTO.*;
-
 public class CategoryCommand {
-    @Data
-    public static class CategoryCreateCommand{
-        private Long superCategoryId;
-        private String name;
-        private String description;
-        private String urlId;
-        private String externalUrl;
-        private String categoryType;
-        private CategoryAccessUpdateRequestElement manage;
-        private CategoryAccessUpdateRequestElement write;
-        private CategoryAccessUpdateRequestElement expose;
-        private CategoryAccessUpdateRequestElement access;
-
-        public CategoryCreateCommand(Long superCategoryId, String name, String description, String urlId, String externalUrl, String categoryType,
-                                     CategoryAccessUpdateRequestElement manage,
-                                     CategoryAccessUpdateRequestElement write,
-                                     CategoryAccessUpdateRequestElement expose,
-                                     CategoryAccessUpdateRequestElement access){
-            this.superCategoryId = superCategoryId;
-            this.name = name;
-            this.description = description;
-            this.urlId = urlId;
-            this.externalUrl = externalUrl;
-            this.categoryType = categoryType;
-            this.manage = manage;
-            this.write = write;
-            this.expose = expose;
-            this.access = access;
-        }
-    }
 
     @Data
     public static class CategoryUpdateCommand{

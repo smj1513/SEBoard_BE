@@ -1,14 +1,18 @@
 package com.seproject.account.account.domain;
 
 import com.seproject.account.role.domain.Role;
+import com.seproject.account.role.domain.RoleAccount;
 import com.seproject.board.common.Status;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 
@@ -27,16 +31,21 @@ public class OAuthAccount extends Account{
 
     @Builder
     public OAuthAccount(Long accountId, String loginId,
-                   String name, String nickname,
-                   String password, List<Role> authorities,String provider, String sub) {
+                        String name, String nickname,
+                        String password, List<RoleAccount> roleAccounts, LocalDateTime createdAt, Status status, String provider, String sub) {
         this.accountId = accountId;
         this.loginId = loginId;
         this.name = name;
         this.nickname = nickname;
         this.password = password;
-        this.authorities = authorities;
-        this.createdAt = LocalDateTime.now();
-        this.status = Status.NORMAL;
+
+        this.roleAccounts = new ArrayList<>();
+        for (RoleAccount roleAccount : roleAccounts) {
+            addRoleAccount(roleAccount);
+        }
+
+        this.createdAt = createdAt;
+        this.status = status;
         this.provider = provider;
         this.sub = sub;
     }
@@ -44,4 +53,6 @@ public class OAuthAccount extends Account{
     public void removeSub(){
         this.sub = null;
     }
+
+
 }

@@ -25,14 +25,11 @@ public class RefreshTokenController {
     private final TokenService tokenService;
 
     @Operation(summary = "토큰 재발행", description = "refreshToken을 이용한 토큰 재 발행")
-    @ApiResponses({
-            @ApiResponse(content = @Content(schema = @Schema(implementation = AccessTokenRefreshResponse.class)), responseCode = "200", description = "토큰 재발행 성공")
-    })
     @PostMapping("/refresh")
-    public ResponseEntity<?> refreshUserToken(@RequestBody AccessTokenRefreshRequest accessTokenRefreshRequest) {
-        String refreshToken = accessTokenRefreshRequest.getRefreshToken();
-        AccessTokenRefreshResponse responseDTO = tokenService.refresh(refreshToken);
-        return new ResponseEntity<>(responseDTO, HttpStatus.OK);
+    public ResponseEntity<AccessTokenRefreshResponse> refreshUserToken(@RequestBody AccessTokenRefreshRequest request) {
+        String refreshToken = request.getRefreshToken();
+        AccessTokenRefreshResponse response = tokenService.refresh(refreshToken);
+        return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
 

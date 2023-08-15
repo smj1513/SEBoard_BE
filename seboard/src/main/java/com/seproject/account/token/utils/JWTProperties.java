@@ -1,13 +1,12 @@
 package com.seproject.account.token.utils;
 
 public class JWTProperties {
-    public static final String TYPE = "type";
+    public static final Integer BEGIN_INDEX = 7;
+    public static final String TYPE = "typ";
     public static final String ALGORITHM = "alg";
     public static final String HS256 = "HS256";
     public static final String AUTHORITIES = "authorities";
 
-    //TODO : ENUM
-    public static final String TEMPORAL_TOKEN = "temporalToken";
     public static final String REFRESH_TOKEN = "refreshToken";
     public static final String ACCESS_TOKEN = "accessToken";
     public static final String LARGE_REFRESH_TOKEN = "largeRefreshToken";

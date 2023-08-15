@@ -23,10 +23,9 @@ public class CommentRequest {
         @JsonProperty("isReadOnlyAuthor")
         private boolean isReadOnlyAuthor;
 
-        public CommentWriteCommand toCommand(String loginId) {
+        public CommentWriteCommand toCommand() {
             return CommentWriteCommand.builder()
                     .postId(postId)
-                    .loginId(loginId)
                     .contents(contents)
                     .isAnonymous(isAnonymous)
                     .isOnlyReadByAuthor(isReadOnlyAuthor)
@@ -41,10 +40,9 @@ public class CommentRequest {
         @NotNull
         @JsonProperty("isReadOnlyAuthor")
         private boolean isReadOnlyAuthor;
-        public CommentEditCommand toCommand(Long commentId, String loginId) {
+        public CommentEditCommand toCommand(Long commentId) {
             return CommentEditCommand.builder()
                     .commentId(commentId)
-                    .loginId(loginId)
                     .contents(contents)
                     .isOnlyReadByAuthor(isReadOnlyAuthor)
                     .build();

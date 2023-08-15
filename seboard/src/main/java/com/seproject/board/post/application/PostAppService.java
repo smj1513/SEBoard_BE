@@ -61,7 +61,7 @@ public class PostAppService {
         Category category = categoryRepository.findById(command.getCategoryId())
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_CATEGORY));
 
-        if(!category.writable(account.getAuthorities())){
+        if(!category.editable(account.getRoles())){
             throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 
@@ -97,7 +97,7 @@ public class PostAppService {
 
         boolean isPined = command.isPined();
 
-        if(!category.manageable(author.getAccount().getAuthorities())){
+        if(!category.manageable(author.getAccount().getRoles())){
             isPined = false;
         }
 
@@ -126,7 +126,7 @@ public class PostAppService {
         Post post = postRepository.findById(command.getPostId())
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
 
-        if(!post.isWrittenBy(account.getAccountId()) &&  !post.getCategory().manageable(account.getAuthorities())){
+        if(!post.isWrittenBy(account.getAccountId()) &&  !post.getCategory().manageable(account.getRoles())){
             throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 
@@ -174,7 +174,7 @@ public class PostAppService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
 
-        if(!post.isWrittenBy(account.getAccountId()) &&  !post.getCategory().manageable(account.getAuthorities())){
+        if(!post.isWrittenBy(account.getAccountId()) &&  !post.getCategory().manageable(account.getRoles())){
             throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 

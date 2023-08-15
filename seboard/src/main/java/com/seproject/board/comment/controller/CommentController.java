@@ -1,6 +1,5 @@
 package com.seproject.board.comment.controller;
 
-import com.seproject.account.utils.SecurityUtils;
 import com.seproject.board.comment.application.CommentAppService;
 import com.seproject.board.common.controller.dto.MessageResponse;
 import com.seproject.board.comment.controller.dto.CommentRequest.CreateCommentRequest;
@@ -28,10 +27,7 @@ public class CommentController {
     @Operation(summary = "댓글 작성", description = "사용자는 실명으로 댓글을 작성한다.")
     @PostMapping()
     public ResponseEntity<?> createComment(@Validated @RequestBody CreateCommentRequest request) {
-        String loginId = SecurityUtils.getLoginId();
-
-        Long commentId = commentAppService.writeComment(request.toCommand(loginId));
-
+        Long commentId = commentAppService.writeComment(request.toCommand());
 
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(CreateAndUpdateMessage.of(commentId, "댓글 작성 성공"));
@@ -47,10 +43,9 @@ public class CommentController {
     @Operation(summary = "댓글 수정", description = "사용자는 자신이 작성한 댓글을 수정한다.")
     @PutMapping("/{commentId}")
     public ResponseEntity<?> updateComment(@PathVariable Long commentId, @Validated @RequestBody UpdateCommentRequest request) {
-        String loginId = SecurityUtils.getLoginId();
 
         Long id = commentAppService.editComment(
-                request.toCommand(commentId, loginId)
+                request.toCommand(commentId)
         );
 
         return ResponseEntity.ok(CreateAndUpdateMessage.of(id, "댓글 수정 성공"));
@@ -60,9 +55,8 @@ public class CommentController {
     @Operation(summary = "댓글 삭제", description = "사용자는 자신이 작성한 댓글을 삭제한다")
     @DeleteMapping("/{commentId}")
     public ResponseEntity<?> deleteNamedComment(@PathVariable Long commentId) {
-        String loginId = SecurityUtils.getLoginId();
 
-        commentAppService.removeComment(commentId, loginId);
+        commentAppService.removeComment(commentId);
 
         return ResponseEntity.ok(MessageResponse.of("댓글 삭제 성공"));
     }

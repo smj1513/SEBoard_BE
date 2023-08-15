@@ -20,90 +20,44 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @Component
 public class JwtProvider {
-
-
     @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.token_prefix}")
-    private String tokenPrefix;
-
-    @Value("${jwt.expiration_time}")
-    private int expirationTime;
-
-    public JWT createLargeToken(UsernamePasswordAuthenticationToken token){
-        String accessToken = createJWT(token);
-        String refreshToken = createLargeRefreshToken(token);
-        JWT jwt = new JWT(accessToken,refreshToken);
-        return jwt;
-    }
-
-    public JWT createToken(UsernamePasswordAuthenticationToken token){
-        String accessToken = createJWT(token);
-        String refreshToken = createRefreshToken(token);
-        JWT jwt = new JWT(accessToken,refreshToken);
-        return jwt;
-    }
-
-    public String createTemporalJWT(AbstractAuthenticationToken token) {
-        Instant instant = Instant.now().truncatedTo(ChronoUnit.SECONDS);
-        Instant expiredDate = instant.plus(30, ChronoUnit.MINUTES);
-        String jwt = Jwts.builder()
-                .setHeaderParam(JWTProperties.TYPE, JWTProperties.TEMPORAL_TOKEN)
-                .setHeaderParam(JWTProperties.ALGORITHM, JWTProperties.HS256)
-                .setSubject(token.getPrincipal().toString())
-                .setIssuedAt(Date.from(instant))
-                .setExpiration(Date.from(expiredDate))
-                .signWith(SignatureAlgorithm.HS256, secret)
-                .compact();
-        return jwt;
-    }
-
-    private String createLargeRefreshToken(AbstractAuthenticationToken token) {
+    public JWT createLargeRefreshToken(AbstractAuthenticationToken token) {
         Instant instant = Instant.now().truncatedTo(ChronoUnit.SECONDS);
         Instant expiredDate = instant.plus(JWTProperties.LARGE_REFRESH_TOKEN_EXPIRE, ChronoUnit.SECONDS);
-        String refreshToken = Jwts.builder()
-                .setHeaderParam(JWTProperties.TYPE, JWTProperties.LARGE_REFRESH_TOKEN)
-                .setHeaderParam(JWTProperties.ALGORITHM, JWTProperties.HS256)
-                .setSubject(token.getPrincipal().toString())
-                .setIssuedAt(Date.from(instant))
-                .setExpiration(Date.from(expiredDate))
-                .signWith(SignatureAlgorithm.HS256, secret)
-                .compact();
-
-        return refreshToken;
+        JWT jwt = createToken(token, JWTProperties.LARGE_REFRESH_TOKEN, JWTProperties.HS256, Date.from(instant), Date.from(expiredDate));
+        return jwt;
     }
 
-    private String createRefreshToken(AbstractAuthenticationToken token) {
+    public JWT createRefreshToken(AbstractAuthenticationToken token) {
         Instant instant = Instant.now().truncatedTo(ChronoUnit.SECONDS);
         Instant expiredDate = instant.plus(JWTProperties.REFRESH_TOKEN_EXPIRE, ChronoUnit.SECONDS);
-        String refreshToken = Jwts.builder()
-                .setHeaderParam(JWTProperties.TYPE, JWTProperties.REFRESH_TOKEN)
-                .setHeaderParam(JWTProperties.ALGORITHM, JWTProperties.HS256)
-                .setSubject(token.getPrincipal().toString())
-                .setIssuedAt(Date.from(instant))
-                .setExpiration(Date.from(expiredDate))
-                .signWith(SignatureAlgorithm.HS256, secret)
-                .compact();
-
-        return refreshToken;
+        JWT jwt = createToken(token, JWTProperties.REFRESH_TOKEN, JWTProperties.HS256, Date.from(instant), Date.from(expiredDate));
+        return jwt;
     }
 
-    private String createJWT(AbstractAuthenticationToken token) {
+    public JWT createAccessToken(AbstractAuthenticationToken token) {
         Instant instant = Instant.now().truncatedTo(ChronoUnit.SECONDS);
         Instant expiredDate = instant.plus(JWTProperties.ACCESS_TOKEN_EXPIRE, ChronoUnit.SECONDS);
+        JWT jwt = createToken(token, JWTProperties.ACCESS_TOKEN, JWTProperties.HS256, Date.from(instant), Date.from(expiredDate));
+        return jwt;
+    }
+
+    public JWT createToken(AbstractAuthenticationToken token, String type, String alg, Date IssuedAt, Date expiredAt) {
         String jwt = Jwts.builder()
-                .setHeaderParam(JWTProperties.TYPE, JWTProperties.ACCESS_TOKEN)
-                .setHeaderParam(JWTProperties.ALGORITHM, JWTProperties.HS256)
+                .setHeaderParam(JWTProperties.TYPE, type)
+                .setHeaderParam(JWTProperties.ALGORITHM, alg)
                 .setSubject(token.getPrincipal().toString())
-                .setIssuedAt(Date.from(instant))
-                .setExpiration(Date.from(expiredDate))
+                .setIssuedAt(IssuedAt)
+                .setExpiration(expiredAt)
                 .claim(JWTProperties.AUTHORITIES,token.getAuthorities().stream()
                         .map(GrantedAuthority::getAuthority)
                         .collect(Collectors.toList()))
                 .signWith(SignatureAlgorithm.HS256, secret)
                 .compact();
-        return jwt;
+
+        return new JWT(jwt);
     }
 
 

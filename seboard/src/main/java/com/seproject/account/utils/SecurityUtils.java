@@ -33,7 +33,7 @@ public class SecurityUtils {
      */
 
 
-    public static String getLoginId(){
+    public static String getLoginId() {
         Account account = getAccount().orElse(null);
         if(account == null) return null;
         return account.getUsername();

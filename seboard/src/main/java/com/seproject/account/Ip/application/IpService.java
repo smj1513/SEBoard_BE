@@ -2,13 +2,14 @@ package com.seproject.account.Ip.application;
 
 import com.seproject.account.Ip.domain.Ip;
 import com.seproject.account.Ip.domain.repository.IpRepository;
+import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.CustomIllegalArgumentException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-
-import static com.seproject.admin.dto.IpDTO.*;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Service
@@ -19,36 +20,28 @@ public class IpService {
         return ipRepository.findAll();
     }
 
-    public Ip banIp(CreateIpRequest createIpRequest) {
+    public Long createIp(String ipAddress) {
         Ip ip = Ip.builder()
-                .ipAddress(createIpRequest.getIpAddress())
+                .ipAddress(ipAddress)
                 .build();
 
         ipRepository.save(ip);
-        return ip;
+        return ip.getId();
     }
 
-    public Ip unBanIp(DeleteIpRequest deleteIpRequest) {
-
-        Ip ip = ipRepository.findByIpAddress(deleteIpRequest.getIpAddress());
-        if(ip == null) throw new NoSuchElementException();
+    public void deleteIp(String ipAddress) {
+        Ip ip = ipRepository.findByIpAddress(ipAddress)
+                .orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.NOT_EXIST_IP, null));
         ipRepository.delete(ip);
-        return ip;
     }
 
     public boolean existIpAddress(String ipAddress) {
         return ipRepository.existsByIpAddress(ipAddress);
     }
 
-    public Ip findIpByAddress(String address) {
-        return ipRepository.findByIpAddress(address);
-    }
+//    public Ip findIpByAddress(String address) {
+//        return ipRepository.findByIpAddress(address)
+//                .orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.NOT_EXIST_IP,null));
+//    }
 
-    public void addIp(String address) {
-        Ip ip = Ip.builder()
-                .ipAddress(address)
-                .build();
-
-        ipRepository.save(ip);
-    }
 }

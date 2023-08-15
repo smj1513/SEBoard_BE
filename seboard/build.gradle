@@ -53,6 +53,14 @@ dependencies {
 
     implementation "com.querydsl:querydsl-jpa:${queryDslVersion}"
     annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"
+
+    // https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator-annotation-processor
+    implementation 'org.hibernate.validator:hibernate-validator-annotation-processor:8.0.1.Final'
+
+    // https://mvnrepository.com/artifact/com.h2database/h2
+    testImplementation 'com.h2database:h2:2.1.214'
+
+
 }
 
 tasks.named('test') {

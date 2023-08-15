@@ -74,7 +74,8 @@ public class PostSearchAppService {
                     .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_MEMBER));
 
             isBookmarked = bookmarkRepository.existsByPostIdAndMemberId(postId, member.getBoardUserId());
-            isEditable = post.isWrittenBy(account.getAccountId()) || post.getCategory().manageable(account.getAuthorities());
+            isEditable = post.isWrittenBy(account.getAccountId()) ||
+                    post.getCategory().manageable(account.getRoles());
         }
 
         postDetailResponse.setEditable(isEditable);
@@ -105,14 +106,16 @@ public class PostSearchAppService {
                     .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_MEMBER));
 
             isBookmarked = bookmarkRepository.existsByPostIdAndMemberId(postId, member.getBoardUserId());
-            isEditable = post.isWrittenBy(account.getAccountId()) || post.getCategory().manageable(account.getAuthorities());
+            isEditable = post.isWrittenBy(account.getAccountId())
+                    || post.getCategory().manageable(account.getRoles());
         }
 
         postDetailResponse.setEditable(isEditable);
         postDetailResponse.setBookmarked(isBookmarked);
 
         if(post.getExposeOption().getExposeState()== ExposeState.PRIVACY){
-            if(account!=null && (post.isWrittenBy(account.getAccountId()) || post.getCategory().manageable(account.getAuthorities()))){
+            if(account!=null && (post.isWrittenBy(account.getAccountId())
+                    || post.getCategory().manageable(account.getRoles()))){
                 post.increaseViews();
                 return postDetailResponse;
             }else{
@@ -122,7 +125,7 @@ public class PostSearchAppService {
             if(account!=null){
                 Collection<? extends GrantedAuthority> authorities = SecurityUtils.getAuthorities();
                 boolean isKumoh = authorities.stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_KUMOH"));
-                if(isKumoh || post.getCategory().manageable(account.getAuthorities())){
+                if(isKumoh || post.getCategory().manageable(account.getRoles())){
                     post.increaseViews();
                     return postDetailResponse;
                 }else{
@@ -154,7 +157,7 @@ public class PostSearchAppService {
         }else{ //최소 로그인을 해야만 볼 수 있다
             Account account = SecurityUtils.getAccount().orElseThrow(()-> new NoSuchResourceException(ErrorCode.NOT_LOGIN));
 
-            if(!boardMenu.exposable(account.getAuthorities())){
+            if(!boardMenu.exposable(account.getRoles())){
                 throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
             }
 
@@ -182,9 +185,10 @@ public class PostSearchAppService {
             postPage = postSearchRepository.findPostByCategoryId(categoryId, PageRequest.of(page, size));
             setCommentSize(postPage);
         }else{ //최소 로그인을 해야만 볼 수 있다
-            Account account = SecurityUtils.getAccount().orElseThrow(()-> new NoSuchResourceException(ErrorCode.NOT_LOGIN));
+            Account account = SecurityUtils.getAccount()
+                    .orElseThrow(()-> new NoSuchResourceException(ErrorCode.NOT_LOGIN));
 
-            if(!boardMenu.exposable(account.getAuthorities())){
+            if(!boardMenu.exposable(account.getRoles())){
                 throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
             }
 

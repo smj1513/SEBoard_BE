@@ -1,0 +1,19 @@
+INSERT INTO accounts(account_id,login_id,name,nickname,password,created_at,status,dtype) values (5234058023851,'admin','admin','nick','$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6','2023-04-26','NORMAL','FORM_ACCOUNT');
+INSERT INTO public.board_users(board_user_id, name, account_id) VALUES (3421245, '이한나', 5234058023851);
+INSERT INTO public.members(member_id) VALUES (3421245);
+INSERT INTO roles (role_id, name,description,alias) values (5234058023850, 'ROLE_USER','일반 사용자,일부 게시글에 접근 가능','준회원'),
+                                                           (5234058023851, 'ROLE_ADMIN', '최고 관리 권한을 가짐','관리자'),
+                                                           (5234058023852, 'ROLE_PROFESSOR','교수 권한','교수'),
+                                                           (5234058023853, 'ROLE_KUMOH','금오공대 이메일 인증을 하여 금오인에게 공개된 게시글에 접근 가능','금오인'),
+                                                           (5234058023854, 'ROLE_ANONYMOUS','로그인 하지 않은 사용자','익명 사용자');
+INSERT INTO authorities(account_id,role_id) values(5234058023851,5234058023850);
+INSERT INTO authorities(account_id,role_id) values(5234058023851,5234058023851);
+INSERT INTO authorities(account_id,role_id) values(5234058023851,5234058023852);
+INSERT INTO authorities(account_id,role_id) values(5234058023851,5234058023853);
+INSERT INTO menus(menu_id, super_menu_id, name, description, depth, url_info, menu_type) VALUES
+           (43214231, null, '공지사항', '공지임니둥', 0, 'notice', 'BOARD'),
+           (43214232, 43214231, '일반', '공지임니둥', 1, 'notice_normal', 'CATEGORY');
+INSERT INTO public.board_users(board_user_id, name, account_id) VALUES (3421243, '이한나', 5234058023851);
+INSERT INTO expose_options(expose_option_id, expose_type) VALUES (28822821, 'PUBLIC');
+INSERT INTO expose_options(expose_option_id, expose_type) VALUES (28822822, 'KUMOH');
+INSERT INTO expose_options(expose_option_id, expose_type) VALUES (28822823, 'PUBLIC');

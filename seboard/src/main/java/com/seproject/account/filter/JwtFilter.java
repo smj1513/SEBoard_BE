@@ -1,9 +1,12 @@
 package com.seproject.account.filter;
 
 import com.seproject.account.common.authentication.handler.failure.CustomAuthenticationFailureHandler;
+import com.seproject.account.token.domain.JWT;
 import com.seproject.account.token.domain.repository.LogoutTokenRepository;
+import com.seproject.account.token.service.TokenService;
 import com.seproject.account.token.utils.JwtDecoder;
 import com.seproject.error.exception.CustomAuthenticationException;
+import com.seproject.error.exception.CustomUserNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -16,12 +19,13 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
-    private final JwtDecoder jwtDecoder;
+    private final TokenService tokenService;
 
     private final CustomAuthenticationFailureHandler failureHandler;
     private final LogoutTokenRepository logoutTokenRepository;
@@ -31,18 +35,18 @@ public class JwtFilter extends OncePerRequestFilter {
                                     HttpServletResponse response,
                                     FilterChain filterChain) throws ServletException, IOException {
 
-        String jwt = jwtDecoder.getAccessToken(request);
+        Optional<JWT> getTokenFromService = tokenService.getAccessToken();
 
         try {
-            if(StringUtils.hasText(jwt)) {
-
-                if(!logoutTokenRepository.existsById(jwt)) {
-                    Authentication authentication = jwtDecoder.getAuthentication(jwt);
+            if(getTokenFromService.isPresent()) {
+                JWT token = getTokenFromService.get();
+                if(!logoutTokenRepository.existsById(token.getToken())) {
+                    Authentication authentication = tokenService.getAuthentication(token);
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             }
             filterChain.doFilter(request,response);
-        } catch (CustomAuthenticationException e) {
+        } catch (CustomAuthenticationException | CustomUserNotFoundException e) {
             failureHandler.onAuthenticationFailure(request,response,e);
         }
     }

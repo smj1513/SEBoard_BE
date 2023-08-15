@@ -31,17 +31,18 @@ public class FormLoginAuthenticationSuccessHandler implements AuthenticationSucc
         UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) authentication;
 
         boolean largeLogin = Boolean.parseBoolean(request.getParameter("largeLogin"));
-        JWT jwt;
+        JWT accessToken = tokenService.createAccessToken(token);
+        JWT refreshToken;
 
         if(largeLogin) {
-            jwt = tokenService.createLargeToken(token);
+            refreshToken = tokenService.createLargeRefreshToken(token);
         } else {
-            jwt = tokenService.createToken(token);
+            refreshToken = tokenService.createRefreshToken(token);
         }
 
         LoginResponseDTO responseDTO = LoginResponseDTO.builder()
-                .accessToken(jwt.getAccessToken())
-                .refreshToken(jwt.getRefreshToken())
+                .accessToken(accessToken.getToken())
+                .refreshToken(refreshToken.getToken())
                 .build();
 
         responseWriter.write(responseDTO,HttpStatus.OK,response);
