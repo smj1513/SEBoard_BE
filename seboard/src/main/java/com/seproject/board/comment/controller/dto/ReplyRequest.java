@@ -26,10 +26,9 @@ public class ReplyRequest {
         @JsonProperty("isReadOnlyAuthor")
         private boolean isReadOnlyAuthor;
 
-        public ReplyWriteCommand toCommand(String loginId) {
+        public ReplyWriteCommand toCommand() {
             return ReplyWriteCommand.builder()
                     .postId(postId)
-                    .loginId(loginId)
                     .superCommentId(superCommentId)
                     .tagCommentId(tagCommentId)
                     .contents(contents)
@@ -47,9 +46,8 @@ public class ReplyRequest {
         @JsonProperty("isReadOnlyAuthor")
         private boolean isReadOnlyAuthor;
 
-        public ReplyEditCommand toCommand(Long replyId, String loginId) {
+        public ReplyEditCommand toCommand(Long replyId) {
             return ReplyEditCommand.builder()
-                    .loginId(loginId)
                     .replyId(replyId)
                     .contents(contents)
                     .isOnlyReadByAuthor(isReadOnlyAuthor)

@@ -10,7 +10,6 @@ public class ReplyCommand {
         private Long postId;
         private Long superCommentId;
         private Long tagCommentId;
-        private String loginId;
         private String contents;
         private boolean isAnonymous;
         private boolean isOnlyReadByAuthor;
@@ -20,7 +19,6 @@ public class ReplyCommand {
     @Builder
     public static class ReplyEditCommand{
         private Long replyId;
-        private String loginId;
         private String contents;
         private boolean isOnlyReadByAuthor;
     }

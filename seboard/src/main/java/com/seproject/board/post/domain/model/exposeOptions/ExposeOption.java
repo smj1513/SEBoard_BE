@@ -1,8 +1,12 @@
 package com.seproject.board.post.domain.model.exposeOptions;
 
+import com.seproject.account.account.domain.Account;
+import com.seproject.account.role.domain.Role;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Entity
@@ -19,6 +23,23 @@ public abstract class ExposeOption {
 
     public abstract ExposeState getExposeState();
 
+    public boolean pass(List<Role> roles,String password) {
+        switch (exposeState){
+            case PUBLIC:
+                return true;
+            case KUMOH:
+                List<String> collect = roles.stream()
+                        .map(Role::getAuthority)
+                        .collect(Collectors.toList());
+                return collect.contains(Role.ROLE_KUMOH);
+            case PRIVACY:
+                return this.password.equals(password);
+            default:
+                throw new IllegalArgumentException("Invalid ExposeState");
+        }
+
+    }
+
 
     public static ExposeOption of(ExposeState state, String password){
         switch (state){
@@ -32,5 +53,7 @@ public abstract class ExposeOption {
                 throw new IllegalArgumentException("Invalid ExposeState");
         }
     }
+
+
 
 }

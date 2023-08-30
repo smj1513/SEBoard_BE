@@ -44,8 +44,9 @@ public class FileAppService {
         return new FileMetaDataListResponse(fileMetaDataList);
     }
 
-    public void deleteFile(Long fileMetaDataId) {
-        FileMetaData fileMetaData = fileMetaDataRepository.findById(fileMetaDataId).orElseThrow(IllegalArgumentException::new);
+    public void deleteFile(Long fileMetaDataId) { //TODO : return
+        FileMetaData fileMetaData = fileMetaDataRepository.findById(fileMetaDataId)
+                .orElseThrow(IllegalArgumentException::new);
 
         fileRepository.delete(fileMetaData.getFilePath());
         fileMetaDataRepository.delete(fileMetaData);

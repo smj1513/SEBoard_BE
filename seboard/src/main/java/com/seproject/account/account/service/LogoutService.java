@@ -2,6 +2,7 @@ package com.seproject.account.account.service;
 
 
 import com.seproject.account.token.domain.JWT;
+import com.seproject.account.token.service.TokenService;
 import com.seproject.account.token.utils.JwtDecoder;
 import com.seproject.account.token.domain.LogoutLargeRefreshToken;
 import com.seproject.account.token.domain.LogoutRefreshToken;
@@ -27,27 +28,22 @@ public class LogoutService {
     private final LogoutTokenRepository logoutTokenRepository;
     private final LogoutRefreshTokenRepository logoutRefreshTokenRepository;
     private final LogoutLargeRefreshTokenRepository logoutLargeRefreshTokenRepository;
-    private final JwtDecoder jwtDecoder;
+    private final TokenService tokenService;
 
     public String getRedirectURL() {
         return LOGOUT_URL + clientId + REDIRECT_PATH;
     }
 
-    public void logout(JWT jwt) { //TODO : largeRefreshToken
-        String accessToken = jwt.getAccessToken();
-        String refreshToken = jwt.getRefreshToken();
-        logoutTokenRepository.save(new LogoutToken(accessToken));
+    public void logout(JWT accessToken, JWT refreshToken) {
+        logoutTokenRepository.save(new LogoutToken(accessToken.getToken()));
 
-        try{
-            if(jwtDecoder.isLargeToken(refreshToken)) {
-                logoutLargeRefreshTokenRepository.save(new LogoutLargeRefreshToken(refreshToken));
-            } else {
-                logoutRefreshTokenRepository.save(new LogoutRefreshToken(refreshToken));
-            }
-        } catch (CustomAuthenticationException e) {
-            throw new CustomAuthenticationException(ErrorCode.DISABLE_REFRESH_TOKEN,null);
+        String refreshTokenValue = refreshToken.getToken();
+
+        if(tokenService.isLargeToken(refreshToken)) {
+            logoutLargeRefreshTokenRepository.save(new LogoutLargeRefreshToken(refreshTokenValue));
+        } else {
+            logoutRefreshTokenRepository.save(new LogoutRefreshToken(refreshTokenValue));
         }
-
     }
 
 }

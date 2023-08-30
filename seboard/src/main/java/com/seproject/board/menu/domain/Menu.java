@@ -1,24 +1,20 @@
 package com.seproject.board.menu.domain;
 
-import com.seproject.admin.domain.AccessOption;
-import com.seproject.admin.domain.MenuAuthorization;
+import com.seproject.account.authorization.domain.Authorization;
+import com.seproject.account.authorization.utils.AuthorizationProperty;
+import com.seproject.account.role.domain.Role;
+import com.seproject.account.authorization.domain.MenuAuthorization;
 import com.seproject.board.menu.service.CategoryService;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
-import org.springframework.security.core.GrantedAuthority;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @NoArgsConstructor
 @Entity
 @Getter
-@SuperBuilder
 @Table(name = "menus")
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "menu_type")
@@ -29,21 +25,21 @@ public class Menu {
 
     @Id @GeneratedValue
     private Long menuId;
-
     @ManyToOne
     @JoinColumn(name = "super_menu_id")
     private Menu superMenu;
     private String name;
     private String description;
     private int depth;
+
+    //TODO : Internal -> urlId, External -> urlInfo
     protected String urlInfo;
 
-    @Builder.Default
-    @OneToMany(mappedBy = "menu",fetch = FetchType.LAZY , cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "menu",fetch = FetchType.LAZY, cascade = CascadeType.ALL,orphanRemoval = true)
     private List<MenuAuthorization> menuAuthorizations = new ArrayList<>();
 
     public Menu(Long menuId, Menu superMenu, String name, String description) {
-        if(isValidName(name)){
+        if(!isValidName(name)){
             throw new IllegalArgumentException();
         }
 
@@ -53,9 +49,11 @@ public class Menu {
         this.description = description;
         this.depth = calculateDepth();
         this.menuAuthorizations = new ArrayList<>();
-        if(depth > 0){
-            throw new IllegalArgumentException();
-        }
+    }
+
+    public void addAuthorization(MenuAuthorization menuAuthorization) {
+        this.menuAuthorizations.add(menuAuthorization);
+        menuAuthorization.setMenu(this);
     }
 
     protected int calculateDepth() {
@@ -66,27 +64,24 @@ public class Menu {
         }
     }
 
-    public boolean isRootMenu() {
-        return depth == 0;
-    }
-
     public boolean isRemovable(CategoryService categoryService){
         return !categoryService.hasSubCategory(menuId);
     }
 
     public void changeName(String name) {
-//        if(isValidName(name)){
-//            throw new IllegalArgumentException();
-//        }
+        if(!isValidName(name)){
+            throw new IllegalArgumentException();
+        }
 
         this.name = name;
     }
 
     private boolean isValidName(String name) {
-        return MIN_NAME_LENGTH < name.length() && name.length() < MAX_NAME_LENGTH;
+        return MIN_NAME_LENGTH <= name.length() && name.length() <= MAX_NAME_LENGTH;
     }
 
     public void updateMenuAuthorizations(List<MenuAuthorization> menuAuthorizations) {
+        this.menuAuthorizations.clear();
         this.menuAuthorizations.addAll(menuAuthorizations);
     }
 
@@ -98,45 +93,43 @@ public class Menu {
         this.superMenu = superMenu;
     }
 
-    public boolean writable(Collection<? extends GrantedAuthority> authorities) {
-        List<MenuAuthorization> collect = menuAuthorizations.stream()
-                .filter((menuAuthorization) -> menuAuthorization.getAccessOption().equals(AccessOption.WRITE))
-                .collect(Collectors.toList());
-        if(collect.size() == 0) return true;
-        boolean flag = false;
+    public void changeUrlInfo(String urlInfo) {this.urlInfo = urlInfo;}
 
-        for (MenuAuthorization menuAuthorization : collect) {
-            flag |= menuAuthorization.writable(authorities);
-        }
 
-        return flag;
-    }
-
-    public boolean manageable(Collection<? extends GrantedAuthority> authorities) {
-        List<MenuAuthorization> collect = menuAuthorizations.stream()
-                .filter((menuAuthorization) -> menuAuthorization.getAccessOption().equals(AccessOption.MANAGE))
-                .collect(Collectors.toList());
-        if(collect.size() == 0) return true;
-        boolean flag = false;
-
-        for (MenuAuthorization menuAuthorization : collect) {
-            flag |= menuAuthorization.manageable(authorities);
-        }
-
-        return flag;
-    }
-
-    public boolean exposable(Collection<? extends GrantedAuthority> authorities) {
-        List<MenuAuthorization> collect = menuAuthorizations.stream()
-                .filter((menuAuthorization) -> menuAuthorization.getAccessOption().equals(AccessOption.EXPOSE))
-                .collect(Collectors.toList());
-        if(collect.size() == 0) return true;
-        boolean flag = false;
-
+    //TODO : throw vs return true
+    public boolean editable(List<Role> roles) {
         for (MenuAuthorization menuAuthorization : menuAuthorizations) {
-            flag |= menuAuthorization.exposable(authorities);
+            if(menuAuthorization.support(AuthorizationProperty.EDITABLE)) {
+                return menuAuthorization.isAuth(roles);
+            }
         }
+        return true;
+    }
 
-        return flag;
+    public boolean manageable(List<Role> roles) {
+        for (MenuAuthorization menuAuthorization : menuAuthorizations) {
+            if(menuAuthorization.support(AuthorizationProperty.MANAGEABLE)) {
+                return menuAuthorization.isAuth(roles);
+            }
+        }
+        return true;
+    }
+
+    public boolean accessible(List<Role> roles) {
+        for (MenuAuthorization menuAuthorization : menuAuthorizations) {
+            if(menuAuthorization.support(AuthorizationProperty.ACCESS)) {
+                return menuAuthorization.isAuth(roles);
+            }
+        }
+        return true;
+    }
+
+    public boolean exposable(List<Role> roles) {
+        for (MenuAuthorization menuAuthorization : menuAuthorizations) {
+            if(menuAuthorization.support(AuthorizationProperty.EXPOSE)) {
+                return menuAuthorization.isAuth(roles);
+            }
+        }
+        return true;
     }
 }

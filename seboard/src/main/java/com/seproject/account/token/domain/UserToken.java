@@ -1,6 +1,7 @@
 package com.seproject.account.token.domain;
 
 import com.seproject.account.account.domain.Account;
+import com.seproject.account.account.domain.OAuthAccount;
 import lombok.Builder;
 import lombok.Getter;
 import org.springframework.data.annotation.Id;
@@ -14,6 +15,6 @@ public class UserToken {
     @Id
     private String id;
 
-    private Account account;
+    private OAuthAccount account;
 
 }

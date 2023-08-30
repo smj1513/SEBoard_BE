@@ -3,32 +3,17 @@ package com.seproject.account.account.service;
 import com.seproject.account.account.domain.FormAccount;
 import com.seproject.account.account.domain.OAuthAccount;
 import com.seproject.account.account.domain.repository.OAuthAccountRepository;
-import com.seproject.account.email.application.KumohEmailService;
-import com.seproject.account.email.application.RegisterEmailService;
-import com.seproject.account.utils.SecurityUtils;
-import com.seproject.admin.domain.repository.AdminAccountSearchRepository;
-import com.seproject.admin.service.BannedIdService;
-import com.seproject.admin.service.BannedNicknameService;
+import com.seproject.account.account.persistence.AccountQueryRepository;
+import com.seproject.account.role.domain.RoleAccount;
+import com.seproject.board.common.Status;
 import com.seproject.error.errorCode.ErrorCode;
-import com.seproject.error.exception.CustomAuthenticationException;
 import com.seproject.error.exception.CustomIllegalArgumentException;
 import com.seproject.error.exception.CustomUserNotFoundException;
 import com.seproject.account.account.domain.repository.AccountRepository;
 import com.seproject.account.role.domain.repository.RoleRepository;
 import com.seproject.account.account.domain.Account;
 import com.seproject.account.role.domain.Role;
-import com.seproject.board.comment.domain.model.Comment;
-import com.seproject.board.post.domain.model.Bookmark;
-import com.seproject.board.post.domain.model.Post;
-import com.seproject.member.domain.Member;
-import com.seproject.board.comment.domain.repository.CommentRepository;
-import com.seproject.board.post.domain.repository.BookmarkRepository;
-import com.seproject.board.post.domain.repository.PostRepository;
-import com.seproject.member.domain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -36,39 +21,26 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.persistence.EntityManager;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.seproject.admin.dto.AccountDTO.*;
-import static com.seproject.account.account.controller.dto.AccountDTO.*;
-import static com.seproject.account.account.controller.dto.RegisterDTO.*;
-
-@Slf4j
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
 public class AccountService implements UserDetailsService {
 
     private final AccountRepository accountRepository;
+    private final AccountQueryRepository accountQueryRepository;
     private final OAuthAccountRepository oAuthAccountRepository;
-    private final RoleRepository roleRepository;
     private final BCryptPasswordEncoder passwordEncoder;
-    private final RegisterEmailService registerEmailService;
-    private final MemberRepository memberRepository;
-    private final AdminAccountSearchRepository accountSearchRepository;
 
-    private final BannedIdService bannedIdService;
-    private final BannedNicknameService bannedNicknameService;
-    private final PostRepository postRepository;
-    private final CommentRepository commentRepository;
-    private final BookmarkRepository bookmarkRepository;
-    private final KumohEmailService kumohEmailService;
-
-    public boolean isExist(String loginId){
-        return accountRepository.existsByLoginId(loginId);
+    public boolean isExistLoginId(String loginId) {
+        return accountQueryRepository.existsByLoginId(loginId);
     }
-    public boolean isExistByNickname(String nickname) {
-        return accountRepository.existsByNickname(nickname);
+    public boolean isExistNickname(String nickname) {
+        return accountQueryRepository.existsByNickname(nickname);
     }
     public boolean isOAuthUser(String loginId) {
         Account account = accountRepository.findByLoginId(loginId)
@@ -76,148 +48,113 @@ public class AccountService implements UserDetailsService {
         return account.getClass() == OAuthAccount.class;
     }
 
-    private Role mapEmailToRole(String email) {
-
-        if(registerEmailService.isKumohMail(email)){
-            return roleRepository.findByName("ROLE_KUMOH").orElseThrow();
-        } else if(registerEmailService.isEmail(email)) {
-            return roleRepository.findByName("ROLE_USER").orElseThrow();
-        }
-
-        throw new CustomIllegalArgumentException(ErrorCode.INVALID_MAIL,null);
+    public boolean matchPassword(Account account, String password) {
+       return passwordEncoder.matches(password,account.getPassword());
     }
+
     @Transactional
-    public OAuthAccount register(OAuth2RegisterRequest oAuth2RegisterRequest) {
-        String email = oAuth2RegisterRequest.getEmail();
+    public Long createOAuthAccount(String email,String name,String nickname,String password,List<Role> roles,String sub,String provider) {
 
-        if(isExist(email)) throw new CustomIllegalArgumentException(ErrorCode.USER_ALREADY_EXIST, null);
-        if(!bannedIdService.possibleId(email)) throw new CustomIllegalArgumentException(ErrorCode.BANNED_ID,null);
-        if(!bannedNicknameService.possibleNickname(oAuth2RegisterRequest.getNickname())) throw new CustomIllegalArgumentException(ErrorCode.BANNED_NICKNAME,null);
-
-        Role role = mapEmailToRole(email);
-        List<Role> authorities = List.of(role);
+        List<RoleAccount> roleAccounts = roles.stream()
+                .map((role) -> new RoleAccount(null,role))
+                .collect(Collectors.toList());
 
         OAuthAccount oAuthAccount = OAuthAccount.builder()
                 .loginId(email)
-                .name(oAuth2RegisterRequest.getName())
-                .nickname(oAuth2RegisterRequest.getNickname())
-                .password(passwordEncoder.encode(oAuth2RegisterRequest.getPassword()))
-                .authorities(authorities)
-                .sub(oAuth2RegisterRequest.getSubject())
-                .provider(oAuth2RegisterRequest.getProvider())
+                .name(name)
+                .nickname(nickname)
+                .password(passwordEncoder.encode(password))
+                .roleAccounts(roleAccounts)
+                .sub(sub)
+                .provider(provider)
+                .createdAt(LocalDateTime.now())
+                .status(Status.NORMAL)
                 .build();
 
         oAuthAccountRepository.save(oAuthAccount);
 
-        Member member = Member.builder()
-                .name(oAuthAccount.getNickname())
-                .account(oAuthAccount)
+        return oAuthAccount.getAccountId();
+    }
+
+    @Transactional
+    public Long createFormAccount(String email,String name,String nickname,String password,List<Role> roles) {
+
+        List<RoleAccount> roleAccounts = roles.stream()
+                .map((role) -> new RoleAccount(null, role))
+                .collect(Collectors.toList());
+
+        FormAccount formAccount = FormAccount.builder()
+                .loginId(email)
+                .name(name)
+                .nickname(nickname)
+                .password(passwordEncoder.encode(password))
+                .roleAccounts(roleAccounts)
+                .createdAt(LocalDateTime.now())
+                .status(Status.NORMAL)
                 .build();
 
-        memberRepository.save(member);
-
-        return oAuthAccount;
+        accountRepository.save(formAccount);
+        return formAccount.getAccountId();
     }
+    public Account findById(Long accountId) {
+        return accountRepository.findById(accountId)
+                .orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.USER_NOT_FOUND,null));
+    }
+
+    public Account findByLoginId(String loginId) {
+        return accountRepository.findByLoginId(loginId)
+                .orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.USER_NOT_FOUND,null));
+    }
+
+    public Optional<OAuthAccount> findOAuthAccountById(Long accountId) {
+        return oAuthAccountRepository.findById(accountId);
+    }
+
     @Transactional
-    public Account register(FormRegisterRequest formRegisterRequest) {
-
-        String id = formRegisterRequest.getId();
-
-        if(isExist(id)) throw new CustomIllegalArgumentException(ErrorCode.USER_ALREADY_EXIST,null);
-        if(!bannedIdService.possibleId(id)) throw new CustomIllegalArgumentException(ErrorCode.BANNED_ID,null);
-        if(!bannedNicknameService.possibleNickname(formRegisterRequest.getNickname())) throw new CustomIllegalArgumentException(ErrorCode.BANNED_NICKNAME,null);
-
-        Role role = mapEmailToRole(id);
-        List<Role> authorities = List.of(role);
+    public Long createAccount(String loginId, String password,String name, String nickname,List<Role> roles) {
+        List<RoleAccount> roleAccounts = roles.stream()
+                .map((role) -> new RoleAccount(null, role))
+                .collect(Collectors.toList());
 
         FormAccount account = FormAccount.builder()
-                .loginId(id)
-                .name(formRegisterRequest.getName())
-                .nickname(formRegisterRequest.getNickname())
-                .password(passwordEncoder.encode(formRegisterRequest.getPassword()))
-                .authorities(authorities)
+                .loginId(loginId)
+                .password(passwordEncoder.encode(password))
+                .name(name)
+                .nickname(nickname)
+                .roleAccounts(roleAccounts)
+                .status(Status.NORMAL)
+                .createdAt(LocalDateTime.now())
                 .build();
 
         accountRepository.save(account);
-
-        Member member = Member.builder()
-                .name(account.getNickname())
-                .account(account)
-                .build();
-
-        memberRepository.save(member);
-        return account;
-    }
-    public Page<RetrieveAccountResponse> findAllAccount(AdminRetrieveAccountCondition condition, Pageable pageable) {
-        return accountSearchRepository.findAllAccount(condition, pageable);
-    }
-    public RetrieveAccountResponse findAccount(Long accountId) {
-        Account account = accountRepository.findById(accountId).orElseThrow();
-        return RetrieveAccountResponse.toDTO(account);
-    }
-    private List<Role> convertAuthorities(List<String> authorities) {
-        List<Role> convertedAuthorities = roleRepository.findByNameIn(authorities);
-
-        if(authorities.size() != convertedAuthorities.size()) {
-            throw new CustomIllegalArgumentException(ErrorCode.ROLE_NOT_FOUND,null);
-        }
-
-        return convertedAuthorities;
+        return account.getAccountId();
     }
     @Transactional
-    public CreateAccountResponse createAccount(CreateAccountRequest request) {
-
-        String id = request.getId();
-        String nickname = request.getNickname();
-        if(isExist(id))  throw new CustomIllegalArgumentException(ErrorCode.USER_ALREADY_EXIST,null);
-        if(!bannedIdService.possibleId(id)) throw new CustomIllegalArgumentException(ErrorCode.BANNED_ID,null);
-        if(!bannedNicknameService.possibleNickname(nickname)) throw new CustomIllegalArgumentException(ErrorCode.BANNED_NICKNAME,null);
-
-        FormAccount account = FormAccount.builder()
-                .loginId(id)
-                .password(passwordEncoder.encode(request.getPassword()))
-                .nickname(nickname)
-                .name(request.getName())
-                .authorities(convertAuthorities(request.getAuthorities()))
-                .build();
-
-        Account savedAccount = accountRepository.save(account);
-
-        Member member = Member.builder()
-                .name(account.getNickname())
-                .account(account)
-                .build();
-
-        memberRepository.save(member);
-
-        return CreateAccountResponse.toDTO(savedAccount);
-    }
-    @Transactional
-    public UpdateAccountResponse updateAccount(UpdateAccountRequest request, Long accountId) {
+    public Long updateAccount(Long accountId,String loginId, String password, String name, String nickname, List<Role> roles) {
 
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.USER_NOT_FOUND,null));
 
-        String id = request.getId();
-        String nickname = request.getNickname();
+        List<RoleAccount> roleAccounts = roles.stream()
+                .map((role) -> new RoleAccount(account,role))
+                .collect(Collectors.toList());
 
-        //TODO : 자기 자신 빼고 이미 존재하는지 확인
-        if(!bannedIdService.possibleId(id)) throw new CustomIllegalArgumentException(ErrorCode.BANNED_ID,null);
-        if(!bannedNicknameService.possibleNickname(nickname)) throw new CustomIllegalArgumentException(ErrorCode.BANNED_NICKNAME,null);
+        String encodedPassword = passwordEncoder.encode(password);
 
-        Account update = account.update(id,
-                passwordEncoder.encode(request.getPassword()),
-                request.getName(),
+        account.update(
+                loginId,
+                encodedPassword,
+                name,
                 nickname,
-                convertAuthorities(request.getAuthorities()));
+                roleAccounts);
 
-        return UpdateAccountResponse.toDTO(update);
+        return account.getAccountId();
     }
 
     @Transactional
-    public DeleteAccountResponse deleteAccount(Long accountId) {
-
-        Account account = accountRepository.findById(accountId).orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
+    public void deleteAccount(Long accountId) {
+        Account account = accountRepository.findById(accountId)
+                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
 
         if(isOAuthUser(account.getLoginId())) {
             OAuthAccount oAuthAccount = oAuthAccountRepository.findByLoginId(account.getLoginId())
@@ -227,25 +164,6 @@ public class AccountService implements UserDetailsService {
         }
 
         account.delete(true);
-
-        List<Post> writePost = postRepository.findByAccountId(accountId);
-
-        for (Post post : writePost) {
-            post.delete(true);
-        }
-
-        List<Comment> writeComment = commentRepository.findCommentsByAccountId(accountId);
-
-        for (Comment comment : writeComment) {
-            comment.delete(true);
-        }
-
-        List<Long> bookmarkIds = bookmarkRepository.findBookmarkByAccountId(accountId)
-                .stream().map(Bookmark::getBookmarkId)
-                .collect(Collectors.toList());
-        bookmarkRepository.deleteAllByIdInBatch(bookmarkIds);
-
-        return DeleteAccountResponse.toDTO(account);
     }
     
     @Override
@@ -256,99 +174,18 @@ public class AccountService implements UserDetailsService {
     }
 
     @Transactional
-    public ResetPasswordResponse resetPassword(ResetPasswordRequest resetPasswordRequest) {
-        String email = resetPasswordRequest.getEmail();
-        String newPassword = resetPasswordRequest.getPassword();
-        Account account = accountRepository.findByLoginId(email)
+    public Long resetPassword(String loginId, String newPassword) {
+        Account account = accountRepository.findByLoginId(loginId)
                 .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
 
-        if(account == null) {
-            throw new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null);
-        }
+        changePassword(account,newPassword);
 
+        return account.getAccountId();
+    }
+
+    @Transactional
+    public void changePassword(Account account, String newPassword) {
         account.changePassword(passwordEncoder.encode(newPassword));
-
-        return ResetPasswordResponse.toDTO(account);
     }
 
-    @Transactional
-    public void changePassword(PasswordChangeRequest request) {
-        String loginId = SecurityUtils.getLoginId();
-        Account account = accountRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
-
-        if(!passwordEncoder.matches(request.getNowPassword(),account.getPassword())){
-            throw new CustomIllegalArgumentException(ErrorCode.PASSWORD_INCORRECT,null);
-        }
-
-        account.changePassword(passwordEncoder.encode(request.getNewPassword()));
-
-    }
-
-    @Transactional
-    public KumohAuthResponse grantKumohAuth(KumohAuthRequest kumohAuthRequest) {
-        String email = kumohAuthRequest.getEmail();
-        String loginId = SecurityUtils.getLoginId();
-
-        if(loginId == null)
-            throw new CustomAuthenticationException(ErrorCode.NOT_LOGIN,null);
-        if(!kumohEmailService.isConfirmed(email))
-            throw new CustomIllegalArgumentException(ErrorCode.EMAIL_NOT_FOUNT,null);
-
-        Account account = accountRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
-
-        List<Role> authorities = account.getAuthorities();
-
-        boolean flag = false;
-        for (Role authority : authorities) {
-            flag |= authority.getAuthority().equals(Role.ROLE_KUMOH);
-        }
-
-        if(!flag) {
-            Role kumoh = roleRepository.findByName(Role.ROLE_KUMOH).get();
-            authorities.add(kumoh);
-        }
-
-        return KumohAuthResponse.toDTO(account);
-    }
-
-    public MyInfoResponse findMyInfo(String loginId) {
-        Account account = accountRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
-
-        return MyInfoResponse.toDTO(account.getLoginId(),account.getNickname(),account.getAuthorities().stream()
-                .map(Role::getAuthority)
-                .collect(Collectors.toList()));
-    }
-
-    @Transactional
-    public Account changeNickname(String loginId,String nickname) {
-        Account account = accountRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND, null));
-
-        account.changeNickname(nickname);
-
-        return account;
-    }
-
-    public Page<RetrieveAccountResponse> findDeletedAccount(Pageable pageable) {
-        return accountSearchRepository.findDeletedAccount(pageable);
-    }
-
-    public void deleteBulkAccount(List<Long> accountIds, boolean isPermanent) {
-        List<Account> accounts = accountRepository.findAllById(accountIds);
-
-        for (Account account : accounts) {
-            account.delete(isPermanent);
-        }
-    }
-
-    public void restoreBulkAccount(List<Long> accountIds) {
-        List<Account> accounts = accountRepository.findAllById(accountIds);
-
-        for (Account account : accounts) {
-            account.restore();
-        }
-    }
 }

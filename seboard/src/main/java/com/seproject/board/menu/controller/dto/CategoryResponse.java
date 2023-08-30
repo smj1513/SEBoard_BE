@@ -25,7 +25,7 @@ public class CategoryResponse {
         this.menuId = menu.getMenuId();
         this.name = menu.getName();
 
-        if(menu.getClass()== ExternalSiteMenu.class){ //TODO : 이게 맞나?
+        if(menu.getClass()== ExternalSiteMenu.class){
             this.externalUrl = menu.getUrlInfo();
         }else{
             this.urlId = menu.getUrlInfo();

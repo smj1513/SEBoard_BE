@@ -26,6 +26,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 import static com.seproject.board.comment.application.dto.CommentCommand.*;
 import static com.seproject.board.common.controller.dto.MessageResponse.*;
@@ -149,14 +150,15 @@ public class PostController {
             @PathVariable Long postId,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "25") Integer perPage) {
-        String loginId = SecurityUtils.getLoginId();
 
+        //TODO: body에 post password 추가
+        String password = UUID.randomUUID().toString();
         CommentListResponse commentListResponse = commentAppService.retrieveCommentList(
                 CommentListFindCommand.builder()
                         .postId(postId)
+                        .password(password)
                         .page(page)
                         .perPage(perPage)
-                        .loginId(loginId)
                         .build()
         );
 

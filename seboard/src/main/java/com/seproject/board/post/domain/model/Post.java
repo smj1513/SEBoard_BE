@@ -63,6 +63,8 @@ public class Post {
         return author.isOwnAccountId(accountId);
     }
 
+
+
     public Anonymous createAnonymous(Account account) {
         return Anonymous.builder()
                 .name(String.format("익명%d", ++anonymousCount))

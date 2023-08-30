@@ -21,8 +21,7 @@ public class Role implements GrantedAuthority {
     public static final String ROLE_KUMOH = "ROLE_KUMOH";
 
     private static final List<String> IMMUTABLE_ROLES = List.of(ROLE_ADMIN,ROLE_USER,ROLE_KUMOH);
-    @Id
-    @GeneratedValue
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roleId;
 
     @Column(nullable=false, unique=true)

@@ -1,10 +1,11 @@
 package com.seproject.board.menu.domain;
 
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 import org.apache.commons.lang3.RandomStringUtils;
 
-@SuperBuilder
+import javax.persistence.Entity;
+
+@Entity
 @NoArgsConstructor
 public abstract class InternalSiteMenu extends Menu {
 

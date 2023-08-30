@@ -4,7 +4,9 @@ import com.seproject.board.common.domain.Report;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ReportRepository extends JpaRepository<Report, Long> {
@@ -19,7 +21,11 @@ public interface ReportRepository extends JpaRepository<Report, Long> {
     @Query("delete Report r where r.targetId = :postId and r.reportType = 'POST'")
     void deleteAllByPostId(Long postId);
 
-    @Modifying
+    @Modifying //N+1
     @Query("delete Report r where r.targetId = :commentId and r.reportType = 'COMMENT'")
-    void deleteAllByCommentId(Long commentId);
+    void deleteAllByCommentId(@Param("commentId") Long commentId);
+
+    @Modifying
+    @Query("delete Report r where r.targetId in :commentIds and r.reportType = 'COMMENT'")
+    void deleteAllByCommentId(@Param("commentIds") List<Long> commentIds);
 }

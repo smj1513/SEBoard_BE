@@ -1,12 +1,14 @@
 package com.seproject.board.menu.domain;
 
+import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.CustomIllegalArgumentException;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 import javax.persistence.DiscriminatorValue;
 import javax.persistence.Entity;
 
-@SuperBuilder
 @Entity
 @NoArgsConstructor
 @DiscriminatorValue("BOARD")
@@ -16,7 +18,7 @@ public class BoardMenu extends InternalSiteMenu {
         super(categoryId, superMenu, name, description, categoryPathId);
 
         if(getDepth() > 2){
-            throw new IllegalArgumentException();
+            throw new CustomIllegalArgumentException(ErrorCode.MAX_DEPTH,null);
         }
     }
 }

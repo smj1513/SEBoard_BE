@@ -1,13 +1,18 @@
 package com.seproject.account.account.domain;
 
 import com.seproject.account.role.domain.Role;
+import com.seproject.account.role.domain.RoleAccount;
 import com.seproject.board.common.Status;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @NoArgsConstructor
@@ -24,39 +29,26 @@ public abstract class Account implements UserDetails {
     protected String name;
     protected String nickname;
     protected String password;
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(
-            name="authorities",
-            joinColumns={@JoinColumn(name="account_id", referencedColumnName="accountId")},
-            inverseJoinColumns={@JoinColumn(name="role_id", referencedColumnName="roleId")})
-    protected List<Role> authorities;
+
+    @OneToMany(mappedBy = "account", fetch = FetchType.LAZY,cascade = CascadeType.ALL,orphanRemoval = true)
+    protected List<RoleAccount> roleAccounts = new ArrayList<>();
     protected LocalDateTime createdAt;
 
     @Enumerated(EnumType.STRING)
     protected Status status = Status.NORMAL;
 
-//    @Builder
-//    public Account(Long accountId, String loginId,
-//                   String name, String nickname,
-//                   String password, List<Role> authorities) {
-//        this.accountId = accountId;
-//        this.loginId = loginId;
-//        this.name = name;
-//        this.nickname = nickname;
-//        this.password = password;
-//        this.authorities = authorities;
-//        this.createdAt = LocalDateTime.now();
-//        this.isDeleted = false;
-//    }
-
-    public Account update(String loginId,String password,String name,String nickname,List<Role> authorities) {
+    public void update(String loginId,String password,String name,String nickname,List<RoleAccount> roleAccounts) {
         this.loginId = loginId;
         this.password = password;
         this.name = name;
         this.nickname = nickname;
-        this.authorities = authorities;
+        this.roleAccounts.clear();
+        this.roleAccounts.addAll(roleAccounts);
+    }
 
-        return this;
+    public void addRoleAccount(RoleAccount roleAccount) {
+        this.roleAccounts.add(roleAccount);
+        roleAccount.setAccount(this);
     }
 
     public String changePassword(String password) {
@@ -81,6 +73,10 @@ public abstract class Account implements UserDetails {
         return loginId;
     }
 
+    public List<Role> getRoles() {
+        return roleAccounts.stream().map(RoleAccount::getRole).collect(Collectors.toList());
+    }
+
     @Override
     public boolean isAccountNonExpired() {
         return true;
@@ -99,6 +95,11 @@ public abstract class Account implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return getRoles();
     }
 
     public void restore() {

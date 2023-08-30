@@ -15,7 +15,7 @@ import javax.persistence.Table;
 public class Anonymous extends BoardUser {
     @Override
     public String getLoginId(){
-        return null;
+        return null; //TODO : UUID
     }
 
     @Override
