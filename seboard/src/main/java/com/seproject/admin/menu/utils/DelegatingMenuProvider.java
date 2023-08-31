@@ -3,12 +3,11 @@ package com.seproject.admin.menu.utils;
 import com.seproject.account.authorization.service.AuthorizationService;
 import com.seproject.account.role.service.RoleService;
 import com.seproject.admin.menu.controller.dto.MenuDTO;
-import com.seproject.admin.menu.service.MenuService;
+import com.seproject.admin.menu.service.AdminMenuService;
 import com.seproject.board.menu.domain.Menu;
+import com.seproject.board.menu.service.MenuService;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -18,13 +17,14 @@ public class DelegatingMenuProvider extends AbstractMenuProvider {
 
     private final List<AbstractMenuProvider> providers;
 
-    public DelegatingMenuProvider(MenuService menuService, RoleService roleService, AuthorizationService authorizationService) {
-        super(menuService,roleService,authorizationService);
+    public DelegatingMenuProvider(AdminMenuService adminMenuService, MenuService menuService, RoleService roleService, AuthorizationService authorizationService) {
+
+        super(adminMenuService, menuService, roleService, authorizationService);
         providers = List.of(
-                new CategoryProvider(menuService,roleService,authorizationService),
-                new BoardMenuProvider(menuService,roleService,authorizationService),
-                new ExternalSiteMenuProvider(menuService,roleService,authorizationService),
-                new MenuProvider(menuService,roleService,authorizationService)
+                new CategoryProvider(adminMenuService,menuService,roleService,authorizationService),
+                new BoardMenuProvider(adminMenuService,menuService,roleService,authorizationService),
+                new ExternalSiteMenuProvider(adminMenuService,menuService,roleService,authorizationService),
+                new MenuProvider(adminMenuService,menuService,roleService,authorizationService)
         );
     }
 

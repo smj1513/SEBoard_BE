@@ -2,11 +2,12 @@ package com.seproject.admin.bulletin.application;
 
 import com.seproject.admin.bulletin.controller.dto.MainPageDTO.InternalSiteMenuResponse;
 import com.seproject.admin.bulletin.controller.dto.MainPageDTO.MainPageMenuResponse;
-import com.seproject.admin.menu.service.MenuService;
+import com.seproject.admin.menu.service.AdminMenuService;
 import com.seproject.board.bulletin.domain.model.MainPageMenu;
 import com.seproject.board.bulletin.service.MainPageService;
 import com.seproject.board.menu.domain.InternalSiteMenu;
 import com.seproject.board.menu.domain.Menu;
+import com.seproject.board.menu.service.MenuService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

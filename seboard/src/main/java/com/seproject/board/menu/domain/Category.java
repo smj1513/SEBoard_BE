@@ -1,6 +1,6 @@
 package com.seproject.board.menu.domain;
 
-import com.seproject.board.menu.service.CategoryService;
+import com.seproject.board.menu.service.MenuService;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
 import lombok.NoArgsConstructor;
@@ -21,7 +21,7 @@ public class Category extends BoardMenu {
     }
 
     @Override
-    public boolean isRemovable(CategoryService categoryService) {
+    public boolean isRemovable(MenuService categoryService) {
         return !categoryService.hasPost(getMenuId());
     }
 }

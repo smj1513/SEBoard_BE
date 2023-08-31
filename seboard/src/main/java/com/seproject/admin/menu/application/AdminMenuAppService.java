@@ -1,8 +1,9 @@
 package com.seproject.admin.menu.application;
 
-import com.seproject.admin.menu.service.MenuService;
+import com.seproject.admin.menu.service.AdminMenuService;
 import com.seproject.admin.menu.utils.DelegatingMenuProvider;
 import com.seproject.board.menu.domain.Menu;
+import com.seproject.board.menu.service.MenuService;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import static com.seproject.admin.menu.controller.dto.MenuDTO.*;
 @Service
 public class AdminMenuAppService {
 
+    private final AdminMenuService adminMenuService;
     private final MenuService menuService;
     private final DelegatingMenuProvider menuProvider;
 
@@ -59,13 +61,13 @@ public class AdminMenuAppService {
 
     @Transactional
     public void delete(Long menuId) {
-        menuService.delete(menuId);
+        adminMenuService.delete(menuId);
     }
 
 
     @Transactional
     public void migrateCategory(Long fromMenuId, Long toMenuId){
-        menuService.changeSuperCategory(fromMenuId,toMenuId);
+        adminMenuService.changeSuperCategory(fromMenuId,toMenuId);
     }
 
     @Transactional

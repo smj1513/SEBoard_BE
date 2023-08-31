@@ -4,12 +4,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seproject.account.authorization.domain.MenuAuthorization;
 import com.seproject.account.role.domain.Role;
 import com.seproject.admin.domain.SelectOption;
-import com.seproject.admin.menu.application.AdminMenuAppService;
-import com.seproject.admin.menu.service.MenuService;
+import com.seproject.admin.menu.service.AdminMenuService;
 import com.seproject.board.menu.domain.BoardMenu;
 import com.seproject.board.menu.domain.Category;
 import com.seproject.board.menu.domain.ExternalSiteMenu;
 import com.seproject.board.menu.domain.Menu;
+import com.seproject.board.menu.service.MenuService;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
 import com.seproject.global.MenuSetup;
@@ -44,6 +44,7 @@ class AdminMenuControllerTest {
     @Autowired RoleSetup roleSetup;
     @Autowired ObjectMapper objectMapper;
     @Autowired EntityManager em;
+    @Autowired AdminMenuService adminMenuService;
     @Autowired MenuService menuService;
 
     @Value("${jwt.test}") String accessToken;
@@ -800,14 +801,5 @@ class AdminMenuControllerTest {
     }
     
     
-    //TODO : migrate 테스트 
-
-
-
-
-
-
-
-
-
+    //TODO : migrate 테스트
 }

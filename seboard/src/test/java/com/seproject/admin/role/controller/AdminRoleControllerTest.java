@@ -7,10 +7,11 @@ import com.seproject.account.role.service.RoleService;
 import com.seproject.admin.domain.SelectOption;
 import com.seproject.admin.menu.application.AdminMenuAppService;
 import com.seproject.admin.menu.controller.dto.MenuDTO;
-import com.seproject.admin.menu.service.MenuService;
+import com.seproject.admin.menu.service.AdminMenuService;
 import com.seproject.admin.menu.utils.MenuRequestBuilder;
 import com.seproject.admin.role.controller.dto.RoleDTO;
 import com.seproject.board.menu.domain.Menu;
+import com.seproject.board.menu.service.MenuService;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
 import com.seproject.global.AccountSetup;
@@ -50,7 +51,9 @@ class AdminRoleControllerTest {
     @Autowired RoleService roleService;
     @Autowired MenuSetup menuSetup;
     @Autowired AdminMenuAppService menuAppService;
-    @Autowired MenuService menuService;
+    @Autowired AdminMenuService adminMenuService;
+    @Autowired
+    MenuService menuService;
 
     @Value("${jwt.test}") String accessToken;
 
