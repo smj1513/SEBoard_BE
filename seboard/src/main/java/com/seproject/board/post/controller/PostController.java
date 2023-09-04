@@ -45,7 +45,8 @@ public class PostController {
     private final CommentAppService commentAppService;
 
     @PostMapping("/{postId}/auth")
-    public ResponseEntity<?> retrievePrivacyPost(@RequestBody RetrievePrivacyPostRequest request, @PathVariable Long postId){
+    public ResponseEntity<?> retrievePrivacyPost(@RequestBody RetrievePrivacyPostRequest request,
+                                                 @PathVariable Long postId){
 
         RetrievePostDetailResponse privacyPost = postSearchAppService.findPrivacyPost(postId, request.getPassword());
         return ResponseEntity.ok(privacyPost);

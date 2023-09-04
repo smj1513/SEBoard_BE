@@ -8,6 +8,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
@@ -18,6 +20,10 @@ public class PostService {
     public Post findById(Long id) {
         return postRepository.findById(id)
                 .orElseThrow(()->new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
+    }
 
+    public List<Post> findAllByIds(List<Long> ids) {
+        List<Post> allById = postRepository.findAllById(ids);
+        return allById;
     }
 }

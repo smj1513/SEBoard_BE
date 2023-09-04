@@ -42,14 +42,12 @@ import java.util.*;
 @Transactional
 public class PostAppService {
     private final PostRepository postRepository;
-    private final PostSearchRepository postSearchRepository;
+
     private final CategoryRepository categoryRepository;
     private final AnonymousRepository anonymousRepository;
     private final MemberRepository memberRepository;
     private final FileMetaDataRepository fileMetaDataRepository;
-    private final CommentRepository commentRepository;
-    private final BookmarkRepository bookmarkRepository;
-    private final FileAppService fileAppService;
+
     private final AccountRepository accountRepository;
     private final FileRepository fileRepository;
     private final FileConfigurationRepository fileConfigurationRepository;

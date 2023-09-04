@@ -1,7 +1,6 @@
-package com.seproject.board.post.controller.dto;
+package com.seproject.admin.post.controller.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.seproject.board.post.controller.dto.PostResponse;
 import com.seproject.member.controller.dto.UserResponse;
 import com.seproject.board.menu.domain.Menu;
 import com.seproject.board.common.Status;
@@ -11,9 +10,9 @@ import lombok.Data;
 import java.time.LocalDateTime;
 
 @Data
-public class AdminPostResponse {
+public class PostResponse {
     @Data
-    public static class MenuResponse{
+    public static class MenuResponse {
         private Long menuId;
         private String name;
         private String urlId;
@@ -26,10 +25,10 @@ public class AdminPostResponse {
     }
 
     @Data
-    public static class AdminPostRetrieveResponse{
+    public static class PostRetrieveResponse {
         private Long postId;
         private String title;
-        private PostResponse.PostDetailCategoryResponse category;
+        private com.seproject.board.post.controller.dto.PostResponse.PostDetailCategoryResponse category;
         private MenuResponse menu;
         private UserResponse author;
         private Integer views;
@@ -39,10 +38,11 @@ public class AdminPostResponse {
         @JsonProperty("isReported")
         private boolean isReported;
         private String exposeOption;
-        public AdminPostRetrieveResponse(Post post){
+
+        public PostRetrieveResponse(Post post){
             this.postId = post.getPostId();
             this.title = post.getTitle();
-            this.category = new PostResponse.PostDetailCategoryResponse(post.getCategory());
+            this.category = new com.seproject.board.post.controller.dto.PostResponse.PostDetailCategoryResponse(post.getCategory());
             this.menu = new MenuResponse(post.getCategory().getSuperMenu());
             this.author = new UserResponse(post.getAuthor());
             this.views = post.getViews();
@@ -56,10 +56,10 @@ public class AdminPostResponse {
     }
 
     @Data
-    public static class AdminDeletedPostResponse{
+    public static class DeletedPostResponse {
         private Long postId;
         private String title;
-        private PostResponse.PostDetailCategoryResponse category;
+        private com.seproject.board.post.controller.dto.PostResponse.PostDetailCategoryResponse category;
         private MenuResponse menu;
         private UserResponse author;
         private Integer views;
@@ -67,10 +67,10 @@ public class AdminPostResponse {
         private LocalDateTime modifiedAt;
         private boolean hasAttachment;
         private String exposeOption;
-        public AdminDeletedPostResponse(Post post){
+        public DeletedPostResponse(Post post){
             this.postId = post.getPostId();
             this.title = post.getTitle();
-            this.category = new PostResponse.PostDetailCategoryResponse(post.getCategory());
+            this.category = new com.seproject.board.post.controller.dto.PostResponse.PostDetailCategoryResponse(post.getCategory());
             this.menu = new MenuResponse(post.getCategory().getSuperMenu());
             this.author = new UserResponse(post.getAuthor());
             this.views = post.getViews();

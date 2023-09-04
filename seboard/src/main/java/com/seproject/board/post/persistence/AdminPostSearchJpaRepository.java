@@ -3,9 +3,9 @@ package com.seproject.board.post.persistence;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.seproject.board.post.controller.dto.AdminPostRequest.AdminPostRetrieveCondition;
-import com.seproject.board.post.controller.dto.AdminPostResponse;
-import com.seproject.board.post.controller.dto.AdminPostResponse.AdminPostRetrieveResponse;
+import com.seproject.admin.post.controller.dto.PostRequest.AdminPostRetrieveCondition;
+import com.seproject.admin.post.controller.dto.PostResponse;
+import com.seproject.admin.post.controller.dto.PostResponse.PostRetrieveResponse;
 import com.seproject.board.post.domain.repository.AdminPostSearchRepository;
 import com.seproject.board.post.controller.PostSearchOptions;
 import com.seproject.board.common.Status;
@@ -33,10 +33,10 @@ public class AdminPostSearchJpaRepository implements AdminPostSearchRepository {
     }
 
     @Override
-    public Page<AdminPostRetrieveResponse> findPostListByCondition(AdminPostRetrieveCondition condition, Pageable pageable) {
-        List<AdminPostRetrieveResponse> contents = queryFactory
+    public Page<PostRetrieveResponse> findPostListByCondition(AdminPostRetrieveCondition condition, Pageable pageable) {
+        List<PostRetrieveResponse> contents = queryFactory
                 .select(Projections.constructor(
-                        AdminPostRetrieveResponse.class,
+                        PostRetrieveResponse.class,
                         post
                 ))
                 .from(post)
@@ -70,10 +70,10 @@ public class AdminPostSearchJpaRepository implements AdminPostSearchRepository {
     }
 
     @Override
-    public Page<AdminPostResponse.AdminDeletedPostResponse> findDeletedPostList(Pageable pageable) {
-        List<AdminPostResponse.AdminDeletedPostResponse> content = queryFactory
+    public Page<PostResponse.DeletedPostResponse> findDeletedPostList(Pageable pageable) {
+        List<PostResponse.DeletedPostResponse> content = queryFactory
                 .select(Projections.constructor(
-                        AdminPostResponse.AdminDeletedPostResponse.class,
+                        PostResponse.DeletedPostResponse.class,
                         post
                 ))
                 .from(post)

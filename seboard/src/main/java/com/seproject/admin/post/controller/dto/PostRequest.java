@@ -1,11 +1,11 @@
-package com.seproject.board.post.controller.dto;
+package com.seproject.admin.post.controller.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.List;
 
-public class AdminPostRequest {
+public class PostRequest {
     @Data
     public static class AdminPostRetrieveCondition{
         private Long categoryId;
@@ -15,6 +15,7 @@ public class AdminPostRequest {
         private String searchOption;
         private String query;
     }
+
     @Data
     public static class BulkPostRequest {
         private List<Long> postIds;

@@ -1,4 +1,4 @@
-package com.seproject.board.comment.application;
+package com.seproject.board.common.application;
 
 import com.seproject.account.account.domain.Account;
 import com.seproject.account.role.domain.Role;

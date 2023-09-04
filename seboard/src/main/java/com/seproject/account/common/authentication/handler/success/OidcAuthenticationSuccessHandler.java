@@ -28,7 +28,6 @@ public class OidcAuthenticationSuccessHandler implements AuthenticationSuccessHa
 
     private static final String REDIRECT_URL = "http://localhost:3000";
 
-    private final JwtProvider jwtProvider;
     private final OAuthAccountRepository oAuthAccountRepository;
     private final TemporalUserInfoRepository temporalUserInfoRepository;
     private final UserTokenRepository userTokenRepository;
