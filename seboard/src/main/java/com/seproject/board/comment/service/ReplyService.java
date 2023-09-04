@@ -3,7 +3,9 @@ package com.seproject.board.comment.service;
 import com.seproject.board.comment.domain.model.Comment;
 import com.seproject.board.comment.domain.model.Reply;
 import com.seproject.board.comment.domain.repository.ReplyRepository;
+import com.seproject.board.post.domain.model.Post;
 import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.CustomIllegalArgumentException;
 import com.seproject.error.exception.NoSuchResourceException;
 import com.seproject.member.domain.Anonymous;
 import com.seproject.member.domain.BoardUser;
@@ -26,6 +28,23 @@ public class ReplyService {
                             String contents,
                             Comment tagComment,
                             BoardUser member, boolean onlyReadByAuthor) {
+
+        Post superCommentPost = superComment.getPost();
+        Post tagCommentPost = tagComment.getPost();
+
+        if (!superCommentPost.getPostId().equals(tagCommentPost.getPostId()) )
+            throw new CustomIllegalArgumentException(ErrorCode.DIFFERENT_POST_COMMENT,null);
+
+        Comment c = tagComment;
+
+        while (c instanceof Reply) {
+            c = ((Reply) c).getSuperComment();
+        }
+
+        if (!c.getCommentId().equals(superComment.getCommentId())) {
+            throw new CustomIllegalArgumentException(ErrorCode.DIFFERENT_SUPER_COMMENT,null);
+        }
+
         Reply reply = superComment.writeReply(contents, tagComment, member, onlyReadByAuthor);
         replyRepository.save(reply);
 

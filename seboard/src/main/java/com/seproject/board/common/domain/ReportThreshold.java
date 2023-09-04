@@ -1,9 +1,11 @@
 package com.seproject.board.common.domain;
 
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 
+@Getter
 @Entity
 @NoArgsConstructor
 @Table(name = "report_thresholds")

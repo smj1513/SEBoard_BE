@@ -22,39 +22,18 @@ import org.springframework.util.StringUtils;
 
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
-
-import static com.seproject.board.common.utils.AppServiceHelper.findByIdOrThrow;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
 @Service
-public class MenuService {
+public class AdminMenuService {
 
     private final MenuRepository menuRepository;
     private final BoardMenuRepository boardMenuRepository;
     private final CategoryRepository categoryRepository;
     private final ExternalSiteMenuRepository externalSiteMenuRepository;
-
-    public List<Menu> findByIds(List<Long> ids) {
-        return menuRepository.findAllById(ids);
-    }
-    public Menu findById(Long menuId) {
-        return menuRepository.findById(menuId)
-                .orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.NOT_EXIST_MENU, null));
-    }
-
-    public Map<Menu, List<Menu>> findAllMenuTree() {
-        List<Menu> groupMenus = menuRepository.findByDepthWithSuperMenu(1);
-        return groupMenus.stream()
-                .collect(Collectors.groupingBy(Menu::getSuperMenu));
-    }
-
-    public List<Menu> findSubMenu(Long superMenuId) {
-        return menuRepository.findBySuperMenu(superMenuId);
-    }
 
     private void addMenuAuthorization(Menu menu) {
         MenuExposeAuthorization expose = new MenuExposeAuthorization(menu);

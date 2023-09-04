@@ -12,14 +12,14 @@ import java.util.Optional;
 public interface ReportRepository extends JpaRepository<Report, Long> {
 
     @Query("select r from Report r where r.targetId = :postId and r.memberId = :memberId and r.reportType = 'POST'")
-    Optional<Report> findByPostIdAndMemberId(Long postId, Long memberId);
+    Optional<Report> findByPostIdAndMemberId(@Param("postId") Long postId,@Param("memberId") Long memberId);
 
     @Query("select r from Report r where r.targetId = :commentId and r.memberId = :memberId and r.reportType = 'COMMENT'")
-    Optional<Report> findByCommentIdAndMemberId(Long commentId, Long memberId);
+    Optional<Report> findByCommentIdAndMemberId(@Param("commentId") Long commentId,@Param("memberId") Long memberId);
 
     @Modifying
     @Query("delete Report r where r.targetId = :postId and r.reportType = 'POST'")
-    void deleteAllByPostId(Long postId);
+    void deleteAllByPostId(@Param("postId") Long postId);
 
     @Modifying //N+1
     @Query("delete Report r where r.targetId = :commentId and r.reportType = 'COMMENT'")

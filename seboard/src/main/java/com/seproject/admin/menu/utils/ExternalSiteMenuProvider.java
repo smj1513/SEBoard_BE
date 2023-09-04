@@ -6,9 +6,10 @@ import com.seproject.account.role.domain.Role;
 import com.seproject.account.role.service.RoleService;
 import com.seproject.admin.domain.SelectOption;
 import com.seproject.admin.menu.controller.dto.MenuDTO;
-import com.seproject.admin.menu.service.MenuService;
+import com.seproject.admin.menu.service.AdminMenuService;
 import com.seproject.board.menu.domain.ExternalSiteMenu;
 import com.seproject.board.menu.domain.Menu;
+import com.seproject.board.menu.service.MenuService;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
 
@@ -16,8 +17,8 @@ import java.util.List;
 
 public class ExternalSiteMenuProvider extends AbstractMenuProvider {
 
-    public ExternalSiteMenuProvider(MenuService menuService, RoleService roleService, AuthorizationService authorizationService) {
-        super(menuService, roleService, authorizationService);
+    public ExternalSiteMenuProvider(AdminMenuService adminMenuService, MenuService menuService, RoleService roleService, AuthorizationService authorizationService) {
+        super(adminMenuService, menuService, roleService, authorizationService);
     }
 
     @Override
@@ -37,7 +38,7 @@ public class ExternalSiteMenuProvider extends AbstractMenuProvider {
                 superMenu = menuService.findById(request.getSuperCategoryId());
             }
 
-            Long externalSiteMenuId = menuService.createExternalSiteMenu(superMenu,name,description, urlInfo);
+            Long externalSiteMenuId = adminMenuService.createExternalSiteMenu(superMenu,name,description, urlInfo);
 
             MenuDTO.MenuAuthOption expose = request.getExpose();
 

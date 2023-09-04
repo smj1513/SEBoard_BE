@@ -1,7 +1,10 @@
 package com.seproject.board.comment.application;
 
 import com.seproject.account.account.domain.Account;
+import com.seproject.account.role.domain.Role;
 import com.seproject.account.utils.SecurityUtils;
+import com.seproject.board.comment.service.CommentService;
+import com.seproject.board.post.service.PostService;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.DuplicatedReportException;
 import com.seproject.error.exception.InvalidAuthorizationException;
@@ -16,6 +19,7 @@ import com.seproject.board.post.domain.repository.PostRepository;
 import com.seproject.board.common.domain.repository.ReportRepository;
 import com.seproject.board.common.domain.repository.ReportThresholdRepository;
 import com.seproject.member.domain.repository.MemberRepository;
+import com.seproject.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,16 +28,16 @@ import javax.annotation.PostConstruct;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class ReportAppService {
     private final ReportRepository reportRepository;
     private final ReportThresholdRepository reportThresholdRepository;
-    private final MemberRepository memberRepository;
-    private final PostRepository postRepository;
-    private final CommentRepository commentRepository;
+    private final MemberService memberService;
+    private final PostService postService;
+    private final CommentService commentService;
+
     private ReportThreshold postThreshold;
     private ReportThreshold commentThreshold;
-
 
     @PostConstruct
     protected void init(){
@@ -46,15 +50,14 @@ public class ReportAppService {
         );
     }
 
+    @Transactional
     public void reportPost(Long postId) {
         Account account = SecurityUtils.getAccount()
                 .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
 
-        Member member = memberRepository.findByAccountId(account.getAccountId())
-                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_MEMBER));
+        Member member = memberService.findByAccountId(account.getAccountId());
 
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
+        Post post = postService.findById(postId);
 
         // 해당 사용자가 이전에 해당 post를 신고한 적이 있는지 확인
         // 신고한 적이 있다면 Exception 발생
@@ -73,15 +76,14 @@ public class ReportAppService {
         post.increaseReportCount(postThreshold);
     }
 
+    @Transactional
     public void reportComment(Long commentId) {
         Account account = SecurityUtils.getAccount()
                 .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
 
-        Member member = memberRepository.findByAccountId(account.getAccountId())
-                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_MEMBER));
+        Member member = memberService.findByAccountId(account.getAccountId());
 
-        Comment comment = commentRepository.findById(commentId)
-                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_COMMENT));
+        Comment comment = commentService.findById(commentId);
 
         // 해당 사용자가 이전에 해당 post를 신고한 적이 있는지 확인
         // 신고한 적이 있다면 Exception 발생
@@ -100,12 +102,15 @@ public class ReportAppService {
         comment.increaseReportCount(commentThreshold);
     }
 
+    @Transactional //TODO : admin 이동
     public void setReportThreshold(int threshold, String thresholdType) {
         Account account = SecurityUtils.getAccount()
                 .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
 
 
-        boolean isAdmin = account.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+        boolean isAdmin = account.getAuthorities()
+                .stream()
+                .anyMatch(authority -> authority.getAuthority().equals(Role.ROLE_ADMIN));
 
         if(!isAdmin){
             throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);

@@ -10,8 +10,11 @@ import java.util.List;
 public interface MenuRepository extends JpaRepository<Menu, Long> {
     @Query("select m from Menu m where m.depth = :depth order by m.menuId ASC ")
     List<Menu> findByDepth(@Param("depth") int depth);
-    @Query("select m from Menu m where m.superMenu.menuId = :superMenuId order by m.menuId ASC ")
+    @Query("select m from Menu m join fetch m.superMenu sm where sm.menuId = :superMenuId order by m.menuId ASC ")
     List<Menu> findBySuperMenu(@Param("superMenuId") Long superMenuId);
+
+    @Query("select m from Menu m join fetch m.superMenu sm where sm.menuId in :superMenuIds order by m.menuId ASC ")
+    List<Menu> findBySuperMenu(@Param("superMenuIds") List<Long> superMenuIds);
     @Query("select case when count(m) > 0 then true else false end from Menu m where m.superMenu.menuId = :menuId")
     boolean existsSubMenuById(@Param("menuId") Long menuId);
 

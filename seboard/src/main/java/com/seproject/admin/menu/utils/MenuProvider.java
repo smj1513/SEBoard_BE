@@ -1,25 +1,24 @@
 package com.seproject.admin.menu.utils;
 
 import com.seproject.account.authorization.domain.MenuAccessAuthorization;
-import com.seproject.account.authorization.domain.MenuAuthorization;
 import com.seproject.account.authorization.domain.MenuExposeAuthorization;
 import com.seproject.account.authorization.service.AuthorizationService;
 import com.seproject.account.role.domain.Role;
 import com.seproject.account.role.service.RoleService;
 import com.seproject.admin.domain.SelectOption;
 import com.seproject.admin.menu.controller.dto.MenuDTO;
-import com.seproject.admin.menu.service.MenuService;
+import com.seproject.admin.menu.service.AdminMenuService;
 import com.seproject.board.menu.domain.Menu;
+import com.seproject.board.menu.service.MenuService;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class MenuProvider extends AbstractMenuProvider{
 
-    public MenuProvider(MenuService menuService, RoleService roleService, AuthorizationService authorizationService) {
-        super(menuService, roleService, authorizationService);
+    public MenuProvider(AdminMenuService adminMenuService, MenuService menuService, RoleService roleService, AuthorizationService authorizationService) {
+        super(adminMenuService, menuService, roleService, authorizationService);
     }
 
     @Override
@@ -39,7 +38,7 @@ public class MenuProvider extends AbstractMenuProvider{
                 superMenu = menuService.findById(request.getSuperCategoryId());
             }
 
-            Long menuId = menuService.createMenu(superMenu,name,description, urlInfo);
+            Long menuId = adminMenuService.createMenu(superMenu,name,description, urlInfo);
 
             MenuDTO.MenuAuthOption access = request.getAccess();
             MenuDTO.MenuAuthOption expose = request.getExpose();

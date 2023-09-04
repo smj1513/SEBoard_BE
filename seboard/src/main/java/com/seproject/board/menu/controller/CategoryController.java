@@ -20,7 +20,7 @@ public class CategoryController {
     private final CategoryAppService categoryAppService;
 
     @Operation(summary = "메뉴 목록 조회", description = "권한에 따라서 메뉴 목록을 노출한다.")
-    @GetMapping
+    @GetMapping //TODO : 권한별 추가 테스트
     public ResponseEntity<List<CategoryResponse>> retrieveAllMenu(){
         List<CategoryResponse> categoryResponses = categoryAppService.retrieveAllMenu();
         return new ResponseEntity<>(categoryResponses, HttpStatus.OK);

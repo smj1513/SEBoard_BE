@@ -1,10 +1,9 @@
 package com.seproject.board.menu.domain;
 
-import com.seproject.account.authorization.domain.Authorization;
 import com.seproject.account.authorization.utils.AuthorizationProperty;
 import com.seproject.account.role.domain.Role;
 import com.seproject.account.authorization.domain.MenuAuthorization;
-import com.seproject.board.menu.service.CategoryService;
+import com.seproject.board.menu.service.MenuService;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -64,7 +63,7 @@ public class Menu {
         }
     }
 
-    public boolean isRemovable(CategoryService categoryService){
+    public boolean isRemovable(MenuService categoryService){
         return !categoryService.hasSubCategory(menuId);
     }
 

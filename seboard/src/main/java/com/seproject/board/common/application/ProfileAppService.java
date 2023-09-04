@@ -12,33 +12,42 @@ import com.seproject.board.comment.domain.repository.CommentRepository;
 import com.seproject.board.comment.domain.repository.CommentSearchRepository;
 import com.seproject.board.post.domain.repository.BookmarkRepository;
 import com.seproject.board.post.domain.repository.PostSearchRepository;
+import com.seproject.member.domain.Member;
 import com.seproject.member.domain.repository.MemberRepository;
+import com.seproject.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class ProfileAppService {
     private final PostSearchRepository postSearchRepository;
     private final CommentRepository commentRepository;
     private final CommentSearchRepository commentSearchRepository;
     private final BookmarkRepository bookmarkRepository;
-    private final MemberRepository memberRepository;
+
+    private final MemberService memberService;
+
     public ProfileInfoResponse retrieveProfileInfo(String loginId){
         Account account = SecurityUtils.getAccount().orElse(null);
+
         //TODO : SQL 쿼리 변경 필요
         Integer postCount = null;
         Integer commentCount = null;
         Integer bookmarkCount = null;
-        String nickname = memberRepository.findByLoginId(loginId).orElseThrow(()-> new NoSuchResourceException(ErrorCode.NOT_EXIST_MEMBER)).getName();
 
-        if(account != null && account.getLoginId().equals(loginId)){
+        Member member = memberService.findByLoginId(loginId);
+        String nickname = member.getName();
+
+        if(account != null && account.getLoginId().equals(loginId)) {
             postCount = postSearchRepository.countsPostByLoginId(loginId);
             commentCount = commentSearchRepository.countsCommentByLoginId(loginId);
             bookmarkCount = bookmarkRepository.countsBookmarkByLoginId(loginId);
-        }else{
+        } else {
             postCount = postSearchRepository.countsMemberPostByLoginId(loginId);
             commentCount = commentSearchRepository.countsMemberCommentByLoginId(loginId);
         }
@@ -53,12 +62,13 @@ public class ProfileAppService {
 
     public Page<RetrievePostListResponseElement> retrieveMyPost(String loginId, int page, int perPage){
         Account account = SecurityUtils.getAccount().orElse(null);
+
         Page<RetrievePostListResponseElement> posts;
 
         if(account == null || !account.getLoginId().equals(loginId)){
             posts = postSearchRepository.findMemberPostByLoginId(loginId, PageRequest.of(page, perPage));
 
-        }else{
+        } else {
             posts = postSearchRepository.findPostByLoginId(loginId, PageRequest.of(page, perPage));
         }
 
@@ -71,13 +81,12 @@ public class ProfileAppService {
     }
 
     public Page<RetrievePostListResponseElement> retrieveBookmarkPost(String loginId, int page, int perPage){
-        Account account = SecurityUtils.getAccount().orElse(null);
+        Account account = SecurityUtils.getAccount()
+                .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.UNAUTHORIZATION));
 
-        if(account == null){
-            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
-        }
+        Page<RetrievePostListResponseElement> posts = postSearchRepository
+                .findBookmarkPostByLoginId(loginId, PageRequest.of(page, perPage));
 
-        Page<RetrievePostListResponseElement> posts = postSearchRepository.findBookmarkPostByLoginId(loginId, PageRequest.of(page, perPage));
         posts.getContent().forEach(post -> {
             int commentSize = commentRepository.countCommentsByPostId(post.getPostId());
             post.setCommentSize(commentSize);
@@ -90,9 +99,11 @@ public class ProfileAppService {
         Account account = SecurityUtils.getAccount().orElse(null);
 
         if(account == null || !account.getLoginId().equals(loginId)){
-            return commentSearchRepository.findMemberCommentByLoginId(loginId, PageRequest.of(page, perPage));
+            return commentSearchRepository
+                    .findMemberCommentByLoginId(loginId, PageRequest.of(page, perPage));
         }else{
-            return commentSearchRepository.findCommentByLoginId(loginId, PageRequest.of(page, perPage));
+            return commentSearchRepository
+                    .findCommentByLoginId(loginId, PageRequest.of(page, perPage));
         }
     }
 

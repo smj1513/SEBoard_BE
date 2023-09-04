@@ -4,7 +4,6 @@ import com.seproject.account.authorization.domain.MenuAccessAuthorization;
 import com.seproject.account.authorization.domain.MenuEditAuthorization;
 import com.seproject.account.authorization.domain.MenuExposeAuthorization;
 import com.seproject.account.authorization.domain.MenuManageAuthorization;
-import com.seproject.admin.menu.service.MenuService;
 import com.seproject.board.menu.domain.BoardMenu;
 import com.seproject.board.menu.domain.Category;
 import com.seproject.board.menu.domain.ExternalSiteMenu;
