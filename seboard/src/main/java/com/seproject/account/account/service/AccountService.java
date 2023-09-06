@@ -43,7 +43,7 @@ public class AccountService implements UserDetailsService {
         return accountQueryRepository.existsByNickname(nickname);
     }
     public boolean isOAuthUser(String loginId) {
-        Account account = accountRepository.findByLoginId(loginId)
+        Account account = accountRepository.findByLoginIdWithRole(loginId)
                 .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
         return account.getClass() == OAuthAccount.class;
     }
@@ -102,7 +102,7 @@ public class AccountService implements UserDetailsService {
     }
 
     public Account findByLoginId(String loginId) {
-        return accountRepository.findByLoginId(loginId)
+        return accountRepository.findByLoginIdWithRole(loginId)
                 .orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.USER_NOT_FOUND,null));
     }
 
@@ -169,9 +169,6 @@ public class AccountService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        Account account1 = accountRepository.findByLoginId(username)
-                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
-
         Account account = accountRepository.findByLoginIdWithRole(username)
                 .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
         return account;
@@ -179,7 +176,7 @@ public class AccountService implements UserDetailsService {
 
     @Transactional
     public Long resetPassword(String loginId, String newPassword) {
-        Account account = accountRepository.findByLoginId(loginId)
+        Account account = accountRepository.findByLoginIdWithRole(loginId)
                 .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
 
         changePassword(account,newPassword);

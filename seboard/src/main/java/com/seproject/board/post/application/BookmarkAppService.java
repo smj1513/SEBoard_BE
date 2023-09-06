@@ -27,7 +27,7 @@ public class BookmarkAppService {
     private final AccountRepository accountRepository;
 
     public void enrollBookmark(Long postId, String loginId) {
-        Account account = accountRepository.findByLoginId(loginId)
+        Account account = accountRepository.findByLoginIdWithRole(loginId)
                 .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
 
         //TODO : member 없을 때 처리 필요, member 생성 or error?
@@ -49,7 +49,7 @@ public class BookmarkAppService {
     }
 
     public void cancelBookmark(Long postId, String loginId) {
-        Account account = accountRepository.findByLoginId(loginId)
+        Account account = accountRepository.findByLoginIdWithRole(loginId)
                 .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
         //TODO : member 없을 때 처리 필요, member 생성 or error?
         Member member = memberRepository.findByAccountId(account.getAccountId())
