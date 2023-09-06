@@ -68,7 +68,7 @@ public class TokenService {
 
         try {
            String subject = jwtDecoder.getSubject(jwt);
-           Account account = accountRepository.findByLoginId(subject)
+           Account account = accountRepository.findByLoginIdWithRole(subject)
                    .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
 
            Collection<? extends GrantedAuthority> authorities = account.getAuthorities();
@@ -103,7 +103,7 @@ public class TokenService {
     public Authentication getAuthentication(JWT token) {
         Claims claims = jwtDecoder.getClaims(token);
 
-        Account account = accountRepository.findByLoginId(claims.getSubject())
+        Account account = accountRepository.findByLoginIdWithRole(claims.getSubject())
                 .orElseThrow(() -> new CustomAuthenticationException(ErrorCode.UNAUTHORIZATION,null));
         String credential = UUID.randomUUID().toString();
         //TODO: account vs loginId
