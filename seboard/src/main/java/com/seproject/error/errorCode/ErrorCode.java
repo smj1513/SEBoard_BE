@@ -65,6 +65,7 @@ public enum ErrorCode {
     NOT_EXIST_FILE(HttpStatus.NOT_FOUND, 308, "존재하지 않는 파일입니다."),
     NOT_EXIST_BANNER(HttpStatus.NOT_FOUND, 309, "존재하지 않는 배너입니다."),
     NOT_EXIST_MENU(HttpStatus.NOT_FOUND, 310, "존재하지 않는 메뉴입니다."),
+    NOT_EXIST_ANONYMOUS(HttpStatus.NOT_FOUND, 311, "존재하지 않는 익명 유저 입니다."),
     DUPLICATED_REPORT(HttpStatus.BAD_REQUEST, 400, "이미 신고하였습니다.");
 
     ErrorCode(HttpStatus httpStatus, int code, String message) {

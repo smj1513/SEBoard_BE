@@ -2,15 +2,15 @@ package com.seproject.board.post.application;
 
 import com.seproject.account.account.domain.Account;
 import com.seproject.account.account.domain.repository.AccountRepository;
+import com.seproject.account.account.service.AccountService;
 import com.seproject.account.utils.SecurityUtils;
+import com.seproject.board.menu.service.CategoryService;
+import com.seproject.board.post.service.PostService;
+import com.seproject.error.exception.*;
 import com.seproject.file.domain.model.FileConfiguration;
 import com.seproject.file.domain.repository.FileConfigurationRepository;
 import com.seproject.file.application.FileAppService;
 import com.seproject.error.errorCode.ErrorCode;
-import com.seproject.error.exception.CustomUserNotFoundException;
-import com.seproject.error.exception.ExceedFileSizeException;
-import com.seproject.error.exception.InvalidAuthorizationException;
-import com.seproject.error.exception.NoSuchResourceException;
 import com.seproject.board.post.application.dto.PostCommand.PostEditCommand;
 import com.seproject.board.post.application.dto.PostCommand.PostWriteCommand;
 import com.seproject.board.menu.domain.Category;
@@ -30,6 +30,8 @@ import com.seproject.board.post.domain.repository.PostRepository;
 import com.seproject.board.post.domain.repository.PostSearchRepository;
 import com.seproject.member.domain.repository.AnonymousRepository;
 import com.seproject.member.domain.repository.MemberRepository;
+import com.seproject.member.service.AnonymousService;
+import com.seproject.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,54 +41,41 @@ import java.util.*;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
+@Transactional(readOnly = true)
 public class PostAppService {
-    private final PostRepository postRepository;
-    private final PostSearchRepository postSearchRepository;
-    private final CategoryRepository categoryRepository;
-    private final AnonymousRepository anonymousRepository;
-    private final MemberRepository memberRepository;
+
     private final FileMetaDataRepository fileMetaDataRepository;
-    private final CommentRepository commentRepository;
-    private final BookmarkRepository bookmarkRepository;
-    private final FileAppService fileAppService;
-    private final AccountRepository accountRepository;
     private final FileRepository fileRepository;
     private final FileConfigurationRepository fileConfigurationRepository;
 
+    private final MemberService memberService;
+    private final AccountService accountService;
+    private final AnonymousService anonymousService;
+    private final PostService postService;
+    private final CategoryService categoryService;
+
+    @Transactional
     public Long writePost(PostWriteCommand command){
         Account account = SecurityUtils.getAccount()
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_LOGIN));
 
-        Category category = categoryRepository.findById(command.getCategoryId())
-                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_CATEGORY));
+        Category category = categoryService.findById(command.getCategoryId());
 
         if(!category.editable(account.getRoles())){
             throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 
-        if(command.isAnonymous()){
-            return writeUnnamedPost(command, account, category);
-        }else{
-            return writeNamedPost(command, account.getAccountId(), category);
-        }
+        BoardUser author = command.isAnonymous() ?
+                createAnonymous(account) : memberService.findByAccountId(account.getAccountId());
+
+        return createPost(command, author, category);
     }
 
-    protected Long writeUnnamedPost(PostWriteCommand command, Account account, Category category) {
-        Anonymous anonymous = Anonymous.builder()
-                .name("익명") //TODO : 익명 이름 다양하게?
-                .account(account)
-                .build();
-
-        anonymousRepository.save(anonymous);
-
-        return createPost(command, anonymous, category);
-    }
-
-    protected Long writeNamedPost(PostWriteCommand command, Long accountId, Category category) {
-        Member member = memberRepository.findByAccountId(accountId).orElseThrow(NoSuchElementException::new);
-
-        return createPost(command, member, category);
+    private BoardUser createAnonymous(Account account) {
+        String name = "익명";
+        Long anonymousId = anonymousService.createAnonymous(name, account);
+        Anonymous anonymous = anonymousService.findById(anonymousId);
+        return anonymous;
     }
 
     private Long createPost(PostWriteCommand command, BoardUser author, Category category){
@@ -97,34 +86,27 @@ public class PostAppService {
 
         boolean isPined = command.isPined();
 
-        if(!category.manageable(author.getAccount().getRoles())){
-            isPined = false;
+        if(category.manageable(author.getAccount().getRoles())){
+            throw new CustomAccessDeniedException(ErrorCode.ACCESS_DENIED,null);
         }
 
-        Post post = Post.builder()
-                .title(command.getTitle())
-                .contents(command.getContents())
-                .category(category)
-                .author(author)
-                .baseTime(BaseTime.now())
-                .pined(isPined)
-                .attachments(new HashSet<>(fileMetaDataList))
-                .exposeOption(ExposeOption.of(command.getExposeState(), command.getPrivatePassword()))
-                .build();
+        String title = command.getTitle();
+        String contents = command.getContents();
+        BaseTime now = BaseTime.now();
 
-        postRepository.save(post);
-
-        return post.getPostId();
+        HashSet<FileMetaData> attachments = new HashSet<>(fileMetaDataList);
+        ExposeOption exposeOption = ExposeOption.of(command.getExposeState(), command.getPrivatePassword());
+        Long postId = postService.createPost(title, contents, category, author, now, isPined, attachments, exposeOption);
+        return postId;
     }
 
 
 
+    @Transactional
     public Long editPost(PostEditCommand command) {
-        Account account = accountRepository.findByLoginId(command.getLoginId())
-                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
+        Account account = accountService.findByLoginId(command.getLoginId());
 
-        Post post = postRepository.findById(command.getPostId())
-                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
+        Post post = postService.findByIdWithCategory(command.getPostId());
 
         if(!post.isWrittenBy(account.getAccountId()) &&  !post.getCategory().manageable(account.getRoles())){
             throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
@@ -142,15 +124,14 @@ public class PostAppService {
         Set<FileMetaData> removalAttachments = post.getAttachments();
         removalAttachments.removeAll(attachments); //요청으로 들어온 PK와 기존의 PK를 비교하고, 새로온 PK에 없는 것은 삭제 대상
 
+        //TODO : N+1 문제
         removalAttachments.forEach(fileMetaData -> fileRepository.delete(fileMetaData.getFilePath())); //file 삭제
         removalAttachments.forEach(fileMetaData -> post.removeAttachment(fileMetaData)); //db에서 정보 삭제
-
         attachments.forEach(fileMetaData -> post.addAttachment(fileMetaData));
 
         validFileListSize(new ArrayList<>(post.getAttachments()));
 
-        Category category = categoryRepository.findById(command.getCategoryId())
-                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_CATEGORY));
+        Category category = categoryService.findById(command.getCategoryId());
         post.changeCategory(category);
 
         return post.getPostId();
@@ -162,17 +143,15 @@ public class PostAppService {
 
         Long totalSize = fileMetaDataList.stream().mapToLong(fileMetaData -> fileMetaData.getFileSize()/(1024*1024)).sum();
 
-        if(maxSize<totalSize){
+        if(maxSize < totalSize) {
             throw new ExceedFileSizeException(ErrorCode.INVALID_FILE_SIZE);
         }
     }
 
+    @Transactional
     public void removePost(Long postId, String loginId) {
-        Account account = accountRepository.findByLoginId(loginId)
-                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
-
-        Post post = postRepository.findById(postId)
-                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
+        Account account = accountService.findByLoginId(loginId);
+        Post post = postService.findByIdWithCategory(postId);
 
         if(!post.isWrittenBy(account.getAccountId()) &&  !post.getCategory().manageable(account.getRoles())){
             throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);

@@ -3,6 +3,8 @@ package com.seproject.member.service;
 import com.seproject.account.account.domain.Account;
 import com.seproject.board.comment.domain.model.Comment;
 import com.seproject.board.post.domain.model.Post;
+import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.CustomIllegalArgumentException;
 import com.seproject.member.domain.Anonymous;
 import com.seproject.member.domain.BoardUser;
 import com.seproject.member.domain.repository.AnonymousRepository;
@@ -18,6 +20,24 @@ import java.util.List;
 public class AnonymousService {
 
     private final AnonymousRepository anonymousRepository;
+
+
+    public Anonymous findById(Long id) {
+        Anonymous anonymous = anonymousRepository.findById(id)
+                .orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.NOT_EXIST_ANONYMOUS, null));
+        return anonymous;
+    }
+
+
+    @Transactional
+    public Long createAnonymous(String name, Account account) {
+        Anonymous anonymous = Anonymous.builder()
+                .name(name)
+                .account(account)
+                .build();
+        anonymousRepository.save(anonymous);
+        return anonymous.getBoardUserId();
+    }
 
     @Transactional
     public Anonymous createAnonymousInPost(Account account, Post post, List<Comment> comments) {

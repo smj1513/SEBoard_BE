@@ -1,6 +1,6 @@
 package com.seproject.board.common.controller;
 
-import com.seproject.board.comment.application.ReportAppService;
+import com.seproject.board.common.application.ReportAppService;
 import com.seproject.board.common.controller.dto.MessageResponse;
 import com.seproject.board.common.controller.dto.ReportThresholdRequest;
 import lombok.RequiredArgsConstructor;

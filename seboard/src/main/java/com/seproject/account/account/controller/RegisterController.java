@@ -1,35 +1,13 @@
 package com.seproject.account.account.controller;
 
 import com.seproject.account.account.application.RegisterAppService;
-import com.seproject.account.token.domain.JWT;
-import com.seproject.account.account.domain.Account;
-import com.seproject.account.account.domain.OAuthAccount;
-import com.seproject.account.social.TemporalUserInfo;
-import com.seproject.account.token.domain.UserToken;
-import com.seproject.account.social.repository.TemporalUserInfoRepository;
-import com.seproject.account.token.domain.repository.UserTokenRepository;
 import com.seproject.account.account.service.AccountService;
-import com.seproject.account.email.service.RegisterEmailService;
-import com.seproject.account.token.service.TokenService;
 import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
-
-import static com.seproject.account.account.controller.dto.LoginDTO.*;
-
-import java.util.Optional;
-import java.util.UUID;
 
 import static com.seproject.account.account.controller.dto.RegisterDTO.*;
 
