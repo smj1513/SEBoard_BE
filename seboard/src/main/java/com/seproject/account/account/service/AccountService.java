@@ -168,7 +168,11 @@ public class AccountService implements UserDetailsService {
     
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        Account account = accountRepository.findByLoginId(username)
+
+        Account account1 = accountRepository.findByLoginId(username)
+                .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
+
+        Account account = accountRepository.findByLoginIdWithRole(username)
                 .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
         return account;
     }

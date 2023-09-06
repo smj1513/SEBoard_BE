@@ -147,9 +147,9 @@ public class Post {
     public boolean checkPassword(String password) {
         if(exposeOption.getExposeState()==ExposeState.PRIVACY){
             return ((Privacy)exposeOption).checkPassword(password);
-        }else{
-            return false;
         }
+
+        return true;
     }
 
     public void restore() {

@@ -36,31 +36,36 @@ public class AdminPostController {
         return ResponseEntity.ok(response);
     }
 
-
+    //TODO : 굳이 2개 만들지 말고 밑에꺼 하나로 쓰기
+    @Operation(summary = "게시글 복구", description = "휴지통에 있는 게시글을 복구한다.")
     @PostMapping("/{postId}/restore")
     public ResponseEntity<MessageResponse> restorePost(@PathVariable Long postId){
         adminPostAppService.restorePost(postId);
         return new ResponseEntity<>(MessageResponse.of("게시글 복구 성공"), HttpStatus.OK);
     }
 
+    @Operation(summary = "게시글 복구", description = "휴지통에 있는 게시글들을 복구한다.")
     @PostMapping("/restore")
     public ResponseEntity<MessageResponse> restoreBulkPost(@RequestBody BulkPostRequest request){
         adminPostAppService.restoreBulkPost(request.getPostIds());
         return new ResponseEntity<>(MessageResponse.of("게시글 복구 성공"), HttpStatus.OK);
     }
 
+    @Operation(summary = "게시글 흎지통 이동", description = "게시글을 흎지통으로 이동한다.")
     @DeleteMapping()
     public ResponseEntity<MessageResponse> deleteBulkPost(@RequestBody BulkPostRequest request){
         adminPostAppService.deleteBulkPost(request.getPostIds(), false);
         return new ResponseEntity<>(MessageResponse.of("게시글 삭제 성공"), HttpStatus.OK);
     }
 
+    @Operation(summary = "게시글 완전 삭제", description = "휴지통에 있는 게시글을 완전 삭제한다.")
     @DeleteMapping("/permanent")
     public ResponseEntity<MessageResponse> deleteBulkPostPermanent(@RequestBody BulkPostRequest request){
         adminPostAppService.deleteBulkPost(request.getPostIds(), true);
         return new ResponseEntity<>(MessageResponse.of("게시글 영구 삭제 성공"), HttpStatus.OK);
     }
 
+    @Operation(summary = "휴지통 게시글 조회", description = "휴지통에 있는 게시글을 조회한다.")
     @GetMapping("/deleted")
     public ResponseEntity<Page<DeletedPostResponse>> retrieveDeletedPostList(@RequestParam(defaultValue = "0") int page,
                                                                              @RequestParam(defaultValue = "25") int perPage) {
@@ -68,9 +73,12 @@ public class AdminPostController {
         return ResponseEntity.ok(response);
     }
 
-    @PostMapping("/migrate") //TODO : Migrate 말고 게시글 카테고리 변경 , category migration이랑 이름 겹침
+    //TODO : Migrate 말고 게시글 카테고리 변경 , category migration이랑 이름 겹침
+    @Operation(summary = "게시글 카테고리 이동", description = "from 카테고리의 모든 게시글을 to 카테고리로 변경한다.")
+    @PostMapping("/migrate")
     public ResponseEntity<MessageResponse> migratePost(@RequestBody MigratePostRequest request){
         adminPostAppService.migratePost(request.getFromCategoryId(), request.getToCategoryId());
         return ResponseEntity.ok(MessageResponse.of("게시글 전체 이동 성공"));
     }
+
 }
