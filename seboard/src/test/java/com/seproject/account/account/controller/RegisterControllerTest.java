@@ -163,7 +163,7 @@ class RegisterControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.accessToken").isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.refreshToken").isNotEmpty());
 
-        Account account = accountRepository.findByLoginId(email).orElseThrow();
+        Account account = accountRepository.findByLoginIdWithRole(email).orElseThrow();
         Assertions.assertEquals(account.getNickname(),nickname);
         Assertions.assertEquals(account.getName(),name);
         Assertions.assertTrue(accountService.matchPassword(account,password));

@@ -114,7 +114,7 @@ public class PostAppService {
 
         Post post = postService.findByIdWithCategory(command.getPostId());
 
-        if(!post.isWrittenBy(account.getAccountId()) &&  !post.getCategory().manageable(account.getRoles())){
+        if(!post.isWrittenBy(account.getAccountId()) || !post.getCategory().manageable(account.getRoles())){
             throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 
@@ -137,8 +137,9 @@ public class PostAppService {
 
         validFileListSize(new ArrayList<>(post.getAttachments()));
 
-        Category category = categoryService.findById(command.getCategoryId());
-        post.changeCategory(category);
+        //TODO : 카테고리 변경은 불가능
+//        Category category = categoryService.findById(command.getCategoryId());
+//        post.changeCategory(category);
 
         return post.getPostId();
     }
@@ -155,15 +156,19 @@ public class PostAppService {
     }
 
     @Transactional
-    public void removePost(Long postId, String loginId) {
-        Account account = accountService.findByLoginId(loginId);
+    public void removePost(Long postId) {
+        Account account = SecurityUtils.getAccount()
+                .orElseThrow(() -> new CustomAuthenticationException(ErrorCode.NOT_LOGIN,null));
+
         Post post = postService.findByIdWithCategory(postId);
 
-        if(!post.isWrittenBy(account.getAccountId()) &&  !post.getCategory().manageable(account.getRoles())){
-            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
+        if (post.isWrittenBy(account.getAccountId()) || post.getCategory().manageable(account.getRoles())) {
+            post.delete(true);
+            return;
         }
 
-        post.delete(true);
+        throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
+
 //        post.getAttachments().forEach(fileAppService::deleteFileFromStorage); //TODO : fileSystem에서 transactional 처리 필요
 //        postRepository.deleteById(postId);
     }

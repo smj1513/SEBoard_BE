@@ -11,13 +11,7 @@ import com.seproject.board.post.controller.dto.PostResponse.RetrievePostListResp
 import com.seproject.board.post.controller.dto.PostResponse.RetrievePostDetailResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.Parameters;
-import io.swagger.v3.oas.annotations.media.Content;
-import io.swagger.v3.oas.annotations.media.Schema;
-import io.swagger.v3.oas.annotations.responses.ApiResponse;
-import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -25,15 +19,12 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
-import java.util.UUID;
 
 import static com.seproject.board.comment.application.dto.CommentCommand.*;
 import static com.seproject.board.common.controller.dto.MessageResponse.*;
 import static com.seproject.board.comment.controller.dto.CommentResponse.*;
 import static com.seproject.board.post.controller.dto.PostRequest.*;
-import static com.seproject.board.post.controller.dto.PostResponse.*;
 
 @Slf4j
 @Tag(name = "게시글 API", description = "게시글(posts) 관련 API")
@@ -116,9 +107,8 @@ public class PostController {
     @DeleteMapping("/{postId}")
     public ResponseEntity<?> deletePost(
             @PathVariable Long postId) {
-        String loginId = SecurityUtils.getLoginId();
 
-        postAppService.removePost(postId, loginId);
+        postAppService.removePost(postId);
 
         return ResponseEntity.ok(CreateAndUpdateMessage.of(postId, "게시글 삭제 성공"));
     }
@@ -127,11 +117,10 @@ public class PostController {
     @GetMapping("/{postId}/comments")
     public ResponseEntity<CommentListResponse> retrievePostComments(
             @PathVariable Long postId,
-            @RequestBody RetrievePrivacyPostRequest request,
+            @RequestBody(required = false) String password,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "25") Integer perPage) {
 
-        String password = request.getPassword();
         CommentListResponse commentListResponse = commentAppService.retrieveCommentList(
                 CommentListFindCommand.builder()
                         .postId(postId)

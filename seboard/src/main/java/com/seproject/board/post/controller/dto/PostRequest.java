@@ -23,13 +23,8 @@ public class PostRequest {
     }
 
     @Data
-    @NoArgsConstructor
-    public static class RetrievePrivacyPostRequest{
-        private String password;
-
-        public RetrievePrivacyPostRequest(String password) {
-            this.password = password;
-        }
+    public static class RetrievePrivacyPostRequest {
+        private String password = " ";
     }
 
     @Data
