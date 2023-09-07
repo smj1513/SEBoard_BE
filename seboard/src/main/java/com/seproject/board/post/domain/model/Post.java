@@ -63,6 +63,9 @@ public class Post {
         return author.isOwnAccountId(accountId);
     }
 
+    public void changeExposeOption(ExposeOption exposeOption) {
+        this.exposeOption = exposeOption;
+    }
 
 
     public Anonymous createAnonymous(Account account) {

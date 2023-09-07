@@ -55,9 +55,6 @@ public class TokenService {
             throw new CustomAuthenticationException(ErrorCode.DISABLE_REFRESH_TOKEN,null);
         }
 
-        Account loginAccount = SecurityUtils.getAccount()
-                .orElseThrow(() -> new CustomAuthenticationException(ErrorCode.UNAUTHORIZATION,null));
-
         boolean isLargeToken = isLargeToken(jwt);
 
         if(isLargeToken) {

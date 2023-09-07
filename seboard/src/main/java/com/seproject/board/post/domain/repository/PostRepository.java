@@ -7,7 +7,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
-import org.springframework.security.core.parameters.P;
 
 import java.util.List;
 import java.util.Optional;
@@ -16,7 +15,7 @@ public interface PostRepository extends JpaRepository<Post,Long> {
     @Query(value = "select exists(select * from posts where category_id = :categoryId)", nativeQuery = true)
     boolean existsByCategoryId(@Param("categoryId") Long categoryId);
 
-    @Query(value = "select p from Post p join fetch p.category c where p.postId = :postId")
+    @Query(value = "select p from Post p left join fetch p.category c where p.postId = :postId")
     Optional<Post> findByIdWithCategory(@Param("postId") Long postId);
 
     @Query(value = "select p from Post p join p.author join p.author.account where p.author.account.accountId = :accountId")

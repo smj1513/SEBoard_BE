@@ -33,7 +33,6 @@ public class PostRequest {
     }
 
     @Data
-    @AllArgsConstructor
     public static class CreatePostRequest {
         @NotNull
         private String title;
@@ -78,14 +77,13 @@ public class PostRequest {
         @NotNull
         private ExposeOptionRequest exposeOption;
 
-        public PostEditCommand toCommand(Long postId, String loginId) {
+        public PostEditCommand toCommand(Long postId) {
             return PostEditCommand.builder()
                     .postId(postId)
                     .title(title)
                     .contents(getContents())
                     .categoryId(categoryId)
                     .pined(pined)
-                    .loginId(loginId)
                     .exposeState(ExposeState.valueOf(exposeOption.getName()))
                     .privatePassword(exposeOption.getPassword())
                     .attachmentIds(attachmentIds)

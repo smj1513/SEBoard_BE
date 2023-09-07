@@ -4,13 +4,11 @@ import com.seproject.account.account.domain.Account;
 import com.seproject.account.role.domain.Role;
 import com.seproject.account.utils.SecurityUtils;
 import com.seproject.board.menu.domain.Category;
-import com.seproject.board.menu.service.MenuService;
+import com.seproject.board.post.persistence.PostQueryRepository;
 import com.seproject.board.post.service.BookmarkService;
 import com.seproject.board.post.service.PostService;
 import com.seproject.error.errorCode.ErrorCode;
-import com.seproject.error.exception.CustomIllegalArgumentException;
-import com.seproject.error.exception.InvalidAuthorizationException;
-import com.seproject.error.exception.NoSuchResourceException;
+import com.seproject.error.exception.*;
 import com.seproject.board.post.controller.dto.PostResponse.RetrievePostDetailResponse;
 import com.seproject.board.post.controller.dto.PostResponse.RetrievePostListResponseElement;
 import com.seproject.board.menu.domain.BoardMenu;
@@ -40,97 +38,77 @@ public class PostSearchAppService {
     private final BoardMenuRepository boardMenuRepository;
 
 
+    private final PostQueryRepository postQueryRepository;
     private final MemberService memberService;
     private final PostService postService;
     private final BookmarkService bookmarkService;
 
+
     @Transactional // TODO : 조회수 늘리기 다른 방법으로 변경
-    public RetrievePostDetailResponse findPrivacyPost(Long postId, String password){
+    public RetrievePostDetailResponse findPostDetail(Long postId, String password){
 
         Account account = SecurityUtils.getAccount().orElse(null);
-        Post post = postService.findByIdWithCategory(postId);
-
-        if(post.getExposeOption().getExposeState() != ExposeState.PRIVACY) {
-            return findPostDetail(postId);
-        }
-
-        if(!post.checkPassword(password)) {
-            throw new CustomIllegalArgumentException(ErrorCode.INCORRECT_POST_PASSWORD,null);
-        }
-
-        RetrievePostDetailResponse postDetailResponse = postSearchRepository.findPostDetailById(postId)
-                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
+        Post post = postQueryRepository.findByIdWithAll(postId);
+        Category category = post.getCategory();
+        RetrievePostDetailResponse postDetailResponse = new RetrievePostDetailResponse(post);
 
         boolean isEditable = false;
         boolean isBookmarked = false;
+        boolean isAuthor = false;
 
-        if(account!=null) {
+        if(account != null) {
             Member member = memberService.findByAccountId(account.getAccountId());
             isBookmarked = bookmarkService.isBookmarked(post, member);
+            isAuthor = post.isWrittenBy(account.getAccountId());
 
-            Category category = post.getCategory();
-            isEditable = category.editable(account.getRoles()) || post.isWrittenBy(account.getAccountId());
+            isEditable = category.editable(account.getRoles()) || isAuthor;
         }
 
         postDetailResponse.setEditable(isEditable);
         postDetailResponse.setBookmarked(isBookmarked);
 
-        post.increaseViews();
+        ExposeState exposeState = post.getExposeOption().getExposeState();
+        if(exposeState == ExposeState.PRIVACY) {
 
+            if (account == null) {
+                throw new CustomAuthenticationException(ErrorCode.NOT_LOGIN,null);
+            }
+
+            if (isAuthor || category.manageable(account.getRoles())) {
+                post.increaseViews();
+                return postDetailResponse;
+            }
+
+            if(!post.checkPassword(password)) {
+                throw new CustomIllegalArgumentException(ErrorCode.INCORRECT_POST_PASSWORD,null);
+            }
+
+        } else if(exposeState == ExposeState.KUMOH) {
+
+            if (account == null) {
+                throw new CustomAuthenticationException(ErrorCode.NOT_LOGIN,null);
+            }
+
+            if (isAuthor || category.manageable(account.getRoles())) {
+                post.increaseViews();
+                return postDetailResponse;
+            }
+
+            boolean isKumoh = account.getRoles().stream()
+                    .anyMatch(role -> role.getAuthority().equals(Role.ROLE_KUMOH));
+
+            if (!isKumoh) {
+                throw new CustomAccessDeniedException(ErrorCode.ACCESS_DENIED,null);
+            }
+        }
+
+        post.increaseViews();
         return postDetailResponse;
     }
 
     @Transactional
     public RetrievePostDetailResponse findPostDetail(Long postId){
-
-        Account account = SecurityUtils.getAccount().orElse(null);
-        Post post = postService.findByIdWithCategory(postId);
-        RetrievePostDetailResponse postDetailResponse = postSearchRepository.findPostDetailById(postId)
-                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
-
-        boolean isEditable = false;
-        boolean isBookmarked = false;
-
-        if(account!=null) {
-            Member member = memberService.findByAccountId(account.getAccountId());
-            isBookmarked = bookmarkService.isBookmarked(post, member);
-
-            Category category = post.getCategory();
-            isEditable = category.editable(account.getRoles()) || post.isWrittenBy(account.getAccountId());
-        }
-
-        postDetailResponse.setEditable(isEditable);
-        postDetailResponse.setBookmarked(isBookmarked);
-
-        if(post.getExposeOption().getExposeState()== ExposeState.PRIVACY) {
-
-            if(account!=null && (post.isWrittenBy(account.getAccountId())
-                    || post.getCategory().manageable(account.getRoles()))) {
-                post.increaseViews();
-                return postDetailResponse;
-            }
-
-            throw new InvalidAuthorizationException(ErrorCode.NOT_POST_AUTHOR);
-
-        } else if(post.getExposeOption().getExposeState() == ExposeState.KUMOH) {
-
-            if(account!=null) {
-                List<Role> roles = account.getRoles();
-
-                boolean isKumoh = roles.stream()
-                        .anyMatch(role -> role.getAuthority().equals(Role.ROLE_KUMOH));
-
-                if(isKumoh || post.getCategory().manageable(account.getRoles())){
-                    post.increaseViews();
-                    return postDetailResponse;
-                }
-            }
-
-            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
-        }
-
-        post.increaseViews();
-        return postDetailResponse;
+        return findPostDetail(postId, "");
     }
 
     public List<RetrievePostListResponseElement> findPinedPostList(Long categoryId) {

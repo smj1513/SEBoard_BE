@@ -97,6 +97,10 @@ public class Menu {
 
     //TODO : throw vs return true
     public boolean editable(List<Role> roles) {
+        if (superMenu != null && !superMenu.editable(roles)) {
+            return false;
+        }
+
         for (MenuAuthorization menuAuthorization : menuAuthorizations) {
             if(menuAuthorization.support(AuthorizationProperty.EDITABLE)) {
                 return menuAuthorization.isAuth(roles);
@@ -106,6 +110,10 @@ public class Menu {
     }
 
     public boolean manageable(List<Role> roles) {
+        if (superMenu != null && !superMenu.manageable(roles)) {
+            return false;
+        }
+
         for (MenuAuthorization menuAuthorization : menuAuthorizations) {
             if(menuAuthorization.support(AuthorizationProperty.MANAGEABLE)) {
                 return menuAuthorization.isAuth(roles);
@@ -115,6 +123,11 @@ public class Menu {
     }
 
     public boolean accessible(List<Role> roles) {
+
+        if (superMenu != null && !superMenu.accessible(roles)) {
+            return false;
+        }
+
         for (MenuAuthorization menuAuthorization : menuAuthorizations) {
             if(menuAuthorization.support(AuthorizationProperty.ACCESS)) {
                 return menuAuthorization.isAuth(roles);
@@ -124,6 +137,11 @@ public class Menu {
     }
 
     public boolean exposable(List<Role> roles) {
+
+        if (superMenu != null && !superMenu.exposable(roles)) {
+            return false;
+        }
+
         for (MenuAuthorization menuAuthorization : menuAuthorizations) {
             if(menuAuthorization.support(AuthorizationProperty.EXPOSE)) {
                 return menuAuthorization.isAuth(roles);
