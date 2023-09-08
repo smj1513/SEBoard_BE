@@ -30,6 +30,10 @@ public class Role implements GrantedAuthority {
     private String description;
     private String alias;
 
+    public static boolean isImmutable(String name) {
+        return IMMUTABLE_ROLES.contains(name);
+    }
+
     public Long getId() {
         return roleId;
     }

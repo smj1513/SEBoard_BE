@@ -35,37 +35,21 @@ class AccountServiceTest {
     public void 로그인_아이디_중복_테스트() throws Exception {
         String loginId = UUID.randomUUID().toString();
         Assertions.assertFalse(accountService.isExistLoginId(loginId));
-        accountService.createFormAccount(loginId, "name", "nickname", UUID.randomUUID().toString(), List.of());
+        accountService.createFormAccount(loginId, "name", UUID.randomUUID().toString(), List.of());
         Assertions.assertTrue(accountService.isExistLoginId(loginId));
 
         FormAccount permanentDeleteAccount =
-                accountSetup.createFormAccount(UUID.randomUUID().toString(), "name", "nickname", List.of(), LocalDateTime.now(),Status.PERMANENT_DELETED);
+                accountSetup.createFormAccount(UUID.randomUUID().toString(), "name", List.of(), LocalDateTime.now(),Status.PERMANENT_DELETED);
         Assertions.assertFalse(accountService.isExistLoginId(permanentDeleteAccount.getLoginId()));
 
         FormAccount tempDeleteAccount =
-                accountSetup.createFormAccount(UUID.randomUUID().toString(), "name", "nickname", List.of(), LocalDateTime.now(),Status.TEMP_DELETED);
+                accountSetup.createFormAccount(UUID.randomUUID().toString(), "name", List.of(), LocalDateTime.now(),Status.TEMP_DELETED);
         Assertions.assertTrue(accountService.isExistLoginId(tempDeleteAccount.getLoginId()));
     }
 
     @Test
-    public void 닉네임_중복_테스트() throws Exception {
-        String nickname = UUID.randomUUID().toString();
-        Assertions.assertFalse(accountService.isExistNickname(nickname));
-        FormAccount account = accountSetup.createFormAccount("loginId", "name", nickname, List.of(), LocalDateTime.now(), Status.NORMAL);
-        Assertions.assertTrue(accountService.isExistNickname(nickname));
-
-        FormAccount permanentDeleteAccount =
-                accountSetup.createFormAccount(UUID.randomUUID().toString(), "name", UUID.randomUUID().toString(), List.of(), LocalDateTime.now(),Status.PERMANENT_DELETED);
-        Assertions.assertFalse(accountService.isExistNickname(permanentDeleteAccount.getNickname()));
-
-        FormAccount tempDeleteAccount =
-                accountSetup.createFormAccount(UUID.randomUUID().toString(), "name", UUID.randomUUID().toString(), List.of(), LocalDateTime.now(),Status.TEMP_DELETED);
-        Assertions.assertTrue(accountService.isExistNickname(tempDeleteAccount.getNickname()));
-    }
-
-    @Test
     public void 소셜_로그인_사용자_테스트() {
-        FormAccount formAccount = accountSetup.createFormAccount("loginId", "name", "nickname", List.of(), LocalDateTime.now(), Status.NORMAL);
+        FormAccount formAccount = accountSetup.createFormAccount("loginId", "name", List.of(), LocalDateTime.now(), Status.NORMAL);
         Assertions.assertFalse(accountService.isOAuthUser(formAccount.getLoginId()));
         OAuthAccount oAuthAccount = accountSetup.createOAuthAccount();
         Assertions.assertTrue(accountService.isOAuthUser(oAuthAccount.getLoginId()));
@@ -74,7 +58,7 @@ class AccountServiceTest {
     @Test
     public void 비밀번호_일치_테스트() throws Exception {
         String password = "D337";
-        Long accountId = accountService.createAccount("loginId", password, "name", "nickname", List.of());
+        Long accountId = accountService.createAccount("loginId", password, "name", List.of());
         Account account = accountService.findById(accountId);
         Assertions.assertTrue(accountService.matchPassword(account, "D337"));
         Assertions.assertFalse(accountService.matchPassword(account,"D336"));
@@ -90,11 +74,10 @@ class AccountServiceTest {
         String newPassword = UUID.randomUUID().toString();
         Role roleAdmin = roleSetup.getRoleAdmin();
         accountService.updateAccount(formAccount.getAccountId(),updateLoginId,
-                newPassword,updateName,updateNickname,List.of(roleAdmin));
+                newPassword,updateName,List.of(roleAdmin));
 
         Assertions.assertEquals(formAccount.getLoginId(),updateLoginId);
         Assertions.assertEquals(formAccount.getName(),updateName);
-        Assertions.assertEquals(formAccount.getNickname(),updateNickname);
         Assertions.assertEquals(formAccount.getRoleAccounts().size(),1);
         Assertions.assertEquals(formAccount.getRoles().get(0),roleAdmin);
 

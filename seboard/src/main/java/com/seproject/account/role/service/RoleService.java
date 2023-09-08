@@ -62,14 +62,14 @@ public class RoleService {
             roleName = "ROLE_" + roleName;
         }
 
+        if (Role.isImmutable(roleName))
+            throw new CustomIllegalArgumentException(ErrorCode.IMMUTABLE_ROLE,null);
+
         Role role = Role.builder()
                 .name(roleName)
                 .description(description)
                 .alias(alias)
                 .build();
-
-        if (role.isImmutable())
-            throw new CustomIllegalArgumentException(ErrorCode.IMMUTABLE_ROLE,null);
 
         roleRepository.save(role);
         return role.getId();

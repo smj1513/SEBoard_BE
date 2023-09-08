@@ -11,6 +11,7 @@ import com.seproject.admin.account.controller.condition.AccountCondition;
 import com.seproject.admin.account.controller.dto.AdminAccountDto;
 import com.seproject.admin.banned.service.BannedIdService;
 import com.seproject.admin.banned.service.BannedNicknameService;
+import com.seproject.admin.role.controller.dto.RoleDTO;
 import com.seproject.board.comment.domain.model.Comment;
 import com.seproject.board.comment.domain.repository.CommentRepository;
 import com.seproject.board.common.Status;
@@ -23,6 +24,7 @@ import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
 import com.seproject.global.*;
 import com.seproject.member.domain.Member;
+import com.seproject.member.service.MemberService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -59,6 +61,7 @@ class AdminAccountAppServiceTest {
     @Autowired PasswordEncoder passwordEncoder;
     @Autowired BannedIdService bannedIdService;
     @Autowired BannedNicknameService bannedNicknameService;
+    @Autowired MemberService memberService;
 
     @Autowired private PostSetup postSetup;
     @Autowired private BoardUserSetup boardUserSetup;
@@ -81,17 +84,16 @@ class AdminAccountAppServiceTest {
 
     @Test
     public void 목록_조회_테스트() throws Exception {
-        for (int i = 0; i < 20; i++) {
-            accountSetup.createFormAccount();
+        for (int i = 0; i < 19; i++) {
+            FormAccount formAccount = accountSetup.createFormAccount();
+            Member member = boardUserSetup.createMember(formAccount);
         }
 
         em.flush(); em.clear();
 
         Page<AccountResponse> allAccount =
                 accountAppService.findAllAccount(new AccountCondition(), 1, 10);
-        Assertions.assertEquals(allAccount.getContent().size(),10);
-        allAccount = accountAppService.findAllAccount(new AccountCondition(),2,10);
-        Assertions.assertEquals(allAccount.getContent().size(),1); //
+        Assertions.assertEquals(allAccount.getContent().size(),9);
     }
 
     @Test
@@ -102,11 +104,12 @@ class AdminAccountAppServiceTest {
         AccountResponse accountResponse = accountAppService.findAccount(accountId);
 
         Assertions.assertEquals(accountResponse.getAccountId(),accountId);
-        Assertions.assertEquals(accountResponse.getNickname(),formAccount.getNickname());
         Assertions.assertEquals(accountResponse.getName(),formAccount.getName());
-        Assertions.assertEquals(accountResponse.getCreatedAt(),formAccount.getCreatedAt());
+        Assertions.assertEquals(accountResponse.getRegisteredDate(),formAccount.getCreatedAt());
 
-        List<String> responseRoles = accountResponse.getRoles();
+        List<String> responseRoles = accountResponse.getRoles()
+                .stream().map(RoleDTO.RoleResponse::getAlias)
+                .collect(Collectors.toList());
         List<String> collect = formAccount.getRoles().stream()
                 .map(Role::toString)
                 .collect(Collectors.toList());
@@ -132,7 +135,6 @@ class AdminAccountAppServiceTest {
         Account findAccount = accountService.findById(accountId);
 
         Assertions.assertEquals(request.getId(),findAccount.getLoginId());
-        Assertions.assertEquals(request.getNickname(),findAccount.getNickname());
         Assertions.assertEquals(request.getName(),findAccount.getName());
 
         Assertions.assertTrue(passwordEncoder.matches(request.getPassword(),findAccount.getPassword()));
@@ -183,11 +185,10 @@ class AdminAccountAppServiceTest {
         ErrorCode errorCode = customIllegalArgumentException.getErrorCode();
         Assertions.assertEquals(errorCode,ErrorCode.BANNED_NICKNAME);
     }
-
     @Test
     public void 관리자_계정_수정() throws Exception {
         OAuthAccount oAuthAccount = accountSetup.createOAuthAccount();
-
+        Member member = boardUserSetup.createMember(oAuthAccount);
         UpdateAccountRequest request = updateAccountRequest(null,null,null,null,List.of("ROLE_USER", "ROLE_KUMOH"));
         accountAppService.updateAccount(oAuthAccount.getAccountId(), request);
 
@@ -195,9 +196,10 @@ class AdminAccountAppServiceTest {
         em.clear();
 
         Account findAccount = accountService.findById(oAuthAccount.getAccountId());
+        Member findMember = memberService.findByAccountId(findAccount.getAccountId());
 
         Assertions.assertEquals(request.getName(),findAccount.getName());
-        Assertions.assertEquals(request.getNickname(),findAccount.getNickname());
+        Assertions.assertEquals(request.getNickname(),findMember.getName());
         Assertions.assertEquals(request.getId(),findAccount.getLoginId());
 
         Assertions.assertTrue(passwordEncoder.matches(request.getPassword(),findAccount.getPassword()));

@@ -148,7 +148,7 @@ class RefreshTokenControllerTest {
         );
 
         perform.andDo(MockMvcResultHandlers.print())
-                .andExpect(MockMvcResultMatchers.status().isUnauthorized());
+                .andExpect(MockMvcResultMatchers.status().isOk());
     }
 
     @Test

@@ -18,9 +18,9 @@ public class MemberService {
 
     private final MemberRepository memberRepository;
     @Transactional
-    public Long createMember(Account account) {
+    public Long createMember(Account account,String nickname) {
         Member member = Member.builder()
-                .name(account.getNickname())
+                .name(nickname)
                 .account(account)
                 .build();
 

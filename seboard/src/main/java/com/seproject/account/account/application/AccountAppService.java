@@ -18,6 +18,8 @@ import com.seproject.account.utils.SecurityUtils;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomAuthenticationException;
 import com.seproject.error.exception.CustomIllegalArgumentException;
+import com.seproject.member.domain.Member;
+import com.seproject.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
@@ -138,11 +140,15 @@ public class AccountAppService {
         return KumohAuthResponse.toDTO(account);
     }
 
+    private final MemberService memberService;
+
     public MyInfoResponse findMyPage() {
         Account account = SecurityUtils.getAccount()
                 .orElseThrow(() -> new CustomAuthenticationException(ErrorCode.NOT_LOGIN,null));
 
-        return MyInfoResponse.toDTO(account.getLoginId(),account.getNickname(),account.getRoles().stream()
+        Member findMember = memberService.findByAccountId(account.getAccountId());
+
+        return MyInfoResponse.toDTO(account.getLoginId(),findMember.getName(),account.getRoles().stream()
                 .map(Role::getAuthority)
                 .collect(Collectors.toList()));
     }
@@ -151,10 +157,11 @@ public class AccountAppService {
     public MyInfoChangeResponse updateMyInfo(MyInfoChangeRequest request) {
         Account account = SecurityUtils.getAccount()
                         .orElseThrow(() -> new CustomAuthenticationException(ErrorCode.NOT_LOGIN,null));
-
+        Member findMember = memberService.findByAccountId(account.getAccountId());
         account = accountService.findById(account.getAccountId());
-        account.changeNickname(request.getNickname());
-        return MyInfoChangeResponse.toDTO(account);
+        findMember.changeName(request.getNickname());
+
+        return MyInfoChangeResponse.toDTO(findMember);
     }
 
 

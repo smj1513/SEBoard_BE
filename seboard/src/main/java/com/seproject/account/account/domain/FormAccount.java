@@ -22,12 +22,11 @@ public class FormAccount extends Account {
 
     @Builder
     public FormAccount(Long accountId, String loginId,
-                   String name, String nickname,
+                   String name,
                    String password, List<RoleAccount> roleAccounts,LocalDateTime createdAt,Status status) {
         this.accountId = accountId;
         this.loginId = loginId;
         this.name = name;
-        this.nickname = nickname;
         this.password = password;
 
         this.roleAccounts = new ArrayList<>();
@@ -44,7 +43,6 @@ public class FormAccount extends Account {
                 .accountId(accountId)
                 .loginId(loginId)
                 .name(name)
-                .nickname(nickname)
                 .password(password)
                 .createdAt(createdAt)
                 .status(status)

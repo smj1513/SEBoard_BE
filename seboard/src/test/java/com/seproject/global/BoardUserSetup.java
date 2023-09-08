@@ -8,6 +8,8 @@ import com.seproject.member.domain.repository.MemberRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.UUID;
+
 @Component
 public class BoardUserSetup {
 
@@ -19,7 +21,7 @@ public class BoardUserSetup {
     public Member createMember(Account account) {
 
         Member member = Member.builder()
-                .name(account.getName())
+                .name(UUID.randomUUID().toString())
                 .account(account)
                 .build();
 

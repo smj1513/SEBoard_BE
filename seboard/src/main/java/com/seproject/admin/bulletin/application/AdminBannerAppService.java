@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static com.seproject.admin.bulletin.controller.dto.BannerDTO.*;
 
@@ -24,7 +25,7 @@ public class AdminBannerAppService {
     private final BannerService bannerService;
     private final AdminBannerQueryRepository adminBannerQueryRepository;
 
-    public Page<BannerResponse> retrieveBanner(Pageable pageable, Boolean isActive){
+    public List<BannerResponse> retrieveBanner( Boolean isActive){
 //        Account account = SecurityUtils.getAccount()
 //                .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
 //
@@ -37,11 +38,11 @@ public class AdminBannerAppService {
 //        }
 
         if(isActive==null){
-            return adminBannerQueryRepository.findAllBanner(pageable);
+            return adminBannerQueryRepository.findAllBanner();
         }else if(isActive){
-            return adminBannerQueryRepository.findActiveBanners(pageable,LocalDate.now());
+            return adminBannerQueryRepository.findActiveBanners(LocalDate.now());
         }else{
-            return adminBannerQueryRepository.findUnActiveBanners(pageable,LocalDate.now());
+            return adminBannerQueryRepository.findUnActiveBanners(LocalDate.now());
         }
     }
 

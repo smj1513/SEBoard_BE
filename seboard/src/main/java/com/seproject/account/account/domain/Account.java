@@ -27,7 +27,6 @@ public abstract class Account implements UserDetails {
 
     protected String loginId;
     protected String name;
-    protected String nickname; //TODO : 닉네임 변경
     protected String password;
 
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY,cascade = CascadeType.ALL,orphanRemoval = true)
@@ -37,11 +36,10 @@ public abstract class Account implements UserDetails {
     @Enumerated(EnumType.STRING)
     protected Status status = Status.NORMAL;
 
-    public void update(String loginId,String password,String name,String nickname,List<RoleAccount> roleAccounts) {
+    public void update(String loginId,String password,String name,List<RoleAccount> roleAccounts) {
         this.loginId = loginId;
         this.password = password;
         this.name = name;
-        this.nickname = nickname;
         this.roleAccounts.clear();
         this.roleAccounts.addAll(roleAccounts);
     }
@@ -54,11 +52,6 @@ public abstract class Account implements UserDetails {
     public String changePassword(String password) {
         this.password = password;
         return password;
-    }
-
-    public String changeNickname(String nickname) {
-        this.nickname = nickname;
-        return nickname;
     }
 
     public void delete(boolean isPermanent) {

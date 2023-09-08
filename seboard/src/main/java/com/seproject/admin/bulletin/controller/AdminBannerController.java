@@ -23,13 +23,10 @@ public class AdminBannerController {
     private final AdminBannerAppService adminBannerAppService;
 
     @GetMapping
-    public ResponseEntity<List<BannerResponse>> retrieveBanner(@RequestParam(required = false) Boolean isActive,
-                                                               @RequestParam(defaultValue = "0") int page,
-                                                               @RequestParam(defaultValue = "10") int perPage){
+    public ResponseEntity<List<BannerResponse>> retrieveBanner(@RequestParam(required = false) Boolean isActive){
 
-        Page<BannerResponse> res = adminBannerAppService.retrieveBanner(PageRequest.of(0,100_000), isActive);
-        //TODO : 페이징 빼기
-        return ResponseEntity.ok(res.getContent());
+        List<BannerResponse> res = adminBannerAppService.retrieveBanner(isActive);
+        return ResponseEntity.ok(res);
     }
 
     @PostMapping

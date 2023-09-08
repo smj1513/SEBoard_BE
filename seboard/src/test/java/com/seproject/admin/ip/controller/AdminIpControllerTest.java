@@ -71,11 +71,7 @@ class AdminIpControllerTest {
         perform.andDo(print())
                 .andExpect(status().isOk());
 
-        perform.andExpect(jsonPath("$.first").value(false))
-                .andExpect(jsonPath("$.totalPages").value(3))
-                .andExpect(jsonPath("$.totalElements").value(27))
-                .andExpect(jsonPath("$.size").value(11))
-                .andExpect(jsonPath("$.number").value(2));
+        perform.andExpect(jsonPath("$.size()").value(27));
     }
 
     @Test

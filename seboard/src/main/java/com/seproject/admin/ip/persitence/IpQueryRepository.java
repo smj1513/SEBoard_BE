@@ -23,22 +23,22 @@ public class IpQueryRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    public Page<IpResponse> findAll(IpCondition condition, Pageable pageable) {
+    public List<IpResponse> findAll(IpCondition condition) {
 
         List<IpResponse> ips = jpaQueryFactory
                 .select(Projections.constructor(IpResponse.class,
                         ip.id, ip.ipAddress))
                 .from(ip)
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize())
                 .fetch();
-
-        Long count = jpaQueryFactory
-                .select(ip.count())
-                .from(ip)
-                .fetchOne();
-
-        return new PageImpl<>(ips,pageable,count);
+        return ips;
+//        Long count = jpaQueryFactory
+//                .select(ip.count())
+//                .from(ip)
+//                .fetchOne();
+//
+//        return new PageImpl<>(ips,pageable,count);
     }
 
 

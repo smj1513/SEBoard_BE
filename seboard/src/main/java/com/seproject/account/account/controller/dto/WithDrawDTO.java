@@ -23,12 +23,11 @@ public class WithDrawDTO {
     public static class WithDrawResponse {
         private boolean requiredRedirect;
         private String url;
-
         private Long accountId;
         private String loginId;
         private List<String> roles;
-        private String nickname;
         private String name;
+
         public static WithDrawResponse toDTO(Account account, boolean requiredRedirect, String url) {
             return builder()
                     .requiredRedirect(requiredRedirect)
@@ -39,7 +38,6 @@ public class WithDrawDTO {
                             .map(RoleAccount::getRole)
                             .map(Role::toString)
                             .collect(Collectors.toList()))
-                    .nickname(account.getNickname())
                     .name(account.getName())
                     .build();
         }

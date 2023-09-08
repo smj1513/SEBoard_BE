@@ -60,18 +60,6 @@ public class AdminAccountController {
         return new ResponseEntity<>(HttpStatus.OK);
     }
 
-    @Operation(summary = "삭제된 계정 조회", description = "삭제된 계정 목록을 조회한다.")
-    @GetMapping("/deleted")
-    public ResponseEntity<Page<AccountResponse>> retrieveAccount(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "25") int perPage)  {
-
-        AccountCondition condition = new AccountCondition();
-        condition.setStatus(Status.TEMP_DELETED);
-        Page<AccountResponse> response = accountAppService.findAllAccount(condition, page, perPage);
-        return new ResponseEntity<>(response,HttpStatus.OK);
-    }
-
 //    @DeleteMapping
 //    public ResponseEntity<MessageResponse> deleteBulkAccount(@RequestBody AdminBulkAccountRequest request){
 //        accountService.deleteBulkAccount(request.getAccountIds(), false);

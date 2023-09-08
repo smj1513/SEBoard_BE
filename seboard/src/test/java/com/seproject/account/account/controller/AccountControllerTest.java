@@ -18,7 +18,10 @@ import com.seproject.account.token.domain.repository.LogoutTokenRepository;
 import com.seproject.account.token.service.TokenService;
 import com.seproject.board.common.Status;
 import com.seproject.global.AccountSetup;
+import com.seproject.global.BoardUserSetup;
 import com.seproject.global.RoleSetup;
+import com.seproject.member.domain.Member;
+import com.seproject.member.service.MemberService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -63,7 +66,7 @@ class AccountControllerTest {
     @Autowired private LogoutRefreshTokenRepository logoutRefreshTokenRepository;
     @Autowired private PasswordChangeConfirmedEmailRepository passwordChangeConfirmedEmailRepository;
     @Autowired private KumohConfirmedEmailRepository kumohConfirmedEmailRepository;
-
+    @Autowired MemberService memberService;
     @Test
     public void 로그아웃_테스트_성공() throws Exception {
         FormAccount formAccount = accountSetup.createFormAccount();
@@ -207,7 +210,6 @@ class AccountControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.accountId").value(formAccount.getAccountId()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.loginId").value(formAccount.getLoginId()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.roles.size()").value(1))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.nickname").value(formAccount.getNickname()))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.name").value(formAccount.getName()));
 
         Account account = accountService.findById(formAccount.getAccountId());
@@ -238,7 +240,7 @@ class AccountControllerTest {
     @Test
     public void 비밀번호_찾기() throws Exception {
         String email = UUID.randomUUID().toString() + "@kumoh.ac.kr";
-        FormAccount formAccount = accountSetup.createFormAccount(email, "name","nickname", List.of(), LocalDateTime.now(),Status.NORMAL);
+        FormAccount formAccount = accountSetup.createFormAccount(email, "name", List.of(), LocalDateTime.now(),Status.NORMAL);
 
         ResetPasswordRequest request = new ResetPasswordRequest();
         String newPassword = UUID.randomUUID().toString();
@@ -265,7 +267,7 @@ class AccountControllerTest {
     @Test
     public void 비밀번호_찾기_미인증_이메일() throws Exception {
         String email = UUID.randomUUID().toString() + "@kumoh.ac.kr";
-        FormAccount formAccount = accountSetup.createFormAccount(email, "name","nickname", List.of(), LocalDateTime.now(),Status.NORMAL);
+        FormAccount formAccount = accountSetup.createFormAccount(email, "name", List.of(), LocalDateTime.now(),Status.NORMAL);
 
         ResetPasswordRequest request = new ResetPasswordRequest();
         String newPassword = UUID.randomUUID().toString();
@@ -288,7 +290,7 @@ class AccountControllerTest {
         Role role = roleSetup.getRoleUser();
         ArrayList<Role> roles = new ArrayList<>(List.of(role));
         String email = UUID.randomUUID().toString() + "@kumoh.ac.kr";
-        FormAccount formAccount = accountSetup.createFormAccount(email, "name", "nickname", roles, LocalDateTime.now(), Status.NORMAL);
+        FormAccount formAccount = accountSetup.createFormAccount(email, "name", roles, LocalDateTime.now(), Status.NORMAL);
         KumohAuthDTO.KumohAuthRequest request = new KumohAuthDTO.KumohAuthRequest();
         request.setEmail(email);
         kumohConfirmedEmailRepository.save(new KumohConfirmedEmail(email));
@@ -316,7 +318,7 @@ class AccountControllerTest {
         Role role = roleSetup.getRoleUser();
         ArrayList<Role> roles = new ArrayList<>(List.of(role));
         String email = UUID.randomUUID().toString() + "@kumoh.ac.kr";
-        FormAccount formAccount = accountSetup.createFormAccount(email, "name", "nickname", roles, LocalDateTime.now(), Status.NORMAL);
+        FormAccount formAccount = accountSetup.createFormAccount(email, "name", roles, LocalDateTime.now(), Status.NORMAL);
         KumohAuthDTO.KumohAuthRequest request = new KumohAuthDTO.KumohAuthRequest();
         request.setEmail(email);
 
@@ -334,13 +336,16 @@ class AccountControllerTest {
         perform.andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
-    
+    @Autowired BoardUserSetup boardUserSetup;
+
     @Test
     public void 내정보_조회() throws Exception {
         FormAccount formAccount = accountSetup.createFormAccount();
+        Member member = boardUserSetup.createMember(formAccount);
 
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(formAccount.getLoginId(), formAccount.getPassword(), formAccount.getAuthorities());
         JWT accessToken = tokenService.createAccessToken(token);
+        em.flush(); em.clear();
 
         ResultActions perform = mvc.perform(MockMvcRequestBuilders.get("/mypage")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -351,7 +356,7 @@ class AccountControllerTest {
 
         perform.andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.nickname").value(formAccount.getNickname()));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.nickname").value(member.getName()));
     }
 
     @Test
@@ -365,11 +370,10 @@ class AccountControllerTest {
         perform.andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized());
     }
-
     @Test
     public void 내정보_변경() throws Exception {
         FormAccount formAccount = accountSetup.createFormAccount();
-
+        Member member = boardUserSetup.createMember(formAccount);
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(formAccount.getLoginId(), formAccount.getPassword(), formAccount.getAuthorities());
         JWT accessToken = tokenService.createAccessToken(token);
         MyPageDTO.MyInfoChangeRequest request = new MyPageDTO.MyInfoChangeRequest();
@@ -391,14 +395,14 @@ class AccountControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.nickname").value(nickname));
 
-        Account account = accountService.findById(formAccount.getAccountId());
-        Assertions.assertEquals(account.getNickname(),nickname);
+        Member findMember = memberService.findByAccountId(formAccount.getAccountId());
+        Assertions.assertEquals(findMember.getName(),nickname);
     }
 
     @Test
     public void 내정보_변경_비로그인() throws Exception {
         FormAccount formAccount = accountSetup.createFormAccount();
-
+        Member member = boardUserSetup.createMember(formAccount);
         MyPageDTO.MyInfoChangeRequest request = new MyPageDTO.MyInfoChangeRequest();
         String nickname = UUID.randomUUID().toString();
         request.setNickname(nickname);
@@ -414,7 +418,7 @@ class AccountControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isUnauthorized());
 
         Account account = accountService.findById(formAccount.getAccountId());
-        Assertions.assertNotEquals(account.getNickname(),nickname);
+        Assertions.assertNotEquals(member.getName(),nickname);
     }
     
     @Test
@@ -423,7 +427,7 @@ class AccountControllerTest {
         String newPassword = UUID.randomUUID().toString();
         String loginId = UUID.randomUUID().toString();
         List<Role> roles = new ArrayList<>();
-        Long formAccountId = accountService.createFormAccount(loginId, "name", "nickname", nowPassword, roles);
+        Long formAccountId = accountService.createFormAccount(loginId, "name", nowPassword, roles);
 
         UsernamePasswordAuthenticationToken token
                 = new UsernamePasswordAuthenticationToken(loginId,null,roles);
@@ -456,7 +460,7 @@ class AccountControllerTest {
         String newPassword = UUID.randomUUID().toString();
         String loginId = UUID.randomUUID().toString();
         List<Role> roles = new ArrayList<>();
-        Long formAccountId = accountService.createFormAccount(loginId, "name", "nickname", nowPassword, roles);
+        Long formAccountId = accountService.createFormAccount(loginId, "name", nowPassword, roles);
 
         UsernamePasswordAuthenticationToken token
                 = new UsernamePasswordAuthenticationToken(loginId,null,roles);

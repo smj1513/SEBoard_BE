@@ -53,7 +53,7 @@ public class AccountService implements UserDetailsService {
     }
 
     @Transactional
-    public Long createOAuthAccount(String email,String name,String nickname,String password,List<Role> roles,String sub,String provider) {
+    public Long createOAuthAccount(String email,String name,String password,List<Role> roles,String sub,String provider) {
 
         List<RoleAccount> roleAccounts = roles.stream()
                 .map((role) -> new RoleAccount(null,role))
@@ -62,7 +62,6 @@ public class AccountService implements UserDetailsService {
         OAuthAccount oAuthAccount = OAuthAccount.builder()
                 .loginId(email)
                 .name(name)
-                .nickname(nickname)
                 .password(passwordEncoder.encode(password))
                 .roleAccounts(roleAccounts)
                 .sub(sub)
@@ -77,7 +76,7 @@ public class AccountService implements UserDetailsService {
     }
 
     @Transactional
-    public Long createFormAccount(String email,String name,String nickname,String password,List<Role> roles) {
+    public Long createFormAccount(String email,String name,String password,List<Role> roles) {
 
         List<RoleAccount> roleAccounts = roles.stream()
                 .map((role) -> new RoleAccount(null, role))
@@ -86,7 +85,6 @@ public class AccountService implements UserDetailsService {
         FormAccount formAccount = FormAccount.builder()
                 .loginId(email)
                 .name(name)
-                .nickname(nickname)
                 .password(passwordEncoder.encode(password))
                 .roleAccounts(roleAccounts)
                 .createdAt(LocalDateTime.now())
@@ -111,7 +109,7 @@ public class AccountService implements UserDetailsService {
     }
 
     @Transactional
-    public Long createAccount(String loginId, String password,String name, String nickname,List<Role> roles) {
+    public Long createAccount(String loginId, String password,String name,List<Role> roles) {
         List<RoleAccount> roleAccounts = roles.stream()
                 .map((role) -> new RoleAccount(null, role))
                 .collect(Collectors.toList());
@@ -120,7 +118,6 @@ public class AccountService implements UserDetailsService {
                 .loginId(loginId)
                 .password(passwordEncoder.encode(password))
                 .name(name)
-                .nickname(nickname)
                 .roleAccounts(roleAccounts)
                 .status(Status.NORMAL)
                 .createdAt(LocalDateTime.now())
@@ -130,7 +127,7 @@ public class AccountService implements UserDetailsService {
         return account.getAccountId();
     }
     @Transactional
-    public Long updateAccount(Long accountId,String loginId, String password, String name, String nickname, List<Role> roles) {
+    public Long updateAccount(Long accountId,String loginId, String password, String name, List<Role> roles) {
 
         Account account = accountRepository.findById(accountId)
                 .orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.USER_NOT_FOUND,null));
@@ -145,7 +142,6 @@ public class AccountService implements UserDetailsService {
                 loginId,
                 encodedPassword,
                 name,
-                nickname,
                 roleAccounts);
 
         return account.getAccountId();

@@ -8,6 +8,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 import static com.seproject.admin.ip.controller.dto.IpDTO.*;
 
 @Transactional(readOnly = true)
@@ -18,9 +20,9 @@ public class AdminIpAppService {
     private final IpService ipService;
     private final IpQueryRepository ipQueryRepository;
 
-    public Page<IpResponse> findAll(IpCondition condition, int page, int perPage) {
-        PageRequest pageRequest = PageRequest.of(page, perPage);
-        return ipQueryRepository.findAll(condition,pageRequest);
+    public List<IpResponse> findAll(IpCondition condition) {
+//        PageRequest pageRequest = PageRequest.of(page, perPage);
+        return ipQueryRepository.findAll(condition);
 
     }
 

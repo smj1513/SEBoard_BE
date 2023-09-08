@@ -73,7 +73,7 @@ class ProfileControllerTest {
                         .header("Authorization",accessToken)
         ).andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nickname").value(formAccount.getNickname()))
+                .andExpect(jsonPath("$.nickname").value(member.getName()))
                 .andExpect(jsonPath("$.postCount").value(1))
                 .andExpect(jsonPath("$.commentCount").value(1))
                 .andExpect(jsonPath("$.bookmarkCount").value(1));
@@ -100,7 +100,7 @@ class ProfileControllerTest {
                                 .characterEncoding("UTF-8")
                 ).andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.nickname").value(formAccount.getNickname()))
+                .andExpect(jsonPath("$.nickname").value(member.getName()))
                 .andExpect(jsonPath("$.postCount").value(1))
                 .andExpect(jsonPath("$.commentCount").value(1))
                 .andExpect(jsonPath("$.bookmarkCount").isEmpty());

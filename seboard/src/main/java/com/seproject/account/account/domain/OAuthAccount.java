@@ -31,12 +31,11 @@ public class OAuthAccount extends Account{
 
     @Builder
     public OAuthAccount(Long accountId, String loginId,
-                        String name, String nickname,
+                        String name,
                         String password, List<RoleAccount> roleAccounts, LocalDateTime createdAt, Status status, String provider, String sub) {
         this.accountId = accountId;
         this.loginId = loginId;
         this.name = name;
-        this.nickname = nickname;
         this.password = password;
 
         this.roleAccounts = new ArrayList<>();
