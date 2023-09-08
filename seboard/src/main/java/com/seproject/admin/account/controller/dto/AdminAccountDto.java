@@ -22,7 +22,11 @@ public class AdminAccountDto {
         private LocalDateTime createdAt;
         private List<String> roles;
 
-        public AccountResponse(Long accountId, String loginId, String name, String nickname, LocalDateTime createdAt) {
+        public AccountResponse(Long accountId,
+                               String loginId,
+                               String name,
+                               String nickname,
+                               LocalDateTime createdAt) {
             this.accountId = accountId;
             this.loginId = loginId;
             this.name = name;

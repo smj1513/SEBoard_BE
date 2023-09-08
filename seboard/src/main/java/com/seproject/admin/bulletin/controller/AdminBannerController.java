@@ -12,6 +12,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 import static com.seproject.admin.bulletin.controller.dto.BannerDTO.*;
 
 @RestController
@@ -21,11 +23,13 @@ public class AdminBannerController {
     private final AdminBannerAppService adminBannerAppService;
 
     @GetMapping
-    public ResponseEntity<Page<BannerResponse>> retrieveBanner(@RequestParam(required = false) Boolean isActive,
+    public ResponseEntity<List<BannerResponse>> retrieveBanner(@RequestParam(required = false) Boolean isActive,
                                                                @RequestParam(defaultValue = "0") int page,
                                                                @RequestParam(defaultValue = "10") int perPage){
-        Page<BannerResponse> res = adminBannerAppService.retrieveBanner(PageRequest.of(page,perPage), isActive);
-        return ResponseEntity.ok(res);
+
+        Page<BannerResponse> res = adminBannerAppService.retrieveBanner(PageRequest.of(0,100_000), isActive);
+        //TODO : 페이징 빼기
+        return ResponseEntity.ok(res.getContent());
     }
 
     @PostMapping

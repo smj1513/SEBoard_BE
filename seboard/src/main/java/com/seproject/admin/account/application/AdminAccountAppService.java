@@ -48,8 +48,10 @@ public class AdminAccountAppService {
 
 
     public Page<AccountResponse> findAllAccount(AccountCondition condition, int page, int perPage) {
+         //TODO :
         PageRequest pageRequest = PageRequest.of(page,perPage);
-        return accountQueryRepository.findAllAccount(condition,pageRequest);
+        Page<AccountResponse> response = accountQueryRepository.findAllAccount(condition, pageRequest);
+        return response;
     }
 
     public AccountResponse findAccount(Long accountId) {

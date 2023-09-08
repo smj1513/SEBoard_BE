@@ -30,11 +30,12 @@ public class AdminIpController {
 
     @Operation(summary = "금지 아이피 목록 조회", description = "접근이 금지된 아이피의 목록을 조회한다.")
     @GetMapping
-    public ResponseEntity<Page<IpResponse>> retrieveAllBannedIp(@ModelAttribute IpCondition condition,
+    public ResponseEntity<List<IpResponse>> retrieveAllBannedIp(@ModelAttribute IpCondition condition,
                                                  @RequestParam(value = "page", defaultValue = "0") int page,
                                                  @RequestParam(value = "perPage", defaultValue = "25") int perPage) {
-        Page<IpResponse> response = adminIpAppService.findAll(condition, page, perPage);
-        return new ResponseEntity<>(response, HttpStatus.OK);
+        //TODO : 페이징 빼기
+        Page<IpResponse> response = adminIpAppService.findAll(condition, 0, 100_000);
+        return new ResponseEntity<>(response.getContent(), HttpStatus.OK);
     }
 
     @Operation(summary = "금지 아이피 추가", description = "접근을 금지할 아이피를 추가한다.")

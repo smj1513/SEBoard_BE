@@ -151,8 +151,9 @@ public class AccountAppService {
     public MyInfoChangeResponse updateMyInfo(MyInfoChangeRequest request) {
         Account account = SecurityUtils.getAccount()
                         .orElseThrow(() -> new CustomAuthenticationException(ErrorCode.NOT_LOGIN,null));
-        account.changeNickname(request.getNickname());
 
+        account = accountService.findById(account.getAccountId());
+        account.changeNickname(request.getNickname());
         return MyInfoChangeResponse.toDTO(account);
     }
 

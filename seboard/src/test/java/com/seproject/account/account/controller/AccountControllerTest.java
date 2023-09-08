@@ -376,6 +376,7 @@ class AccountControllerTest {
         String nickname = UUID.randomUUID().toString();
         request.setNickname(nickname);
 
+        em.flush(); em.clear();
         ResultActions perform = mvc.perform(MockMvcRequestBuilders.put("/mypage/info")
                 .contentType(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8")
@@ -383,6 +384,8 @@ class AccountControllerTest {
                 .content(objectMapper.writeValueAsString(request))
                 .header(HttpHeaders.AUTHORIZATION, accessToken.getToken())
         );
+
+        em.flush(); em.clear();
 
         perform.andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())

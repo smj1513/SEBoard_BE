@@ -27,7 +27,7 @@ public abstract class Account implements UserDetails {
 
     protected String loginId;
     protected String name;
-    protected String nickname;
+    protected String nickname; //TODO : 닉네임 변경
     protected String password;
 
     @OneToMany(mappedBy = "account", fetch = FetchType.LAZY,cascade = CascadeType.ALL,orphanRemoval = true)
