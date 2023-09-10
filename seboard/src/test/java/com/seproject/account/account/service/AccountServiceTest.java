@@ -91,7 +91,7 @@ class AccountServiceTest {
         Optional<OAuthAccount> optional = oAuthAccountRepository.findOAuthAccountBySubAndProvider(oAuthAccount.getSub(), oAuthAccount.getProvider());
         Assertions.assertTrue(optional.isEmpty());
 
-        OAuthAccount findAccount = accountService.findOAuthAccountById(oAuthAccount.getAccountId()).orElseThrow();
+        OAuthAccount findAccount = accountService.findOAuthAccountById(oAuthAccount.getAccountId());
         Assertions.assertNull(findAccount.getSub());
     }
 

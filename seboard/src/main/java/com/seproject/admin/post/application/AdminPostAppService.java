@@ -6,22 +6,15 @@ import com.seproject.admin.post.controller.dto.PostRequest.AdminPostRetrieveCond
 import com.seproject.admin.post.controller.dto.PostResponse.DeletedPostResponse;
 import com.seproject.admin.post.controller.dto.PostResponse.PostRetrieveResponse;
 import com.seproject.admin.post.service.AdminPostService;
-import com.seproject.board.menu.domain.Menu;
-import com.seproject.board.menu.service.MenuService;
 import com.seproject.board.post.domain.repository.AdminPostSearchRepository;
 import com.seproject.board.post.service.PostService;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomAccessDeniedException;
 import com.seproject.error.exception.CustomAuthenticationException;
-import com.seproject.error.exception.InvalidAuthorizationException;
 import com.seproject.error.exception.NoSuchResourceException;
 import com.seproject.board.menu.domain.Category;
-import com.seproject.member.domain.BoardUser;
 import com.seproject.board.post.domain.model.Post;
 import com.seproject.board.menu.domain.repository.CategoryRepository;
-import com.seproject.board.common.domain.repository.ReportRepository;
-import com.seproject.member.domain.repository.BoardUserRepository;
-import com.seproject.board.post.domain.repository.PostRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -29,10 +22,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.nio.file.AccessDeniedException;
 import java.util.List;
 
-import static com.seproject.board.common.utils.AppServiceHelper.findByIdOrThrow;
 
 @Service
 @RequiredArgsConstructor

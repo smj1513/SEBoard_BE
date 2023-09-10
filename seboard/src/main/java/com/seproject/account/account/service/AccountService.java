@@ -104,8 +104,9 @@ public class AccountService implements UserDetailsService {
                 .orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.USER_NOT_FOUND,null));
     }
 
-    public Optional<OAuthAccount> findOAuthAccountById(Long accountId) {
-        return oAuthAccountRepository.findById(accountId);
+    public OAuthAccount findOAuthAccountById(Long accountId) {
+        return oAuthAccountRepository.findById(accountId)
+                .orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.USER_NOT_FOUND,null));
     }
 
     @Transactional

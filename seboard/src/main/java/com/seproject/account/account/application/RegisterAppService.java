@@ -64,7 +64,7 @@ public class RegisterAppService {
         List<Role> authorities = roleService.findByNameIn(roles);
 
         Long accountId = accountService.createOAuthAccount(email, name, password, authorities, sub, provider);
-        OAuthAccount account = accountService.findOAuthAccountById(accountId).orElseThrow();
+        OAuthAccount account = accountService.findOAuthAccountById(accountId);
         Long memberId = memberService.createMember(account,nickname);
 
         UsernamePasswordAuthenticationToken token =

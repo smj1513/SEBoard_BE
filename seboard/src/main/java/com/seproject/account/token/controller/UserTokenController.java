@@ -2,6 +2,8 @@ package com.seproject.account.token.controller;
 
 import com.seproject.account.account.controller.dto.LoginDTO;
 import com.seproject.account.account.domain.OAuthAccount;
+import com.seproject.account.account.domain.repository.OAuthAccountRepository;
+import com.seproject.account.account.service.AccountService;
 import com.seproject.account.social.TemporalUserInfo;
 import com.seproject.account.social.repository.TemporalUserInfoRepository;
 import com.seproject.account.token.domain.JWT;
@@ -21,6 +23,8 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.Optional;
 import java.util.UUID;
 
+import static com.seproject.account.account.controller.dto.LoginDTO.*;
+
 
 @Tag(name = "토큰 조회 API", description = "로그인 후 토큰 조회 API")
 @RequiredArgsConstructor
@@ -30,8 +34,10 @@ public class UserTokenController {
     private final UserTokenRepository userTokenRepository;
     private final TemporalUserInfoRepository temporalUserInfoRepository;
     private final TokenService tokenService;
+    private final AccountService accountService;
+
     @GetMapping("/auth/kakao")
-    public ResponseEntity<?> findUserToken(@RequestParam String id) {
+    public ResponseEntity<LoginResponseDTO> findUserToken(@RequestParam("id") String id) {
         Optional<UserToken> userTokenOptional = userTokenRepository.findById(id);
 
         if(userTokenOptional.isEmpty()) {
@@ -41,7 +47,8 @@ public class UserTokenController {
         UserToken userToken = userTokenOptional.get();
         userTokenRepository.delete(userToken);
 
-        OAuthAccount account = userToken.getAccount();
+        Long oAuthAccountId = userToken.getOAuthAccountId();
+        OAuthAccount account = accountService.findOAuthAccountById(oAuthAccountId);
 
         UsernamePasswordAuthenticationToken token =
                 new UsernamePasswordAuthenticationToken(account.getSub(), UUID.randomUUID().toString(),account.getAuthorities());
@@ -49,7 +56,7 @@ public class UserTokenController {
         JWT accessToken = tokenService.createAccessToken(token);
         JWT refreshToken = tokenService.createLargeRefreshToken(token);
 
-        LoginDTO.LoginResponseDTO loginResponseDTO = LoginDTO.LoginResponseDTO.builder()
+        LoginResponseDTO loginResponseDTO = LoginResponseDTO.builder()
                 .accessToken(accessToken.getToken())
                 .refreshToken(refreshToken.getToken())
                 .build();
@@ -58,7 +65,7 @@ public class UserTokenController {
     }
 
     @GetMapping("/register/oauth")
-    public ResponseEntity<?> findTemporalUserInfo(@RequestParam("id") String id) {
+    public ResponseEntity<TemporalUserInfo> findTemporalUserInfo(@RequestParam("id") String id) {
         Optional<TemporalUserInfo> optionalTemporalUserInfo = temporalUserInfoRepository.findById(id);
 
         if(optionalTemporalUserInfo.isEmpty()) {

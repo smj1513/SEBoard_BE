@@ -91,6 +91,7 @@ tasks.jacocoTestReport {
                     fileTree(dir: it, exclude: ["**/*ProjectApplication*",
                                                 "**/*Config*",
                                                 "**/*DTO*",
+                                                "**/*Dto*",
                                                 "**/*Command*",
                                                 "**/*ControllerAdvice*",
                                                 "**/*Exception*",
@@ -105,6 +106,9 @@ tasks.jacocoTestReport {
                                                 "**/*Oidc*.*",
                                                 "**/*File*.*",
                                                 "**/*Email*.*",
+                                                "**/*DeSerializer*.*",
+                                                "**/*Serializer*.*",
+                                                "**/*HTMLCharacterEscapes*.*",
                     ] + Qdomains)
                 }))
     }
@@ -123,13 +127,27 @@ tasks.jacocoTestCoverageVerification {
 
         classDirectories.setFrom(
                 files(classDirectories.files.collect {
-                    fileTree(dir: it, exclude: ["**/*Application*",
-                                                "**/*Request*",
-                                                "**/*Command*",
+                    fileTree(dir: it, exclude: ["**/*ProjectApplication*",
+                                                "**/*Config*",
+                                                "**/*DTO*",
                                                 "**/*Dto*",
+                                                "**/*Command*",
+                                                "**/*ControllerAdvice*",
+                                                "**/*Exception*",
+                                                "**/*Condition*",
+                                                "**/*Init*",
                                                 "**/*BaseTime**",
-                                                "**/*Foramtter**",
-                                                "**/*ReservationStatusReqConverter**"
+                                                "**/*Response*.*",
+                                                "**/*Request*.*",
+                                                "**/*Builder*.*",
+                                                "**/*Handler*.*",
+                                                "**/*OAuth2*.*",
+                                                "**/*Oidc*.*",
+                                                "**/*File*.*",
+                                                "**/*Email*.*",
+                                                "**/*DeSerializer*.*",
+                                                "**/*Serializer*.*",
+                                                "**/*HTMLCharacterEscapes*.*",
                     ] + Qdomains)
                 }))
     }

@@ -15,6 +15,6 @@ public class UserToken {
     @Id
     private String id;
 
-    private OAuthAccount account;
+    private Long oAuthAccountId;
 
 }

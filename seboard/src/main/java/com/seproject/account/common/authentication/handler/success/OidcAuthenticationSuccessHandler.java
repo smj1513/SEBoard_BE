@@ -45,7 +45,7 @@ public class OidcAuthenticationSuccessHandler implements AuthenticationSuccessHa
             String id = UUID.randomUUID().toString();
             UserToken userToken = UserToken.builder()
                     .id(id)
-                    .account(oAuthAccount)
+                    .oAuthAccountId(oAuthAccount.getAccountId())
                     .build();
 
             userTokenRepository.save(userToken);
