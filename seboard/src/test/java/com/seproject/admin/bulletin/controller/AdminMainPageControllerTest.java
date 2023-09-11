@@ -125,6 +125,27 @@ class AdminMainPageControllerTest {
     }
 
     @Test
+    public void 메인_페이지_외부_메뉴는_등록_불가() throws Exception {
+        ExternalSiteMenu externalSiteMenu = menuSetup.createExternalSiteMenu(menuSetup.createMenu());
+
+        CreateMainPageMenuRequest request = new CreateMainPageMenuRequest();
+        request.setMenuId(externalSiteMenu.getMenuId());
+
+        em.flush();
+        em.clear();
+
+        mvc.perform(post(url)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .header("Authorization",accessToken)
+                        .characterEncoding("UTF-8")
+                        .content(objectMapper.writeValueAsString(request))
+                ).andDo(print())
+                .andExpect(status().isBadRequest());
+    }
+
+
+    @Test
     public void 등록할_수_없는_메뉴_메인페이지_추가() throws Exception {
         Menu menu = menuSetup.createMenu();
         ExternalSiteMenu externalSiteMenu = menuSetup.createExternalSiteMenu(menu);
@@ -234,6 +255,8 @@ class AdminMainPageControllerTest {
             assertTrue(ids.contains(menuIds.get(i)));
         }
     }
+
+
 
 
 

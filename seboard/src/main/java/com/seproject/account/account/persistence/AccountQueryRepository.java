@@ -3,9 +3,11 @@ package com.seproject.account.account.persistence;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.seproject.account.role.domain.QRoleAccount;
 import com.seproject.admin.account.controller.condition.AccountCondition;
 import com.seproject.admin.account.controller.dto.AdminAccountDto;
 import com.seproject.board.common.Status;
+import com.seproject.member.domain.QMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import static com.seproject.account.account.domain.QAccount.account;
+import static com.seproject.member.domain.QMember.*;
 
 @RequiredArgsConstructor
 @Repository
@@ -33,8 +36,9 @@ public class AccountQueryRepository {
 
     public boolean existsByNickname(String nickname) {
         return jpaQueryFactory
-                .select(account.accountId)
-                .from(account)
+                .select(member.boardUserId)
+                .from(member)
+                .leftJoin(member.account, account)
                 .where(eqNickname(nickname)
                         .and(available()))
                 .fetchFirst() != null;
@@ -43,12 +47,13 @@ public class AccountQueryRepository {
     public Page<AdminAccountDto.AccountResponse> findAllAccount(AccountCondition condition, Pageable pageable) {
         List<AdminAccountDto.AccountResponse> accounts = jpaQueryFactory
                 .select(Projections.constructor(AdminAccountDto.AccountResponse.class,
-                        account.accountId,
-                        account.loginId,
-                        account.name,
-                        account.nickname,
-                        account.createdAt))
-                .from(account)
+                        member.account.accountId,
+                        member.account.loginId,
+                        member.account.name,
+                        member.name,
+                        member.account.createdAt))
+                .from(member)
+                .join(member.account,account)
                 .where(eqStatus(condition.getStatus()))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -73,7 +78,7 @@ public class AccountQueryRepository {
     }
 
     private BooleanExpression eqNickname(String nickname) {
-        return account.nickname.eq(nickname);
+        return member.name.eq(nickname);
     }
 
     private BooleanExpression available() {

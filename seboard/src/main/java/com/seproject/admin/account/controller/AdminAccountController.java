@@ -2,6 +2,7 @@ package com.seproject.admin.account.controller;
 
 import com.seproject.admin.account.application.AdminAccountAppService;
 import com.seproject.admin.account.controller.condition.AccountCondition;
+import com.seproject.board.common.Status;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;

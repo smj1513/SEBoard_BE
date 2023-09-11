@@ -18,9 +18,7 @@ public class LoginHistory {
 
     @Id @GeneratedValue
     private Long id;
-
     private String loginId;
-
     private LocalDateTime time;
 
     public LoginHistory(String loginId) {

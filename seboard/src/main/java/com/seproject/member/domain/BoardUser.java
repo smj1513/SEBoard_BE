@@ -33,4 +33,8 @@ public abstract class BoardUser {
     public String getLoginId(){
         return account.getLoginId();
     }
+
+    public void changeName(String name) {
+        this.name = name;
+    }
 }

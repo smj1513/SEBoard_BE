@@ -3,11 +3,13 @@ package com.seproject.account.role.domain;
 import com.seproject.account.account.domain.Account;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import javax.persistence.*;
 
 @NoArgsConstructor
 @Getter
+@ToString(exclude = {"account"})
 @Entity
 public class RoleAccount {
 

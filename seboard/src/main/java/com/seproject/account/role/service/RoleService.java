@@ -62,14 +62,14 @@ public class RoleService {
             roleName = "ROLE_" + roleName;
         }
 
+        if (Role.isImmutable(roleName))
+            throw new CustomIllegalArgumentException(ErrorCode.IMMUTABLE_ROLE,null);
+
         Role role = Role.builder()
                 .name(roleName)
                 .description(description)
                 .alias(alias)
                 .build();
-
-        if (role.isImmutable())
-            throw new CustomIllegalArgumentException(ErrorCode.IMMUTABLE_ROLE,null);
 
         roleRepository.save(role);
         return role.getId();
@@ -109,8 +109,12 @@ public class RoleService {
 
     public List<Role> convertRoles(SelectOption selectOption) {
         List<String> roleNames;
-        switch (selectOption){
 
+        if (selectOption == null) {
+            throw new CustomIllegalArgumentException(ErrorCode.SELECT_OPTION_NOT_FOUND,null);
+        }
+
+        switch (selectOption){
             case OVER_USER: {
                 roleNames = List.of(Role.ROLE_USER,Role.ROLE_KUMOH,Role.ROLE_ADMIN);
                 return roleRepository.findByNameIn(roleNames);
@@ -131,7 +135,7 @@ public class RoleService {
             }
         }
 
-        throw new CustomIllegalArgumentException(ErrorCode.INVALID_MENU_REQUEST,null);
+        throw new CustomIllegalArgumentException(ErrorCode.SELECT_OPTION_NOT_FOUND,null);
     }
 
 }

@@ -33,7 +33,6 @@ public class InitData {
                     .accountId(100000L)
                     .loginId("user")
                     .name("user_name")
-                    .nickname("user_nickname")
                     .password("$2a$10$Dw5746fmIzeN.SqjuPzR9.FHEwQP4IXOggdIG78bjaWn1lz0864R6")
                     .createdAt( LocalDateTime.of(2023, 04, 26, 12, 12, 10))
                     .status(Status.NORMAL)

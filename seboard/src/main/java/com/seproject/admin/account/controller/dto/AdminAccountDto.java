@@ -1,43 +1,65 @@
 package com.seproject.admin.account.controller.dto;
 
 import com.seproject.account.account.domain.Account;
+import com.seproject.account.role.domain.Role;
+import com.seproject.admin.role.controller.dto.RoleDTO;
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class AdminAccountDto {
 
     @Data
-    @AllArgsConstructor
-    @Builder(access = AccessLevel.PRIVATE)
+
     public static class AccountResponse {
         private Long accountId;
         private String loginId;
         private String name;
         private String nickname;
-        private LocalDateTime createdAt;
-        private List<String> roles;
+        private LocalDateTime registeredDate;
+        private List<RoleDTO.RoleResponse> roles;
 
-        public AccountResponse(Long accountId, String loginId, String name, String nickname, LocalDateTime createdAt) {
+        public AccountResponse(Long accountId,
+                               String loginId,
+                               String name,
+                               String nickname,
+                               LocalDateTime registeredDate) {
             this.accountId = accountId;
             this.loginId = loginId;
             this.name = name;
             this.nickname = nickname;
-            this.createdAt = createdAt;
+            this.registeredDate = registeredDate;
+            this.roles = new ArrayList<>();
         }
 
-        public static AccountResponse of(Account account,List<String> roles) {
+        @Builder(access = AccessLevel.PRIVATE)
+        public AccountResponse(Long accountId,
+                               String loginId,
+                               String name,
+                               String nickname,
+                               LocalDateTime registeredDate,
+                               List<RoleDTO.RoleResponse> roles) {
+            this.accountId = accountId;
+            this.loginId = loginId;
+            this.name = name;
+            this.nickname = nickname;
+            this.registeredDate = registeredDate;
+            this.roles = roles;
+        }
+
+        public static AccountResponse of(Account account,List<RoleDTO.RoleResponse> roles) {
 
             return builder()
                     .accountId(account.getAccountId())
                     .loginId(account.getLoginId())
                     .name(account.getName())
-                    .nickname(account.getNickname())
-                    .createdAt(account.getCreatedAt())
+                    .registeredDate(account.getCreatedAt())
                     .roles(roles)
                     .build();
 

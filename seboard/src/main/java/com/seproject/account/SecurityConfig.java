@@ -110,10 +110,6 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
-    public GrantedAuthoritiesMapper customAuthorityMapper() {
-        return new CustomAuthorityMapper();
-    }
 
     @Bean
     public AuthenticationManager authenticationManager() throws Exception {

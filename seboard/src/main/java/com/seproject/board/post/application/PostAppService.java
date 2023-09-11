@@ -3,8 +3,10 @@ package com.seproject.board.post.application;
 import com.seproject.account.account.domain.Account;
 import com.seproject.account.account.domain.repository.AccountRepository;
 import com.seproject.account.account.service.AccountService;
+import com.seproject.account.role.domain.Role;
 import com.seproject.account.utils.SecurityUtils;
 import com.seproject.board.menu.service.CategoryService;
+import com.seproject.board.post.domain.model.exposeOptions.ExposeState;
 import com.seproject.board.post.service.PostService;
 import com.seproject.error.exception.*;
 import com.seproject.file.domain.model.FileConfiguration;
@@ -58,13 +60,7 @@ public class PostAppService {
     public Long writePost(PostWriteCommand command){
         Account account = SecurityUtils.getAccount()
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_LOGIN));
-
         Category category = categoryService.findById(command.getCategoryId());
-
-        if(!category.editable(account.getRoles())){
-            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
-        }
-
         BoardUser author = command.isAnonymous() ?
                 createAnonymous(account) : memberService.findByAccountId(account.getAccountId());
 
@@ -85,8 +81,8 @@ public class PostAppService {
         validFileListSize(fileMetaDataList);
 
         boolean isPined = command.isPined();
-
-        if(category.manageable(author.getAccount().getRoles())){
+        List<Role> roles = author.getAccount().getRoles();
+        if(!category.editable(roles)){
             throw new CustomAccessDeniedException(ErrorCode.ACCESS_DENIED,null);
         }
 
@@ -96,6 +92,15 @@ public class PostAppService {
 
         HashSet<FileMetaData> attachments = new HashSet<>(fileMetaDataList);
         ExposeOption exposeOption = ExposeOption.of(command.getExposeState(), command.getPrivatePassword());
+
+        if (command.getExposeState() == ExposeState.KUMOH) {
+            boolean match = roles.stream()
+                    .anyMatch((role) -> role.getAuthority().equals(Role.ROLE_KUMOH));
+            if (!match) {
+                throw new CustomIllegalArgumentException(ErrorCode.ACCESS_DENIED,null);
+            }
+        }
+
         Long postId = postService.createPost(title, contents, category, author, now, isPined, attachments, exposeOption);
         return postId;
     }
@@ -104,11 +109,12 @@ public class PostAppService {
 
     @Transactional
     public Long editPost(PostEditCommand command) {
-        Account account = accountService.findByLoginId(command.getLoginId());
+        Account account = SecurityUtils.getAccount()
+                .orElseThrow(() -> new CustomAuthenticationException(ErrorCode.NOT_LOGIN,null));
 
         Post post = postService.findByIdWithCategory(command.getPostId());
 
-        if(!post.isWrittenBy(account.getAccountId()) &&  !post.getCategory().manageable(account.getRoles())){
+        if(!post.isWrittenBy(account.getAccountId()) || !post.getCategory().manageable(account.getRoles())){
             throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 
@@ -131,8 +137,9 @@ public class PostAppService {
 
         validFileListSize(new ArrayList<>(post.getAttachments()));
 
-        Category category = categoryService.findById(command.getCategoryId());
-        post.changeCategory(category);
+        //TODO : 카테고리 변경은 불가능
+//        Category category = categoryService.findById(command.getCategoryId());
+//        post.changeCategory(category);
 
         return post.getPostId();
     }
@@ -149,15 +156,19 @@ public class PostAppService {
     }
 
     @Transactional
-    public void removePost(Long postId, String loginId) {
-        Account account = accountService.findByLoginId(loginId);
+    public void removePost(Long postId) {
+        Account account = SecurityUtils.getAccount()
+                .orElseThrow(() -> new CustomAuthenticationException(ErrorCode.NOT_LOGIN,null));
+
         Post post = postService.findByIdWithCategory(postId);
 
-        if(!post.isWrittenBy(account.getAccountId()) &&  !post.getCategory().manageable(account.getRoles())){
-            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
+        if (post.isWrittenBy(account.getAccountId()) || post.getCategory().manageable(account.getRoles())) {
+            post.delete(true);
+            return;
         }
 
-        post.delete(true);
+        throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
+
 //        post.getAttachments().forEach(fileAppService::deleteFileFromStorage); //TODO : fileSystem에서 transactional 처리 필요
 //        postRepository.deleteById(postId);
     }

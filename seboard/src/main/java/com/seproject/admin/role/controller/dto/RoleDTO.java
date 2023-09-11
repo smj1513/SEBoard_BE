@@ -4,6 +4,7 @@ import com.seproject.account.role.domain.Role;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,18 +12,33 @@ import java.util.stream.Collectors;
 public class RoleDTO {
 
     @Data
-    @Builder(access = AccessLevel.PRIVATE)
+    @NoArgsConstructor
     public static class RoleResponse {
+        private Long accountId;
         private Long roleId;
         private String name;
         private String description;
         private String alias;
+        private boolean immutable;
 
-        public RoleResponse(Long roleId, String name, String description, String alias) {
+        @Builder(access = AccessLevel.PRIVATE)
+        public RoleResponse(Long accountId, Long roleId, String name, String description, String alias,boolean immutable) {
+            this.accountId = accountId;
             this.roleId = roleId;
             this.name = name;
             this.description = description;
             this.alias = alias;
+            this.immutable = immutable;
+        }
+
+        @Builder(access = AccessLevel.PRIVATE)
+        public RoleResponse(Long accountId, Long roleId, String name, String description, String alias) {
+            this.accountId = accountId;
+            this.roleId = roleId;
+            this.name = name;
+            this.description = description;
+            this.alias = alias;
+            this.immutable = Role.isImmutable(name);
         }
 
         public static RoleResponse of(Role role) {
@@ -30,6 +46,7 @@ public class RoleDTO {
                     .roleId(role.getId())
                     .name(role.getAuthority())
                     .description(role.getDescription())
+                    .immutable(role.isImmutable())
                     .alias(role.toString())
                     .build();
         }

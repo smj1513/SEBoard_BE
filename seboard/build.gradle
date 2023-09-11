@@ -9,7 +9,12 @@ plugins {
     id 'java'
     id 'org.springframework.boot' version '2.7.9'
     id 'io.spring.dependency-management' version '1.0.15.RELEASE'
+    id 'jacoco'
     id "com.ewerk.gradle.plugins.querydsl" version "1.0.10"
+}
+
+jacoco {
+    toolVersion = "0.8.7"
 }
 
 
@@ -63,9 +68,106 @@ dependencies {
 
 }
 
-tasks.named('test') {
+tasks.test {
     useJUnitPlatform()
+    finalizedBy 'jacocoTestReport'
 }
+
+tasks.jacocoTestReport {
+    reports {
+        html.enabled true
+        xml.enabled false
+        csv.enabled false
+    }
+
+    def Qdomains = []
+    for (qPattern in "**/QA".."**/QZ") {
+        Qdomains.add(qPattern + "*")
+    }
+
+    afterEvaluate {
+        classDirectories.setFrom(
+                files(classDirectories.files.collect {
+                    fileTree(dir: it, exclude: ["**/*ProjectApplication*",
+                                                "**/*Config*",
+                                                "**/*DTO*",
+                                                "**/*Dto*",
+                                                "**/*Command*",
+                                                "**/*ControllerAdvice*",
+                                                "**/*Exception*",
+                                                "**/*Condition*",
+                                                "**/*Init*",
+                                                "**/*BaseTime**",
+                                                "**/*Response*.*",
+                                                "**/*Request*.*",
+                                                "**/*Builder*.*",
+                                                "**/*Handler*.*",
+                                                "**/*OAuth2*.*",
+                                                "**/*Oidc*.*",
+                                                "**/*File*.*",
+                                                "**/*Email*.*",
+                                                "**/*DeSerializer*.*",
+                                                "**/*Serializer*.*",
+                                                "**/*HTMLCharacterEscapes*.*",
+                    ] + Qdomains)
+                }))
+    }
+
+    finalizedBy 'jacocoTestCoverageVerification'
+}
+
+tasks.jacocoTestCoverageVerification {
+    def Qdomains = []
+
+    for (qPattern in 'A'..'Z') {
+        Qdomains.add("*.Q${qPattern}*")
+    }
+
+    afterEvaluate {
+
+        classDirectories.setFrom(
+                files(classDirectories.files.collect {
+                    fileTree(dir: it, exclude: ["**/*ProjectApplication*",
+                                                "**/*Config*",
+                                                "**/*DTO*",
+                                                "**/*Dto*",
+                                                "**/*Command*",
+                                                "**/*ControllerAdvice*",
+                                                "**/*Exception*",
+                                                "**/*Condition*",
+                                                "**/*Init*",
+                                                "**/*BaseTime**",
+                                                "**/*Response*.*",
+                                                "**/*Request*.*",
+                                                "**/*Builder*.*",
+                                                "**/*Handler*.*",
+                                                "**/*OAuth2*.*",
+                                                "**/*Oidc*.*",
+                                                "**/*File*.*",
+                                                "**/*Email*.*",
+                                                "**/*DeSerializer*.*",
+                                                "**/*Serializer*.*",
+                                                "**/*HTMLCharacterEscapes*.*",
+                    ] + Qdomains)
+                }))
+    }
+
+
+    violationRules {
+        rule {
+            enabled = true // 활성화
+            element = 'CLASS' // 클래스 단위로 커버리지 체크
+
+            excludes = ["**/*Request*.*",
+                        "**/*Response*.*",
+                        "**/*Command*.*"
+            ] + Qdomains
+        }
+
+    }
+}
+
+
 
 def querydslDir = "$buildDir/generated/querydsl"
 

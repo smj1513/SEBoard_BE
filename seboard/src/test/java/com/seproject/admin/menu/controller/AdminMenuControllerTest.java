@@ -98,6 +98,11 @@ class AdminMenuControllerTest {
         assertTrue(subMenu.exposable(List.of(roleKumoh)));
         assertTrue(subMenu.exposable(List.of(roleAdmin)));
         assertFalse(subMenu.exposable(List.of(roleSetup.createRole())));
+
+
+        List<Menu> categoryMenu = menuService.findSubMenu(subMenu.getMenuId());
+
+        assertEquals(categoryMenu.size(),1);
     }
     @Test
     public void 메뉴_하위_메뉴_생성() throws Exception {

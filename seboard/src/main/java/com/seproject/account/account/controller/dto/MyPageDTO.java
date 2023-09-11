@@ -1,6 +1,7 @@
 package com.seproject.account.account.controller.dto;
 
 import com.seproject.account.account.domain.Account;
+import com.seproject.member.domain.Member;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -36,9 +37,9 @@ public class MyPageDTO {
     public static class MyInfoChangeResponse {
         private String nickname;
 
-        public static MyInfoChangeResponse toDTO(Account account) {
+        public static MyInfoChangeResponse toDTO(Member member) {
             return builder()
-                    .nickname(account.getNickname())
+                    .nickname(member.getName())
                     .build();
         }
     }

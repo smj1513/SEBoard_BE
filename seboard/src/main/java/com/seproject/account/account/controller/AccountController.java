@@ -32,7 +32,7 @@ public class AccountController {
     }
 
     @Operation(summary = "회원 탈퇴", description = "회원 탈퇴를 시도")
-    @DeleteMapping("/withdraw")
+    @DeleteMapping("/withdraw") // 응답 필드 : 닉네임 삭제
     public ResponseEntity<WithDrawResponse> withdraw(@RequestBody WithDrawRequest request) {
         WithDrawResponse response = accountAppService.withDraw(request);
         return new ResponseEntity<>(response,HttpStatus.OK);

@@ -50,7 +50,7 @@ public class CategoryAppService {
         return subMenuRes;
     }
 
-    protected void retrieveSubMenu(Menu targetMenu, CategoryResponse res) {
+//    protected void retrieveSubMenu(Menu targetMenu, CategoryResponse res) {
 //        if(targetMenu.getDepth()==0){
 //
 //            List<Menu> depth1menu = menuService.findSubMenu(targetMenu.getMenuId());
@@ -74,7 +74,7 @@ public class CategoryAppService {
 //                res.addSubMenu(new CategoryResponse(menu));
 //            }
 //        }
-    }
+//    }
 
     public List<CategoryResponse> retrieveAllMenu() {
         Optional<Account> account = SecurityUtils.getAccount();

@@ -12,9 +12,11 @@ import com.seproject.account.email.domain.AccountRegisterConfirmedEmail;
 import com.seproject.account.email.domain.repository.AccountRegisterConfirmedEmailRepository;
 import com.seproject.account.role.domain.Role;
 import com.seproject.global.AccountSetup;
+import com.seproject.global.BoardUserSetup;
 import com.seproject.global.RoleSetup;
 import com.seproject.member.domain.Member;
 import com.seproject.member.domain.repository.MemberRepository;
+import com.seproject.member.service.MemberService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,14 +48,14 @@ class RegisterControllerTest {
     @Autowired private AccountService accountService;
     @Autowired private OAuthAccountRepository oAuthAccountRepository;
     @Autowired private RoleSetup roleSetup;
-
+    @Autowired BoardUserSetup boardUserSetup;
     @Autowired private MockMvc mvc;
     @Autowired private ObjectMapper objectMapper;
 
     @Autowired private EntityManager em;
 
     @Autowired private AccountRegisterConfirmedEmailRepository accountRegisterConfirmedEmailRepository;
-    @Autowired private MemberRepository memberRepository;
+    @Autowired private MemberService memberService;
 
     @Test
     public void OAuth_회원가입() throws Exception {
@@ -84,7 +86,7 @@ class RegisterControllerTest {
         Role roleUser = roleSetup.getRoleUser();
         Assertions.assertEquals(oAuthAccount.getAuthorities().size(),1);
         Assertions.assertTrue(oAuthAccount.getAuthorities().contains(roleUser));
-        Member member = memberRepository.findByLoginId(email).orElseThrow();
+        Member member = memberService.findByLoginId(email);
         Assertions.assertEquals(member.getAccount(),oAuthAccount);
     }
 
@@ -114,6 +116,8 @@ class RegisterControllerTest {
     public void OAuth_회원가입_이미_존재하는_닉네임() throws Exception {
 
         FormAccount formAccount = accountSetup.createFormAccount();
+        Member member = boardUserSetup.createMember(formAccount);
+
         String email = UUID.randomUUID().toString() + "@gmail.com";
         OAuth2RegisterRequest request = new OAuth2RegisterRequest();
         request.setSubject("12345678");
@@ -121,9 +125,11 @@ class RegisterControllerTest {
         request.setEmail(email);
         request.setPassword(UUID.randomUUID().toString());
         request.setName("name");
-        request.setNickname(formAccount.getNickname());
+        request.setNickname(member.getName());
 
         accountRegisterConfirmedEmailRepository.save(new AccountRegisterConfirmedEmail(email));
+
+        em.flush(); em.clear();
 
         ResultActions perform = mvc.perform(MockMvcRequestBuilders.post("/account/oauth")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -132,6 +138,7 @@ class RegisterControllerTest {
                 .content(objectMapper.writeValueAsString(request))
         );
 
+        em.flush(); em.clear();
         perform.andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
     }
@@ -152,6 +159,8 @@ class RegisterControllerTest {
 
         accountRegisterConfirmedEmailRepository.save(new AccountRegisterConfirmedEmail(email));
 
+        em.flush(); em.clear();
+
         ResultActions perform = mvc.perform(MockMvcRequestBuilders.post("/account/form")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
@@ -163,8 +172,11 @@ class RegisterControllerTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.accessToken").isNotEmpty())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.refreshToken").isNotEmpty());
 
-        Account account = accountRepository.findByLoginId(email).orElseThrow();
-        Assertions.assertEquals(account.getNickname(),nickname);
+        em.flush(); em.clear();
+
+        Account account = accountRepository.findByLoginIdWithRole(email).orElseThrow();
+        Member fineMember = memberService.findByAccountId(account.getAccountId());
+        Assertions.assertEquals(fineMember.getName(),nickname);
         Assertions.assertEquals(account.getName(),name);
         Assertions.assertTrue(accountService.matchPassword(account,password));
     }
@@ -195,9 +207,10 @@ class RegisterControllerTest {
     @Test
     public void form회원가입_이미_존재하는_닉네임() throws Exception {
         FormAccount formAccount = accountSetup.createFormAccount();
+        Member member = boardUserSetup.createMember(formAccount);
         String email = UUID.randomUUID().toString() + "@kumoh.ac.kr";
         String password = UUID.randomUUID().toString();
-        String nickname = formAccount.getNickname();
+        String nickname = member.getName();
         String name = "name";
 
         FormRegisterRequest request = new FormRegisterRequest();
@@ -208,11 +221,14 @@ class RegisterControllerTest {
 
         accountRegisterConfirmedEmailRepository.save(new AccountRegisterConfirmedEmail(email));
 
+        em.flush(); em.clear();
         ResultActions perform = mvc.perform(MockMvcRequestBuilders.post("/account/form")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .characterEncoding("UTF-8")
                 .content(objectMapper.writeValueAsString(request)));
+
+        em.flush(); em.clear();
 
         perform.andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isBadRequest());
@@ -238,7 +254,8 @@ class RegisterControllerTest {
     @Test
     public void 닉네임_중복_체크_중복() throws Exception {
         FormAccount formAccount = accountSetup.createFormAccount();
-        String nickname = formAccount.getNickname();
+        Member member = boardUserSetup.createMember(formAccount);
+        String nickname = member.getName();
         ConfirmDuplicateNicknameRequest request = new ConfirmDuplicateNicknameRequest();
         request.setNickname(nickname);
 

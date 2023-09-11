@@ -9,6 +9,8 @@ import com.seproject.admin.account.controller.dto.AdminAccountDto.AccountRespons
 import com.seproject.admin.banned.service.BannedIdService;
 import com.seproject.admin.banned.service.BannedNicknameService;
 import com.seproject.account.role.service.RoleService;
+import com.seproject.admin.role.controller.dto.RoleDTO;
+import com.seproject.admin.role.persistence.RoleQueryRepository;
 import com.seproject.board.comment.domain.model.Comment;
 import com.seproject.board.comment.domain.repository.CommentRepository;
 import com.seproject.board.post.domain.model.Bookmark;
@@ -17,6 +19,7 @@ import com.seproject.board.post.domain.repository.BookmarkRepository;
 import com.seproject.board.post.domain.repository.PostRepository;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
+import com.seproject.member.domain.Member;
 import com.seproject.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,6 +28,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.seproject.admin.account.controller.dto.AdminAccountDto.*;
@@ -38,7 +42,7 @@ public class AdminAccountAppService {
     private final RoleService roleService;
     private final MemberService memberService;
     private final AccountQueryRepository accountQueryRepository;
-
+    private final RoleQueryRepository roleQueryRepository;
     private final BannedIdService bannedIdService;
     private final BannedNicknameService bannedNicknameService;
 
@@ -49,13 +53,26 @@ public class AdminAccountAppService {
 
     public Page<AccountResponse> findAllAccount(AccountCondition condition, int page, int perPage) {
         PageRequest pageRequest = PageRequest.of(page,perPage);
-        return accountQueryRepository.findAllAccount(condition,pageRequest);
+        Page<AccountResponse> response = accountQueryRepository.findAllAccount(condition, pageRequest);
+
+        List<Long> ids = response.getContent()
+                .stream().map(AccountResponse::getAccountId)
+                .collect(Collectors.toList());
+
+        Map<Long, List<RoleDTO.RoleResponse>> accountRole = roleQueryRepository.findAccountRole(ids);
+
+        List<AccountResponse> content = response.getContent();
+        for (AccountResponse accountResponse : content) {
+            accountResponse.setRoles(accountRole.get(accountResponse.getAccountId()));
+        }
+
+        return response;
     }
 
     public AccountResponse findAccount(Long accountId) {
         Account account = accountService.findById(accountId);
-        List<String> roles = account.getRoles()
-                .stream().map(Role::toString)
+        List<RoleDTO.RoleResponse> roles = account.getRoles()
+                .stream().map(RoleDTO.RoleResponse :: of)
                 .collect(Collectors.toList());
         return AccountResponse.of(account,roles);
     }
@@ -83,10 +100,10 @@ public class AdminAccountAppService {
 
         List<Role> roles = roleService.findByNameIn(request.getRoles());
 
-        Long accountId = accountService.createAccount(loginId, request.getPassword(), request.getName(), nickname, roles);
+        Long accountId = accountService.createAccount(loginId, request.getPassword(), request.getName(), roles);
         Account account = accountService.findById(accountId);
 
-        memberService.createMember(account);
+        memberService.createMember(account,nickname);
         return accountId;
     }
 
@@ -107,8 +124,11 @@ public class AdminAccountAppService {
             throw new CustomIllegalArgumentException(ErrorCode.BANNED_NICKNAME,null);
         }
 
+        Member member = memberService.findByAccountId(accountId);
+        member.changeName(nickname);
+
         List<Role> roles = roleService.findByNameIn(request.getRoles());
-        accountService.updateAccount(accountId, loginId,request.getPassword(),request.getName(), nickname,roles);
+        accountService.updateAccount(accountId, loginId,request.getPassword(),request.getName(),roles);
     }
 
     @Transactional

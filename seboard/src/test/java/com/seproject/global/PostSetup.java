@@ -10,6 +10,7 @@ import com.seproject.member.domain.BoardUser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.UUID;
 
 @Component
@@ -28,6 +29,7 @@ public class PostSetup {
                 .exposeOption(ExposeOption.of(ExposeState.PUBLIC, null))
                 .anonymousCount(0)
                 .reportCount(0)
+                .attachments(new HashSet<>())
                 .author(boardUser)
                 .baseTime(BaseTime.now())
                 .build();

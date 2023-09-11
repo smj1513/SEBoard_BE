@@ -2,6 +2,7 @@ package com.seproject.account.role.service;
 
 import com.seproject.account.role.domain.Role;
 import com.seproject.admin.domain.SelectOption;
+import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
 import com.seproject.global.RoleSetup;
 import org.junit.jupiter.api.Assertions;
@@ -235,6 +236,15 @@ class RoleServiceTest {
         List<Role> onlyAdminRoles = roleService.convertRoles(SelectOption.ONLY_ADMIN);
         Assertions.assertEquals(onlyAdminRoles.size() , 1);
         Assertions.assertTrue(onlyAdminRoles.contains(roleAdmin));
+    }
+
+    @Test
+    public void 권한_매핑_실패() throws Exception {
+        CustomIllegalArgumentException e = assertThrows(CustomIllegalArgumentException.class, () -> {
+            List<Role> allRoles = roleService.convertRoles(null);
+        });
+
+        assertEquals(e.getErrorCode(), ErrorCode.SELECT_OPTION_NOT_FOUND);
     }
 
 

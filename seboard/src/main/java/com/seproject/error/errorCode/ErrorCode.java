@@ -45,6 +45,7 @@ public enum ErrorCode {
     UNAUTHORIZATION(HttpStatus.UNAUTHORIZED,137, "등록되지 않은 사용자입니다."),
     DIFFERENT_POST_COMMENT(HttpStatus.BAD_REQUEST,138, "서로 다른 게시글에 작성된 댓글입니다."),
     DIFFERENT_SUPER_COMMENT(HttpStatus.BAD_REQUEST,139, "부모 댓글과 태그 댓글의 부모가 서로 다릅니다."),
+    SELECT_OPTION_NOT_FOUND(HttpStatus.NOT_FOUND,140, "존재하지 않는 선택 옵션입니다."),
 
 
     INVALID_PAGINATION(HttpStatus.BAD_REQUEST,200, "올바르지 않은 페이지 정보를 전송하였습니다."),

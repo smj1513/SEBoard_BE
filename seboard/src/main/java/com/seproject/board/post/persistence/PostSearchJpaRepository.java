@@ -30,7 +30,7 @@ public interface PostSearchJpaRepository extends PostSearchRepository {
     Page<RetrievePostListResponseElement> findPostByLoginId(@Param("loginId") String loginId, Pageable pagingInfo);
     @Query("select count(*) from Post p where p.author.account.loginId = :loginId and p.status = 'NORMAL'")
     Integer countsPostByLoginId(@Param("loginId") String loginId);
-    @Query("select new com.seproject.board.post.controller.dto.PostResponse$RetrievePostDetailResponse(p)" +
+    @Query("select new com.seproject.board.post.controller.dto.PostResponse$RetrievePostDetailResponse(p) " +
             "from Post p where p.postId = :id and p.status = 'NORMAL'")
     Optional<PostResponse.RetrievePostDetailResponse> findPostDetailById(@Param("id") Long id);
     @Query("select new com.seproject.board.post.controller.dto.PostResponse$RetrievePostListResponseElement(p)" +

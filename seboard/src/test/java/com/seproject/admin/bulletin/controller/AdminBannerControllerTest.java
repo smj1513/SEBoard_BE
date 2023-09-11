@@ -96,12 +96,7 @@ class AdminBannerControllerTest {
                 .param("perPage","5")
         ).andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.first").value(false))
-                .andExpect(jsonPath("$.totalPages").value(4))
-                .andExpect(jsonPath("$.totalElements").value(18))
-                .andExpect(jsonPath("$.size").value(5))
-                .andExpect(jsonPath("$.numberOfElements").value(5))
-                .andExpect(jsonPath("$.number").value(2));
+                .andExpect(jsonPath("$.size()").value(18));
     }
     @Test
     public void 비활성화_배너조회() throws Exception {
@@ -125,12 +120,7 @@ class AdminBannerControllerTest {
                         .param("perPage","5")
                 ).andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.first").value(true))
-                .andExpect(jsonPath("$.totalPages").value(1))
-                .andExpect(jsonPath("$.totalElements").value(3))
-                .andExpect(jsonPath("$.size").value(5))
-                .andExpect(jsonPath("$.numberOfElements").value(3))
-                .andExpect(jsonPath("$.number").value(0));
+                .andExpect(jsonPath("$.size()").value(3));
     }
     @Test
     public void 배너조회() throws Exception {
@@ -153,12 +143,7 @@ class AdminBannerControllerTest {
                         .param("perPage","5")
                 ).andDo(print())
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.first").value(true))
-                .andExpect(jsonPath("$.totalPages").value(5))
-                .andExpect(jsonPath("$.totalElements").value(21))
-                .andExpect(jsonPath("$.size").value(5))
-                .andExpect(jsonPath("$.numberOfElements").value(5))
-                .andExpect(jsonPath("$.number").value(0));
+                .andExpect(jsonPath("$.size()").value(21));
     }
     @Test
     public void 배너_생성() throws Exception {

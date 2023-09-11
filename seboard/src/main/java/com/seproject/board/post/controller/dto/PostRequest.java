@@ -23,17 +23,11 @@ public class PostRequest {
     }
 
     @Data
-    @NoArgsConstructor
-    public static class RetrievePrivacyPostRequest{
-        private String password;
-
-        public RetrievePrivacyPostRequest(String password) {
-            this.password = password;
-        }
+    public static class RetrievePrivacyPostRequest {
+        private String password = " ";
     }
 
     @Data
-    @AllArgsConstructor
     public static class CreatePostRequest {
         @NotNull
         private String title;
@@ -78,14 +72,13 @@ public class PostRequest {
         @NotNull
         private ExposeOptionRequest exposeOption;
 
-        public PostEditCommand toCommand(Long postId, String loginId) {
+        public PostEditCommand toCommand(Long postId) {
             return PostEditCommand.builder()
                     .postId(postId)
                     .title(title)
                     .contents(getContents())
                     .categoryId(categoryId)
                     .pined(pined)
-                    .loginId(loginId)
                     .exposeState(ExposeState.valueOf(exposeOption.getName()))
                     .privatePassword(exposeOption.getPassword())
                     .attachmentIds(attachmentIds)

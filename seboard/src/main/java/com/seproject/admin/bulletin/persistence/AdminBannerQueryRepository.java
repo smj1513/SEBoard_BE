@@ -21,56 +21,60 @@ public class AdminBannerQueryRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    public Page<BannerResponse> findAllBanner(Pageable pageable) {
+    public List<BannerResponse> findAllBanner() {
         List<BannerResponse> fetch = jpaQueryFactory
                 .select(Projections.constructor(BannerResponse.class, banner))
                 .from(banner)
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize())
                 .fetch();
 
-        Long count = jpaQueryFactory
-                .select(banner.count())
-                .from(banner)
-                .fetchOne();
-
-        return new PageImpl<>(fetch,pageable,count);
+        return fetch;
+//
+//        Long count = jpaQueryFactory
+//                .select(banner.count())
+//                .from(banner)
+//                .fetchOne();
+//
+//        return new PageImpl<>(fetch,pageable,count);
     }
 
-    public Page<BannerResponse> findActiveBanners(Pageable pageable, LocalDate currentDate) {
+    public List<BannerResponse> findActiveBanners(LocalDate currentDate) {
         List<BannerResponse> fetch = jpaQueryFactory
                 .select(Projections.constructor(BannerResponse.class, banner))
                 .from(banner)
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize())
                 .where(between(currentDate))
                 .fetch();
-
-        Long count = jpaQueryFactory
-                .select(banner.count())
-                .from(banner)
-                .where(between(currentDate))
-                .fetchOne();
-
-        return new PageImpl<>(fetch,pageable,count);
+        return fetch;
+//        Long count = jpaQueryFactory
+//                .select(banner.count())
+//                .from(banner)
+//                .where(between(currentDate))
+//                .fetchOne();
+//
+//        return new PageImpl<>(fetch,pageable,count);
     }
 
-    public Page<BannerResponse> findUnActiveBanners(Pageable pageable, LocalDate currentDate) {
+    public List<BannerResponse> findUnActiveBanners(LocalDate currentDate) {
         List<BannerResponse> fetch = jpaQueryFactory
                 .select(Projections.constructor(BannerResponse.class, banner))
                 .from(banner)
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
+//                .offset(pageable.getOffset())
+//                .limit(pageable.getPageSize())
                 .where(between(currentDate).not())
                 .fetch();
 
-        Long count = jpaQueryFactory
-                .select(banner.count())
-                .from(banner)
-                .where(between(currentDate).not())
-                .fetchOne();
+        return fetch;
 
-        return new PageImpl<>(fetch,pageable,count);
+//        Long count = jpaQueryFactory
+//                .select(banner.count())
+//                .from(banner)
+//                .where(between(currentDate).not())
+//                .fetchOne();
+//
+//        return new PageImpl<>(fetch,pageable,count);
 
     }
 

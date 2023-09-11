@@ -18,7 +18,9 @@ import com.seproject.board.post.domain.repository.BookmarkRepository;
 import com.seproject.board.post.domain.repository.PostRepository;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.global.*;
+import com.seproject.member.domain.BoardUser;
 import com.seproject.member.domain.Member;
+import com.seproject.member.service.MemberService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -73,18 +75,19 @@ class AdminAccountControllerTest {
 
     @Value("${jwt.test}") String accessToken;
 
-//    @Test
+    @Test
     public void 모든_계정_목록_조회() throws Exception {
 
-        for (int i = 0; i < 100; i++) {
-            accountSetup.createFormAccount();
+        for (int i = 0; i < 25; i++) {
+            FormAccount formAccount = accountSetup.createFormAccount();
+            Member member = boardUserSetup.createMember(formAccount);
         }
 
         em.flush();
         em.clear();
 
         int page = 1;
-        int perPage = 35;
+        int perPage = 10;
 
         ResultActions perform = mvc.perform(get("/admin/accounts")
                 .queryParam("page", String.valueOf(page))
@@ -99,7 +102,7 @@ class AdminAccountControllerTest {
                 .andExpect(status().isOk());
 
 
-        perform.andExpect(jsonPath("$.content.size()").value(35));
+        perform.andExpect(jsonPath("$.content.size()").value(10));
         for (int i = 0; i < perPage; i++) {
             perform.andExpect(jsonPath("$.content[" +i + "]").exists());
         }
@@ -109,7 +112,50 @@ class AdminAccountControllerTest {
                 .andExpect(jsonPath("$.first").value(false))
                 .andExpect(jsonPath("$.last").value(false))
                 .andExpect(jsonPath("$.number").value(1))
-                .andExpect(jsonPath("$.numberOfElements").value(35))
+                .andExpect(jsonPath("$.numberOfElements").value(10))
+                .andExpect(jsonPath("$.size").value(10));
+    }
+
+    @Test
+    public void 삭제_계정_목록_조회() throws Exception {
+
+        for (int i = 0; i < 4; i++) {
+            FormAccount formAccount = accountSetup.createFormAccount();
+            boardUserSetup.createMember(formAccount);
+            formAccount.delete(false);
+        }
+
+        em.flush();
+        em.clear();
+
+        int page = 0;
+        int perPage = 35;
+
+        ResultActions perform = mvc.perform(get("/admin/accounts")
+                .queryParam("page", String.valueOf(page))
+                .queryParam("perPage", String.valueOf(perPage))
+                .queryParam("status", "TEMP_DELETED")
+                .contentType(MediaType.APPLICATION_JSON)
+                .characterEncoding("UTF-8")
+                .header("Authorization",accessToken)
+                .accept(MediaType.APPLICATION_JSON)
+        );
+
+        perform.andDo(print())
+                .andExpect(status().isOk());
+
+
+        perform.andExpect(jsonPath("$.content.size()").value(4));
+        for (int i = 0; i < 4; i++) {
+            perform.andExpect(jsonPath("$.content[" +i + "]").exists());
+        }
+
+        perform
+                .andExpect(jsonPath("$.empty").value(false))
+                .andExpect(jsonPath("$.first").value(true))
+                .andExpect(jsonPath("$.last").value(true))
+                .andExpect(jsonPath("$.number").value(0))
+                .andExpect(jsonPath("$.numberOfElements").value(4))
                 .andExpect(jsonPath("$.size").value(35));
     }
 
@@ -136,9 +182,8 @@ class AdminAccountControllerTest {
                 .andExpect(jsonPath("$.accountId").value(oAuthAccount.getAccountId()))
                 .andExpect(jsonPath("$.loginId").value(oAuthAccount.getLoginId()))
                 .andExpect(jsonPath("$.name").value(oAuthAccount.getName()))
-                .andExpect(jsonPath("$.nickname").value(oAuthAccount.getNickname()))
                 .andExpect(jsonPath("$.roles.size()").value(roles.size()))
-                    .andExpect(jsonPath("$.roles[0]").value(roles.get(0).toString()));
+                    .andExpect(jsonPath("$.roles[0].alias").value(roles.get(0).toString()));
     }
 
     @Test
@@ -266,7 +311,8 @@ class AdminAccountControllerTest {
     @Test
     public void 계정_생성_이미_존재하는_닉네임() throws Exception {
         FormAccount formAccount = accountSetup.createFormAccount();
-        CreateAccountRequest request = createAccountRequest(null, formAccount.getNickname(), null, null, List.of("ROLE_USER"));
+        Member member = boardUserSetup.createMember(formAccount);
+        CreateAccountRequest request = createAccountRequest(null, member.getName(), null, null, List.of("ROLE_USER"));
 
         em.flush();
         em.clear();
@@ -292,11 +338,11 @@ class AdminAccountControllerTest {
     public void 계정_수정() throws Exception {
         Role role = roleSetup.createRole();
         FormAccount formAccount = accountSetup.createFormAccount();
-
+        Member member = boardUserSetup.createMember(formAccount);
         em.flush();
         em.clear();
 
-        UpdateAccountRequest request = updateAccountRequest(null, null, null, null, List.of(role.getAuthority()));
+        UpdateAccountRequest request = updateAccountRequest(null, member.getName(), null, null, List.of(role.getAuthority()));
         ResultActions perform = mvc.perform(put("/admin/accounts/{accountId}", formAccount.getAccountId())
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
@@ -314,7 +360,7 @@ class AdminAccountControllerTest {
 
         Assertions.assertTrue(collect.contains(role.getAuthority()));
         Assertions.assertEquals(findAccount.getLoginId(),request.getId());
-        Assertions.assertEquals(findAccount.getNickname(),request.getNickname());
+        Assertions.assertEquals(member.getName(),request.getNickname());
         Assertions.assertEquals(findAccount.getName(),request.getName());
         Assertions.assertTrue(accountService.matchPassword(findAccount,request.getPassword()));
     }
@@ -399,7 +445,8 @@ class AdminAccountControllerTest {
     @Test
     public void 계정_수정_이미_존재하는_닉네임() throws Exception {
         FormAccount formAccount = accountSetup.createFormAccount();
-        UpdateAccountRequest request = updateAccountRequest(null, formAccount.getNickname(), null, null, List.of("ROLE_USER"));
+        Member member = boardUserSetup.createMember(formAccount);
+        UpdateAccountRequest request = updateAccountRequest(null, member.getName(), null, null, List.of("ROLE_USER"));
 
         em.flush();
         em.clear();

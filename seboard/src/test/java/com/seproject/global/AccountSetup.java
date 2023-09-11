@@ -47,7 +47,6 @@ public class AccountSetup {
 
         adminAccount = createFormAccount("admin",
                 "admin",
-                "admin",
                 List.of(roleSetup.getRoleAdmin(), roleSetup.getRoleKumoh(), roleSetup.getRoleUser()),
                 LocalDateTime.now(), Status.NORMAL);
 
@@ -64,8 +63,11 @@ public class AccountSetup {
     }
 
 
-    public FormAccount createFormAccount(String loginId, String name,
-                                         String nickname, List<Role> roles,LocalDateTime createdAt,Status status) {
+    public FormAccount createFormAccount(String loginId,
+                                         String name,
+                                         List<Role> roles,
+                                         LocalDateTime createdAt,
+                                         Status status) {
 
         List<RoleAccount> roleAccounts = roles.stream().map((role) -> new RoleAccount(null, role))
                 .collect(Collectors.toList());
@@ -73,7 +75,6 @@ public class AccountSetup {
         FormAccount formAccount = FormAccount.builder()
                 .loginId(loginId)
                 .name(name)
-                .nickname(nickname)
                 .password(passwordEncoder.encode(UUID.randomUUID().toString()))
                 .roleAccounts(roleAccounts)
                 .createdAt(createdAt)
@@ -92,8 +93,7 @@ public class AccountSetup {
         FormAccount formAccount = FormAccount.builder()
                 .loginId(UUID.randomUUID().toString())
                 .name("se")
-                .nickname("se")
-                .password(passwordEncoder.encode(UUID.randomUUID().toString()))
+                .password(passwordEncoder.encode("1234"))
                 .roleAccounts(new ArrayList<>(List.of(roleAccount)))
                 .createdAt(LocalDateTime.now())
                 .status(Status.NORMAL)
@@ -109,7 +109,6 @@ public class AccountSetup {
         OAuthAccount oAuthAccount = OAuthAccount.builder()
                 .loginId(UUID.randomUUID().toString())
                 .name("se_oauth")
-                .nickname("se_oauth")
                 .password(passwordEncoder.encode(UUID.randomUUID().toString()))
                 .roleAccounts(new ArrayList<>(List.of(roleAccount)))
                 .provider("kakao")
