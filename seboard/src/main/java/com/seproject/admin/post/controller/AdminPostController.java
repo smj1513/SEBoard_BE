@@ -1,6 +1,7 @@
 package com.seproject.admin.post.controller;
 
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.seproject.admin.post.controller.dto.PostRequest.AdminPostRetrieveCondition;
 import com.seproject.admin.post.controller.dto.PostRequest.BulkPostRequest;
 import com.seproject.admin.post.controller.dto.PostRequest.MigratePostRequest;
@@ -11,11 +12,15 @@ import com.seproject.board.common.controller.dto.MessageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.apache.el.parser.BooleanNode;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.NumberUtils;
 import org.springframework.web.bind.annotation.*;
+
+import java.lang.module.Configuration;
 
 import static com.seproject.admin.post.controller.dto.PostResponse.*;
 
@@ -29,10 +34,23 @@ public class AdminPostController {
 
     @Operation(summary = "게시글 목록 조회", description = "등록된 게시글 목록들을 조회한다.")
     @GetMapping
-    public ResponseEntity<Page<PostRetrieveResponse>> retrieveAllPost(@ModelAttribute AdminPostRetrieveCondition request,
-                                             @RequestParam(defaultValue = "0") int page,
-                                             @RequestParam(defaultValue = "25") int perPage) {
-        Page<PostRetrieveResponse> response = adminPostAppService.findPostList(request, page, perPage);
+    public ResponseEntity<Page<PostRetrieveResponse>> retrieveAllPost(
+                                                @RequestParam(required = false) Long categoryId,
+                                                @RequestParam(required = false) String exposeOption,
+                                                @RequestParam(required = false) String searchOption,
+                                                @RequestParam(name = "isReported",required = false) Boolean isReported,
+                                                @RequestParam(required = false) String query,
+                                                @RequestParam(defaultValue = "0",required = true) int page,
+                                                @RequestParam(defaultValue = "25",required = true) int perPage) {
+
+        AdminPostRetrieveCondition condition = new AdminPostRetrieveCondition();
+        condition.setCategoryId(categoryId);
+        condition.setExposeOption(exposeOption);
+        condition.setExposeOption(searchOption);
+        condition.setIsReported(isReported);
+        condition.setQuery(query);
+
+        Page<PostRetrieveResponse> response = adminPostAppService.findPostList(condition, page, perPage);
         return ResponseEntity.ok(response);
     }
 

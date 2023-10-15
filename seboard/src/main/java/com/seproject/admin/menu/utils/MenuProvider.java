@@ -34,8 +34,9 @@ public class MenuProvider extends AbstractMenuProvider{
             String urlInfo = request.getUrlId();
 
             Menu superMenu = null;
-            if (request.getSuperCategoryId() != null) {
-                superMenu = menuService.findById(request.getSuperCategoryId());
+            Long superCategoryId = request.getSuperCategoryId();
+            if (superCategoryId != null) {
+                superMenu = menuService.findById(superCategoryId);
             }
 
             Long menuId = adminMenuService.createMenu(superMenu,name,description, urlInfo);

@@ -30,8 +30,9 @@ public class AdminIpController {
 
     @Operation(summary = "금지 아이피 목록 조회", description = "접근이 금지된 아이피의 목록을 조회한다.")
     @GetMapping
-    public ResponseEntity<List<IpResponse>> retrieveAllBannedIp(@ModelAttribute IpCondition condition) {
-        //TODO : 페이징 빼기
+    public ResponseEntity<List<IpResponse>> retrieveAllBannedIp() {
+
+        IpCondition condition = new IpCondition();
         List<IpResponse> response = adminIpAppService.findAll(condition);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }

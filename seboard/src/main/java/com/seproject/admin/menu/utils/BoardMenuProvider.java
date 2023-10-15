@@ -37,11 +37,13 @@ public class BoardMenuProvider extends AbstractMenuProvider {
             String description = request.getDescription();
             String urlInfo = request.getUrlId();
 
-            if(superCategoryId == null) {
-                throw new CustomIllegalArgumentException(ErrorCode.NOT_EXIST_MENU,null);
+            Menu superMenu = null;
+
+            if(superCategoryId != null) {
+                superMenu = menuService.findById(superCategoryId);
+                // throw new CustomIllegalArgumentException(ErrorCode.NOT_EXIST_MENU,null);
             }
 
-            Menu superMenu = menuService.findById(superCategoryId);
             Long boardMenuId = adminMenuService.createBoardMenu(superMenu, name, description, urlInfo);
 
             MenuDTO.MenuAuthOption expose = request.getExpose();

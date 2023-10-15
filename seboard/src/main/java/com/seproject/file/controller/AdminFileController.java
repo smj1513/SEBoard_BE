@@ -1,5 +1,6 @@
 package com.seproject.file.controller;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.seproject.file.controller.dto.FileRequest.AdminFileRetrieveCondition;
 import com.seproject.file.controller.dto.FileRequest.BulkFileRequest;
 import com.seproject.file.controller.dto.FileRequest.FileConfigurationRequest;
@@ -22,9 +23,17 @@ public class AdminFileController {
     private final AdminFileAppService adminFileAppService;
 
     @GetMapping
-    public ResponseEntity<Page<AdminFileRetrieveResponse>> retrieveFileList(@ModelAttribute AdminFileRetrieveCondition condition,
+    public ResponseEntity<Page<AdminFileRetrieveResponse>> retrieveFileList(@RequestParam(name = "isOrphan", required = false) Boolean isOrphan,
+                                                                            @RequestParam(required = false) String searchOption,
+                                                                            @RequestParam(required = false) String query,
                                                                             @RequestParam(defaultValue = "0") int page,
-                                                                            @RequestParam(defaultValue = "25") int perPage){
+                                                                            @RequestParam(defaultValue = "25") int perPage) {
+
+        AdminFileRetrieveCondition condition = new AdminFileRetrieveCondition();
+        condition.setIsOrphan(isOrphan);
+        condition.setSearchOption(searchOption);
+        condition.setQuery(query);
+
         Page<AdminFileRetrieveResponse> res = adminFileAppService.retrieveFileMetaData(condition, PageRequest.of(page, perPage));
         return ResponseEntity.ok(res);
     }
