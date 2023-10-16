@@ -3,6 +3,9 @@ package com.seproject.admin.account.controller;
 import com.seproject.admin.account.application.AdminAccountAppService;
 import com.seproject.admin.account.controller.condition.AccountCondition;
 import com.seproject.board.common.Status;
+import com.seproject.board.common.utils.StatusUtils;
+import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.CustomIllegalArgumentException;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -23,9 +26,15 @@ public class AdminAccountController {
     private final AdminAccountAppService accountAppService;
     @Operation(summary = "모든 계정 목록 조회", description = "계정 관리를 위하여 등록된 계정 목록을 확인한다.")
     @GetMapping
-    public ResponseEntity<Page<AccountResponse>> retrieveAllAccount(@ModelAttribute AccountCondition condition,
+    public ResponseEntity<Page<AccountResponse>> retrieveAllAccount(@RequestParam(required = false) String status,
                                                                             @RequestParam(value = "page", defaultValue = "0") int page,
                                                                             @RequestParam(value = "perPage", defaultValue = "25") int perPage) {
+        //TODO :
+        AccountCondition condition = new AccountCondition();
+        if(StatusUtils.contains(status)) {
+            condition.setStatus(Status.valueOf(status));
+        }
+
         Page<AccountResponse> response = accountAppService.findAllAccount(condition, page, perPage);
         return new ResponseEntity<>(response,HttpStatus.OK);
     }

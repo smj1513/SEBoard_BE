@@ -1,5 +1,6 @@
 package com.seproject.admin.comment.controller;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.seproject.admin.comment.application.AdminCommentAppService;
 import com.seproject.admin.comment.controller.condition.AdminCommentRetrieveCondition;
 import com.seproject.board.common.controller.dto.MessageResponse;
@@ -21,9 +22,19 @@ public class AdminCommentController {
     @Operation(summary = "댓글 목록 조회")
     @GetMapping
     public ResponseEntity<Page<AdminCommentListResponse>> retrieveCommentList(
-            @ModelAttribute AdminCommentRetrieveCondition condition,
+            @RequestParam(name = "isReported", required = false) Boolean isReported,
+            @RequestParam(name = "isReadOnlyAuthor" , required = false) Boolean isReadOnlyAuthor,
+            @RequestParam(required = false) String searchOption,
+            @RequestParam(required = false) String query,
              @RequestParam(defaultValue = "0") int page,
              @RequestParam(defaultValue = "25") int perPage) {
+
+        //TODO :
+        AdminCommentRetrieveCondition condition = new AdminCommentRetrieveCondition();
+        condition.setIsReported(isReported);
+        condition.setQuery(query);
+        condition.setIsReadOnlyAuthor(isReadOnlyAuthor);
+        condition.setSearchOption(searchOption);
 
         Page<AdminCommentListResponse> res =
                 adminCommentAppService.retrieveCommentList(condition, PageRequest.of(page, perPage));
