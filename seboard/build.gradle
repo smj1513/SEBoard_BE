@@ -68,6 +68,14 @@ dependencies {
 
 }
 
+processResources.dependsOn('copySecret')
+
+tasks.register('copySecret', Copy) {
+    from 'SE-Deployment/backend'
+    include "application*.yml"
+    into 'src/main/resources'
+}
+
 tasks.test {
     useJUnitPlatform()
     finalizedBy 'jacocoTestReport'
