@@ -91,7 +91,7 @@ public class CategoryAppService {
 
         for (Menu menu : menus) {
             if (menu.exposable(roles)) {
-                List<Menu> subMenus = subMenuMap.get(menu.getMenuId());
+                List<Menu> subMenus = subMenuMap.getOrDefault(menu.getMenuId(), Collections.emptyList());
 
                 CategoryResponse categoryResponse = new CategoryResponse(menu);
 
