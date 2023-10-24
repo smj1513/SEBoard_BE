@@ -55,11 +55,11 @@ public class BoardMenuProvider extends AbstractMenuProvider {
 
             Menu menu = menuService.findById(boardMenuId);
 
-            SelectOption accessSelectOption = SelectOption.of(access.getName());
+            SelectOption accessSelectOption = SelectOption.of(access.getOption());
             List<Role> accessRoles = roleService.convertRoles(accessSelectOption);
             authorizationService.updateAccess(menu,accessSelectOption,accessRoles);
 
-            SelectOption exposeSelectOption = SelectOption.of(expose.getName());
+            SelectOption exposeSelectOption = SelectOption.of(expose.getOption());
             List<Role> exposeRoles = roleService.convertRoles(exposeSelectOption);
             authorizationService.updateExpose(menu,exposeSelectOption,exposeRoles);
 
@@ -87,13 +87,13 @@ public class BoardMenuProvider extends AbstractMenuProvider {
                 throw new CustomIllegalArgumentException(ErrorCode.INVALID_MENU_REQUEST, null);
 
             List<Role> accessRoles = parseRoles(access);
-            SelectOption accessSelectOption = SelectOption.of(access.getName());
+            SelectOption accessSelectOption = SelectOption.of(access.getOption());
             MenuAccessAuthorization menuAccessAuthorization = new MenuAccessAuthorization(menu);
             menuAccessAuthorization.update(accessRoles);
             menuAccessAuthorization.setSelectOption(accessSelectOption);
 
             List<Role> exposeRoles = parseRoles(expose);
-            SelectOption exposeSelectOption = SelectOption.of(expose.getName());
+            SelectOption exposeSelectOption = SelectOption.of(expose.getOption());
             MenuExposeAuthorization menuExposeAuthorization = new MenuExposeAuthorization(menu);
             menuExposeAuthorization.update(exposeRoles);
             menuExposeAuthorization.setSelectOption(exposeSelectOption);

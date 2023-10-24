@@ -48,7 +48,7 @@ public class ExternalSiteMenuProvider extends AbstractMenuProvider {
 
             Menu menu = menuService.findById(externalSiteMenuId);
 
-            SelectOption exposeSelectOption = SelectOption.of(expose.getName());
+            SelectOption exposeSelectOption = SelectOption.of(expose.getOption());
             List<Role> exposeRoles = roleService.convertRoles(exposeSelectOption);
             authorizationService.updateExpose(menu,exposeSelectOption,exposeRoles);
             return externalSiteMenuId;
@@ -73,7 +73,7 @@ public class ExternalSiteMenuProvider extends AbstractMenuProvider {
                 throw new CustomIllegalArgumentException(ErrorCode.INVALID_MENU_REQUEST, null);
 
             List<Role> exposeRoles = parseRoles(expose);
-            SelectOption selectOption = SelectOption.of(expose.getName());
+            SelectOption selectOption = SelectOption.of(expose.getOption());
             MenuExposeAuthorization menuExposeAuthorization = new MenuExposeAuthorization(menu);
             menuExposeAuthorization.update(exposeRoles);
             menuExposeAuthorization.setSelectOption(selectOption);
