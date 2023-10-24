@@ -53,11 +53,11 @@ public class CategoryProvider extends AbstractMenuProvider {
             }
 
             Menu menu = menuService.findById(categoryId);
-            SelectOption manageSelectOption = SelectOption.of(manage.getName());
+            SelectOption manageSelectOption = SelectOption.of(manage.getOption());
             List<Role> manageRoles = roleService.convertRoles(manageSelectOption);
             authorizationService.updateManage(menu,manageSelectOption,manageRoles);
 
-            SelectOption editSelectOption = SelectOption.of(edit.getName());
+            SelectOption editSelectOption = SelectOption.of(edit.getOption());
             List<Role> editRoles = roleService.convertRoles(editSelectOption);
             authorizationService.updateEdit(menu,editSelectOption,editRoles);
 
@@ -85,12 +85,12 @@ public class CategoryProvider extends AbstractMenuProvider {
                 throw new CustomIllegalArgumentException(ErrorCode.INVALID_MENU_REQUEST, null);
 
             List<Role> editRoles = parseRoles(edit);
-            SelectOption editSelectOption = SelectOption.of(edit.getName());
+            SelectOption editSelectOption = SelectOption.of(edit.getOption());
             MenuEditAuthorization menuEditAuthorization = new MenuEditAuthorization(menu);
             menuEditAuthorization.update(editRoles);
             menuEditAuthorization.setSelectOption(editSelectOption);
 
-            SelectOption manageSelectOption = SelectOption.of(manage.getName());
+            SelectOption manageSelectOption = SelectOption.of(manage.getOption());
             List<Role> manageRoles = parseRoles(manage);
             MenuManageAuthorization menuManageAuthorization = new MenuManageAuthorization(menu);
             menuManageAuthorization.update(manageRoles);

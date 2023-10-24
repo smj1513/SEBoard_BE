@@ -38,7 +38,7 @@ public abstract class AbstractMenuProvider {
      public abstract MenuResponse toDto(Menu menu);
 
      protected List<Role> parseRoles(MenuAuthOption option) {
-          SelectOption selectOption = SelectOption.of(option.getName());
+          SelectOption selectOption = SelectOption.of(option.getOption());
           if(selectOption == SelectOption.SELECT) {
                List<Long> roleIds = option.getRoles();
                return roleService.findByIds(roleIds);
