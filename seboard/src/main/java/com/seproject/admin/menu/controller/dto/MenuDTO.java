@@ -69,7 +69,7 @@ public class MenuDTO {
 
     @Data
     public static class MenuAuthOption {
-        private String name;
+        private String option;
         private List<Long> roles;
     }
 
