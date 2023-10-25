@@ -101,7 +101,7 @@ class PostControllerTest {
         Category category = menuSetup.createCategory(menuSetup.createBoardMenu(menuSetup.createMenu()));
 
         MenuDTO.MenuAuthOption edit = new MenuDTO.MenuAuthOption();
-        edit.setName(SelectOption.SELECT.getName());
+        edit.setOption(SelectOption.SELECT.getName());
         edit.setRoles(List.of(roleSetup.createRole().getId()));
 
         MenuDTO.MenuAuthOption[] input = new MenuDTO.MenuAuthOption[] {null,null,edit,edit};
@@ -132,7 +132,7 @@ class PostControllerTest {
         Category category = menuSetup.createCategory(menuSetup.createBoardMenu(menuSetup.createMenu()));
 
         MenuDTO.MenuAuthOption edit = new MenuDTO.MenuAuthOption();
-        edit.setName(SelectOption.SELECT.getName());
+        edit.setOption(SelectOption.SELECT.getName());
         edit.setRoles(List.of(roleSetup.createRole().getId()));
 
         MenuDTO.MenuAuthOption[] input = new MenuDTO.MenuAuthOption[] {null,null,edit,edit};
@@ -196,7 +196,7 @@ class PostControllerTest {
         post.changeExposeOption(ExposeOption.of(ExposeState.KUMOH,null));
 
         MenuDTO.MenuAuthOption edit = new MenuDTO.MenuAuthOption();
-        edit.setName(SelectOption.SELECT.getName());
+        edit.setOption(SelectOption.SELECT.getName());
         edit.setRoles(List.of(roleSetup.getRoleAdmin().getId()));
 
         MenuDTO.MenuAuthOption[] input = new MenuDTO.MenuAuthOption[] {null,null,edit,edit};
@@ -235,7 +235,7 @@ class PostControllerTest {
         post.changeExposeOption(ExposeOption.of(ExposeState.KUMOH,null));
 
         MenuDTO.MenuAuthOption edit = new MenuDTO.MenuAuthOption();
-        edit.setName(SelectOption.SELECT.getName());
+        edit.setOption(SelectOption.SELECT.getName());
         edit.setRoles(List.of(roleSetup.createRole().getId()));
 
         MenuDTO.MenuAuthOption[] input = new MenuDTO.MenuAuthOption[] {null,null,edit,edit};
@@ -271,7 +271,7 @@ class PostControllerTest {
         post.changeExposeOption(ExposeOption.of(ExposeState.KUMOH,null));
 
         MenuDTO.MenuAuthOption edit = new MenuDTO.MenuAuthOption();
-        edit.setName(SelectOption.SELECT.getName());
+        edit.setOption(SelectOption.SELECT.getName());
         edit.setRoles(List.of(roleSetup.createRole().getId()));
 
         MenuDTO.MenuAuthOption[] input = new MenuDTO.MenuAuthOption[] {null,null,edit,edit};
@@ -348,7 +348,7 @@ class PostControllerTest {
         request.setPassword("1234");
 
         MenuDTO.MenuAuthOption edit = new MenuDTO.MenuAuthOption();
-        edit.setName(SelectOption.SELECT.getName());
+        edit.setOption(SelectOption.SELECT.getName());
         edit.setRoles(List.of(roleSetup.getRoleAdmin().getId()));
 
         MenuDTO.MenuAuthOption[] input = new MenuDTO.MenuAuthOption[] {null,null,edit,edit};
@@ -393,7 +393,7 @@ class PostControllerTest {
         request.setPassword("1234");
 
         MenuDTO.MenuAuthOption edit = new MenuDTO.MenuAuthOption();
-        edit.setName(SelectOption.SELECT.getName());
+        edit.setOption(SelectOption.SELECT.getName());
         edit.setRoles(List.of(roleSetup.getRoleAdmin().getId()));
 
         MenuDTO.MenuAuthOption[] input = new MenuDTO.MenuAuthOption[] {null,null,edit,edit};
@@ -478,7 +478,7 @@ class PostControllerTest {
         Category category = menuSetup.createCategory(boardMenu);
 
         MenuDTO.MenuAuthOption expose = new MenuDTO.MenuAuthOption();
-        expose.setName(SelectOption.SELECT.getName());
+        expose.setOption(SelectOption.SELECT.getName());
         expose.setRoles(List.of(roleSetup.getRoleAdmin().getId()));
 
         MenuDTO.MenuAuthOption[] input = new MenuDTO.MenuAuthOption[] {expose,expose,expose,expose};
@@ -558,7 +558,7 @@ class PostControllerTest {
         Category category = menuSetup.createCategory(menuSetup.createBoardMenu(menuSetup.createMenu()));
 
         MenuDTO.MenuAuthOption edit = new MenuDTO.MenuAuthOption();
-        edit.setName(SelectOption.SELECT.getName());
+        edit.setOption(SelectOption.SELECT.getName());
         edit.setRoles(List.of(roleSetup.getRoleAdmin().getId()));
 
         MenuDTO.MenuAuthOption[] input = new MenuDTO.MenuAuthOption[] {null,null,edit,edit};
@@ -694,7 +694,7 @@ class PostControllerTest {
         Post post = postSetup.createPost(member, category);
 
         MenuDTO.MenuAuthOption edit = new MenuDTO.MenuAuthOption();
-        edit.setName(SelectOption.SELECT.getName());
+        edit.setOption(SelectOption.SELECT.getName());
         edit.setRoles(List.of(roleSetup.getRoleAdmin().getId()));
 
         MenuDTO.MenuAuthOption[] input = new MenuDTO.MenuAuthOption[] {null,null,edit,edit};
@@ -764,7 +764,7 @@ class PostControllerTest {
         Post post = postSetup.createPost(member, category);
 
         MenuDTO.MenuAuthOption manage = new MenuDTO.MenuAuthOption();
-        manage.setName(SelectOption.SELECT.getName());
+        manage.setOption(SelectOption.SELECT.getName());
         manage.setRoles(List.of(roleSetup.createRole().getId()));
 
         MenuDTO.MenuAuthOption[] input = new MenuDTO.MenuAuthOption[] {null,null,manage,manage};
@@ -798,7 +798,7 @@ class PostControllerTest {
         Post post = postSetup.createPost(member, category);
 
         MenuDTO.MenuAuthOption manage = new MenuDTO.MenuAuthOption();
-        manage.setName(SelectOption.SELECT.getName());
+        manage.setOption(SelectOption.SELECT.getName());
         manage.setRoles(List.of(roleSetup.getRoleAdmin().getId()));
 
         MenuDTO.MenuAuthOption[] input = new MenuDTO.MenuAuthOption[] {null,null,manage,manage};

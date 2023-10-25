@@ -244,7 +244,7 @@ class AdminRoleControllerTest {
         assertTrue(menu.manageable(List.of(role))); assertTrue(menu.manageable(List.of(roleUser)));
 
         MenuDTO.MenuAuthOption opt = new MenuDTO.MenuAuthOption();
-        opt.setName(SelectOption.SELECT.getName());
+        opt.setOption(SelectOption.SELECT.getName());
         opt.setRoles(List.of(role.getId()));
 
         MenuDTO.MenuAuthOption[] input = new MenuDTO.MenuAuthOption[]{opt,opt,null,null};

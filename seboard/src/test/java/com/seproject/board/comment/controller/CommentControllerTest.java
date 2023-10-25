@@ -167,7 +167,7 @@ class CommentControllerTest {
         request.setAnonymous(true);
 
         MenuDTO.MenuAuthOption access = new MenuDTO.MenuAuthOption();
-        access.setName(SelectOption.SELECT.getName());
+        access.setOption(SelectOption.SELECT.getName());
         access.setRoles(List.of(roleSetup.createRole().getId()));
 
         MenuDTO.MenuAuthOption[] input = new MenuDTO.MenuAuthOption[] {access,access,null,null};
@@ -230,7 +230,7 @@ class CommentControllerTest {
         Category category = menuSetup.createCategory(boardMenu);
 
         MenuDTO.MenuAuthOption manage = new MenuDTO.MenuAuthOption();
-        manage.setName(SelectOption.SELECT.getName());
+        manage.setOption(SelectOption.SELECT.getName());
         manage.setRoles(List.of(roleSetup.createRole().getId()));
 
         MenuDTO.MenuAuthOption[] input = new MenuDTO.MenuAuthOption[] {null,null,manage,manage};
@@ -303,7 +303,7 @@ class CommentControllerTest {
         Category category = menuSetup.createCategory(boardMenu);
 
         MenuDTO.MenuAuthOption manage = new MenuDTO.MenuAuthOption();
-        manage.setName(SelectOption.SELECT.getName());
+        manage.setOption(SelectOption.SELECT.getName());
         manage.setRoles(List.of(roleSetup.createRole().getId()));
 
         MenuDTO.MenuAuthOption[] input = new MenuDTO.MenuAuthOption[] {null,null,manage,manage};

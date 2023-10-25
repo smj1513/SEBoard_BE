@@ -54,9 +54,9 @@ class AdminMenuControllerTest {
         Menu menu = menuSetup.createMenu();
 
         MenuAuthOption access = new MenuAuthOption();
-        access.setName(SelectOption.OVER_USER.getName());
+        access.setOption(SelectOption.OVER_USER.getName());
         MenuAuthOption expose = new MenuAuthOption();
-        expose.setName(SelectOption.OVER_USER.getName());
+        expose.setOption(SelectOption.OVER_USER.getName());
 
         CreateMenuRequest request = getCreateMenuRequest(menu,new MenuAuthOption[]{access,expose,null,null});
 
@@ -109,9 +109,9 @@ class AdminMenuControllerTest {
         Menu groupMenu = menuSetup.createMenu();
 
         MenuAuthOption access = new MenuAuthOption();
-        access.setName(SelectOption.OVER_USER.getName());
+        access.setOption(SelectOption.OVER_USER.getName());
         MenuAuthOption expose = new MenuAuthOption();
-        expose.setName(SelectOption.OVER_USER.getName());
+        expose.setOption(SelectOption.OVER_USER.getName());
 
         CreateMenuRequest request = getCreateMenuRequest(groupMenu,new MenuAuthOption[]{access,expose,null,null});
 
@@ -157,7 +157,7 @@ class AdminMenuControllerTest {
         Menu menu = menuSetup.createMenu();
 
         MenuAuthOption expose = new MenuAuthOption();
-        expose.setName(SelectOption.OVER_USER.getName());
+        expose.setOption(SelectOption.OVER_USER.getName());
 
         CreateMenuRequest request =
                 getCreateMenuRequest(menu,new MenuAuthOption[]{null,expose,null,null});
@@ -200,9 +200,9 @@ class AdminMenuControllerTest {
         Menu menu = menuSetup.createMenu();
 
         MenuAuthOption menuAccess = new MenuAuthOption();
-        menuAccess.setName(SelectOption.OVER_USER.getName());
+        menuAccess.setOption(SelectOption.OVER_USER.getName());
         MenuAuthOption menuExpose = new MenuAuthOption();
-        menuExpose.setName(SelectOption.OVER_USER.getName());
+        menuExpose.setOption(SelectOption.OVER_USER.getName());
 
         CreateMenuRequest request =
                 getCreateMenuRequest(menu,new MenuAuthOption[]{menuAccess,menuExpose,null,null});
@@ -219,9 +219,9 @@ class AdminMenuControllerTest {
                 .andExpect(status().isOk());
 
         MenuAuthOption boardMenuAccess = new MenuAuthOption();
-        boardMenuAccess.setName(SelectOption.OVER_USER.getName());
+        boardMenuAccess.setOption(SelectOption.OVER_USER.getName());
         MenuAuthOption boardMenuExpose = new MenuAuthOption();
-        boardMenuExpose.setName(SelectOption.OVER_USER.getName());
+        boardMenuExpose.setOption(SelectOption.OVER_USER.getName());
 
         request = getCreateMenuRequest(menu,
                 new MenuAuthOption[]{boardMenuAccess,boardMenuExpose,null,null});
@@ -238,7 +238,7 @@ class AdminMenuControllerTest {
                 .andExpect(status().isOk());
 
         MenuAuthOption externalMenuExpose = new MenuAuthOption();
-        externalMenuExpose.setName(SelectOption.OVER_USER.getName());
+        externalMenuExpose.setOption(SelectOption.OVER_USER.getName());
 
         request = getCreateMenuRequest(menu,
                 new MenuAuthOption[]{null,externalMenuExpose,null,null});
@@ -265,9 +265,9 @@ class AdminMenuControllerTest {
         Menu menu = menuSetup.createMenu();
 
         MenuAuthOption manage = new MenuAuthOption();
-        manage.setName(SelectOption.OVER_USER.getName());
+        manage.setOption(SelectOption.OVER_USER.getName());
         MenuAuthOption edit = new MenuAuthOption();
-        edit.setName(SelectOption.OVER_USER.getName());
+        edit.setOption(SelectOption.OVER_USER.getName());
 
         CreateMenuRequest request = getCreateMenuRequest(menu,
                 new MenuAuthOption[]{null,null,edit,manage});
@@ -293,9 +293,9 @@ class AdminMenuControllerTest {
         BoardMenu boardMenu = menuSetup.createBoardMenu(menuSetup.createMenu());
 
         MenuAuthOption manage = new MenuAuthOption();
-        manage.setName(SelectOption.ONLY_ADMIN.getName());
+        manage.setOption(SelectOption.ONLY_ADMIN.getName());
         MenuAuthOption edit = new MenuAuthOption();
-        edit.setName(SelectOption.ONLY_ADMIN.getName());
+        edit.setOption(SelectOption.ONLY_ADMIN.getName());
 
         CreateMenuRequest request = getCreateMenuRequest(boardMenu,
                 new MenuAuthOption[]{null,null,edit,manage});
@@ -355,9 +355,9 @@ class AdminMenuControllerTest {
         BoardMenu lastDepthMenu = menuSetup.createBoardMenu(boardMenu);
 
         MenuAuthOption manage = new MenuAuthOption();
-        manage.setName(SelectOption.ONLY_ADMIN.getName());
+        manage.setOption(SelectOption.ONLY_ADMIN.getName());
         MenuAuthOption edit = new MenuAuthOption();
-        edit.setName(SelectOption.ONLY_ADMIN.getName());
+        edit.setOption(SelectOption.ONLY_ADMIN.getName());
 
         CreateMenuRequest request = getCreateMenuRequest(lastDepthMenu,
                 new MenuAuthOption[]{null,null,edit,manage});
@@ -384,7 +384,7 @@ class AdminMenuControllerTest {
         BoardMenu boardMenu = menuSetup.createBoardMenu(menu);
 
         MenuAuthOption option = new MenuAuthOption();
-        option.setName(SelectOption.OVER_USER.getName());
+        option.setOption(SelectOption.OVER_USER.getName());
 
         MenuAuthOption[][] input = new MenuAuthOption[][]{
                 {option,null,null,null},
@@ -532,11 +532,11 @@ class AdminMenuControllerTest {
         Role role = roleSetup.createRole();
 
         MenuAuthOption access = new MenuAuthOption();
-        access.setName(SelectOption.SELECT.getName());
+        access.setOption(SelectOption.SELECT.getName());
         access.setRoles(List.of(role.getId()));
 
         MenuAuthOption expose = new MenuAuthOption();
-        expose.setName(SelectOption.SELECT.getName());
+        expose.setOption(SelectOption.SELECT.getName());
         expose.setRoles(List.of(role.getId()));
 
         UpdateMenuRequest request  = getUpdateMenuRequest(new MenuAuthOption[]{access,expose,null,null});
@@ -580,11 +580,11 @@ class AdminMenuControllerTest {
         Role admin = roleSetup.getRoleAdmin();
 
         MenuAuthOption access = new MenuAuthOption();
-        access.setName(SelectOption.SELECT.getName());
+        access.setOption(SelectOption.SELECT.getName());
         access.setRoles(List.of(role.getId(),admin.getId()));
 
         MenuAuthOption expose = new MenuAuthOption();
-        expose.setName(SelectOption.SELECT.getName());
+        expose.setOption(SelectOption.SELECT.getName());
         expose.setRoles(List.of(role.getId(),admin.getId(), kumoh.getId()));
 
         UpdateMenuRequest request  = getUpdateMenuRequest(new MenuAuthOption[]{access,expose,null,null});
@@ -626,7 +626,7 @@ class AdminMenuControllerTest {
         ExternalSiteMenu externalSiteMenu = menuSetup.createExternalSiteMenu(menuSetup.createMenu());
 
         MenuAuthOption expose = new MenuAuthOption();
-        expose.setName(SelectOption.ONLY_ADMIN.getName());
+        expose.setOption(SelectOption.ONLY_ADMIN.getName());
 
         UpdateMenuRequest request  = getUpdateMenuRequest(new MenuAuthOption[]{null,expose,null,null});
 
@@ -666,12 +666,12 @@ class AdminMenuControllerTest {
 
         Role editRole = roleSetup.createRole();
         MenuAuthOption edit = new MenuAuthOption();
-        edit.setName(SelectOption.SELECT.getName());
+        edit.setOption(SelectOption.SELECT.getName());
         edit.setRoles(List.of(roleKumoh.getId(),roleAdmin.getId(),editRole.getId()));
 
         Role manageRole = roleSetup.createRole();
         MenuAuthOption manage = new MenuAuthOption();
-        manage.setName(SelectOption.SELECT.getName());
+        manage.setOption(SelectOption.SELECT.getName());
         manage.setRoles(List.of(manageRole.getId(), roleUser.getId()));
 
         UpdateMenuRequest request  = getUpdateMenuRequest(new MenuAuthOption[]{null,null,edit,manage});
@@ -721,7 +721,7 @@ class AdminMenuControllerTest {
 
         List<Menu> list = List.of(menu, boardMenu, externalSiteMenu, category);
         MenuAuthOption menuAuthOption = new MenuAuthOption();
-        menuAuthOption.setName(SelectOption.OVER_USER.getName());
+        menuAuthOption.setOption(SelectOption.OVER_USER.getName());
         MenuAuthOption[][][] input = new MenuAuthOption[][][]{
                 {
                         {null,menuAuthOption,null,null},
