@@ -41,18 +41,13 @@ public class MenuProvider extends AbstractMenuProvider{
 
             Long menuId = adminMenuService.createMenu(superMenu,name,description, urlInfo);
 
-            MenuDTO.MenuAuthOption access = request.getAccess();
             MenuDTO.MenuAuthOption expose = request.getExpose();
 
-            if(access == null || expose == null) {
+            if(expose == null) {
                 throw new CustomIllegalArgumentException(ErrorCode.INVALID_MENU_REQUEST, null);
             }
 
             Menu menu = menuService.findById(menuId);
-
-            SelectOption selectOption = SelectOption.of(access.getOption());
-            List<Role> roles = roleService.convertRoles(selectOption);
-            authorizationService.updateAccess(menu,selectOption,roles);
 
             SelectOption exposeSelectOption = SelectOption.of(expose.getOption());
             List<Role> exposeRoles = roleService.convertRoles(exposeSelectOption);
