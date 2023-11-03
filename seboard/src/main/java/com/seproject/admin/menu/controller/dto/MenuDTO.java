@@ -71,7 +71,7 @@ public class MenuDTO {
         private String externalUrl;
 
         private MenuAuthOption access;
-        private MenuAuthOption edit;
+        private MenuAuthOption write;
         private MenuAuthOption expose;
         private MenuAuthOption manage;
     }
@@ -84,7 +84,7 @@ public class MenuDTO {
         private String externalUrl;
 
         private MenuAuthOption access;
-        private MenuAuthOption edit;
+        private MenuAuthOption write;
         private MenuAuthOption expose;
         private MenuAuthOption manage;
     }

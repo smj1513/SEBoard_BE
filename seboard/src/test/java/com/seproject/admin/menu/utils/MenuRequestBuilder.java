@@ -26,7 +26,7 @@ public class MenuRequestBuilder {
 
         request.setAccess(menuAuthOptions[0]);
         request.setExpose(menuAuthOptions[1]);
-        request.setEdit(menuAuthOptions[2]);
+        request.setWrite(menuAuthOptions[2]);
         request.setManage(menuAuthOptions[3]);
 
         return request;
@@ -42,7 +42,7 @@ public class MenuRequestBuilder {
 
         request.setAccess(menuAuthOptions[0]);
         request.setExpose(menuAuthOptions[1]);
-        request.setEdit(menuAuthOptions[2]);
+        request.setWrite(menuAuthOptions[2]);
         request.setManage(menuAuthOptions[3]);
 
         return request;
