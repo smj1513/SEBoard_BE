@@ -46,7 +46,7 @@ public class CategoryProvider extends AbstractMenuProvider {
             Long categoryId = adminMenuService.createCategory(superMenu, name, description, urlInfo);
 
             MenuDTO.MenuAuthOption manage = request.getManage();
-            MenuDTO.MenuAuthOption edit = request.getEdit();
+            MenuDTO.MenuAuthOption edit = request.getWrite();
 
             if(manage == null || edit == null) {
                 throw new CustomIllegalArgumentException(ErrorCode.INVALID_MENU_REQUEST, null);
@@ -78,7 +78,7 @@ public class CategoryProvider extends AbstractMenuProvider {
             menu.changeName(name);
             menu.changeUrlInfo(urlId);
 
-            MenuDTO.MenuAuthOption edit = request.getEdit();
+            MenuDTO.MenuAuthOption edit = request.getWrite();
             MenuDTO.MenuAuthOption manage = request.getManage();
 
             if (edit == null || manage == null)
