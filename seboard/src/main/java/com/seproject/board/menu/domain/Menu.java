@@ -3,13 +3,17 @@ package com.seproject.board.menu.domain;
 import com.seproject.account.authorization.utils.AuthorizationProperty;
 import com.seproject.account.role.domain.Role;
 import com.seproject.account.authorization.domain.MenuAuthorization;
+import com.seproject.admin.domain.SelectOption;
 import com.seproject.board.menu.service.MenuService;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.util.Pair;
 
 import javax.persistence.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @NoArgsConstructor
 @Entity
@@ -48,6 +52,11 @@ public class Menu {
         this.description = description;
         this.depth = calculateDepth();
         this.menuAuthorizations = new ArrayList<>();
+    }
+
+
+    public String getType(){
+        return "MENU";
     }
 
     public void addAuthorization(MenuAuthorization menuAuthorization) {
@@ -94,6 +103,22 @@ public class Menu {
 
     public void changeUrlInfo(String urlInfo) {this.urlInfo = urlInfo;}
 
+    public Map<AuthorizationProperty, Pair<SelectOption, List<Role>>> getAvailableRoles() {
+        Map<AuthorizationProperty, Pair<SelectOption, List<Role>>> res = new HashMap<>();
+
+        for (MenuAuthorization menuAuthorization : menuAuthorizations) {
+            AuthorizationProperty authProperty = menuAuthorization.getAuthorizationProperty();
+            List<Role> availableRoles = menuAuthorization.getAvailableRoles();
+
+            //TODO : 해당 MENU TYPE에 필요없는 Authorization이면 아예 Entity생성이 안되어야하는거 아닌가?
+            if(menuAuthorization.getSelectOption()!=null){
+                res.putIfAbsent(authProperty, Pair.of(menuAuthorization.getSelectOption(), new ArrayList<>()));
+                res.get(authProperty).getSecond().addAll(availableRoles);
+            }
+        }
+
+        return res;
+    }
 
     //TODO : throw vs return true
     public boolean editable(List<Role> roles) {
@@ -123,7 +148,6 @@ public class Menu {
     }
 
     public boolean accessible(List<Role> roles) {
-
         if (superMenu != null && !superMenu.accessible(roles)) {
             return false;
         }

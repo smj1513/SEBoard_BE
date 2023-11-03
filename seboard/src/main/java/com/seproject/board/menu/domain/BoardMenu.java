@@ -13,6 +13,10 @@ import javax.persistence.Entity;
 @NoArgsConstructor
 @DiscriminatorValue("BOARD")
 public class BoardMenu extends InternalSiteMenu {
+    @Override
+    public String getType() {
+        return "BOARD";
+    }
 
     public BoardMenu(Long categoryId, Menu superMenu, String name, String description, String categoryPathId) {
         super(categoryId, superMenu, name, description, categoryPathId);

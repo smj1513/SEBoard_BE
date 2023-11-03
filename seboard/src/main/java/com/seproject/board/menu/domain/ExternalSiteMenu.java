@@ -18,6 +18,11 @@ public class ExternalSiteMenu extends Menu {
         }
     }
 
+    @Override
+    public String getType(){
+        return "EXTERNAL";
+    }
+
     public void changeExternalSiteUrl(String externalUrl) {
         this.urlInfo = externalUrl;
     }
