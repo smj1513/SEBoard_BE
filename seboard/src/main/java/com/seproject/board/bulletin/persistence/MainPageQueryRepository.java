@@ -48,7 +48,7 @@ public class MainPageQueryRepository {
     }
 
     private BooleanExpression isInternalSiteMenu() {
-        return menu.instanceOfAny(InternalSiteMenu.class, BoardMenu.class, Category.class);
+        return menu.instanceOfAny(InternalSiteMenu.class, BoardMenu.class);
     }
 
 }

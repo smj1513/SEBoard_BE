@@ -77,6 +77,7 @@ public class CategoryAppService {
 //    }
 
     public List<CategoryResponse> retrieveAllMenu() {
+        //TODO : 3 depth의 경우 3 dpeth의 것 조회 불가능
         Optional<Account> account = SecurityUtils.getAccount();
         List<Role> roles = account.isPresent() ? account.get().getRoles() : List.of();
 

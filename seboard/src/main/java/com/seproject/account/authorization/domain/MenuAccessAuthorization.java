@@ -18,11 +18,7 @@ public class MenuAccessAuthorization extends MenuAuthorization {
 
     public MenuAccessAuthorization(Menu menu) {
         super(menu);
-    }
-
-    @Override
-    public boolean support(AuthorizationProperty property) {
-        return property.equals(AuthorizationProperty.ACCESS);
+        selectOption = SelectOption.ALL;
     }
 
     @Override
@@ -33,5 +29,10 @@ public class MenuAccessAuthorization extends MenuAuthorization {
     @Override
     public SelectOption getSelectOption() {
         return selectOption;
+    }
+
+    @Override
+    public AuthorizationProperty getAuthorizationProperty() {
+        return AuthorizationProperty.ACCESS;
     }
 }

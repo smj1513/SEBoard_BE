@@ -21,6 +21,11 @@ public class Category extends BoardMenu {
     }
 
     @Override
+    public String getType(){
+        return "CATEGORY";
+    }
+
+    @Override
     public boolean isRemovable(MenuService categoryService) {
         return !categoryService.hasPost(getMenuId());
     }

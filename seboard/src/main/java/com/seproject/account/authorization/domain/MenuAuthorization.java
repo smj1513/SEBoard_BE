@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Getter
@@ -24,7 +26,9 @@ public abstract class MenuAuthorization extends Authorization {
         this.menu = menu;
     }
 
-    public abstract boolean support(AuthorizationProperty property);
+    public boolean support(AuthorizationProperty property){
+        return property.equals(getAuthorizationProperty());
+    }
     public boolean isAuth(List<Role> roles) {
 
         if (roleAuthorizations.size() == 0) return true;
@@ -46,5 +50,15 @@ public abstract class MenuAuthorization extends Authorization {
     }
     public abstract void setSelectOption(SelectOption selectOption);
     public abstract SelectOption getSelectOption();
+    public abstract AuthorizationProperty getAuthorizationProperty();
 
+    public List<Role> getAvailableRoles() {
+        List<Role> roles = new ArrayList<>();
+
+        for (RoleAuthorization roleAuthorization : roleAuthorizations) {
+            roles.add(roleAuthorization.getRole());
+        }
+
+        return roles;
+    }
 }
