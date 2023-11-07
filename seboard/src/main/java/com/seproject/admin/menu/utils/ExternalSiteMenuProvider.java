@@ -48,8 +48,8 @@ public class ExternalSiteMenuProvider extends AbstractMenuProvider {
 
             Menu menu = menuService.findById(externalSiteMenuId);
 
+            List<Role> exposeRoles = parseRoles(expose);
             SelectOption exposeSelectOption = SelectOption.of(expose.getOption());
-            List<Role> exposeRoles = roleService.convertRoles(exposeSelectOption);
             authorizationService.updateExpose(menu,exposeSelectOption,exposeRoles);
             return externalSiteMenuId;
         }

@@ -57,12 +57,10 @@ public class BoardMenuProvider extends AbstractMenuProvider {
 
             List<Role> accessRoles = parseRoles(access);
             SelectOption accessSelectOption = SelectOption.of(access.getOption());
-//            List<Role> accessRoles = roleService.convertRoles(accessSelectOption);
             authorizationService.updateAccess(menu,accessSelectOption,accessRoles);
 
             List<Role> exposeRoles = parseRoles(expose);
             SelectOption exposeSelectOption = SelectOption.of(expose.getOption());
-//            List<Role> exposeRoles = roleService.convertRoles(exposeSelectOption);
             authorizationService.updateExpose(menu,exposeSelectOption,exposeRoles);
 
             return boardMenuId;
