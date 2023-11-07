@@ -53,12 +53,13 @@ public class CategoryProvider extends AbstractMenuProvider {
             }
 
             Menu menu = menuService.findById(categoryId);
+
+            List<Role> manageRoles = parseRoles(manage);
             SelectOption manageSelectOption = SelectOption.of(manage.getOption());
-            List<Role> manageRoles = roleService.convertRoles(manageSelectOption);
             authorizationService.updateManage(menu,manageSelectOption,manageRoles);
 
+            List<Role> editRoles = parseRoles(edit);
             SelectOption editSelectOption = SelectOption.of(edit.getOption());
-            List<Role> editRoles = roleService.convertRoles(editSelectOption);
             authorizationService.updateEdit(menu,editSelectOption,editRoles);
 
             return categoryId;

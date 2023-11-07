@@ -49,8 +49,8 @@ public class MenuProvider extends AbstractMenuProvider{
 
             Menu menu = menuService.findById(menuId);
 
+            List<Role> exposeRoles = parseRoles(expose);
             SelectOption exposeSelectOption = SelectOption.of(expose.getOption());
-            List<Role> exposeRoles = roleService.convertRoles(exposeSelectOption);
             authorizationService.updateExpose(menu,exposeSelectOption,exposeRoles);
             return menuId;
         }
