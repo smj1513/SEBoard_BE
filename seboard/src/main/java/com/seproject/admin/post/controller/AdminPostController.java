@@ -46,7 +46,7 @@ public class AdminPostController {
         AdminPostRetrieveCondition condition = new AdminPostRetrieveCondition();
         condition.setCategoryId(categoryId);
         condition.setExposeOption(exposeOption);
-        condition.setExposeOption(searchOption);
+        condition.setSearchOption(searchOption);
         condition.setIsReported(isReported);
         condition.setQuery(query);
 
