@@ -55,15 +55,15 @@ public class TokenService {
             throw new CustomAuthenticationException(ErrorCode.DISABLE_REFRESH_TOKEN,null);
         }
 
-        boolean isLargeToken = isLargeToken(jwt);
-
-        if(isLargeToken) {
-            logoutLargeRefreshTokenRepository.save(new LogoutLargeRefreshToken(refreshToken));
-        } else {
-            logoutRefreshTokenRepository.save(new LogoutRefreshToken(refreshToken));
-        }
-
         try {
+            boolean isLargeToken = isLargeToken(jwt);
+
+            if(isLargeToken) {
+                logoutLargeRefreshTokenRepository.save(new LogoutLargeRefreshToken(refreshToken));
+            } else {
+                logoutRefreshTokenRepository.save(new LogoutRefreshToken(refreshToken));
+            }
+
            String subject = jwtDecoder.getSubject(jwt);
            Account account = accountRepository.findByLoginIdWithRole(subject)
                    .orElseThrow(() -> new CustomUserNotFoundException(ErrorCode.USER_NOT_FOUND,null));
