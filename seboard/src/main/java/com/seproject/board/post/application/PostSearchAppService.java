@@ -4,6 +4,8 @@ import com.seproject.account.account.domain.Account;
 import com.seproject.account.role.domain.Role;
 import com.seproject.account.utils.SecurityUtils;
 import com.seproject.board.menu.domain.Category;
+import com.seproject.board.post.controller.PostSearchOptions;
+import com.seproject.board.post.controller.dto.PostSearchRequest;
 import com.seproject.board.post.persistence.PostQueryRepository;
 import com.seproject.board.post.service.BookmarkService;
 import com.seproject.board.post.service.PostService;
@@ -152,48 +154,19 @@ public class PostSearchAppService {
         throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
     }
 
-    public Page<RetrievePostListResponseElement> searchByTitle(String title, int page, int perPage){
-        Page<RetrievePostListResponseElement> postPage =
-                postSearchRepository.findByTitle(title, PageRequest.of(page, perPage));
+    public Page<RetrievePostListResponseElement> searchPost(PostSearchRequest request, int page, int size){
+        try{
+            Page<RetrievePostListResponseElement> res =
+                    postQueryRepository.searchPostList(request.getCategoryId(), PostSearchOptions.valueOf(request.getSearchOption()), request.getQuery(), page, size);
+            setCommentSize(res);
 
-        setCommentSize(postPage);
-
-        return postPage;
+            return res;
+        }catch (IllegalArgumentException e){
+            throw new CustomIllegalArgumentException(ErrorCode.INVALID_SEARCH_OPTION, e);
+        }
     }
 
-    public Page<RetrievePostListResponseElement> searchByContent(String content, int page, int perPage){
-        Page<RetrievePostListResponseElement> postPage = postSearchRepository.findByContents(content, PageRequest.of(page, perPage));
-
-        setCommentSize(postPage);
-
-        return postPage;
-    }
-
-    public Page<RetrievePostListResponseElement> searchByTitleOrContent(String query, int page, int perPage){
-        Page<RetrievePostListResponseElement> postPage = postSearchRepository.findByTitleOrContents(query, PageRequest.of(page, perPage));
-
-        setCommentSize(postPage);
-
-        return postPage;
-    }
-
-    public Page<RetrievePostListResponseElement> searchByAuthorName(String authorName, int page, int perPage){
-        Page<RetrievePostListResponseElement> postPage = postSearchRepository.findByAuthorName(authorName, PageRequest.of(page, perPage));
-
-        setCommentSize(postPage);
-
-        return postPage;
-    }
-
-    public Page<RetrievePostListResponseElement> searchByAll(String query, int page, int perPage){
-        Page<RetrievePostListResponseElement> postPage = postSearchRepository.findByAllOptions(query, PageRequest.of(page, perPage));
-
-        setCommentSize(postPage);
-
-        return postPage;
-    }
-
-
+    //TODO : 쿼리문으로 처리?
     private void setCommentSize(Page<RetrievePostListResponseElement> postPage){
         postPage.forEach(postDto -> { // TODO : N+1
             int commentSize = commentRepository.countCommentsByPostId(postDto.getPostId());

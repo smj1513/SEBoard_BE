@@ -30,7 +30,7 @@ public class Menu {
     private Long menuId;
     @ManyToOne
     @JoinColumn(name = "super_menu_id")
-    private Menu superMenu;
+    protected Menu superMenu;
     private String name;
     private String description;
     private int depth;
