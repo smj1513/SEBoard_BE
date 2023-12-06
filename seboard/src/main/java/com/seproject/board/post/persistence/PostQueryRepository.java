@@ -1,14 +1,26 @@
 package com.seproject.board.post.persistence;
 
+import com.querydsl.core.types.Predicate;
+import com.querydsl.core.types.Projections;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import com.seproject.board.common.Status;
+import com.seproject.board.post.controller.PostSearchOptions;
+import com.seproject.board.post.controller.dto.PostResponse;
+import com.seproject.board.post.controller.dto.PostResponse.RetrievePostListResponseElement;
 import com.seproject.board.post.domain.model.Post;
 import com.seproject.file.domain.model.FileMetaData;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
 import java.util.Set;
 
+import static com.fasterxml.jackson.databind.PropertyName.construct;
+import static com.querydsl.core.types.Projections.constructor;
 import static com.seproject.board.menu.domain.QCategory.category;
 import static com.seproject.board.post.domain.model.QPost.post;
 import static com.seproject.member.domain.QBoardUser.boardUser;
@@ -24,12 +36,63 @@ public class PostQueryRepository {
         Post findPost = jpaQueryFactory.select(post)
                 .from(post)
                 .leftJoin(post.category, category).fetchJoin()
+                .leftJoin(post.category.superMenu).fetchJoin()
                 .leftJoin(post.author, boardUser).fetchJoin()
                 .where(post.postId.eq(id))
                 .fetchOne();
 
         Set<FileMetaData> attachments = findPost.getAttachments();
         return findPost;
+    }
+
+
+    public Page<RetrievePostListResponseElement> searchPostList(Long categoryId, PostSearchOptions queryOption, String query, int page, int size) {
+        List<RetrievePostListResponseElement> list = jpaQueryFactory
+                .select(constructor(RetrievePostListResponseElement.class, post))
+                .from(post)
+                .leftJoin(post.category, category)
+                .leftJoin(post.category.superMenu)
+                .leftJoin(post.author, boardUser)
+                .where(categoryEq(categoryId))
+                .where(queryLike(queryOption, query))
+                .where(normalStatusEq())
+                .orderBy(post.baseTime.createdAt.desc())
+                .offset(page)
+                .limit(size)
+                .fetch();
+
+        Long count = jpaQueryFactory
+                .select(post.count())
+                .from(post)
+                .leftJoin(post.category, category)
+                .leftJoin(post.category.superMenu)
+                .leftJoin(post.author, boardUser)
+                .where(categoryEq(categoryId))
+                .where(queryLike(queryOption, query))
+                .where(normalStatusEq())
+                .fetchOne();
+
+        return new PageImpl<>(list, PageRequest.of(page, size), count);
+    }
+
+    private BooleanExpression normalStatusEq() {
+        return post.status.eq(Status.NORMAL);
+    }
+
+    private BooleanExpression queryLike(PostSearchOptions queryOption, String query) {
+        if(query==null || queryOption==null){
+            return null;
+        }
+
+        return queryOption.search(query);
+    }
+
+    private BooleanExpression categoryEq(Long categoryId) {
+        if(categoryId == null){
+            return null;
+        }
+
+        return post.category.menuId.eq(categoryId).or(post.category.superMenu.menuId.eq(categoryId));
     }
 
 }

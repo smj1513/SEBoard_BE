@@ -52,6 +52,7 @@ public enum ErrorCode {
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, 201, "올바르지 않은 형식의 요청입니다."),
     INVALID_DATE(HttpStatus.BAD_REQUEST, 202, "올바르지 않은 날짜 정보를 전송하였습니다."),
     INVALID_FILE_SIZE(HttpStatus.BAD_REQUEST, 203, "파일 크기가 너무 큽니다."),
+    INVALID_SEARCH_OPTION(HttpStatus.BAD_REQUEST, 204, "올바르지 않은 검색 옵션입니다."),
 
 
     NOT_EXIST_POST(HttpStatus.NOT_FOUND, 300, "존재하지 않는 게시글입니다."),

@@ -19,13 +19,7 @@ public interface PostSearchRepository extends Repository<Post, Long> {
     Page<RetrievePostListResponseElement> findBookmarkPostByLoginId(String loginId, Pageable pagingInfo);
     Page<RetrievePostListResponseElement> findMemberPostByLoginId(String loginId, Pageable pagingInfo);
     Page<RetrievePostListResponseElement> findPostByLoginId(String loginId, Pageable pagingInfo);
-    Optional<RetrievePostDetailResponse> findPostDetailById(Long id);
     List<RetrievePostListResponseElement> findPinedPostByCategoryId(Long categoryId);
     Page<RetrievePostListResponseElement> findPostByCategoryId(Long categoryId, Pageable pagingInfo);
-    Page<RetrievePostListResponseElement> findByTitle(String title, Pageable pagingInfo);
-    Page<RetrievePostListResponseElement> findByContents(String content, Pageable pagingInfo);
-    Page<RetrievePostListResponseElement> findByTitleOrContents(String title, Pageable pagingInfo);
-    Page<RetrievePostListResponseElement> findByAuthorName(String authorName, Pageable pagingInfo);
-    Page<RetrievePostListResponseElement> findByAllOptions(String searchQuery, Pageable pagingInfo);
 }
 
