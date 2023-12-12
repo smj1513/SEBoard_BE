@@ -50,7 +50,8 @@ public class PostSearchAppService {
     public RetrievePostDetailResponse findPostDetail(Long postId, String password){
 
         Account account = SecurityUtils.getAccount().orElse(null);
-        Post post = postQueryRepository.findByIdWithAll(postId);
+        Post post = postQueryRepository.findByIdWithAll(postId)
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
         Category category = post.getCategory();
         RetrievePostDetailResponse postDetailResponse = new RetrievePostDetailResponse(post);
 
