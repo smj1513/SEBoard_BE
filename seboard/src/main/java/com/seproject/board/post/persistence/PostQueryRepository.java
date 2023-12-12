@@ -1,12 +1,9 @@
 package com.seproject.board.post.persistence;
 
-import com.querydsl.core.types.Predicate;
-import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.seproject.board.common.Status;
 import com.seproject.board.post.controller.PostSearchOptions;
-import com.seproject.board.post.controller.dto.PostResponse;
 import com.seproject.board.post.controller.dto.PostResponse.RetrievePostListResponseElement;
 import com.seproject.board.post.domain.model.Post;
 import com.seproject.file.domain.model.FileMetaData;
@@ -17,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.fasterxml.jackson.databind.PropertyName.construct;
@@ -31,18 +29,20 @@ public class PostQueryRepository {
 
     private final JPAQueryFactory jpaQueryFactory;
 
-    public Post findByIdWithAll(Long id) {
+    public Optional<Post> findByIdWithAll(Long id) {
 
         Post findPost = jpaQueryFactory.select(post)
                 .from(post)
-                .leftJoin(post.category, category).fetchJoin()
-                .leftJoin(post.category.superMenu).fetchJoin()
-                .leftJoin(post.author, boardUser).fetchJoin()
+                .leftJoin(post.category, category)
+                .leftJoin(post.category.superMenu)
+                .leftJoin(post.author, boardUser)
                 .where(post.postId.eq(id))
                 .fetchOne();
 
-        Set<FileMetaData> attachments = findPost.getAttachments();
-        return findPost;
+        if(findPost!=null){
+            Set<FileMetaData> attachments = findPost.getAttachments();
+        }
+        return Optional.ofNullable(findPost);
     }
 
 
