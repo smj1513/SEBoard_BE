@@ -79,6 +79,7 @@ public class MenuDTO {
     @Data
     public static class UpdateMenuRequest {
         private String name;
+        private Long superMenuId;
         private String description;
         private String urlId;
         private String externalUrl;
@@ -95,5 +96,10 @@ public class MenuDTO {
         private List<Long> roles;
     }
 
+    @Data
+    public static class MigrateMenuRequest{
+        private Long toSuperMenuId;
+        private Long targetMenuId;
+    }
 
 }

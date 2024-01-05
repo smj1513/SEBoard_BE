@@ -3,6 +3,8 @@ package com.seproject.account.authorization.domain;
 import com.seproject.account.authorization.utils.AuthorizationProperty;
 import com.seproject.admin.domain.SelectOption;
 import com.seproject.board.menu.domain.Menu;
+import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.CustomIllegalArgumentException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -20,11 +22,15 @@ public class MenuManageAuthorization extends MenuAuthorization {
 
     public MenuManageAuthorization(Menu menu) {
         super(menu);
-        this.selectOption = SelectOption.ALL;
+        this.selectOption = SelectOption.ONLY_ADMIN;
     }
 
     @Override
     public void setSelectOption(SelectOption selectOption) {
+        if(selectOption.equals(SelectOption.ALL)){
+            throw new CustomIllegalArgumentException(ErrorCode.INVALID_REQUEST);
+        }
+
         this.selectOption = selectOption;
     }
 

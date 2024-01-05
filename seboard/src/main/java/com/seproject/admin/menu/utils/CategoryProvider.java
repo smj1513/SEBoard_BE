@@ -54,6 +54,10 @@ public class CategoryProvider extends AbstractMenuProvider {
 
             Menu menu = menuService.findById(categoryId);
 
+            if(manage.getOption().equals("ALL")){
+                throw new CustomIllegalArgumentException(ErrorCode.INVALID_REQUEST);
+            }
+            
             List<Role> manageRoles = parseRoles(manage);
             SelectOption manageSelectOption = SelectOption.of(manage.getOption());
             authorizationService.updateManage(menu,manageSelectOption,manageRoles);
