@@ -11,4 +11,9 @@ public class CustomIllegalArgumentException extends IllegalArgumentException {
         super(errorCode.getMessage(),e);
         this.errorCode = errorCode;
     }
+
+    public CustomIllegalArgumentException(ErrorCode errorCode) {
+        super(errorCode.getMessage());
+        this.errorCode = errorCode;
+    }
 }

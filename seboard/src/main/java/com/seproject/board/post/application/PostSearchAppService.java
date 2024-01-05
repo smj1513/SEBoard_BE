@@ -144,7 +144,7 @@ public class PostSearchAppService {
         Optional<Account> optional = SecurityUtils.getAccount();
         List<Role> roles = optional.isPresent() ? optional.get().getRoles() : Collections.emptyList();
 
-        if(boardMenu.editable(roles)) {
+        if(boardMenu.accessible(roles)) {
             Page<RetrievePostListResponseElement> postPage =
                     postSearchRepository.findPostByCategoryId(categoryId, PageRequest.of(page, size));
             setCommentSize(postPage);

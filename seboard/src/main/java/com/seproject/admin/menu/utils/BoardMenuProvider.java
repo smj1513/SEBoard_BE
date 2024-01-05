@@ -76,6 +76,15 @@ public class BoardMenuProvider extends AbstractMenuProvider {
             String name = request.getName();
             String urlId = request.getUrlId();
 
+            if(request.getSuperMenuId() != null) {
+                if(menu.getDepth() <= 1){
+                    Menu superMenu = menuService.findById(request.getSuperMenuId());
+                    menu.changeSuperMenu(superMenu);
+                }else{
+                    throw new CustomIllegalArgumentException(ErrorCode.INVALID_REQUEST);
+                }
+            }
+
             menu.changeDescription(description);
             menu.changeName(name);
             menu.changeUrlInfo(urlId);
