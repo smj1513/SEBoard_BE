@@ -5,6 +5,8 @@ import com.seproject.account.account.domain.repository.AccountRepository;
 import com.seproject.account.account.service.AccountService;
 import com.seproject.account.role.domain.Role;
 import com.seproject.account.utils.SecurityUtils;
+import com.seproject.admin.banned.domain.SpamWord;
+import com.seproject.admin.banned.domain.repository.SpamWordRepository;
 import com.seproject.board.menu.service.CategoryService;
 import com.seproject.board.post.domain.model.exposeOptions.ExposeState;
 import com.seproject.board.post.service.PostService;
@@ -49,6 +51,7 @@ public class PostAppService {
     private final FileMetaDataRepository fileMetaDataRepository;
     private final FileRepository fileRepository;
     private final FileConfigurationRepository fileConfigurationRepository;
+    private final SpamWordRepository spamWordRepository;
 
     private final MemberService memberService;
     private final AccountService accountService;
@@ -101,10 +104,22 @@ public class PostAppService {
             }
         }
 
+        checkSpamWord(title, contents);
+
         Long postId = postService.createPost(title, contents, category, author, now, isPined, attachments, exposeOption);
         return postId;
     }
 
+    private void checkSpamWord(String title, String contents) {
+        List<SpamWord> spamWords = spamWordRepository.findAll();
+
+        for (SpamWord spamWord : spamWords) {
+            String word = spamWord.getWord().toLowerCase();
+            if (title.toLowerCase().contains(word) || contents.toLowerCase().contains(word)) {
+                throw new CustomIllegalArgumentException(ErrorCode.CONTAIN_SPAM_KEYWORD, null);
+            }
+        }
+    }
 
 
     @Transactional
@@ -117,6 +132,8 @@ public class PostAppService {
         if(!post.isWrittenBy(account.getAccountId()) || !post.getCategory().manageable(account.getRoles())){
             throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
+
+        checkSpamWord(command.getTitle(), command.getContents());
 
         post.changeTitle(command.getTitle());
         post.changeContents(command.getContents());
