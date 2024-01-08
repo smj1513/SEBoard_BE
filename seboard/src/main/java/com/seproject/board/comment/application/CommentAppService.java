@@ -3,6 +3,7 @@ package com.seproject.board.comment.application;
 import com.seproject.account.account.domain.Account;
 import com.seproject.account.role.domain.Role;
 import com.seproject.account.utils.SecurityUtils;
+import com.seproject.admin.banned.domain.repository.SpamWordRepository;
 import com.seproject.board.comment.service.CommentService;
 import com.seproject.board.menu.domain.Category;
 import com.seproject.board.menu.domain.Menu;
@@ -44,6 +45,8 @@ public class CommentAppService {
     private final PostService postService;
     private final MemberService memberService;
 
+    private final SpamWordRepository spamWordRepository;
+
     @Transactional
     public Long writeComment(CommentWriteCommand command){
         Account account = SecurityUtils.getAccount()
@@ -72,8 +75,22 @@ public class CommentAppService {
         BoardUser author = command.isAnonymous() ?
                 anonymousService.createAnonymousInPost(account, post,comments) : memberService.findByAccountId(account.getAccountId());
 
+        checkSpamWord(contents);
+
         Long commentId = commentService.createComment(post, author, contents, onlyReadByAuthor);
         return commentId;
+    }
+
+    private void checkSpamWord(String contents) {
+        List<String> spamWords = spamWordRepository.findAll().stream()
+                .map(spamWord -> spamWord.getWord().toLowerCase())
+                .collect(Collectors.toList());
+
+        for (String spamWord : spamWords) {
+            if (contents.toLowerCase().contains(spamWord)) {
+                throw new CustomIllegalArgumentException(ErrorCode.CONTAIN_SPAM_KEYWORD, null);
+            }
+        }
     }
 
     @Transactional
@@ -91,6 +108,8 @@ public class CommentAppService {
         List<Role> roles = account.getRoles();
 
         if (comment.isWrittenBy(accountId) || category.manageable(roles) || category.editable(roles)) {
+           checkSpamWord(command.getContents());
+
             comment.changeContents(command.getContents());
             comment.changeOnlyReadByAuthor(command.isOnlyReadByAuthor());
 
