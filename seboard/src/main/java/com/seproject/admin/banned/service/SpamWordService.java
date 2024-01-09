@@ -17,7 +17,7 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-@Trantactional
+@Transactional
 public class SpamWordService {
     private final SpamWordRepository spamWordRepository;
 
