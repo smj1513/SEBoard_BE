@@ -11,11 +11,13 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Required;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Trantactional
 public class SpamWordService {
     private final SpamWordRepository spamWordRepository;
 
@@ -37,7 +39,7 @@ public class SpamWordService {
     }
 
     public void deleteSpamWord(Long id){
-        if(!spamWordRepository.findById(id).isEmpty()){
+        if(spamWordRepository.findById(id).isEmpty()){
             throw new CustomIllegalArgumentException(ErrorCode.INVALID_REQUEST, null);
         }
 
