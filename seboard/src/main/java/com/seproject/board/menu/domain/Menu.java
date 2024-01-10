@@ -99,6 +99,7 @@ public class Menu {
 
     public void changeSuperMenu(Menu superMenu) {
         this.superMenu = superMenu;
+        this.depth = calculateDepth();
     }
 
     public void changeUrlInfo(String urlInfo) {this.urlInfo = urlInfo;}
