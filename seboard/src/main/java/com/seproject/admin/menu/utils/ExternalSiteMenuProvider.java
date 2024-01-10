@@ -66,7 +66,7 @@ public class ExternalSiteMenuProvider extends AbstractMenuProvider {
             Menu superMenu = null;
             if(request.getSuperMenuId() != null) {
                 if(menu.getDepth() <= 1){
-                    Menu superMenu = menuService.findById(request.getSuperMenuId());
+                    superMenu = menuService.findById(request.getSuperMenuId());
                 }else{
                     throw new CustomIllegalArgumentException(ErrorCode.INVALID_REQUEST);
                 }
