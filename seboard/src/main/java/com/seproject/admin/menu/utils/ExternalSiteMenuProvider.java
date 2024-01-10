@@ -63,15 +63,16 @@ public class ExternalSiteMenuProvider extends AbstractMenuProvider {
             String name = request.getName();
             String externalUrl = request.getExternalUrl();
 
+            Menu superMenu = null;
             if(request.getSuperMenuId() != null) {
                 if(menu.getDepth() <= 1){
                     Menu superMenu = menuService.findById(request.getSuperMenuId());
-                    menu.changeSuperMenu(superMenu);
                 }else{
                     throw new CustomIllegalArgumentException(ErrorCode.INVALID_REQUEST);
                 }
             }
 
+            menu.changeSuperMenu(superMenu);
             menu.changeDescription(description);
             menu.changeName(name);
             menu.changeUrlInfo(externalUrl);
