@@ -47,6 +47,7 @@ public enum ErrorCode {
     DIFFERENT_SUPER_COMMENT(HttpStatus.BAD_REQUEST,139, "부모 댓글과 태그 댓글의 부모가 서로 다릅니다."),
     SELECT_OPTION_NOT_FOUND(HttpStatus.NOT_FOUND,140, "존재하지 않는 선택 옵션입니다."),
     CONTAIN_SPAM_KEYWORD(HttpStatus.BAD_REQUEST,141, "스팸 키워드가 포함되어 있습니다."),
+    NOT_EXIST_DASHBOARDMENU(HttpStatus.BAD_REQUEST,142, "일치하는 URL을 가진 DashBoardMenu가 없습니다."),
 
 
     INVALID_PAGINATION(HttpStatus.BAD_REQUEST,200, "올바르지 않은 페이지 정보를 전송하였습니다."),
