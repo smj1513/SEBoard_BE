@@ -31,14 +31,14 @@ public class AdminDashBoardController {
         return new ResponseEntity<>(adminDashBoardMenuAppService.findDashBoardMenus(),HttpStatus.OK);
     }
 
-    @GetMapping
+    @GetMapping("/setting")
     @Operation(summary = "대시보드에 설정된 접근 권한을 조회" ,description = "대시 보드에 설정된 권한을 조회한다.")
     public ResponseEntity<?> retrieveSettings() {
         return new ResponseEntity<>(adminDashBoardMenuAppService.findDashBoardMenus(),HttpStatus.OK);
     }
 
     @Operation(summary = "대시보드 메뉴 접근 권한 수정", description = "대시보드 url을 통해서 전달한 권한으로 접근 권한을 새로 설정한다.")
-    @PutMapping()
+    @PutMapping("/setting")
     public ResponseEntity<Void> updateSettings(@RequestBody DashBoardUpdateRequest request) {
         adminDashBoardMenuAppService.update(request);
         return new ResponseEntity<>(HttpStatus.OK);
