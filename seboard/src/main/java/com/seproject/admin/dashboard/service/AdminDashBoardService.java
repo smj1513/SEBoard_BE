@@ -53,6 +53,11 @@ public class AdminDashBoardService {
         return allById;
     }
 
+    public List<DashBoardMenu> findDashBoardMenuWithRole(List<Long> ids) {
+        List<DashBoardMenu> dashBoardMenusWithRole = dashBoardMenuRepository.findDashBoardMenusWithRole(ids);
+        return dashBoardMenusWithRole;
+    }
+
     public List<Long> findAuthorizeDashBoardMenuIds(Account account) {
         List<Role> roles = account.getRoles();
         List<Long> ids = new ArrayList<>();
@@ -67,13 +72,13 @@ public class AdminDashBoardService {
     }
 
     @Transactional
-    public void update(DashBoardMenu dashBoardMenu, List<Role> roles) {
+    public void update(SelectOption selectOption, DashBoardMenu dashBoardMenu, List<Role> roles) {
 
         List<DashBoardMenuAuthorization> collect = roles.stream()
                 .map((role) -> new DashBoardMenuAuthorization(dashBoardMenu, role))
                 .collect(Collectors.toList());
 
-        dashBoardMenu.update(collect);
+        dashBoardMenu.update(selectOption, collect);
 
         all = dashBoardMenuRepository.findAll();
     }

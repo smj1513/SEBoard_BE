@@ -4,6 +4,7 @@ import com.seproject.account.role.domain.Role;
 import com.seproject.account.role.domain.RoleAuthorization;
 import com.seproject.account.authorization.domain.Authorization;
 import com.seproject.admin.dashboard.domain.DashBoardMenu;
+import com.seproject.admin.dashboard.domain.DashBoardMenuAuthorization;
 import com.seproject.admin.dashboard.domain.DashBoardMenuGroup;
 import com.seproject.admin.domain.SelectOption;
 import com.seproject.admin.menu.controller.dto.MenuDTO;
@@ -17,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static com.seproject.admin.menu.controller.dto.MenuDTO.*;
+
 public class DashBoardDTO {
 
     @Data
@@ -25,7 +28,6 @@ public class DashBoardDTO {
 
         private Long id;
         private String name;
-        private String desc;
         private String url;
 
         public static DashBoardMenuResponseElement toDTO(DashBoardMenu dashBoardMenu) {
@@ -36,6 +38,8 @@ public class DashBoardDTO {
                     .build();
         }
     }
+
+
     @Data
     @Builder(access = AccessLevel.PRIVATE)
     public static class DashBoardMenuResponse {
@@ -74,26 +78,72 @@ public class DashBoardDTO {
                     .setting(setting)
                     .build();
         }
-
-
-
     }
 
     @Data
     @Builder(access = AccessLevel.PRIVATE)
-    public static class DashBoardAuthorizationResponse {
-        private DashBoardMenuResponse menu;
-        private List<RoleDTO.RoleResponse> roles;
+    public static class DashBoardMenuAuthorizationResponseElement {
 
+        private DashBoardMenuResponseElement menu;
+        private MenuAuthResponse option;
 
+        public static DashBoardMenuAuthorizationResponseElement toDTO(DashBoardMenu dashBoardMenu) {
+            List<String> roles = dashBoardMenu.getDashBoardMenuAuthorizations()
+                            .stream().map(DashBoardMenuAuthorization::getRole)
+                            .map(Role::toString)
+                            .collect(Collectors.toList());
+            return builder()
+                    .menu(DashBoardMenuResponseElement.toDTO(dashBoardMenu))
+                    .option(new MenuAuthResponse(dashBoardMenu.getSelectOption().getName(), roles))
+                    .build();
+        }
+    }
 
+    @Data
+    @Builder(access = AccessLevel.PRIVATE)
+    public static class DashBoardMenuAuthorizationResponse {
+
+        private List<DashBoardMenuAuthorizationResponseElement> menu;
+        private List<DashBoardMenuAuthorizationResponseElement> person;
+        private List<DashBoardMenuAuthorizationResponseElement> content;
+        private List<DashBoardMenuAuthorizationResponseElement> setting;
+
+        public static DashBoardMenuAuthorizationResponse toDTO(List<DashBoardMenu> dashBoardMenus) {
+            List<DashBoardMenuAuthorizationResponseElement> menu = new ArrayList<>();
+            List<DashBoardMenuAuthorizationResponseElement> person = new ArrayList<>();
+            List<DashBoardMenuAuthorizationResponseElement> content = new ArrayList<>();
+            List<DashBoardMenuAuthorizationResponseElement> setting = new ArrayList<>();
+
+            for (DashBoardMenu dashBoardMenu : dashBoardMenus) {
+                List<DashBoardMenuAuthorizationResponseElement> target;
+
+                if(dashBoardMenu.getGroup().equals(DashBoardMenuGroup.MENU_GROUP)) {
+                    target = menu;
+                } else if(dashBoardMenu.getGroup().equals(DashBoardMenuGroup.PERSON_GROUP)) {
+                    target = person;
+                } else if(dashBoardMenu.getGroup().equals(DashBoardMenuGroup.CONTENT_GROUP)) {
+                    target = content;
+                } else {
+                    target = setting;
+                }
+
+                target.add(DashBoardMenuAuthorizationResponseElement.toDTO(dashBoardMenu));
+            }
+
+            return builder()
+                    .menu(menu)
+                    .person(person)
+                    .content(content)
+                    .setting(setting)
+                    .build();
+        }
     }
 
 
     @Data
     public static class DashBoardUpdateRequest {
         private Long id;
-        private MenuDTO.MenuAuthOption option;
+        private MenuAuthOption option;
 
     }
 

@@ -6,6 +6,7 @@ import com.seproject.account.role.service.RoleService;
 import com.seproject.account.utils.SecurityUtils;
 import com.seproject.admin.dashboard.controller.dto.DashBoardDTO;
 import com.seproject.admin.dashboard.domain.DashBoardMenu;
+import com.seproject.admin.dashboard.domain.DashBoardMenuAuthorization;
 import com.seproject.admin.dashboard.service.AdminDashBoardService;
 import com.seproject.admin.domain.SelectOption;
 import com.seproject.admin.menu.controller.dto.MenuDTO;
@@ -17,6 +18,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.seproject.admin.dashboard.controller.dto.DashBoardDTO.*;
@@ -41,6 +43,17 @@ public class AdminDashBoardMenuAppService {
         return response;
     }
 
+    public DashBoardMenuAuthorizationResponse findDashBoardMenuOptions() {
+        Account account = SecurityUtils.getAccount()
+                .orElseThrow(() -> new CustomAuthenticationException(ErrorCode.NOT_LOGIN, null));
+
+        List<Long> ids = adminDashBoardService.findAuthorizeDashBoardMenuIds(account);
+        List<DashBoardMenu> dashBoardMenus = adminDashBoardService.findDashBoardMenuWithRole(ids);
+
+        DashBoardMenuAuthorizationResponse response = DashBoardMenuAuthorizationResponse.toDTO(dashBoardMenus);
+        return response;
+    }
+
     @Transactional
     public void update(DashBoardUpdateRequest request) {
         Long id = request.getId();
@@ -48,9 +61,9 @@ public class AdminDashBoardMenuAppService {
 
         DashBoardMenu dashBoardMenu = adminDashBoardService.findDashBoardMenu(id)
                 .orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.NOT_EXIST_DASHBOARDMENU, null));
-
+        SelectOption selectOption = SelectOption.of(option.getOption());
         List<Role> roles = parseRoles(option);
-        adminDashBoardService.update(dashBoardMenu,roles);
+        adminDashBoardService.update(selectOption, dashBoardMenu,roles);
     }
 
     protected List<Role> parseRoles(MenuDTO.MenuAuthOption option) {

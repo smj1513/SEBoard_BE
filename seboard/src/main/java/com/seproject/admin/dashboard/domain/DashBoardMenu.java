@@ -1,6 +1,7 @@
 package com.seproject.admin.dashboard.domain;
 
 import com.seproject.account.role.domain.Role;
+import com.seproject.admin.domain.SelectOption;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -24,6 +25,8 @@ public class DashBoardMenu {
     @Enumerated(EnumType.STRING)
     private DashBoardMenuGroup group;
 
+    @Enumerated(EnumType.STRING)
+    private SelectOption selectOption;
 
     @OneToMany(mappedBy = "dashBoardMenu", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DashBoardMenuAuthorization> dashBoardMenuAuthorizations;
@@ -39,7 +42,8 @@ public class DashBoardMenu {
         return false;
     }
 
-    public void update(List<DashBoardMenuAuthorization> dashBoardMenuAuthorizations) {
+    public void update(SelectOption selectOption, List<DashBoardMenuAuthorization> dashBoardMenuAuthorizations) {
+        this.selectOption = selectOption;
         this.dashBoardMenuAuthorizations.clear();
         this.dashBoardMenuAuthorizations.addAll(dashBoardMenuAuthorizations);
     }
