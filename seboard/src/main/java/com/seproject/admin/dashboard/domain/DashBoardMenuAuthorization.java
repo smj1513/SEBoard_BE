@@ -16,10 +16,10 @@ public class DashBoardMenuAuthorization {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private DashBoardMenu dashBoardMenu;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.EAGER)
     private Role role;
 
     public DashBoardMenuAuthorization(DashBoardMenu dashBoardMenu, Role role) {
