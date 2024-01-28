@@ -14,7 +14,6 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-@RequiredArgsConstructor
 @Transactional(readOnly = true)
 public class AdminDashBoardServiceImpl {
     private static final String MENU_EDIT_URL = "/admin/menu";
@@ -34,7 +33,12 @@ public class AdminDashBoardServiceImpl {
 
     private final DashBoardMenuRepository dashBoardMenuRepository;
 
-    private List<DashBoardMenu> all = Collections.emptyList(); // cache
+    private List<DashBoardMenu> all; // cache
+
+    public AdminDashBoardServiceImpl(DashBoardMenuRepository dashBoardMenuRepository) {
+        this.dashBoardMenuRepository = dashBoardMenuRepository;
+        all = dashBoardMenuRepository.findAll();
+    }
 
     public Optional<DashBoardMenu> findDashBoardMenu(Long id) {
         return dashBoardMenuRepository.findById(id);
