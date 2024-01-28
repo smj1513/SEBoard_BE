@@ -10,9 +10,7 @@ import javax.persistence.*;
 import java.util.List;
 
 @Getter
-@Table(name = "dash_board_menus")
 @NoArgsConstructor
-@AllArgsConstructor
 @Entity
 public class DashBoardMenu {
 
@@ -23,7 +21,7 @@ public class DashBoardMenu {
     private String url;
 
     @Enumerated(EnumType.STRING)
-    private DashBoardMenuGroup group;
+    private DashBoardMenuGroup menuGroup;
 
     @Enumerated(EnumType.STRING)
     private SelectOption selectOption;

@@ -58,11 +58,11 @@ public class DashBoardDTO {
             for (DashBoardMenu dashBoardMenu : dashBoardMenus) {
                 List<DashBoardMenuResponseElement> target;
 
-                if(dashBoardMenu.getGroup().equals(DashBoardMenuGroup.MENU_GROUP)) {
+                if(dashBoardMenu.getMenuGroup().equals(DashBoardMenuGroup.MENU_GROUP)) {
                     target = menu;
-                } else if(dashBoardMenu.getGroup().equals(DashBoardMenuGroup.PERSON_GROUP)) {
+                } else if(dashBoardMenu.getMenuGroup().equals(DashBoardMenuGroup.PERSON_GROUP)) {
                     target = person;
-                } else if(dashBoardMenu.getGroup().equals(DashBoardMenuGroup.CONTENT_GROUP)) {
+                } else if(dashBoardMenu.getMenuGroup().equals(DashBoardMenuGroup.CONTENT_GROUP)) {
                     target = content;
                 } else {
                     target = setting;
@@ -117,11 +117,11 @@ public class DashBoardDTO {
             for (DashBoardMenu dashBoardMenu : dashBoardMenus) {
                 List<DashBoardMenuAuthorizationResponseElement> target;
 
-                if(dashBoardMenu.getGroup().equals(DashBoardMenuGroup.MENU_GROUP)) {
+                if(dashBoardMenu.getMenuGroup().equals(DashBoardMenuGroup.MENU_GROUP)) {
                     target = menu;
-                } else if(dashBoardMenu.getGroup().equals(DashBoardMenuGroup.PERSON_GROUP)) {
+                } else if(dashBoardMenu.getMenuGroup().equals(DashBoardMenuGroup.PERSON_GROUP)) {
                     target = person;
-                } else if(dashBoardMenu.getGroup().equals(DashBoardMenuGroup.CONTENT_GROUP)) {
+                } else if(dashBoardMenu.getMenuGroup().equals(DashBoardMenuGroup.CONTENT_GROUP)) {
                     target = content;
                 } else {
                     target = setting;
@@ -142,9 +142,15 @@ public class DashBoardDTO {
 
     @Data
     public static class DashBoardUpdateRequest {
+        private List<DashBoardUpdateRequestElement> menus;
+
+    }
+
+
+    @Data
+    public static class DashBoardUpdateRequestElement {
         private Long id;
         private MenuAuthOption option;
-
     }
 
 }
