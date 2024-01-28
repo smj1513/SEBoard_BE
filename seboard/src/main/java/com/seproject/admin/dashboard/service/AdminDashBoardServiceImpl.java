@@ -1,30 +1,22 @@
 package com.seproject.admin.dashboard.service;
 
 import com.seproject.account.account.domain.Account;
-import com.seproject.account.authorization.domain.Authorization;
-import com.seproject.account.authorization.domain.repository.AuthorizationRepository;
 import com.seproject.account.role.domain.Role;
-import com.seproject.account.role.domain.RoleAuthorization;
-import com.seproject.account.role.service.RoleService;
-import com.seproject.admin.dashboard.controller.dto.DashBoardDTO;
 import com.seproject.admin.dashboard.domain.DashBoardMenu;
 import com.seproject.admin.dashboard.domain.DashBoardMenuAuthorization;
 import com.seproject.admin.dashboard.domain.repository.DashBoardMenuRepository;
 import com.seproject.admin.domain.SelectOption;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.seproject.admin.dashboard.controller.dto.DashBoardDTO.*;
-
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
-public class AdminDashBoardService {
+public class AdminDashBoardServiceImpl {
     private static final String MENU_EDIT_URL = "/admin/menu";
 
     private static final String ACCOUNT_MANAGE_URL = "/admin/account";
@@ -42,7 +34,7 @@ public class AdminDashBoardService {
 
     private final DashBoardMenuRepository dashBoardMenuRepository;
 
-    private List<DashBoardMenu> all; // cache
+    private List<DashBoardMenu> all = Collections.emptyList(); // cache
 
     public Optional<DashBoardMenu> findDashBoardMenu(Long id) {
         return dashBoardMenuRepository.findById(id);

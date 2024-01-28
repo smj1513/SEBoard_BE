@@ -4,10 +4,8 @@ import com.seproject.account.account.domain.Account;
 import com.seproject.account.role.domain.Role;
 import com.seproject.account.role.service.RoleService;
 import com.seproject.account.utils.SecurityUtils;
-import com.seproject.admin.dashboard.controller.dto.DashBoardDTO;
 import com.seproject.admin.dashboard.domain.DashBoardMenu;
-import com.seproject.admin.dashboard.domain.DashBoardMenuAuthorization;
-import com.seproject.admin.dashboard.service.AdminDashBoardService;
+import com.seproject.admin.dashboard.service.AdminDashBoardServiceImpl;
 import com.seproject.admin.domain.SelectOption;
 import com.seproject.admin.menu.controller.dto.MenuDTO;
 import com.seproject.error.errorCode.ErrorCode;
@@ -18,7 +16,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Objects;
+import java.util.Map;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.seproject.admin.dashboard.controller.dto.DashBoardDTO.*;
@@ -28,15 +27,15 @@ import static com.seproject.admin.dashboard.controller.dto.DashBoardDTO.*;
 @Transactional(readOnly = true)
 public class AdminDashBoardMenuAppService {
 
-    private final AdminDashBoardService adminDashBoardService;
+    private final AdminDashBoardServiceImpl adminDashBoardServiceImpl;
     private final RoleService roleService;
 
     public DashBoardMenuResponse findDashBoardMenus() {
         Account account = SecurityUtils.getAccount()
                 .orElseThrow(() -> new CustomAuthenticationException(ErrorCode.NOT_LOGIN, null));
 
-        List<Long> ids = adminDashBoardService.findAuthorizeDashBoardMenuIds(account);
-        List<DashBoardMenu> dashBoardMenu = adminDashBoardService.findDashBoardMenu(ids);
+        List<Long> ids = adminDashBoardServiceImpl.findAuthorizeDashBoardMenuIds(account);
+        List<DashBoardMenu> dashBoardMenu = adminDashBoardServiceImpl.findDashBoardMenu(ids);
 
         DashBoardMenuResponse response = DashBoardMenuResponse.toDTO(dashBoardMenu);
 
@@ -47,8 +46,8 @@ public class AdminDashBoardMenuAppService {
         Account account = SecurityUtils.getAccount()
                 .orElseThrow(() -> new CustomAuthenticationException(ErrorCode.NOT_LOGIN, null));
 
-        List<Long> ids = adminDashBoardService.findAuthorizeDashBoardMenuIds(account);
-        List<DashBoardMenu> dashBoardMenus = adminDashBoardService.findDashBoardMenuWithRole(ids);
+        List<Long> ids = adminDashBoardServiceImpl.findAuthorizeDashBoardMenuIds(account);
+        List<DashBoardMenu> dashBoardMenus = adminDashBoardServiceImpl.findDashBoardMenuWithRole(ids);
 
         DashBoardMenuAuthorizationResponse response = DashBoardMenuAuthorizationResponse.toDTO(dashBoardMenus);
         return response;
@@ -56,14 +55,34 @@ public class AdminDashBoardMenuAppService {
 
     @Transactional
     public void update(DashBoardUpdateRequest request) {
-        Long id = request.getId();
-        MenuDTO.MenuAuthOption option = request.getOption();
 
-        DashBoardMenu dashBoardMenu = adminDashBoardService.findDashBoardMenu(id)
-                .orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.NOT_EXIST_DASHBOARDMENU, null));
-        SelectOption selectOption = SelectOption.of(option.getOption());
-        List<Role> roles = parseRoles(option);
-        adminDashBoardService.update(selectOption, dashBoardMenu,roles);
+        List<DashBoardUpdateRequestElement> menus = request.getMenus();
+
+        List<Long> ids = menus.stream()
+                .map(DashBoardUpdateRequestElement::getId)
+                .collect(Collectors.toList());
+
+        List<DashBoardMenu> dashBoardMenuWithRole = adminDashBoardServiceImpl.findDashBoardMenuWithRole(ids);
+
+        if(dashBoardMenuWithRole.size() != ids.size()) {
+            throw new CustomIllegalArgumentException(ErrorCode.NOT_EXIST_DASHBOARDMENU, null);
+        }
+        Map<Long, DashBoardMenu> collect = dashBoardMenuWithRole.stream()
+                .collect(Collectors.toMap(DashBoardMenu::getId, Function.identity()));
+
+
+        for (DashBoardUpdateRequestElement menu : menus) {
+            Long id = menu.getId();
+            MenuDTO.MenuAuthOption option = menu.getOption();
+
+            DashBoardMenu dashBoardMenu = collect.get(id);
+
+            SelectOption selectOption = SelectOption.of(option.getOption());
+            List<Role> roles = parseRoles(option);
+            adminDashBoardServiceImpl.update(selectOption, dashBoardMenu,roles);
+        }
+
+
     }
 
     protected List<Role> parseRoles(MenuDTO.MenuAuthOption option) {
