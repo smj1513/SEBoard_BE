@@ -30,6 +30,6 @@ public class BannerQueryRepository {
     }
 
     private BooleanExpression between(LocalDate currentTime) {
-        return banner.startDate.before(currentTime).and(banner.endDate.after(currentTime));
+        return banner.startDate.loe(currentTime).and(banner.endDate.goe(currentTime));
     }
 }
