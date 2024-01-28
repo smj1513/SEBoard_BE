@@ -26,7 +26,7 @@ public class DashBoardMenu {
     @Enumerated(EnumType.STRING)
     private SelectOption selectOption;
 
-    @OneToMany(mappedBy = "dashBoardMenu", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToMany(mappedBy = "dashBoardMenu", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<DashBoardMenuAuthorization> dashBoardMenuAuthorizations;
 
     public boolean authorize(List<Role> roles) {
