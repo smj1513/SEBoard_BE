@@ -66,7 +66,7 @@ public class PostController {
 
         String password = request.getPassword();
         RetrievePostDetailResponse response =
-                postSearchAppService.findPostDetail(postId, password);
+                postSearchAppService.findPrivacyPostDetail(postId, password);
         return ResponseEntity.ok(response);
     }
 

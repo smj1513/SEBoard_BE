@@ -47,8 +47,7 @@ public class PostSearchAppService {
 
 
     @Transactional // TODO : 조회수 늘리기 다른 방법으로 변경
-    public RetrievePostDetailResponse findPostDetail(Long postId, String password){
-
+    public RetrievePostDetailResponse findPostDetail(Long postId){
         Account account = SecurityUtils.getAccount().orElse(null);
         Post post = postQueryRepository.findByIdWithAll(postId)
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
@@ -72,20 +71,12 @@ public class PostSearchAppService {
 
         ExposeState exposeState = post.getExposeOption().getExposeState();
         if(exposeState == ExposeState.PRIVACY) {
-
-            if (account == null) {
-                throw new CustomAuthenticationException(ErrorCode.NOT_LOGIN,null);
-            }
-
-            if (isAuthor || category.manageable(account.getRoles())) {
+            if (account!=null && (isAuthor || category.manageable(account.getRoles()))) {
                 post.increaseViews();
                 return postDetailResponse;
             }
 
-            if(!post.checkPassword(password)) {
-                throw new CustomIllegalArgumentException(ErrorCode.INCORRECT_POST_PASSWORD,null);
-            }
-
+            throw new CustomIllegalArgumentException(ErrorCode.NOT_POST_AUTHOR, null);
         } else if(exposeState == ExposeState.KUMOH) {
 
             if (account == null) {
@@ -110,8 +101,40 @@ public class PostSearchAppService {
     }
 
     @Transactional
-    public RetrievePostDetailResponse findPostDetail(Long postId){
-        return findPostDetail(postId, "");
+    public RetrievePostDetailResponse findPrivacyPostDetail(Long postId, String password){
+        Account account = SecurityUtils.getAccount().orElse(null);
+
+        Post post = postQueryRepository.findByIdWithAll(postId)
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_POST));
+
+        if(post.getExposeOption().getExposeState()!=ExposeState.PRIVACY){
+            throw new CustomIllegalArgumentException(ErrorCode.INVALID_POST_TYPE, null);
+        }
+
+        if(!post.checkPassword(password)){
+            throw new CustomIllegalArgumentException(ErrorCode.INCORRECT_POST_PASSWORD, null);
+        }
+
+        Category category = post.getCategory();
+        RetrievePostDetailResponse postDetailResponse = new RetrievePostDetailResponse(post);
+
+        boolean isEditable = false;
+        boolean isBookmarked = false;
+        boolean isAuthor = false;
+
+        if(account != null) {
+            Member member = memberService.findByAccountId(account.getAccountId());
+            isBookmarked = bookmarkService.isBookmarked(post, member);
+            isAuthor = post.isWrittenBy(account.getAccountId());
+
+            isEditable = category.editable(account.getRoles()) || isAuthor;
+        }
+
+        postDetailResponse.setEditable(isEditable);
+        postDetailResponse.setBookmarked(isBookmarked);
+
+        post.increaseViews();
+        return postDetailResponse;
     }
 
     public List<RetrievePostListResponseElement> findPinedPostList(Long categoryId) {
