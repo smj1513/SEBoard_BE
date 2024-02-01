@@ -1,72 +1,41 @@
 package com.seproject.account.account.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seproject.account.account.controller.dto.KumohAuthDTO;
 import com.seproject.account.account.controller.dto.MyPageDTO;
 import com.seproject.account.account.domain.Account;
 import com.seproject.account.account.domain.FormAccount;
 import com.seproject.account.account.domain.OAuthAccount;
-import com.seproject.account.account.service.AccountService;
 import com.seproject.account.email.domain.KumohConfirmedEmail;
 import com.seproject.account.email.domain.PasswordChangeConfirmedEmail;
-import com.seproject.account.email.domain.repository.KumohConfirmedEmailRepository;
-import com.seproject.account.email.domain.repository.PasswordChangeConfirmedEmailRepository;
 import com.seproject.account.role.domain.Role;
 import com.seproject.account.token.domain.JWT;
-import com.seproject.account.token.domain.repository.LogoutRefreshTokenRepository;
-import com.seproject.account.token.domain.repository.LogoutTokenRepository;
-import com.seproject.account.token.service.TokenService;
 import com.seproject.board.common.Status;
-import com.seproject.global.AccountSetup;
-import com.seproject.global.BoardUserSetup;
-import com.seproject.global.RoleSetup;
+import com.seproject.global.IntegrationTestSupport;
+import com.seproject.global.data_setup.BoardUserSetup;
 import com.seproject.member.domain.Member;
-import com.seproject.member.service.MemberService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static com.seproject.account.account.controller.dto.PasswordDTO.*;
-import static com.seproject.account.account.controller.dto.WithDrawDTO.*;
-import static com.seproject.account.account.controller.dto.LogoutDTO.*;
+import static com.seproject.account.account.controller.dto.LogoutDTO.LogoutRequestDTO;
+import static com.seproject.account.account.controller.dto.PasswordDTO.PasswordChangeRequest;
+import static com.seproject.account.account.controller.dto.PasswordDTO.ResetPasswordRequest;
+import static com.seproject.account.account.controller.dto.WithDrawDTO.WithDrawRequest;
 
-@AutoConfigureMockMvc
-@Transactional
-@SpringBootTest
-class AccountControllerTest {
-
-    @Autowired private EntityManager em;
-    @Autowired private MockMvc mvc;
-    @Autowired private ObjectMapper objectMapper;
-    @Autowired private AccountService accountService;
-    @Autowired private AccountSetup accountSetup;
-    @Autowired private RoleSetup roleSetup;
-    @Autowired private TokenService tokenService;
-    @Autowired private LogoutTokenRepository logoutTokenRepository;
-    @Autowired private LogoutRefreshTokenRepository logoutRefreshTokenRepository;
-    @Autowired private PasswordChangeConfirmedEmailRepository passwordChangeConfirmedEmailRepository;
-    @Autowired private KumohConfirmedEmailRepository kumohConfirmedEmailRepository;
-    @Autowired MemberService memberService;
+class AccountControllerTest extends IntegrationTestSupport {
     @Test
     public void 로그아웃_테스트_성공() throws Exception {
         FormAccount formAccount = accountSetup.createFormAccount();

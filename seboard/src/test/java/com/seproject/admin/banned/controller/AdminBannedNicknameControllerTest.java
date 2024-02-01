@@ -1,41 +1,27 @@
 package com.seproject.admin.banned.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seproject.admin.banned.domain.BannedNickname;
-import com.seproject.admin.banned.domain.repository.BannedNicknameRepository;
+import com.seproject.global.IntegrationTestSupport;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static com.seproject.admin.banned.controller.dto.BannedNicknameDTO.*;
+import static com.seproject.admin.banned.controller.dto.BannedNicknameDTO.CreateBannedNicknameRequest;
+import static com.seproject.admin.banned.controller.dto.BannedNicknameDTO.DeleteBannedNicknameRequest;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@Transactional
-@AutoConfigureMockMvc
-class AdminBannedNicknameControllerTest {
+class AdminBannedNicknameControllerTest extends IntegrationTestSupport {
 
-    @Autowired private BannedNicknameRepository bannedNicknameRepository;
-    @Autowired private EntityManager em;
-
-    @Autowired private MockMvc mvc;
-
-    @Autowired private ObjectMapper objectMapper;
     static final String url = "/admin/accountPolicy/bannedNickname/";
 
     @Value("${jwt.test}") String accessToken;

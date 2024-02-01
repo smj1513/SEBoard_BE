@@ -1,6 +1,9 @@
 package com.seproject.account.authorization.service;
 
-import com.seproject.account.authorization.domain.*;
+import com.seproject.account.authorization.domain.MenuAccessAuthorization;
+import com.seproject.account.authorization.domain.MenuEditAuthorization;
+import com.seproject.account.authorization.domain.MenuExposeAuthorization;
+import com.seproject.account.authorization.domain.MenuManageAuthorization;
 import com.seproject.account.role.domain.Role;
 import com.seproject.account.role.domain.RoleAuthorization;
 import com.seproject.admin.domain.SelectOption;
@@ -8,30 +11,14 @@ import com.seproject.board.menu.domain.BoardMenu;
 import com.seproject.board.menu.domain.Category;
 import com.seproject.board.menu.domain.ExternalSiteMenu;
 import com.seproject.board.menu.domain.Menu;
-import com.seproject.global.AccountSetup;
-import com.seproject.global.MenuSetup;
-import com.seproject.global.RoleSetup;
+import com.seproject.global.IntegrationTestSupport;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Transactional
-@SpringBootTest
-class AuthorizationServiceTest {
-
-    @Autowired private AccountSetup accountSetup;
-    @Autowired private AuthorizationService authorizationService;
-    @Autowired private MenuSetup menuSetup;
-
-    @Autowired private RoleSetup roleSetup;
-
-    @Autowired private EntityManager em;
+class AuthorizationServiceTest extends IntegrationTestSupport {
 
     @Test
     public void 인가_정보_조회() throws Exception {

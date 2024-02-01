@@ -4,7 +4,8 @@ import com.seproject.account.account.domain.FormAccount;
 import com.seproject.account.token.domain.JWT;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomAuthenticationException;
-import com.seproject.global.AccountSetup;
+import com.seproject.global.IntegrationTestSupport;
+import com.seproject.global.data_setup.AccountSetup;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwsHeader;
@@ -12,26 +13,18 @@ import io.jsonwebtoken.JwtException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.transaction.annotation.Transactional;
+
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@Transactional
-@SpringBootTest
-class JwtDecoderTest {
-
-    @Autowired private AccountSetup accountSetup;
-    @Autowired private JwtDecoder jwtDecoder;
-
-    @Autowired private JwtProvider jwtProvider;
+class JwtDecoderTest extends IntegrationTestSupport {
 
     @Test
     public void 토큰_획득() throws Exception {

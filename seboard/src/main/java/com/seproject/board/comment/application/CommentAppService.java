@@ -141,6 +141,7 @@ public class CommentAppService {
         String password = command.getPassword();
         Account account = SecurityUtils.getAccount().orElse(null);
 
+        //TODO : Anonymous Role??
         List<Role> userRoles = account == null ? null : account.getRoles();
 
         Category category = post.getCategory();

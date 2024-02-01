@@ -1,61 +1,28 @@
 package com.seproject.account.account.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seproject.account.account.controller.dto.RegisterDTO.OAuth2RegisterRequest;
 import com.seproject.account.account.domain.Account;
 import com.seproject.account.account.domain.FormAccount;
 import com.seproject.account.account.domain.OAuthAccount;
-import com.seproject.account.account.domain.repository.AccountRepository;
-import com.seproject.account.account.domain.repository.OAuthAccountRepository;
-import com.seproject.account.account.service.AccountService;
 import com.seproject.account.email.domain.AccountRegisterConfirmedEmail;
-import com.seproject.account.email.domain.repository.AccountRegisterConfirmedEmailRepository;
 import com.seproject.account.role.domain.Role;
-import com.seproject.global.AccountSetup;
-import com.seproject.global.BoardUserSetup;
-import com.seproject.global.RoleSetup;
+import com.seproject.global.IntegrationTestSupport;
 import com.seproject.member.domain.Member;
-import com.seproject.member.domain.repository.MemberRepository;
-import com.seproject.member.service.MemberService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
 
 import java.util.UUID;
 
-import static com.seproject.account.account.controller.dto.RegisterDTO.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static com.seproject.account.account.controller.dto.RegisterDTO.ConfirmDuplicateNicknameRequest;
+import static com.seproject.account.account.controller.dto.RegisterDTO.FormRegisterRequest;
 
-@AutoConfigureMockMvc
-@Transactional
-@SpringBootTest
-class RegisterControllerTest {
+class RegisterControllerTest extends IntegrationTestSupport {
 
-    @Autowired private AccountSetup accountSetup;
-    @Autowired private AccountRepository accountRepository;
-    @Autowired private AccountService accountService;
-    @Autowired private OAuthAccountRepository oAuthAccountRepository;
-    @Autowired private RoleSetup roleSetup;
-    @Autowired BoardUserSetup boardUserSetup;
-    @Autowired private MockMvc mvc;
-    @Autowired private ObjectMapper objectMapper;
-
-    @Autowired private EntityManager em;
-
-    @Autowired private AccountRegisterConfirmedEmailRepository accountRegisterConfirmedEmailRepository;
-    @Autowired private MemberService memberService;
 
     @Test
     public void OAuth_회원가입() throws Exception {

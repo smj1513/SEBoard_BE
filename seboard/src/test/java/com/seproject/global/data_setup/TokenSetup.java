@@ -1,4 +1,4 @@
-package com.seproject.global;
+package com.seproject.global.data_setup;
 
 import com.seproject.account.account.domain.Account;
 import com.seproject.account.token.domain.JWT;

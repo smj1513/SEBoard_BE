@@ -1,4 +1,4 @@
-package com.seproject.global;
+package com.seproject.global.data_setup;
 
 import com.seproject.board.common.BaseTime;
 import com.seproject.board.menu.domain.Category;

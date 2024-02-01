@@ -1,56 +1,29 @@
 package com.seproject.board.post.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seproject.account.account.domain.FormAccount;
 import com.seproject.admin.post.controller.dto.PostRequest;
 import com.seproject.board.common.Status;
 import com.seproject.board.common.domain.ReportThreshold;
 import com.seproject.board.menu.domain.Category;
 import com.seproject.board.post.domain.model.Post;
-import com.seproject.board.post.service.PostService;
-import com.seproject.global.*;
+import com.seproject.global.IntegrationTestSupport;
 import com.seproject.member.domain.Member;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureMockMvc
-@Transactional
-@SpringBootTest
-class AdminPostControllerTest {
+class AdminPostControllerTest extends IntegrationTestSupport {
 
-    @Autowired PostSetup postSetup;
-    @Autowired MenuSetup menuSetup;
-    @Autowired AccountSetup accountSetup;
-    @Autowired BoardUserSetup boardUserSetup;
-
-    @Autowired MockMvc mvc;
-    @Autowired EntityManager em;
-    @Autowired ObjectMapper objectMapper;
-
-
-    @Autowired PostService postService;
-
-    @Value("${jwt.test}") String accessToken;
 
     static final String url = "/admin/posts/";
 

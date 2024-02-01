@@ -1,53 +1,32 @@
 package com.seproject.admin.menu.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seproject.account.authorization.domain.MenuAuthorization;
 import com.seproject.account.role.domain.Role;
 import com.seproject.admin.domain.SelectOption;
-import com.seproject.admin.menu.service.AdminMenuService;
 import com.seproject.board.menu.domain.BoardMenu;
 import com.seproject.board.menu.domain.Category;
 import com.seproject.board.menu.domain.ExternalSiteMenu;
 import com.seproject.board.menu.domain.Menu;
-import com.seproject.board.menu.service.MenuService;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
-import com.seproject.global.MenuSetup;
-import com.seproject.global.RoleSetup;
+import com.seproject.global.IntegrationTestSupport;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.util.List;
 
 import static com.seproject.admin.menu.controller.dto.MenuDTO.*;
-import static com.seproject.admin.menu.utils.MenuRequestBuilder.*;
+import static com.seproject.admin.menu.utils.MenuRequestBuilder.getCreateMenuRequest;
+import static com.seproject.admin.menu.utils.MenuRequestBuilder.getUpdateMenuRequest;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@Transactional
-@AutoConfigureMockMvc
-class AdminMenuControllerTest {
+class AdminMenuControllerTest extends IntegrationTestSupport {
     static final String url = "/admin/menu/";
-    @Autowired MockMvc mvc;
-    @Autowired MenuSetup menuSetup;
-    @Autowired RoleSetup roleSetup;
-    @Autowired ObjectMapper objectMapper;
-    @Autowired EntityManager em;
-    @Autowired AdminMenuService adminMenuService;
-    @Autowired MenuService menuService;
-
-    @Value("${jwt.test}") String accessToken;
 
     @Test
     public void 메뉴_하위_보드메뉴_생성() throws Exception {

@@ -1,11 +1,9 @@
 package com.seproject.board.post.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jayway.jsonpath.JsonPath;
 import com.seproject.account.account.domain.Account;
 import com.seproject.account.account.domain.FormAccount;
 import com.seproject.admin.domain.SelectOption;
-import com.seproject.admin.menu.application.AdminMenuAppService;
 import com.seproject.admin.menu.controller.dto.MenuDTO;
 import com.seproject.admin.menu.utils.MenuRequestBuilder;
 import com.seproject.board.common.Status;
@@ -17,51 +15,24 @@ import com.seproject.board.post.controller.dto.PostRequest;
 import com.seproject.board.post.domain.model.Post;
 import com.seproject.board.post.domain.model.exposeOptions.ExposeOption;
 import com.seproject.board.post.domain.model.exposeOptions.ExposeState;
-import com.seproject.board.post.service.PostService;
-import com.seproject.global.*;
+import com.seproject.global.IntegrationTestSupport;
 import com.seproject.member.domain.BoardUser;
 import com.seproject.member.domain.Member;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
 
 import java.util.List;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@Transactional
-@AutoConfigureMockMvc
-class PostControllerTest {
-
-    @Autowired MockMvc mvc;
-    @Autowired ObjectMapper objectMapper;
-    @Autowired EntityManager em;
-
-    @Autowired PostService postService;
-
-    @Autowired PostSetup postSetup;
-    @Autowired MenuSetup menuSetup;
-    @Autowired BoardUserSetup boardUserSetup;
-    @Autowired AccountSetup accountSetup;
-    @Autowired TokenSetup tokenSetup;
-    @Autowired RoleSetup roleSetup;
-    @Autowired CommentSetup commentSetup;
-
-    @Autowired AdminMenuAppService adminMenuAppService;
+class PostControllerTest extends IntegrationTestSupport {
 
     static final String url = "/posts/";
     

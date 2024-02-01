@@ -3,32 +3,14 @@ package com.seproject.account.account.service;
 import com.seproject.account.account.domain.FormAccount;
 import com.seproject.account.account.domain.OAuthAccount;
 import com.seproject.account.token.domain.JWT;
-import com.seproject.account.token.domain.repository.LogoutLargeRefreshTokenRepository;
-import com.seproject.account.token.domain.repository.LogoutRefreshTokenRepository;
-import com.seproject.account.token.domain.repository.LogoutTokenRepository;
-import com.seproject.account.token.service.TokenService;
-import com.seproject.global.AccountSetup;
+import com.seproject.global.IntegrationTestSupport;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-@SpringBootTest
-@Transactional
-class LogoutServiceTest {
-
-    @Autowired private LogoutService logoutService;
-    @Autowired private AccountSetup accountSetup;
-    @Autowired private LogoutRefreshTokenRepository logoutRefreshTokenRepository;
-    @Autowired private LogoutLargeRefreshTokenRepository logoutLargeRefreshTokenRepository;
-    @Autowired private LogoutTokenRepository logoutTokenRepository;
-    @Autowired private TokenService tokenService;
+class LogoutServiceTest extends IntegrationTestSupport {
     @Test
     public void 로그아웃_성공() throws Exception {
         FormAccount formAccount = accountSetup.createFormAccount();

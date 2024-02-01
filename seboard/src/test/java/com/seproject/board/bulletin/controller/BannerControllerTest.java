@@ -2,42 +2,18 @@ package com.seproject.board.bulletin.controller;
 
 import com.seproject.board.common.BaseTime;
 import com.seproject.file.domain.model.FileMetaData;
-import com.seproject.global.BannerSetup;
-import com.seproject.global.FileMetaDataSetup;
+import com.seproject.global.IntegrationTestSupport;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+class BannerControllerTest extends IntegrationTestSupport {
 
-@Transactional
-@SpringBootTest
-@AutoConfigureMockMvc
-class BannerControllerTest {
-
-    @Autowired
-    BannerSetup bannerSetup;
-
-    @Autowired
-    FileMetaDataSetup fileMetaDataSetup;
-
-    @Autowired
-    EntityManager em;
-
-    @Autowired
-    MockMvc mvc;
 
     static final String url = "/banners/";
 

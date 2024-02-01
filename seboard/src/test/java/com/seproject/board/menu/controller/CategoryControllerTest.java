@@ -1,43 +1,24 @@
 package com.seproject.board.menu.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seproject.board.menu.domain.BoardMenu;
 import com.seproject.board.menu.domain.Category;
 import com.seproject.board.menu.domain.Menu;
-import com.seproject.board.menu.service.MenuService;
-import com.seproject.global.MenuSetup;
+import com.seproject.global.IntegrationTestSupport;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureMockMvc
-@Transactional
-@SpringBootTest
-class CategoryControllerTest {
+class CategoryControllerTest extends IntegrationTestSupport {
 
-    @Autowired MockMvc mvc;
-    @Autowired ObjectMapper objectMapper;
-    @Autowired EntityManager em;
-    @Autowired MenuSetup menuSetup;
-    @Autowired MenuService menuService;
-    @Value("${jwt.test}") String accessToken;
 
     static final String url = "/menu/";
 

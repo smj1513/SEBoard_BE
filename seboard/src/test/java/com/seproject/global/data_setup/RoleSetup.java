@@ -1,4 +1,4 @@
-package com.seproject.global;
+package com.seproject.global.data_setup;
 
 import com.seproject.account.role.domain.Role;
 import com.seproject.account.role.domain.repository.RoleRepository;

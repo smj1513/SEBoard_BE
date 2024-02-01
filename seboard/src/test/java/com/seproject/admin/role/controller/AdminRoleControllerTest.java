@@ -1,61 +1,34 @@
 package com.seproject.admin.role.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seproject.account.account.domain.Account;
 import com.seproject.account.role.domain.Role;
-import com.seproject.account.role.service.RoleService;
 import com.seproject.admin.domain.SelectOption;
-import com.seproject.admin.menu.application.AdminMenuAppService;
 import com.seproject.admin.menu.controller.dto.MenuDTO;
-import com.seproject.admin.menu.service.AdminMenuService;
 import com.seproject.admin.menu.utils.MenuRequestBuilder;
 import com.seproject.admin.role.controller.dto.RoleDTO;
 import com.seproject.board.menu.domain.Menu;
-import com.seproject.board.menu.service.MenuService;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
-import com.seproject.global.AccountSetup;
-import com.seproject.global.MenuSetup;
-import com.seproject.global.RoleSetup;
+import com.seproject.global.IntegrationTestSupport;
+import com.seproject.global.data_setup.AccountSetup;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
 
 import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Transactional
-@SpringBootTest
-@AutoConfigureMockMvc
-class AdminRoleControllerTest {
+class AdminRoleControllerTest extends IntegrationTestSupport {
     static final String url = "/admin/roles/";
-    @Autowired EntityManager em;
-    @Autowired MockMvc mvc;
-    @Autowired ObjectMapper objectMapper;
-    @Autowired RoleSetup roleSetup;
-    @Autowired RoleService roleService;
-    @Autowired MenuSetup menuSetup;
-    @Autowired AdminMenuAppService menuAppService;
-    @Autowired AdminMenuService adminMenuService;
-    @Autowired
-    MenuService menuService;
-
-    @Value("${jwt.test}") String accessToken;
 
     @Test
     public void 권한_목록_조회() throws Exception {
@@ -254,7 +227,7 @@ class AdminRoleControllerTest {
         UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(adminAccount,adminAccount.getPassword(),adminAccount.getAuthorities());
         SecurityContextHolder.getContext().setAuthentication(token);
 
-        menuAppService.update(menu.getMenuId(),request);
+        adminMenuAppService.update(menu.getMenuId(),request);
 
         em.flush(); em.clear();
 

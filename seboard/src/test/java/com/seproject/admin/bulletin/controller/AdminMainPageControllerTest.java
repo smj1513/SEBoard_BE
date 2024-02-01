@@ -1,28 +1,15 @@
 package com.seproject.admin.bulletin.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.seproject.admin.bulletin.controller.dto.MainPageDTO;
-import com.seproject.admin.menu.controller.dto.MenuDTO;
 import com.seproject.board.bulletin.domain.model.MainPageMenu;
-import com.seproject.board.bulletin.service.MainPageService;
 import com.seproject.board.menu.domain.BoardMenu;
 import com.seproject.board.menu.domain.Category;
 import com.seproject.board.menu.domain.ExternalSiteMenu;
 import com.seproject.board.menu.domain.Menu;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
-import com.seproject.global.MainPageMenuSetup;
-import com.seproject.global.MenuSetup;
+import com.seproject.global.IntegrationTestSupport;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,22 +18,12 @@ import java.util.stream.Collectors;
 import static com.seproject.admin.bulletin.controller.dto.MainPageDTO.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Transactional
-@SpringBootTest
-@AutoConfigureMockMvc
-class AdminMainPageControllerTest {
+class AdminMainPageControllerTest extends IntegrationTestSupport {
     static final String url = "/admin/mainPageMenus/";
-    @Autowired EntityManager em;
-    @Autowired ObjectMapper objectMapper;
-    @Autowired MockMvc mvc;
-    @Autowired MainPageService mainPageService;
-    @Autowired MenuSetup menuSetup;
-    @Autowired MainPageMenuSetup mainPageMenuSetup;
-
-    @Value("${jwt.test}") String accessToken;
     @Test
     public void 메인_페이지_메뉴_조회() throws Exception {
         Menu rootMenu = menuSetup.createMenu();

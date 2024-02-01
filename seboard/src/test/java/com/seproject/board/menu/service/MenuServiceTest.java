@@ -3,13 +3,8 @@ package com.seproject.board.menu.service;
 import com.seproject.board.menu.domain.BoardMenu;
 import com.seproject.board.menu.domain.Category;
 import com.seproject.board.menu.domain.Menu;
-import com.seproject.global.MenuSetup;
+import com.seproject.global.IntegrationTestSupport;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,15 +12,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-@Transactional
-@SpringBootTest
-class MenuServiceTest {
-
-    @Autowired MenuService menuService;
-    @Autowired MenuSetup menuSetup;
-    @Autowired EntityManager em;
+class MenuServiceTest extends IntegrationTestSupport {
 
 
     @Test

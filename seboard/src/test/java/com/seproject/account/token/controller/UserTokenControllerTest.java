@@ -2,41 +2,21 @@ package com.seproject.account.token.controller;
 
 import com.seproject.account.account.domain.OAuthAccount;
 import com.seproject.account.social.TemporalUserInfo;
-import com.seproject.account.social.repository.TemporalUserInfoRepository;
 import com.seproject.account.token.domain.UserToken;
-import com.seproject.account.token.domain.repository.UserTokenRepository;
-import com.seproject.global.AccountSetup;
+import com.seproject.global.IntegrationTestSupport;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Transactional
-@SpringBootTest
-@AutoConfigureMockMvc
-class UserTokenControllerTest {
-
-    @Autowired MockMvc mvc;
-    @Autowired EntityManager em;
-    @Autowired UserTokenRepository userTokenRepository;
-    @Autowired TemporalUserInfoRepository temporalUserInfoRepository;
-
-    @Autowired AccountSetup accountSetup;
+class UserTokenControllerTest extends IntegrationTestSupport {
 
     
 

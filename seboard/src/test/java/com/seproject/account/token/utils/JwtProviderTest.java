@@ -2,23 +2,15 @@ package com.seproject.account.token.utils;
 
 import com.seproject.account.account.domain.FormAccount;
 import com.seproject.account.token.domain.JWT;
-import com.seproject.global.AccountSetup;
+import com.seproject.global.IntegrationTestSupport;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 
-@SpringBootTest
-class JwtProviderTest {
-
-
-    @Autowired JwtProvider jwtProvider;
-    @Autowired JwtDecoder jwtDecoder;
-    @Autowired AccountSetup accountSetup;
+class JwtProviderTest extends IntegrationTestSupport {
 
     @Test
     public void 토큰_생성() throws Exception {

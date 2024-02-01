@@ -1,4 +1,4 @@
-package com.seproject.global;
+package com.seproject.global.data_setup;
 
 import com.seproject.board.bulletin.domain.model.Banner;
 import com.seproject.board.bulletin.domain.repository.BannerRepository;

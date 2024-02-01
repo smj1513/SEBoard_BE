@@ -1,72 +1,38 @@
 package com.seproject.board.comment.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seproject.account.account.domain.Account;
 import com.seproject.account.account.domain.FormAccount;
-import com.seproject.account.authorization.domain.MenuAccessAuthorization;
-import com.seproject.account.role.domain.Role;
-import com.seproject.account.token.domain.JWT;
-import com.seproject.account.token.service.TokenService;
-import com.seproject.account.utils.SecurityUtils;
 import com.seproject.admin.domain.SelectOption;
-import com.seproject.admin.menu.application.AdminMenuAppService;
 import com.seproject.admin.menu.controller.dto.MenuDTO;
 import com.seproject.admin.menu.utils.MenuRequestBuilder;
-import com.seproject.board.comment.controller.dto.CommentRequest;
 import com.seproject.board.comment.domain.model.Comment;
-import com.seproject.board.comment.service.CommentService;
 import com.seproject.board.common.Status;
 import com.seproject.board.menu.domain.BoardMenu;
 import com.seproject.board.menu.domain.Category;
 import com.seproject.board.menu.domain.Menu;
 import com.seproject.board.post.domain.model.Post;
-import com.seproject.global.*;
+import com.seproject.global.IntegrationTestSupport;
 import com.seproject.member.domain.Anonymous;
 import com.seproject.member.domain.BoardUser;
 import com.seproject.member.domain.Member;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
 
 import java.util.List;
 import java.util.UUID;
 
-import static com.seproject.board.comment.controller.dto.CommentRequest.*;
+import static com.seproject.board.comment.controller.dto.CommentRequest.CreateCommentRequest;
+import static com.seproject.board.comment.controller.dto.CommentRequest.UpdateCommentRequest;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 
-@SpringBootTest
-@Transactional
-@AutoConfigureMockMvc
-class CommentControllerTest {
+class CommentControllerTest extends IntegrationTestSupport {
 
-    @Autowired MockMvc mvc;
-    @Autowired ObjectMapper objectMapper;
-    @Autowired EntityManager em;
-    @Autowired AccountSetup accountSetup;
-    @Autowired MenuSetup menuSetup;
-    @Autowired BoardUserSetup boardUserSetup;
-    @Autowired PostSetup postSetup;
-    @Autowired RoleSetup roleSetup;
-
-    @Autowired CommentService commentService;
-    @Autowired TokenSetup tokenSetup;
-    @Autowired CommentSetup commentSetup;
-    @Autowired AdminMenuAppService adminMenuAppService;
 
     static final String url = "/comments/";
 

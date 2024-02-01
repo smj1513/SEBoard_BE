@@ -3,30 +3,20 @@ package com.seproject.account.token.service;
 import com.seproject.account.account.domain.FormAccount;
 import com.seproject.account.token.domain.JWT;
 import com.seproject.account.token.utils.JWTProperties;
-import com.seproject.account.token.utils.JwtProvider;
 import com.seproject.error.exception.CustomAuthenticationException;
-import com.seproject.global.AccountSetup;
+import com.seproject.global.IntegrationTestSupport;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 
-@SpringBootTest
-@Transactional
-public class TokenServiceTest {
-
-    @Autowired private AccountSetup accountSetup;
-    @Autowired private TokenService tokenService;
-    @Autowired private JwtProvider jwtProvider;
+public class TokenServiceTest extends IntegrationTestSupport {
 
     @Test
     public void 토큰_파싱_테스트() throws Exception {
