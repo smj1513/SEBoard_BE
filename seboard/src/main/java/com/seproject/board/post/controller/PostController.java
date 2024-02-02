@@ -1,14 +1,12 @@
 package com.seproject.board.post.controller;
 
-import com.seproject.account.utils.SecurityUtils;
 import com.seproject.board.comment.application.CommentAppService;
 import com.seproject.board.post.application.PostAppService;
 import com.seproject.board.post.application.PostSearchAppService;
-import com.seproject.board.common.controller.dto.MessageResponse;
 import com.seproject.board.post.controller.dto.PostRequest.CreatePostRequest;
 import com.seproject.board.post.controller.dto.PostRequest.UpdatePostRequest;
-import com.seproject.board.post.controller.dto.PostResponse.RetrievePostListResponseElement;
 import com.seproject.board.post.controller.dto.PostResponse.RetrievePostDetailResponse;
+import com.seproject.board.post.controller.dto.PostResponse.RetrievePostListResponseElement;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -19,12 +17,13 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 
-import static com.seproject.board.comment.application.dto.CommentCommand.*;
-import static com.seproject.board.common.controller.dto.MessageResponse.*;
-import static com.seproject.board.comment.controller.dto.CommentResponse.*;
-import static com.seproject.board.post.controller.dto.PostRequest.*;
+import static com.seproject.board.comment.application.dto.CommentCommand.CommentListFindCommand;
+import static com.seproject.board.comment.controller.dto.CommentResponse.CommentListResponse;
+import static com.seproject.board.common.controller.dto.MessageResponse.CreateAndUpdateMessage;
+import static com.seproject.board.post.controller.dto.PostRequest.RetrievePrivacyPostRequest;
 
 @Slf4j
 @Tag(name = "게시글 API", description = "게시글(posts) 관련 API")
@@ -117,7 +116,7 @@ public class PostController {
     @GetMapping("/{postId}/comments")
     public ResponseEntity<CommentListResponse> retrievePostComments(
             @PathVariable Long postId,
-            @RequestBody(required = false) String password,
+            @RequestParam(required = false) String password,
             @RequestParam(defaultValue = "0") Integer page,
             @RequestParam(defaultValue = "25") Integer perPage) {
 

@@ -5,50 +5,20 @@ import com.seproject.board.bulletin.domain.model.MainPageMenu;
 import com.seproject.board.menu.domain.BoardMenu;
 import com.seproject.board.menu.domain.Category;
 import com.seproject.board.menu.domain.Menu;
-import com.seproject.global.*;
-import com.seproject.member.domain.Anonymous;
-import com.seproject.member.domain.BoardUser;
+import com.seproject.global.IntegrationTestSupport;
 import com.seproject.member.domain.Member;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
-
-@SpringBootTest
-@Transactional
-@AutoConfigureMockMvc
-class MainPageControllerTest {
+class MainPageControllerTest extends IntegrationTestSupport {
 
     static final String url = "/mainPage/";
-    @Autowired EntityManager em;
-    @Autowired MockMvc mvc;
-
-    @Autowired
-    MenuSetup menuSetup;
-    @Autowired
-    MainPageMenuSetup mainPageMenuSetup;
-
-    @Autowired
-    PostSetup postSetup;
-
-    @Autowired
-    BoardUserSetup boardUserSetup;
-
-    @Autowired
-    AccountSetup accountSetup;
 
     @Test
     public void 메인_페이지_등록_게시물_조회() throws Exception {

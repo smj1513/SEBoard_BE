@@ -3,34 +3,18 @@ package com.seproject.account.account.service;
 import com.seproject.account.account.domain.Account;
 import com.seproject.account.account.domain.FormAccount;
 import com.seproject.account.account.domain.OAuthAccount;
-import com.seproject.account.account.domain.repository.OAuthAccountRepository;
 import com.seproject.account.role.domain.Role;
 import com.seproject.board.common.Status;
-import com.seproject.global.AccountSetup;
-import com.seproject.global.RoleSetup;
+import com.seproject.global.IntegrationTestSupport;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-@Transactional
-@SpringBootTest
-class AccountServiceTest {
-
-    @Autowired private AccountSetup accountSetup;
-    @Autowired private AccountService accountService;
-    @Autowired private RoleSetup roleSetup;
-
-    @Autowired private OAuthAccountRepository oAuthAccountRepository;
-
+class AccountServiceTest extends IntegrationTestSupport {
     @Test
     public void 로그인_아이디_중복_테스트() throws Exception {
         String loginId = UUID.randomUUID().toString();

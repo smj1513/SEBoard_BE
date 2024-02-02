@@ -4,28 +4,18 @@ import com.seproject.account.role.domain.Role;
 import com.seproject.admin.domain.SelectOption;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
-import com.seproject.global.RoleSetup;
+import com.seproject.global.IntegrationTestSupport;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@Transactional
-@SpringBootTest
-class RoleServiceTest {
-
-    @Autowired private RoleSetup roleSetup;
-    @Autowired private RoleService roleService;
-    @Autowired private EntityManager em;
-
+class RoleServiceTest extends IntegrationTestSupport {
 
     @Test
     public void 모든_권한_조회() throws Exception {

@@ -1,4 +1,4 @@
-package com.seproject.global;
+package com.seproject.global.data_setup;
 
 import com.seproject.board.post.domain.model.Bookmark;
 import com.seproject.board.post.domain.model.Post;

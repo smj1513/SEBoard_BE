@@ -1,62 +1,26 @@
 package com.seproject.board.common.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.seproject.account.account.domain.Account;
 import com.seproject.account.account.domain.FormAccount;
 import com.seproject.board.comment.domain.model.Comment;
-import com.seproject.board.comment.service.CommentService;
 import com.seproject.board.common.Status;
 import com.seproject.board.common.controller.dto.ReportThresholdRequest;
 import com.seproject.board.common.domain.ReportThreshold;
-import com.seproject.board.common.domain.repository.ReportThresholdRepository;
 import com.seproject.board.menu.domain.Category;
 import com.seproject.board.post.domain.model.Post;
-import com.seproject.board.post.service.PostService;
-import com.seproject.global.*;
+import com.seproject.global.IntegrationTestSupport;
 import com.seproject.member.domain.Member;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
 
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Transactional
-@SpringBootTest
-@AutoConfigureMockMvc
-class ReportControllerTest {
+class ReportControllerTest extends IntegrationTestSupport {
 
-    @Autowired EntityManager em;
-    @Autowired MockMvc mvc;
-    @Autowired ObjectMapper objectMapper;
-
-    @Autowired AccountSetup accountSetup;
-    @Autowired BoardUserSetup boardUserSetup;
-    @Autowired MenuSetup menuSetup;
-    @Autowired PostSetup postSetup;
-    @Autowired CommentSetup commentSetup;
-    @Autowired TokenSetup tokenSetup;
-
-    @Value("${jwt.test}") String accessToken;
-
-    @Autowired ReportThresholdRepository reportThresholdRepository;
-    @Autowired
-    PostService postService;
-    @Autowired
-    CommentService commentService;
 
 
     @Test

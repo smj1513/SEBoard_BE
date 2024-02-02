@@ -3,42 +3,24 @@ package com.seproject.admin.account.application;
 import com.seproject.account.account.domain.Account;
 import com.seproject.account.account.domain.FormAccount;
 import com.seproject.account.account.domain.OAuthAccount;
-import com.seproject.account.account.service.AccountService;
 import com.seproject.account.role.domain.Role;
-import com.seproject.account.utils.SecurityUtils;
-import com.seproject.admin.AdminAspect;
 import com.seproject.admin.account.controller.condition.AccountCondition;
-import com.seproject.admin.account.controller.dto.AdminAccountDto;
-import com.seproject.admin.banned.service.BannedIdService;
-import com.seproject.admin.banned.service.BannedNicknameService;
 import com.seproject.admin.role.controller.dto.RoleDTO;
 import com.seproject.board.comment.domain.model.Comment;
-import com.seproject.board.comment.domain.repository.CommentRepository;
 import com.seproject.board.common.Status;
 import com.seproject.board.menu.domain.Category;
 import com.seproject.board.post.domain.model.Bookmark;
 import com.seproject.board.post.domain.model.Post;
-import com.seproject.board.post.domain.repository.BookmarkRepository;
-import com.seproject.board.post.domain.repository.PostRepository;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
-import com.seproject.global.*;
+import com.seproject.global.IntegrationTestSupport;
 import com.seproject.member.domain.Member;
-import com.seproject.member.service.MemberService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,32 +29,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.seproject.admin.account.controller.dto.AdminAccountDto.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@Transactional
-@SpringBootTest
-class AdminAccountAppServiceTest {
-
-    @Autowired AccountSetup accountSetup;
-    @Autowired AdminAccountAppService accountAppService;
-    @Autowired AccountService accountService;
-    @Autowired EntityManager em;
-    @Autowired RoleSetup roleSetup;
-    @Autowired PasswordEncoder passwordEncoder;
-    @Autowired BannedIdService bannedIdService;
-    @Autowired BannedNicknameService bannedNicknameService;
-    @Autowired MemberService memberService;
-
-    @Autowired private PostSetup postSetup;
-    @Autowired private BoardUserSetup boardUserSetup;
-    @Autowired private CommentSetup commentSetup;
-    @Autowired private BookmarkSetup bookmarkSetup;
-    @Autowired private MenuSetup menuSetup;
-
-    @Autowired private PostRepository postRepository;
-    @Autowired private CommentRepository commentRepository;
-    @Autowired private BookmarkRepository bookmarkRepository;
-
+class AdminAccountAppServiceTest extends IntegrationTestSupport {
 
     @BeforeEach
     public void set() {

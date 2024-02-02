@@ -1,4 +1,4 @@
-package com.seproject.global;
+package com.seproject.global.data_setup;
 
 import com.seproject.board.bulletin.domain.model.MainPageMenu;
 import com.seproject.board.bulletin.domain.repository.MainPageMenuRepository;

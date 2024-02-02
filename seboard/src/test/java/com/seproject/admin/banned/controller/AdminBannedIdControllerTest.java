@@ -1,44 +1,25 @@
 package com.seproject.admin.banned.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seproject.admin.banned.controller.dto.BannedIdDTO;
 import com.seproject.admin.banned.domain.BannedId;
-import com.seproject.admin.banned.domain.repository.BannedIdRepository;
 import com.seproject.error.errorCode.ErrorCode;
-import com.seproject.global.AccountSetup;
+import com.seproject.global.IntegrationTestSupport;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
-@Transactional
-@AutoConfigureMockMvc
-class AdminBannedIdControllerTest {
-
-    @Autowired AccountSetup accountSetup;
-    @Autowired BannedIdRepository bannedIdRepository;
-    @Autowired EntityManager em;
-    @Autowired ObjectMapper objectMapper;
-
-    @Autowired MockMvc mvc;
-    @Value("${jwt.test}") String accessToken;
+class AdminBannedIdControllerTest extends IntegrationTestSupport {
     static final String url = "/admin/accountPolicy/bannedId/";
     @Test
     public void 금지_아이디_조회() throws Exception {

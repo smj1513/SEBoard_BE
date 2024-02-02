@@ -5,6 +5,7 @@ import com.seproject.board.post.application.dto.PostCommand.PostWriteCommand;
 import com.seproject.board.post.domain.model.exposeOptions.ExposeState;
 import lombok.*;
 
+import javax.validation.Valid;
 import javax.validation.constraints.NotNull;
 import java.util.ArrayList;
 import java.util.List;
@@ -39,7 +40,7 @@ public class PostRequest {
         @NotNull
         private boolean pined;
         @NotNull
-        private ExposeOptionRequest exposeOption;
+        private @Valid ExposeOptionRequest exposeOption;
         @NotNull
         @JsonProperty("anonymous")
         private boolean isAnonymous;

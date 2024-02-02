@@ -1,8 +1,7 @@
-package com.seproject.global;
+package com.seproject.global.data_setup;
 
 import com.seproject.board.comment.domain.model.Comment;
-import com.seproject.board.comment.domain.model.Reply;
-import com.seproject.board.comment.domain.repository.ReplyRepository;
+import com.seproject.board.comment.domain.repository.CommentRepository;
 import com.seproject.board.common.BaseTime;
 import com.seproject.board.post.domain.model.Post;
 import com.seproject.member.domain.BoardUser;
@@ -12,23 +11,22 @@ import org.springframework.stereotype.Component;
 import java.util.UUID;
 
 @Component
-public class ReplySetup {
+public class CommentSetup {
 
-    @Autowired ReplyRepository replyRepository;
+    @Autowired
+    private CommentRepository commentRepository;
 
-    public Reply createReply(Post post, BoardUser author, Comment superComment, Comment tagComment) {
-        Reply reply = Reply.builder()
-                .superComment(superComment)
-                .tag(tagComment)
+    public Comment createComment(Post post , BoardUser boardUser) {
+        Comment comment = Comment.builder()
                 .contents(UUID.randomUUID().toString())
                 .baseTime(BaseTime.now())
                 .post(post)
-                .author(author)
+                .author(boardUser)
                 .isOnlyReadByAuthor(false)
                 .reportCount(0)
                 .build();
 
-        replyRepository.save(reply);
-        return reply;
+        commentRepository.save(comment);
+        return comment;
     }
 }

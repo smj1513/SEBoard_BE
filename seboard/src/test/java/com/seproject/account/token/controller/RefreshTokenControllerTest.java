@@ -1,54 +1,27 @@
 package com.seproject.account.token.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seproject.account.account.domain.FormAccount;
 import com.seproject.account.account.domain.OAuthAccount;
-import com.seproject.account.role.domain.Role;
 import com.seproject.account.token.controller.dto.TokenDTO.AccessTokenRefreshRequest;
 import com.seproject.account.token.domain.JWT;
-import com.seproject.account.token.domain.repository.LogoutLargeRefreshTokenRepository;
-import com.seproject.account.token.domain.repository.LogoutRefreshTokenRepository;
-import com.seproject.account.token.service.TokenService;
 import com.seproject.account.token.utils.JWTProperties;
-import com.seproject.account.token.utils.JwtProvider;
-import com.seproject.global.AccountSetup;
+import com.seproject.global.IntegrationTestSupport;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.sql.Date;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
 
-import static org.junit.jupiter.api.Assertions.*;
-
-@AutoConfigureMockMvc
-@Transactional
-@SpringBootTest
-class RefreshTokenControllerTest {
-
-    @Autowired private AccountSetup accountSetup;
-    @Autowired private MockMvc mvc;
-    @Autowired private TokenService tokenService;
-    @Autowired private LogoutRefreshTokenRepository logoutRefreshTokenRepository;
-    @Autowired private LogoutLargeRefreshTokenRepository logoutLargeRefreshTokenRepository;
-    @Autowired private ObjectMapper objectMapper;
-
-    @Autowired private JwtProvider jwtProvider;
+class RefreshTokenControllerTest extends IntegrationTestSupport {
 
     @Test
     public void 토큰_재발행() throws Exception {

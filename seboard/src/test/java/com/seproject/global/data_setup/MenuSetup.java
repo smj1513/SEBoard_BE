@@ -1,4 +1,4 @@
-package com.seproject.global;
+package com.seproject.global.data_setup;
 
 import com.seproject.account.authorization.domain.MenuAccessAuthorization;
 import com.seproject.account.authorization.domain.MenuEditAuthorization;

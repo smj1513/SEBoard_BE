@@ -3,38 +3,22 @@ package com.seproject.account.common.authentication.provider;
 import com.seproject.account.account.domain.FormAccount;
 import com.seproject.account.common.domain.LoginHistory;
 import com.seproject.account.common.domain.LoginPreventUser;
-import com.seproject.account.common.domain.repository.LoginHistoryRepository;
-import com.seproject.account.common.domain.repository.LoginPreventUserRepository;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomAuthenticationException;
 import com.seproject.error.exception.PasswordIncorrectException;
-import com.seproject.global.AccountSetup;
+import com.seproject.global.IntegrationTestSupport;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
 
 import java.time.LocalDateTime;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@Transactional
-@SpringBootTest
-class UsernameAuthenticationProviderTest {
-
-    @Autowired AccountSetup accountSetup;
-    @Autowired LoginHistoryRepository loginHistoryRepository;
-    @Autowired
-    LoginPreventUserRepository loginPreventUserRepository;
-    @Autowired EntityManager em;
-
-    @Autowired UsernameAuthenticationProvider usernameAuthenticationProvider;
+class UsernameAuthenticationProviderTest extends IntegrationTestSupport {
 
 
     @Test

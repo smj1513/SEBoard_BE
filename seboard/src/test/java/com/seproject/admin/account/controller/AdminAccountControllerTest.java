@@ -1,79 +1,37 @@
 package com.seproject.admin.account.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.seproject.account.account.domain.Account;
 import com.seproject.account.account.domain.FormAccount;
 import com.seproject.account.account.domain.OAuthAccount;
-import com.seproject.account.account.service.AccountService;
 import com.seproject.account.role.domain.Role;
-import com.seproject.admin.banned.service.BannedIdService;
-import com.seproject.admin.banned.service.BannedNicknameService;
 import com.seproject.board.comment.domain.model.Comment;
-import com.seproject.board.comment.domain.repository.CommentRepository;
 import com.seproject.board.common.Status;
 import com.seproject.board.menu.domain.Category;
 import com.seproject.board.post.domain.model.Bookmark;
 import com.seproject.board.post.domain.model.Post;
-import com.seproject.board.post.domain.repository.BookmarkRepository;
-import com.seproject.board.post.domain.repository.PostRepository;
 import com.seproject.error.errorCode.ErrorCode;
-import com.seproject.global.*;
-import com.seproject.member.domain.BoardUser;
+import com.seproject.global.IntegrationTestSupport;
 import com.seproject.member.domain.Member;
-import com.seproject.member.service.MemberService;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
 
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static com.seproject.admin.account.controller.dto.AdminAccountDto.*;
+import static com.seproject.admin.account.controller.dto.AdminAccountDto.CreateAccountRequest;
+import static com.seproject.admin.account.controller.dto.AdminAccountDto.UpdateAccountRequest;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureMockMvc
-@Transactional
-@SpringBootTest
-class AdminAccountControllerTest {
-
-    @Autowired private AccountService accountService;
-    @Autowired private AccountSetup accountSetup;
-    @Autowired private MockMvc mvc;
-    @Autowired private EntityManager em;
-
-    @Autowired private RoleSetup roleSetup;
-    @Autowired private PostSetup postSetup;
-    @Autowired private BoardUserSetup boardUserSetup;
-    @Autowired private CommentSetup commentSetup;
-    @Autowired private BookmarkSetup bookmarkSetup;
-    @Autowired private MenuSetup menuSetup;
-
-    @Autowired private PostRepository postRepository;
-    @Autowired private CommentRepository commentRepository;
-    @Autowired private BookmarkRepository bookmarkRepository;
-
-
-    @Autowired private ObjectMapper objectMapper;
-
-    @Autowired private BannedNicknameService bannedNicknameService;
-    @Autowired private BannedIdService bannedIdService;
-
-    @Value("${jwt.test}") String accessToken;
+class AdminAccountControllerTest extends IntegrationTestSupport {
 
     @Test
     public void 모든_계정_목록_조회() throws Exception {

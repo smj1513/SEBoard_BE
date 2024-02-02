@@ -1,74 +1,29 @@
 package com.seproject.admin.bulletin.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.seproject.account.account.domain.Account;
-import com.seproject.account.role.domain.Role;
-import com.seproject.account.token.service.TokenService;
-import com.seproject.account.token.utils.JwtProvider;
-import com.seproject.admin.bulletin.controller.dto.BannerDTO;
 import com.seproject.board.bulletin.domain.model.Banner;
-import com.seproject.board.bulletin.service.BannerService;
 import com.seproject.board.common.BaseTime;
-import com.seproject.board.common.utils.FileUtils;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.NoSuchResourceException;
 import com.seproject.file.domain.model.FileMetaData;
-import com.seproject.global.AccountSetup;
-import com.seproject.global.BannerSetup;
-import com.seproject.global.FileMetaDataSetup;
-import com.seproject.global.RoleSetup;
-import org.aspectj.lang.annotation.Before;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
+import com.seproject.global.IntegrationTestSupport;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
-import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.transaction.annotation.Transactional;
-
-import javax.persistence.EntityManager;
 
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
-import static com.seproject.admin.bulletin.controller.dto.BannerDTO.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static com.seproject.admin.bulletin.controller.dto.BannerDTO.CreateBannerRequest;
+import static com.seproject.admin.bulletin.controller.dto.BannerDTO.UpdateBannerRequest;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@Transactional
-@SpringBootTest
-@AutoConfigureMockMvc
-class AdminBannerControllerTest {
+class AdminBannerControllerTest extends IntegrationTestSupport {
     static final String url = "/admin/banners/";
-    @Autowired MockMvc mvc;
-    @Autowired ObjectMapper objectMapper;
-    @Autowired EntityManager em;
-    @Autowired BannerSetup bannerSetup;
-    @Autowired FileMetaDataSetup fileMetaDataSetup;
-    @Autowired BannerService bannerService;
-    @Autowired
-    AccountSetup accountSetup;
-    @Autowired
-    RoleSetup roleSetup;
-
-    @Autowired
-    FileUtils fileUtils;
-
-    @Value("${jwt.test}")
-    String accessToken;
 
     //TODO : 배너 조회 시간 너무 오래걸림
     @Test
