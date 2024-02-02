@@ -4,24 +4,27 @@ import com.seproject.account.account.domain.Account;
 import com.seproject.account.role.domain.Role;
 import com.seproject.account.utils.SecurityUtils;
 import com.seproject.admin.banned.domain.repository.SpamWordRepository;
-import com.seproject.board.comment.service.CommentService;
-import com.seproject.board.menu.domain.Category;
-import com.seproject.board.menu.domain.Menu;
-import com.seproject.board.post.domain.model.exposeOptions.ExposeOption;
-import com.seproject.board.post.service.PostService;
-import com.seproject.error.errorCode.ErrorCode;
-import com.seproject.error.exception.*;
 import com.seproject.board.comment.application.dto.CommentCommand.CommentEditCommand;
 import com.seproject.board.comment.application.dto.CommentCommand.CommentListFindCommand;
 import com.seproject.board.comment.application.dto.CommentCommand.CommentWriteCommand;
-import com.seproject.board.comment.controller.dto.PaginationResponse;
 import com.seproject.board.comment.controller.dto.CommentResponse.CommentListElement;
 import com.seproject.board.comment.controller.dto.CommentResponse.CommentListResponse;
+import com.seproject.board.comment.controller.dto.PaginationResponse;
 import com.seproject.board.comment.controller.dto.ReplyResponse;
 import com.seproject.board.comment.domain.model.Comment;
-import com.seproject.board.post.domain.model.Post;
-import com.seproject.member.domain.BoardUser;
 import com.seproject.board.comment.domain.repository.CommentSearchRepository;
+import com.seproject.board.comment.service.CommentService;
+import com.seproject.board.menu.domain.Category;
+import com.seproject.board.menu.domain.Menu;
+import com.seproject.board.post.domain.model.Post;
+import com.seproject.board.post.domain.model.exposeOptions.ExposeOption;
+import com.seproject.board.post.service.PostService;
+import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.CustomAccessDeniedException;
+import com.seproject.error.exception.CustomAuthenticationException;
+import com.seproject.error.exception.CustomIllegalArgumentException;
+import com.seproject.error.exception.InvalidAuthorizationException;
+import com.seproject.member.domain.BoardUser;
 import com.seproject.member.service.AnonymousService;
 import com.seproject.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -141,7 +144,6 @@ public class CommentAppService {
         String password = command.getPassword();
         Account account = SecurityUtils.getAccount().orElse(null);
 
-        //TODO : Anonymous Role??
         List<Role> userRoles = account == null ? null : account.getRoles();
 
         Category category = post.getCategory();
@@ -154,8 +156,14 @@ public class CommentAppService {
         ExposeOption exposeOption = post.getExposeOption();
         boolean pass = exposeOption.pass(userRoles, password);
 
+        if(account!=null){
+            if(post.isWrittenBy(account.getAccountId())){
+                pass = true;
+            }
+        }
+
         if (!pass) {
-            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
+            throw new InvalidAuthorizationException(ErrorCode.INCORRECT_POST_PASSWORD);
         }
 
         int page = command.getPage();

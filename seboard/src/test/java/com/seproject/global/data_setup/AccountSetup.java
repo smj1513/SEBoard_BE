@@ -86,6 +86,11 @@ public class AccountSetup {
         return formAccount;
     }
 
+    public FormAccount createRandomUserAccount(){
+        return createFormAccount(UUID.randomUUID().toString(), UUID.randomUUID().toString(),
+                List.of(roleSetup.getRoleUser()), LocalDateTime.now(), Status.NORMAL);
+    }
+
     public FormAccount createFormAccount() {
         Role roleUser = roleSetup.getRoleUser();
         RoleAccount roleAccount = new RoleAccount(null,roleUser);

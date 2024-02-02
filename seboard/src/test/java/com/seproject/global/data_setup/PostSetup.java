@@ -37,4 +37,23 @@ public class PostSetup {
         postRepository.save(post);
         return post;
     }
+
+    public Post createPost(BoardUser boardUser, Category category, ExposeState exposeState, String password) {
+        Post post = Post.builder()
+                .title(UUID.randomUUID().toString())
+                .contents(UUID.randomUUID().toString())
+                .views(0)
+                .pined(false)
+                .category(category)
+                .exposeOption(ExposeOption.of(exposeState, password))
+                .anonymousCount(0)
+                .reportCount(0)
+                .attachments(new HashSet<>())
+                .author(boardUser)
+                .baseTime(BaseTime.now())
+                .build();
+
+        postRepository.save(post);
+        return post;
+    }
 }

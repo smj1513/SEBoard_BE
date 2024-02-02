@@ -19,6 +19,7 @@ import com.seproject.global.IntegrationTestSupport;
 import com.seproject.member.domain.BoardUser;
 import com.seproject.member.domain.Member;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -800,9 +801,9 @@ class PostControllerTest extends IntegrationTestSupport {
         Assertions.assertEquals(deletePost.getStatus(),Status.PERMANENT_DELETED);
     }
 
+    @DisplayName("공개 게시글 댓글을 조회한다.")
     @Test
     public void 게시글_댓글_조회() throws Exception {
-
         FormAccount formAccount = accountSetup.createFormAccount();
         Member member = boardUserSetup.createMember(formAccount);
 
@@ -826,23 +827,97 @@ class PostControllerTest extends IntegrationTestSupport {
     }
 
 
+    @DisplayName("비밀 게시글 댓글 조회시, 비밀 게시글의 비밀번호를 입력한다.")
+    @Test
+    void 비밀게시글_댓글_조회() throws Exception {
+        //given
+        FormAccount formAccount = accountSetup.createFormAccount();
+        Member member = boardUserSetup.createMember(formAccount);
+
+        Category category = menuSetup.createCategory(menuSetup.createBoardMenu(menuSetup.createMenu()));
+
+        Post privacyPost = postSetup.createPost(member, category, ExposeState.PRIVACY, "1234");
+
+        for (int i = 0; i < 4; i++) {
+            commentSetup.createComment(privacyPost,member);
+        }
+
+        em.flush(); em.clear();
+
+        //when //then
+        mvc.perform(get(url + privacyPost.getPostId() + "/comments")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8")
+                        .queryParam("password","1234")
+                ).andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.size()").value(4));
+    }
 
 
+    @DisplayName("비밀 게시글 댓글 조회시, 자신이 작성한 게시글은 비밀번호 입력이 없어도 조회가능하다.")
+    @Test
+    void 비밀게시글_댓글_조회_자기_게시글_조회() throws Exception {
+        //given
+        FormAccount formAccount = accountSetup.createFormAccount();
+        Member member = boardUserSetup.createMember(formAccount);
+
+        Category category = menuSetup.createCategory(menuSetup.createBoardMenu(menuSetup.createMenu()));
+
+        Post privacyPost = postSetup.createPost(member, category, ExposeState.PRIVACY, "1234");
+
+        for (int i = 0; i < 4; i++) {
+            commentSetup.createComment(privacyPost,member);
+        }
+
+        em.flush(); em.clear();
+
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(formAccount,
+                        null,formAccount.getAuthorities()));
+
+        //when //then
+        mvc.perform(get(url + privacyPost.getPostId() + "/comments")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8")
+                ).andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.size()").value(4));
+    }
 
 
+    @DisplayName("비밀 게시글 댓글 조회시, 비밀 게시글 작성자가 아닐때 비밀번호가 없으면 조회가 불가능하다.")
+    @Test
+    void 비밀게시글_댓글_비밀번호없을때_조회불가능() throws Exception {
+        //given
+        FormAccount formAccount = accountSetup.createFormAccount();
+        Member member = boardUserSetup.createMember(formAccount);
 
+        Category category = menuSetup.createCategory(menuSetup.createBoardMenu(menuSetup.createMenu()));
 
+        Post privacyPost = postSetup.createPost(member, category, ExposeState.PRIVACY, "1234");
 
+        for (int i = 0; i < 4; i++) {
+            commentSetup.createComment(privacyPost,member);
+        }
 
+        em.flush(); em.clear();
 
+        FormAccount otherAccount = accountSetup.createRandomUserAccount();
+        SecurityContextHolder.getContext().setAuthentication(
+                new UsernamePasswordAuthenticationToken(otherAccount,
+                        null,otherAccount.getAuthorities()));
 
-
-
-
-
-
-
-
-
-
+        //when //then
+        mvc.perform(get(url + privacyPost.getPostId() + "/comments")
+                        .accept(MediaType.APPLICATION_JSON)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .characterEncoding("UTF-8")
+                ).andDo(print())
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(114))
+                .andExpect(jsonPath("$.message").value("게시글 비밀번호가 일치하지 않습니다."));
+    }
 }

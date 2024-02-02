@@ -1,13 +1,16 @@
 package com.seproject.board.post.controller.dto;
 
-import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.NotBlank;
 
 @Data
 @NoArgsConstructor
 public class ExposeOptionRequest {
+    @NotBlank
     private String name;
+    @NotBlank
     private String password = "";
 
     public ExposeOptionRequest(String name) {
