@@ -1,14 +1,14 @@
 package com.seproject.account.common.authentication.handler.success;
 
-import com.seproject.account.token.utils.JwtProvider;
-import com.seproject.account.social.KakaoOidcUser;
 import com.seproject.account.account.domain.OAuthAccount;
-import com.seproject.account.social.TemporalUserInfo;
-import com.seproject.account.token.domain.UserToken;
 import com.seproject.account.account.domain.repository.OAuthAccountRepository;
+import com.seproject.account.social.KakaoOidcUser;
+import com.seproject.account.social.TemporalUserInfo;
 import com.seproject.account.social.repository.TemporalUserInfoRepository;
+import com.seproject.account.token.domain.UserToken;
 import com.seproject.account.token.domain.repository.UserTokenRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
@@ -26,7 +26,9 @@ import java.util.UUID;
 @Component
 public class OidcAuthenticationSuccessHandler implements AuthenticationSuccessHandler {
 
-    private static final String REDIRECT_URL = "http://localhost:3000";
+
+    @Value("${frontend.url}")
+    private String REDIRECT_URL;
 
     private final OAuthAccountRepository oAuthAccountRepository;
     private final TemporalUserInfoRepository temporalUserInfoRepository;
