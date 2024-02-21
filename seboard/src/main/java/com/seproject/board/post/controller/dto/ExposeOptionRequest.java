@@ -10,7 +10,6 @@ import javax.validation.constraints.NotBlank;
 public class ExposeOptionRequest {
     @NotBlank
     private String name;
-    @NotBlank
     private String password = "";
 
     public ExposeOptionRequest(String name) {
