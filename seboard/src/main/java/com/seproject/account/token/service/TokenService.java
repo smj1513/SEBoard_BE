@@ -1,5 +1,7 @@
 package com.seproject.account.token.service;
 
+import com.seproject.account.account.domain.OAuthAccount;
+import com.seproject.account.account.domain.repository.OAuthAccountRepository;
 import com.seproject.account.token.domain.JWT;
 import com.seproject.account.token.domain.LogoutLargeRefreshToken;
 import com.seproject.account.token.domain.LogoutRefreshToken;
@@ -21,20 +23,22 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
 import java.util.Collection;
 import java.util.Optional;
 import java.util.UUID;
 
 import static com.seproject.account.token.controller.dto.TokenDTO.*;
 
+@Transactional(readOnly = true)
 @RequiredArgsConstructor
 @Service
 public class TokenService {
 
     private final AccountRepository accountRepository;
+    private final OAuthAccountRepository oAuthAccountRepository;
     private final JwtProvider jwtProvider;
     private final JwtDecoder jwtDecoder;
 
@@ -100,11 +104,26 @@ public class TokenService {
     public Authentication getAuthentication(JWT token) {
         Claims claims = jwtDecoder.getClaims(token);
 
-        Account account = accountRepository.findByLoginIdWithRole(claims.getSubject())
-                .orElseThrow(() -> new CustomAuthenticationException(ErrorCode.UNAUTHORIZATION,null));
-        String credential = UUID.randomUUID().toString();
-        //TODO: account vs loginId
-        return new UsernamePasswordAuthenticationToken(account,credential, account.getAuthorities());
+        //TODO : SecurityContext에 들어갈 Account, OAuthAccount를 조회하는 방법이 formLogin 방식은 jwt의 sub에 이메일이 들어가고, 카카오는 jwt의 sub에 고유 번호가 들어가서 문제 발생
+        Optional<Account> hasAccount = accountRepository.findByLoginIdWithRole(claims.getSubject());
+
+        if(hasAccount.isEmpty()) {
+            Optional<OAuthAccount> hasOAuthAccount = oAuthAccountRepository.findOAuthAccountBySubAndProvider(claims.getSubject(), "kakao");
+
+            if(hasOAuthAccount.isPresent()) {
+                String loginId = hasOAuthAccount.get().getLoginId();
+                hasAccount = accountRepository.findByLoginIdWithRole(loginId);
+            }
+        }
+
+        if(hasAccount.isPresent()) {
+            Account account = hasAccount.get();
+            String credential = UUID.randomUUID().toString();
+            //TODO: account vs loginId
+            return new UsernamePasswordAuthenticationToken(account,credential, account.getAuthorities());
+        }
+
+        throw new CustomAuthenticationException(ErrorCode.UNAUTHORIZATION, null);
     }
 
     public boolean isLargeToken(JWT jwt) {
