@@ -14,6 +14,7 @@ import com.seproject.board.menu.domain.repository.ExternalSiteMenuRepository;
 import com.seproject.board.menu.domain.repository.MenuRepository;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
+import com.seproject.error.exception.InvalidDateException;
 import com.seproject.error.exception.NoSuchResourceException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -21,9 +22,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -46,11 +45,25 @@ public class AdminMenuService {
         menu.addAuthorization(access);
     }
 
+    public void validUrlInfo(String urlInfo) {
+        List<String> blackList = List.of("admin", "jenkins");
+
+        if(menuRepository.existsByUrlInfo(urlInfo)) {
+            throw new InvalidDateException(ErrorCode.INVALID_URL_INFO, "이미 사용중인 URL 입니다.");
+        }
+
+        if(blackList.contains(urlInfo)) {
+            throw new InvalidDateException(ErrorCode.INVALID_URL_INFO, "사용할 수 없는 URL 입니다.");
+        }
+    }
+
     @Transactional
     public Long createMenu(Menu superMenu, String name, String description,String urlInfo) {
         if(!StringUtils.hasText(urlInfo)) {
             urlInfo = UUID.randomUUID().toString().substring(0,8);
         }
+
+        validUrlInfo(urlInfo);
 
         Menu menu = new Menu(null,superMenu,name,description);
         menu.changeUrlInfo(urlInfo);
@@ -63,10 +76,11 @@ public class AdminMenuService {
 
     @Transactional
     public Long createBoardMenu(Menu superMenu,String name, String description,String urlInfo) {
-
         if(!StringUtils.hasText(urlInfo)) {
             urlInfo = UUID.randomUUID().toString().substring(0,8);
         }
+
+        validUrlInfo(urlInfo);
 
         BoardMenu boardMenu = new BoardMenu(null,superMenu,name,description,urlInfo);
         addMenuAuthorization(boardMenu);
@@ -84,6 +98,8 @@ public class AdminMenuService {
         if(!StringUtils.hasText(urlInfo)) {
             urlInfo = UUID.randomUUID().toString().substring(0,8);
         }
+
+        validUrlInfo(urlInfo);
 
         Category category = new Category(null,superMenu,name,description,urlInfo);
         addMenuAuthorization(category);
