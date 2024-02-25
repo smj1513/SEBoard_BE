@@ -8,6 +8,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 
 public interface MenuRepository extends JpaRepository<Menu, Long> {
+    boolean existsByUrlInfo(String urlInfo);
     @Query("select m from Menu m where m.depth = :depth order by m.menuId ASC ")
     List<Menu> findByDepth(@Param("depth") int depth);
     @Query("select m from Menu m join fetch m.superMenu sm where sm.menuId = :superMenuId order by m.menuId ASC ")

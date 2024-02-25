@@ -64,6 +64,8 @@ public class MenuProvider extends AbstractMenuProvider{
             String name = request.getName();
             String urlId = request.getUrlId();
 
+            adminMenuService.validUrlInfo(urlId);
+
             menu.changeDescription(description);
             menu.changeName(name);
             menu.changeUrlInfo(urlId);

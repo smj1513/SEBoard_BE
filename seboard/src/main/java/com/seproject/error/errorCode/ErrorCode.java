@@ -49,7 +49,7 @@ public enum ErrorCode {
     CONTAIN_SPAM_KEYWORD(HttpStatus.BAD_REQUEST,141, "스팸 키워드가 포함되어 있습니다."),
     NOT_EXIST_DASHBOARDMENU(HttpStatus.BAD_REQUEST,142, "일치하는 URL을 가진 DashBoardMenu가 없습니다."),
     INVALID_POST_TYPE(HttpStatus.BAD_REQUEST,143, "요청한 POST Type과 다릅니다."),
-
+    INVALID_URL_INFO(HttpStatus.BAD_REQUEST, 144, "올바르지 않은 URL INFO 입니다."),
 
     INVALID_PAGINATION(HttpStatus.BAD_REQUEST,200, "올바르지 않은 페이지 정보를 전송하였습니다."),
     INVALID_REQUEST(HttpStatus.BAD_REQUEST, 201, "올바르지 않은 형식의 요청입니다."),
