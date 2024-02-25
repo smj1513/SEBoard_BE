@@ -87,9 +87,18 @@ public class AdminDashBoardMenuAppService {
 
     protected List<Role> parseRoles(MenuDTO.MenuAuthOption option) {
         SelectOption selectOption = SelectOption.of(option.getOption());
+
         if(selectOption == SelectOption.SELECT) {
             List<Long> roleIds = option.getRoles();
-            return roleService.findByIds(roleIds);
+
+            Role adminRole = roleService.findByName(Role.ROLE_ADMIN);
+            List<Role> roleList = roleService.findByIds(roleIds);
+
+            if(!roleList.contains(adminRole)){
+                roleList.add(adminRole);
+            }
+
+            return roleList;
         }
 
         return roleService.convertRoles(selectOption);
