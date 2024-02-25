@@ -39,7 +39,7 @@ public class UsernameAuthenticationProvider implements AuthenticationProvider {
         String password = authentication.getCredentials().toString();
         UserDetails userDetails = accountService.loadUserByUsername(username);
 
-        if(loginPreventUserRepository.isPreventUser(username,LocalDateTime.now())) {
+        if(loginPreventUserRepository.isPreventUser(username,LocalDateTime.now()).isPresent()) {
             throw new CustomAuthenticationException(ErrorCode.LOGIN_PREVENT_USER,null);
         }
 
@@ -49,9 +49,7 @@ public class UsernameAuthenticationProvider implements AuthenticationProvider {
 
         loginHistoryRepository.save(new LoginHistory(username));
 
-        em.flush(); em.clear();
-
-        if (loginHistoryRepository.countByTime(LocalDateTime.now().minusMinutes(10), LocalDateTime.now()) >= 5) {
+        if (loginHistoryRepository.countByTime(username, LocalDateTime.now().minusMinutes(10), LocalDateTime.now()) >= 5) {
             loginPreventUserRepository.save(new LoginPreventUser(username));
         }
 

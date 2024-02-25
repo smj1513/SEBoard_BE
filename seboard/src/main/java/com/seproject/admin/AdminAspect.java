@@ -20,27 +20,27 @@ import java.util.Collection;
 @Slf4j
 public class AdminAspect {
 
-    @Pointcut("execution(* *..Admin*AppService.*(..))")
-    private void allAdminAppService(){}
-
-    @Around("allAdminAppService()")
-    public Object hasAdminRole(ProceedingJoinPoint joinPoint) throws Throwable {
-
-        Account account = SecurityUtils.getAccount()
-                .orElseThrow(() -> new CustomAuthenticationException(ErrorCode.NOT_LOGIN, null));
-
-        Collection<? extends GrantedAuthority> authorities = account.getAuthorities();
-
-        for (GrantedAuthority authority : authorities) {
-            if (authority.getAuthority().equals(Role.ROLE_ADMIN)) {
-
-                return joinPoint.proceed();
-            }
-        }
-
-        throw new CustomAccessDeniedException(ErrorCode.ACCESS_DENIED,null);
-
-//        log.info("[@annotation] {}" , joinPoint.getSignature());
-//        return joinPoint.proceed();
-    }
+//    @Pointcut("execution(* *..Admin*AppService.*(..))")
+//    private void allAdminAppService(){}
+//
+//    @Around("allAdminAppService()")
+//    public Object hasAdminRole(ProceedingJoinPoint joinPoint) throws Throwable {
+//
+//        Account account = SecurityUtils.getAccount()
+//                .orElseThrow(() -> new CustomAuthenticationException(ErrorCode.NOT_LOGIN, null));
+//
+//        Collection<? extends GrantedAuthority> authorities = account.getAuthorities();
+//
+//        for (GrantedAuthority authority : authorities) {
+//            if (authority.getAuthority().equals(Role.ROLE_ADMIN)) {
+//
+//                return joinPoint.proceed();
+//            }
+//        }
+//
+//        throw new CustomAccessDeniedException(ErrorCode.ACCESS_DENIED,null);
+//
+////        log.info("[@annotation] {}" , joinPoint.getSignature());
+////        return joinPoint.proceed();
+//    }
 }
