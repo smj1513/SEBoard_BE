@@ -6,9 +6,11 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 public interface LoginPreventUserRepository extends JpaRepository<LoginPreventUser,Long> {
 
-    @Query(value = "select exists(select * from login_prevent_user where login_id = :loginId and local_date_time >= :now)", nativeQuery = true)
-    boolean isPreventUser(@Param("loginId") String loginId,@Param("now") LocalDateTime now);
+    //TODO : method name
+    @Query(value = "select loginPreventUser from LoginPreventUser loginPreventUser where loginPreventUser.loginId = :loginId and loginPreventUser.localDateTime >= :now")
+    Optional<LoginPreventUser> isPreventUser(@Param("loginId") String loginId, @Param("now") LocalDateTime now);
 }

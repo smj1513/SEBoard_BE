@@ -46,7 +46,7 @@ class UsernameAuthenticationProviderTest extends IntegrationTestSupport {
 
         em.flush(); em.clear();
 
-        boolean isPrevented = loginPreventUserRepository.isPreventUser(formAccount.getLoginId(), LocalDateTime.now());
+        boolean isPrevented = loginPreventUserRepository.isPreventUser(formAccount.getLoginId(), LocalDateTime.now()).isPresent();
 
         Assertions.assertFalse(isPrevented);
     }
@@ -69,7 +69,7 @@ class UsernameAuthenticationProviderTest extends IntegrationTestSupport {
 
         em.flush(); em.clear();
 
-        boolean isPrevented = loginPreventUserRepository.isPreventUser(formAccount.getLoginId(), LocalDateTime.now());
+        boolean isPrevented = loginPreventUserRepository.isPreventUser(formAccount.getLoginId(), LocalDateTime.now()).isPresent();
 
         Assertions.assertTrue(isPrevented);
     }

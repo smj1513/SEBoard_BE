@@ -11,7 +11,7 @@ import java.time.LocalDateTime;
 public interface LoginHistoryRepository extends JpaRepository<LoginHistory,Long> {
 
 
-    @Query("select count(loginHistory) from LoginHistory loginHistory where loginHistory.time between :startTime and :endTime")
-    int countByTime(@Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
+    @Query("select count(loginHistory) from LoginHistory loginHistory where loginHistory.loginId = :userId and loginHistory.time between :startTime and :endTime")
+    int countByTime(@Param("userId") String username, @Param("startTime") LocalDateTime startTime, @Param("endTime") LocalDateTime endTime);
 
 }
