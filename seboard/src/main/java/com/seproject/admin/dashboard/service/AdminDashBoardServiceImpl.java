@@ -6,11 +6,12 @@ import com.seproject.admin.dashboard.domain.DashBoardMenu;
 import com.seproject.admin.dashboard.domain.DashBoardMenuAuthorization;
 import com.seproject.admin.dashboard.domain.repository.DashBoardMenuRepository;
 import com.seproject.admin.domain.SelectOption;
-import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -51,7 +52,11 @@ public class AdminDashBoardServiceImpl {
 
     public List<DashBoardMenu> findDashBoardMenuWithRole(List<Long> ids) {
         List<DashBoardMenu> dashBoardMenusWithRole = dashBoardMenuRepository.findDashBoardMenusWithRole(ids);
-        return dashBoardMenusWithRole;
+
+        List<DashBoardMenu> res = dashBoardMenusWithRole.stream().filter(menu -> !menu.getUrl().equals("/admin/adminMenu"))
+                .collect(Collectors.toList());
+
+        return res;
     }
 
     public List<Long> findAuthorizeDashBoardMenuIds(Account account) {

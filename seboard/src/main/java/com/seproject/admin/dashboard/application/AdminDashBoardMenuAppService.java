@@ -9,6 +9,7 @@ import com.seproject.admin.dashboard.service.AdminDashBoardServiceImpl;
 import com.seproject.admin.domain.SelectOption;
 import com.seproject.admin.menu.controller.dto.MenuDTO;
 import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.CustomAccessDeniedException;
 import com.seproject.error.exception.CustomAuthenticationException;
 import com.seproject.error.exception.CustomIllegalArgumentException;
 import lombok.RequiredArgsConstructor;
@@ -46,6 +47,13 @@ public class AdminDashBoardMenuAppService {
         Account account = SecurityUtils.getAccount()
                 .orElseThrow(() -> new CustomAuthenticationException(ErrorCode.NOT_LOGIN, null));
 
+        boolean isAdmin = account.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(Role.ROLE_ADMIN));
+
+        if(!isAdmin){
+            throw new CustomAccessDeniedException(ErrorCode.ACCESS_DENIED, null);
+        }
+
         List<Long> ids = adminDashBoardServiceImpl.findAuthorizeDashBoardMenuIds(account);
         List<DashBoardMenu> dashBoardMenus = adminDashBoardServiceImpl.findDashBoardMenuWithRole(ids);
 
@@ -55,6 +63,15 @@ public class AdminDashBoardMenuAppService {
 
     @Transactional
     public void update(DashBoardUpdateRequest request) {
+        Account account = SecurityUtils.getAccount()
+                .orElseThrow(() -> new CustomAuthenticationException(ErrorCode.NOT_LOGIN, null));
+
+        boolean isAdmin = account.getAuthorities().stream()
+                .anyMatch(grantedAuthority -> grantedAuthority.getAuthority().equals(Role.ROLE_ADMIN));
+
+        if(!isAdmin){
+            throw new CustomAccessDeniedException(ErrorCode.ACCESS_DENIED, null);
+        }
 
         List<DashBoardUpdateRequestElement> menus = request.getMenus();
 

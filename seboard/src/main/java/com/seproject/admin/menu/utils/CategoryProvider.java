@@ -79,7 +79,9 @@ public class CategoryProvider extends AbstractMenuProvider {
             String name = request.getName();
             String urlId = request.getUrlId();
 
-            adminMenuService.validUrlInfo(urlId);
+            if(!menu.getUrlInfo().equals(urlId)){
+                adminMenuService.validUrlInfo(urlId);
+            }
 
             menu.changeDescription(description);
             menu.changeName(name);
