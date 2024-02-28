@@ -3,9 +3,18 @@ package com.seproject.admin.post.controller.dto;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class PostRequest {
+    @Data
+    public static class AdminOldPost{
+        private String title;
+        private String contents;
+        private int views;
+        private LocalDateTime createdAt;
+        private LocalDateTime updatedAt;
+    }
     @Data
     public static class AdminPostRetrieveCondition{
         private Long categoryId;

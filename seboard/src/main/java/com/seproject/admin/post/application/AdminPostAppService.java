@@ -2,19 +2,20 @@ package com.seproject.admin.post.application;
 
 import com.seproject.account.account.domain.Account;
 import com.seproject.account.utils.SecurityUtils;
+import com.seproject.admin.post.controller.dto.PostRequest;
 import com.seproject.admin.post.controller.dto.PostRequest.AdminPostRetrieveCondition;
 import com.seproject.admin.post.controller.dto.PostResponse.DeletedPostResponse;
 import com.seproject.admin.post.controller.dto.PostResponse.PostRetrieveResponse;
 import com.seproject.admin.post.service.AdminPostService;
+import com.seproject.board.menu.domain.Category;
+import com.seproject.board.menu.domain.repository.CategoryRepository;
+import com.seproject.board.post.domain.model.Post;
 import com.seproject.board.post.domain.repository.AdminPostSearchRepository;
 import com.seproject.board.post.service.PostService;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomAccessDeniedException;
 import com.seproject.error.exception.CustomAuthenticationException;
 import com.seproject.error.exception.NoSuchResourceException;
-import com.seproject.board.menu.domain.Category;
-import com.seproject.board.post.domain.model.Post;
-import com.seproject.board.menu.domain.repository.CategoryRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -141,4 +142,16 @@ public class AdminPostAppService {
         adminPostService.changeCategory(from, to);
     }
 
+    public String addOldPost(PostRequest.AdminOldPost request) {
+//        Post.builder()
+//                .title(request.getTitle())
+//                .contents(request.getContents())
+//                .views(request.getViews())
+//                .baseTime(BaseTime.of(request.getCreatedAt(), request.getUpdatedAt()))
+//                .category()
+//                .author()
+//                .exposeOption()
+//                .build();
+        return null;
+    }
 }

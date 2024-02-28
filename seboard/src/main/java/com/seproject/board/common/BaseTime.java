@@ -20,4 +20,8 @@ public class BaseTime {
     public static BaseTime now(){
         return new BaseTime(LocalDateTime.now(), LocalDateTime.now());
     }
+
+    public static BaseTime of(LocalDateTime createdAt, LocalDateTime modifiedAt) {
+        return new BaseTime(createdAt, modifiedAt);
+    }
 }
