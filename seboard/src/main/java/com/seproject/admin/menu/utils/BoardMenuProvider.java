@@ -85,7 +85,9 @@ public class BoardMenuProvider extends AbstractMenuProvider {
                 }
             }
 
-            adminMenuService.validUrlInfo(request.getUrlId());
+            if(!menu.getUrlInfo().equals(request.getUrlId())){
+                adminMenuService.validUrlInfo(request.getUrlId());
+            }
 
             menu.changeSuperMenu(superMenu);
             menu.changeDescription(description);
