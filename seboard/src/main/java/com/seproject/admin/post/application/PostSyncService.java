@@ -21,13 +21,16 @@ import com.seproject.error.exception.CustomAuthenticationException;
 import com.seproject.error.exception.NoSuchResourceException;
 import com.seproject.member.domain.Anonymous;
 import com.seproject.member.domain.repository.AnonymousRepository;
+import lombok.Builder;
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
 
 @Service
 @RequiredArgsConstructor
-public class AdminPostSyncAppService {
+public class PostSyncService {
     private final AccountService accountService;
     private final CategoryRepository categoryRepository;
     private final PostRepository postRepository;
@@ -35,7 +38,7 @@ public class AdminPostSyncAppService {
     private final CommentRepository commentRepository;
     private final ReplyRepository replyRepository;
     @Transactional
-    public String addOldPost(AdminOldPost request) {
+    public String importOldPost(AdminOldPost request) {
         Account account = SecurityUtils.getAccount()
                 .orElseThrow(() -> new CustomAuthenticationException(ErrorCode.NOT_LOGIN, null));
 
@@ -108,5 +111,31 @@ public class AdminPostSyncAppService {
         }
 
         return "성공";
+    }
+
+    public String exportNewPost(String title, String content, String username){
+        RestTemplate restTemplate = new RestTemplate();
+
+        String url = "http://localhost:9000/posts";
+
+        ExportPost exportPost = ExportPost.builder()
+                .title(title)
+                .content(content)
+                .username(username)
+                .password("1234")
+                .build();
+
+        String res = restTemplate.postForObject(url, exportPost, String.class);
+
+        return res;
+    }
+
+    @Data
+    @Builder
+    public static class ExportPost{
+        private String title;
+        private String content;
+        private String username;
+        private String password;
     }
 }

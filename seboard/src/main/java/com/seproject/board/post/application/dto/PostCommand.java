@@ -17,6 +17,7 @@ public class PostCommand {
         private ExposeState exposeState;
         private String privatePassword;
         private boolean anonymous;
+        private boolean isSyncOldVersion;
         private List<Long> attachmentIds;
     }
 

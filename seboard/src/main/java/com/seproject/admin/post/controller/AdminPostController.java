@@ -2,7 +2,7 @@ package com.seproject.admin.post.controller;
 
 
 import com.seproject.admin.post.application.AdminPostAppService;
-import com.seproject.admin.post.application.AdminPostSyncAppService;
+import com.seproject.admin.post.application.PostSyncService;
 import com.seproject.admin.post.controller.dto.AdminOldPost;
 import com.seproject.admin.post.controller.dto.PostRequest.AdminPostRetrieveCondition;
 import com.seproject.admin.post.controller.dto.PostRequest.BulkPostRequest;
@@ -27,12 +27,12 @@ import static com.seproject.admin.post.controller.dto.PostResponse.PostRetrieveR
 public class AdminPostController {
 
     private final AdminPostAppService adminPostAppService;
-    private final AdminPostSyncAppService adminPostSyncAppService;
+    private final PostSyncService postSyncService;
 
     @PostMapping("/old")
     @ResponseStatus(HttpStatus.CREATED)
     public String createOldSePosts(@RequestBody AdminOldPost request){
-        return adminPostSyncAppService.addOldPost(request);
+        return postSyncService.importOldPost(request);
     }
 
     @Operation(summary = "게시글 목록 조회", description = "등록된 게시글 목록들을 조회한다.")
