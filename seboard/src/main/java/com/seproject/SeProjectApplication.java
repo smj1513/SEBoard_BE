@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Import;
 
 import javax.persistence.EntityManager;
 
-@Import({AdminAspect.class,InitData.class})
+@Import({AdminAspect.class, InitRequiredData.class})
 @SpringBootApplication
 public class SeProjectApplication {
 

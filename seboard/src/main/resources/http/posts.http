@@ -1,0 +1,40 @@
+POST http://localhost:8080/posts
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJhY2Nlc3NUb2tlbiIsImFsZyI6IkhTMjU2In0.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwNDcxNDE5MywiZXhwIjoxNzA0NzE1OTkzLCJhdXRob3JpdGllcyI6WyJST0xFX0FETUlOIl19.ztnNB7JFHUlFke2yF0Kt8CYVZIN4mi5J5oKaG391bXE
+
+{
+    "title": "My first post",
+    "contents": "world!",
+  "categoryId" : 2,
+  "pined" : false,
+  "exposeOption" : {
+    "name" : "PUBLIC"
+  },
+  "anonymous" : false
+}
+###
+PUT http://localhost:8080/posts/30
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJhY2Nlc3NUb2tlbiIsImFsZyI6IkhTMjU2In0.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwNDcxNDE5MywiZXhwIjoxNzA0NzE1OTkzLCJhdXRob3JpdGllcyI6WyJST0xFX0FETUlOIl19.ztnNB7JFHUlFke2yF0Kt8CYVZIN4mi5J5oKaG391bXE
+
+{
+  "title": "My 2222first post",
+  "contents": "world! Hello",
+  "categoryId" : 2,
+  "pined" : false,
+  "exposeOption" : {
+    "name" : "PUBLIC"
+  },
+  "anonymous" : false
+}
+###
+GET http://localhost:8080/admin/spamword
+
+###
+POST http://localhost:8080/admin/spamword
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJhY2Nlc3NUb2tlbiIsImFsZyI6IkhTMjU2In0.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwNDcxNDE5MywiZXhwIjoxNzA0NzE1OTkzLCJhdXRob3JpdGllcyI6WyJST0xFX0FETUlOIl19.ztnNB7JFHUlFke2yF0Kt8CYVZIN4mi5J5oKaG391bXE
+
+{
+  "word" : "Hello"
+}

@@ -1,0 +1,18 @@
+
+GET seboard.site/v1/admin/files/extension
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJhY2Nlc3NUb2tlbiIsImFsZyI6IkhTMjU2In0.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTY5ODk5MTIzOSwiZXhwIjoxNjk4OTkzMDM5LCJhdXRob3JpdGllcyI6WyJST0xFX0FETUlOIl19.tkqXs64u3NSEjQDHOHh3QggH2WQBcP2d8KxGf3oQBnQ
+
+
+###
+POST https://seboard.site/v1/admin/files/extension
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJhY2Nlc3NUb2tlbiIsImFsZyI6IkhTMjU2In0.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTY5ODk5MTIzOSwiZXhwIjoxNjk4OTkzMDM5LCJhdXRob3JpdGllcyI6WyJST0xFX0FETUlOIl19.tkqXs64u3NSEjQDHOHh3QggH2WQBcP2d8KxGf3oQBnQ
+
+{
+  "extensions": [
+    "jpg",
+    "png", "jpeg", "gif", "svg",
+    "doc", "docx", "xls", "xlsx", "ppt", "pptx", "pdf"
+  ]
+}

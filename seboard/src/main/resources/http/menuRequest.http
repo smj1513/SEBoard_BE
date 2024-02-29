@@ -1,0 +1,45 @@
+GET http://localhost:8080/admin/mainPageMenus/all
+Accept: application/json
+Authorization: Bearer eyJ0eXAiOiJhY2Nlc3NUb2tlbiIsImFsZyI6IkhTMjU2In0.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTY5ODk4OTQyMiwiZXhwIjoxNjk4OTkxMjIyLCJhdXRob3JpdGllcyI6WyJST0xFX0FETUlOIl19.L3TCF1AIJrowTxPVltLOiPV3c4mIJeNBzNw9lok_q30
+### ADMIN 메뉴 조회
+GET http://localhost:8080/admin/menu
+Accept: application/json
+Authorization: Bearer eyJ0eXAiOiJhY2Nlc3NUb2tlbiIsImFsZyI6IkhTMjU2In0.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwNDQzNDI1MSwiZXhwIjoxNzA0NDM2MDUxLCJhdXRob3JpdGllcyI6WyJST0xFX0FETUlOIl19.lBf7hY2jYZOPAbpWr7EDUKaW9AfvVZcxx59iyDJzr_I
+###
+GET http://localhost:8080/menu
+#Accept: application/json
+#Authorization: Bearer eyJ0eXAiOiJhY2Nlc3NUb2tlbiIsImFsZyI6IkhTMjU2In0.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTY5OTQzNTAxNSwiZXhwIjoxNjk5NDM2ODE1LCJhdXRob3JpdGllcyI6WyJST0xFX0FETUlOIl19.7A1NnX-ioHc9uYp8G0rjMTActn3JTwNQGjyWK7FEC4Y
+
+###
+### BOARD 메뉴 생성
+POST http://localhost:8080/admin/menu?categoryType=MENU
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJhY2Nlc3NUb2tlbiIsImFsZyI6IkhTMjU2In0.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwNDQzNDI1MSwiZXhwIjoxNzA0NDM2MDUxLCJhdXRob3JpdGllcyI6WyJST0xFX0FETUlOIl19.lBf7hY2jYZOPAbpWr7EDUKaW9AfvVZcxx59iyDJzr_I
+
+{
+  "superCategoryId": null,
+  "name": "groupMenu",
+  "description": "groupMenu",
+  "urlId": "groupMenu",
+  "expose": {
+    "option": "onlyAdmin"
+  }
+}
+###
+PUT http://localhost:8080/admin/menu/25
+Content-Type: application/json
+Authorization: Bearer eyJ0eXAiOiJhY2Nlc3NUb2tlbiIsImFsZyI6IkhTMjU2In0.eyJzdWIiOiJhZG1pbiIsImlhdCI6MTcwNDQzNDI1MSwiZXhwIjoxNzA0NDM2MDUxLCJhdXRob3JpdGllcyI6WyJST0xFX0FETUlOIl19.lBf7hY2jYZOPAbpWr7EDUKaW9AfvVZcxx59iyDJzr_I
+
+{
+  "superMenuId": 27,
+  "name": "changed",
+  "description": "groupMenu",
+  "urlId": "changed",
+  "expose": {
+    "option": "onlyAdmin"
+  },
+  "access": {
+    "option": "onlyAdmin"
+  }
+}
+###
