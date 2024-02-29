@@ -2,7 +2,6 @@ package com.seproject.admin.post.application;
 
 import com.seproject.account.account.domain.Account;
 import com.seproject.account.utils.SecurityUtils;
-import com.seproject.admin.post.controller.dto.PostRequest;
 import com.seproject.admin.post.controller.dto.PostRequest.AdminPostRetrieveCondition;
 import com.seproject.admin.post.controller.dto.PostResponse.DeletedPostResponse;
 import com.seproject.admin.post.controller.dto.PostResponse.PostRetrieveResponse;
@@ -142,16 +141,4 @@ public class AdminPostAppService {
         adminPostService.changeCategory(from, to);
     }
 
-    public String addOldPost(PostRequest.AdminOldPost request) {
-//        Post.builder()
-//                .title(request.getTitle())
-//                .contents(request.getContents())
-//                .views(request.getViews())
-//                .baseTime(BaseTime.of(request.getCreatedAt(), request.getUpdatedAt()))
-//                .category()
-//                .author()
-//                .exposeOption()
-//                .build();
-        return null;
-    }
 }
