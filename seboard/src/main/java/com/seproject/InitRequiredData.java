@@ -73,8 +73,8 @@ public class InitRequiredData {
         }
 
         private void initFileExtension() {
-            List.of("jpg, jpeg, png, gif, svg, doc, docx, xls, xlsx, ppt, pptx, pdf")
-                    .forEach(ext -> initFileExtension(ext));
+            List.of("jpg", "jpeg", "png", "gif", "svg", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "pdf")
+                    .forEach(this::initFileExtension);
         }
 
         private void initFileExtension(String name){
