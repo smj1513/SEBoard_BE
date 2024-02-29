@@ -177,9 +177,14 @@ public class InitRequiredData {
 
                 BoardMenu boardMenu = boardMenuRepository.save(menu);
 
-                categoryRepository.save(
-                        new Category(null, boardMenu, "일반", "일반", UUID.randomUUID().toString().substring(0, 8))
-                );
+                Category category = new Category(null, boardMenu, "일반", "일반", UUID.randomUUID().toString().substring(0, 8));
+
+                category.addAuthorization(new MenuAccessAuthorization(category));
+                category.addAuthorization(new MenuExposeAuthorization(category));
+                category.addAuthorization(new MenuEditAuthorization(category));
+                category.addAuthorization(new MenuManageAuthorization(category));
+
+                categoryRepository.save(category);
 
                 log.info("Board Menu {} created", name);
             }
