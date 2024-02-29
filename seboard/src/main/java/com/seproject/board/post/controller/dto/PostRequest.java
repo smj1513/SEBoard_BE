@@ -44,6 +44,8 @@ public class PostRequest {
         @NotNull
         @JsonProperty("anonymous")
         private boolean isAnonymous;
+        @JsonProperty("isSyncOldVersion")
+        private boolean isSyncOldVersion = false;
 
         public PostWriteCommand toCommand() {
             return PostWriteCommand.builder()
@@ -55,6 +57,7 @@ public class PostRequest {
                     .privatePassword(exposeOption.getPassword())
                     .anonymous(isAnonymous)
                     .attachmentIds(attachmentIds)
+                    .isSyncOldVersion(isSyncOldVersion)
                     .build();
         }
     }

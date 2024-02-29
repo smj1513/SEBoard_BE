@@ -127,7 +127,7 @@ public class PostSearchAppService {
             isBookmarked = bookmarkService.isBookmarked(post, member);
             isAuthor = post.isWrittenBy(account.getAccountId());
 
-            isEditable = category.editable(account.getRoles()) || isAuthor;
+            isEditable = category.manageable(account.getRoles()) || isAuthor;
         }
 
         postDetailResponse.setEditable(isEditable);

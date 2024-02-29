@@ -1,46 +1,40 @@
 package com.seproject.board.post.application;
 
 import com.seproject.account.account.domain.Account;
-import com.seproject.account.account.domain.repository.AccountRepository;
 import com.seproject.account.account.service.AccountService;
 import com.seproject.account.role.domain.Role;
 import com.seproject.account.utils.SecurityUtils;
 import com.seproject.admin.banned.domain.SpamWord;
 import com.seproject.admin.banned.domain.repository.SpamWordRepository;
+import com.seproject.admin.post.application.PostSyncService;
+import com.seproject.board.common.BaseTime;
+import com.seproject.board.menu.domain.Category;
 import com.seproject.board.menu.service.CategoryService;
-import com.seproject.board.post.domain.model.exposeOptions.ExposeState;
-import com.seproject.board.post.service.PostService;
-import com.seproject.error.exception.*;
-import com.seproject.file.domain.model.FileConfiguration;
-import com.seproject.file.domain.repository.FileConfigurationRepository;
-import com.seproject.file.application.FileAppService;
-import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.board.post.application.dto.PostCommand.PostEditCommand;
 import com.seproject.board.post.application.dto.PostCommand.PostWriteCommand;
-import com.seproject.board.menu.domain.Category;
-import com.seproject.board.common.BaseTime;
-import com.seproject.file.domain.model.FileMetaData;
 import com.seproject.board.post.domain.model.Post;
 import com.seproject.board.post.domain.model.exposeOptions.ExposeOption;
-import com.seproject.member.domain.Anonymous;
-import com.seproject.member.domain.BoardUser;
-import com.seproject.member.domain.Member;
-import com.seproject.board.menu.domain.repository.CategoryRepository;
-import com.seproject.board.comment.domain.repository.CommentRepository;
+import com.seproject.board.post.domain.model.exposeOptions.ExposeState;
+import com.seproject.board.post.service.PostService;
+import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.*;
+import com.seproject.file.domain.model.FileConfiguration;
+import com.seproject.file.domain.model.FileMetaData;
+import com.seproject.file.domain.repository.FileConfigurationRepository;
 import com.seproject.file.domain.repository.FileMetaDataRepository;
 import com.seproject.file.domain.repository.FileRepository;
-import com.seproject.board.post.domain.repository.BookmarkRepository;
-import com.seproject.board.post.domain.repository.PostRepository;
-import com.seproject.board.post.domain.repository.PostSearchRepository;
-import com.seproject.member.domain.repository.AnonymousRepository;
-import com.seproject.member.domain.repository.MemberRepository;
+import com.seproject.member.domain.Anonymous;
+import com.seproject.member.domain.BoardUser;
 import com.seproject.member.service.AnonymousService;
 import com.seproject.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 
 @Service
@@ -58,6 +52,8 @@ public class PostAppService {
     private final AnonymousService anonymousService;
     private final PostService postService;
     private final CategoryService categoryService;
+
+    private final PostSyncService postSyncAppService;
 
     @Transactional
     public Long writePost(PostWriteCommand command){
@@ -107,6 +103,11 @@ public class PostAppService {
         checkSpamWord(title, contents);
 
         Long postId = postService.createPost(title, contents, category, author, now, isPined, attachments, exposeOption);
+
+        if(command.isSyncOldVersion()){
+            postSyncAppService.exportNewPost(title, contents, author.getName());
+        }
+
         return postId;
     }
 
@@ -129,7 +130,7 @@ public class PostAppService {
 
         Post post = postService.findByIdWithCategory(command.getPostId());
 
-        if(!post.isWrittenBy(account.getAccountId()) || !post.getCategory().manageable(account.getRoles())){
+        if(!(post.isWrittenBy(account.getAccountId()) || post.getCategory().manageable(account.getRoles()))){
             throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 
