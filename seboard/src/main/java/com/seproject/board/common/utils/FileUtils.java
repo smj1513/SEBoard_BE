@@ -1,17 +1,18 @@
 package com.seproject.board.common.utils;
 
-import com.seproject.file.domain.repository.FileExtensionRepository;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.InvalidFileExtensionException;
+import com.seproject.file.domain.repository.FileExtensionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.io.File;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
@@ -19,16 +20,7 @@ public class FileUtils {
     @Value("${storage.rootPath}")
     private String rootPath;
     private final FileExtensionRepository fileExtensionRepository;
-    private Set<String> allowedExtensions;
-
-    @PostConstruct
-    protected void init(){
-        allowedExtensions = new HashSet<>();
-
-        fileExtensionRepository.findAll().forEach(fileExtension -> {
-            allowedExtensions.add(fileExtension.getExtensionName());
-        });
-    }
+    private Set<String> allowedExtensions = new HashSet<>();
 
     public void addAllowedExtension(String extension){
         allowedExtensions.add(extension);
@@ -39,6 +31,12 @@ public class FileUtils {
     }
 
     private String getExtension(String originalFileName){
+        if(allowedExtensions.isEmpty()){
+            fileExtensionRepository.findAll().forEach(fileExtension -> {
+                allowedExtensions.add(fileExtension.getExtensionName());
+            });
+        }
+
         String extension = originalFileName.substring(originalFileName.lastIndexOf("."));
         if(!allowedExtensions.contains(extension.replace(".", ""))){
             throw new InvalidFileExtensionException(ErrorCode.NOT_EXIST_EXTENSION);
