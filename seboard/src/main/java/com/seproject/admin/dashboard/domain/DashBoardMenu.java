@@ -3,15 +3,19 @@ package com.seproject.admin.dashboard.domain;
 import com.seproject.account.role.domain.Role;
 import com.seproject.admin.domain.SelectOption;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
 @NoArgsConstructor
 @Entity
+@Builder
+@AllArgsConstructor
 public class DashBoardMenu {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,7 +31,8 @@ public class DashBoardMenu {
     private SelectOption selectOption;
 
     @OneToMany(mappedBy = "dashBoardMenu", fetch = FetchType.EAGER, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<DashBoardMenuAuthorization> dashBoardMenuAuthorizations;
+    @Builder.Default
+    private List<DashBoardMenuAuthorization> dashBoardMenuAuthorizations = new ArrayList<>();
 
     public boolean authorize(List<Role> roles) {
 

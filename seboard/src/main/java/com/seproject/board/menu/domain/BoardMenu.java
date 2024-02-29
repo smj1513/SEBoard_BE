@@ -2,7 +2,6 @@ package com.seproject.board.menu.domain;
 
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NoArgsConstructor;
 
@@ -18,6 +17,7 @@ public class BoardMenu extends InternalSiteMenu {
         return "BOARD";
     }
 
+    @Builder
     public BoardMenu(Long categoryId, Menu superMenu, String name, String description, String categoryPathId) {
         super(categoryId, superMenu, name, description, categoryPathId);
 
