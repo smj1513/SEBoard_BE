@@ -118,8 +118,8 @@ public class InitRequiredData {
                 );
 
                 DashBoardMenuAuthorization dashBoardMenuAuthorization = new DashBoardMenuAuthorization(dashboardMenu, adminRole);
-
                 dashboardMenu.update(SelectOption.ONLY_ADMIN, List.of(dashBoardMenuAuthorization));
+                dashBoardMenuRepository.save(dashboardMenu);
 
                 log.info("DashboardMenu {} is created", name);
             }
