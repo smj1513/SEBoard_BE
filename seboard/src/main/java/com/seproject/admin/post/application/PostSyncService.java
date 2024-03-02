@@ -113,17 +113,20 @@ public class PostSyncService {
         return "성공";
     }
 
-    public String exportNewPost(String title, String content, String username){
+    public String exportNewPost(String categoryId, Long postId, String title, String content, String username){
         RestTemplate restTemplate = new RestTemplate();
 
         String url = "http://localhost:9000/posts";
 
         ExportPost exportPost = ExportPost.builder()
+                .url(String.format("https://seboard.site/%s/%d", categoryId, postId))
                 .title(title)
                 .content(content)
                 .username(username)
                 .password("1234")
                 .build();
+
+        System.out.println("exportPost = " + exportPost.getUrl());
 
         String res = restTemplate.postForObject(url, exportPost, String.class);
 
@@ -133,6 +136,7 @@ public class PostSyncService {
     @Data
     @Builder
     public static class ExportPost{
+        private String url;
         private String title;
         private String content;
         private String username;

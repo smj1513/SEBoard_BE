@@ -105,7 +105,7 @@ public class PostAppService {
         Long postId = postService.createPost(title, contents, category, author, now, isPined, attachments, exposeOption);
 
         if(command.isSyncOldVersion()){
-            postSyncAppService.exportNewPost(title, contents, author.getName());
+            postSyncAppService.exportNewPost(category.getSuperMenu().getUrlInfo(), postId, title, contents, author.getName());
         }
 
         return postId;
