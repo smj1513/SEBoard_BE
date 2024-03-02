@@ -12,6 +12,7 @@ import com.seproject.account.role.domain.repository.RoleRepository;
 import com.seproject.admin.dashboard.domain.DashBoardMenu;
 import com.seproject.admin.dashboard.domain.DashBoardMenuAuthorization;
 import com.seproject.admin.dashboard.domain.DashBoardMenuGroup;
+import com.seproject.admin.dashboard.domain.repository.DashBoardMenuAuthorizationRepository;
 import com.seproject.admin.dashboard.domain.repository.DashBoardMenuRepository;
 import com.seproject.admin.domain.SelectOption;
 import com.seproject.board.common.Status;
@@ -58,6 +59,7 @@ public class InitRequiredData {
         private final MemberRepository memberRepository;
         private final PasswordEncoder passwordEncoder;
         private final DashBoardMenuRepository dashBoardMenuRepository;
+        private final DashBoardMenuAuthorizationRepository dashBoardMenuAuthorizationRepository;
         private final FileExtensionRepository fileExtensionRepository;
         @Value("${system_account.password}")
         private String systemPassword;
@@ -118,6 +120,7 @@ public class InitRequiredData {
                 );
 
                 DashBoardMenuAuthorization dashBoardMenuAuthorization = new DashBoardMenuAuthorization(dashboardMenu, adminRole);
+                dashBoardMenuAuthorizationRepository.save(dashBoardMenuAuthorization);
                 dashboardMenu.update(SelectOption.ONLY_ADMIN, List.of(dashBoardMenuAuthorization));
                 dashBoardMenuRepository.save(dashboardMenu);
 
