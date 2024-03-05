@@ -1,7 +1,10 @@
 package com.seproject.admin.ip.application;
 
 import com.seproject.account.Ip.application.IpService;
+import com.seproject.account.Ip.domain.IpType;
 import com.seproject.admin.ip.persitence.IpQueryRepository;
+import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.CustomIllegalArgumentException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -28,7 +31,8 @@ public class AdminIpAppService {
 
     @Transactional
     public void createIp(CreateIpRequest request) {
-        ipService.createIp(request.getIpAddress());
+        IpType ipType = IpType.valueOf(request.getIpType());
+        ipService.createIp(request.getIpAddress(),ipType);
     }
 
     @Transactional
