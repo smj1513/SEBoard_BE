@@ -102,6 +102,10 @@ public class PostAppService {
 
         checkSpamWord(title, contents);
 
+        if(command.isPined() && !category.manageable(roles)){
+            throw new CustomAccessDeniedException(ErrorCode.ACCESS_DENIED, null);
+        }
+
         Long postId = postService.createPost(title, contents, category, author, now, isPined, attachments, exposeOption);
 
         if(command.isSyncOldVersion()){
