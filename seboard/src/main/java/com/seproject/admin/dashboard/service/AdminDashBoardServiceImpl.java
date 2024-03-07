@@ -17,19 +17,6 @@ import java.util.stream.Collectors;
 @Service
 @Transactional(readOnly = true)
 public class AdminDashBoardServiceImpl {
-    private static final String MENU_EDIT_URL = "/admin/menu";
-
-    private static final String ACCOUNT_MANAGE_URL = "/admin/account";
-    private static final String ACCOUNT_POLICY_URL = "/admin/accountPolicy";
-    private static final String ROLE_MANAGE_URL = "/admin/roles";
-
-    private static final String POST_MANAGE_URL = "/admin/posts";
-    private static final String COMMENT_MANAGE_URL = "/admin/comments";
-    private static final String FILE_MANAGE_URL = "/admin/files";
-    private static final String TRASH_URL = "/admin/trash";
-
-    private static final String GENERAL_URL = "/admin/general";
-    private static final String MAIN_PAGE_MENU_MANAGE_URL = "/admin/mainPageMenu";
 
 
     private final DashBoardMenuRepository dashBoardMenuRepository;
