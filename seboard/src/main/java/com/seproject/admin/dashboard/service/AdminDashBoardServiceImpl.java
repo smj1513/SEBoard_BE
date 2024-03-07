@@ -6,6 +6,8 @@ import com.seproject.admin.dashboard.domain.DashBoardMenu;
 import com.seproject.admin.dashboard.domain.DashBoardMenuAuthorization;
 import com.seproject.admin.dashboard.domain.repository.DashBoardMenuRepository;
 import com.seproject.admin.domain.SelectOption;
+import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.NoSuchResourceException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +25,7 @@ public class AdminDashBoardServiceImpl {
 
     private List<DashBoardMenu> all; // cache
 
+
     public AdminDashBoardServiceImpl(DashBoardMenuRepository dashBoardMenuRepository) {
         this.dashBoardMenuRepository = dashBoardMenuRepository;
         all = dashBoardMenuRepository.findAll();
@@ -30,6 +33,11 @@ public class AdminDashBoardServiceImpl {
 
     public Optional<DashBoardMenu> findDashBoardMenu(Long id) {
         return dashBoardMenuRepository.findById(id);
+    }
+
+    public DashBoardMenu findDashBoardMenuByUrl(String url){
+        return dashBoardMenuRepository.findByUrl(url)
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_DASHBOARDMENU));
     }
 
     public List<DashBoardMenu> findDashBoardMenu(List<Long> ids) {
