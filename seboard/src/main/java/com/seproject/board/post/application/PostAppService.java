@@ -102,6 +102,10 @@ public class PostAppService {
 
         checkSpamWord(title, contents);
 
+        if(command.isPined() && !category.manageable(roles)){
+            throw new CustomAccessDeniedException(ErrorCode.ACCESS_DENIED, null);
+        }
+
         Long postId = postService.createPost(title, contents, category, author, now, isPined, attachments, exposeOption);
 
         if(command.isSyncOldVersion()){
@@ -132,6 +136,10 @@ public class PostAppService {
 
         if(!(post.isWrittenBy(account.getAccountId()) || post.getCategory().manageable(account.getRoles()))){
             throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
+        }
+
+        if(command.isPined()!=post.isPined() && !post.getCategory().manageable(account.getRoles())){
+            throw new CustomAccessDeniedException(ErrorCode.ACCESS_DENIED, null);
         }
 
         checkSpamWord(command.getTitle(), command.getContents());

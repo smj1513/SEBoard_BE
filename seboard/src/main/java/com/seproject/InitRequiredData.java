@@ -92,17 +92,17 @@ public class InitRequiredData {
         }
 
         private void initAdminDashBoard() {
-            initAdminDashBoard("SE 메뉴 편집", "/admin/menu", DashBoardMenuGroup.MENU_GROUP);
-            initAdminDashBoard("관리자 메뉴 편집", "/admin/adminMenu", DashBoardMenuGroup.MENU_GROUP);
-            initAdminDashBoard("회원 목록", "/admin/account", DashBoardMenuGroup.PERSON_GROUP);
-            initAdminDashBoard("회원 정책", "/admin/accountPolicy", DashBoardMenuGroup.PERSON_GROUP);
-            initAdminDashBoard("회원 그룹", "/admin/roles", DashBoardMenuGroup.PERSON_GROUP);
-            initAdminDashBoard("게시글 관리", "/admin/posts", DashBoardMenuGroup.CONTENT_GROUP);
-            initAdminDashBoard("댓글 관리", "/admin/comments", DashBoardMenuGroup.CONTENT_GROUP);
-            initAdminDashBoard("첨부파일 관리", "/admin/files", DashBoardMenuGroup.CONTENT_GROUP);
-            initAdminDashBoard("휴지통", "/admin/trash", DashBoardMenuGroup.CONTENT_GROUP);
-            initAdminDashBoard("메인 페이지 설정", "/admin/mainPageMenu", DashBoardMenuGroup.SETTING_GROUP);
-            initAdminDashBoard("일반", "/admin/general", DashBoardMenuGroup.SETTING_GROUP);
+            initAdminDashBoard("SE 메뉴 편집", DashBoardMenu.MENU_EDIT_URL, DashBoardMenuGroup.MENU_GROUP);
+            initAdminDashBoard("관리자 메뉴 편집", DashBoardMenu.MENU_ADMIN_DASHBOARD_MENU_URL, DashBoardMenuGroup.MENU_GROUP);
+            initAdminDashBoard("회원 목록", DashBoardMenu.ACCOUNT_MANAGE_URL, DashBoardMenuGroup.PERSON_GROUP);
+            initAdminDashBoard("회원 정책", DashBoardMenu.ACCOUNT_POLICY_URL, DashBoardMenuGroup.PERSON_GROUP);
+            initAdminDashBoard("회원 그룹", DashBoardMenu.ACCOUNT_POLICY_URL, DashBoardMenuGroup.PERSON_GROUP);
+            initAdminDashBoard("게시글 관리", DashBoardMenu.POST_MANAGE_URL, DashBoardMenuGroup.CONTENT_GROUP);
+            initAdminDashBoard("댓글 관리", DashBoardMenu.COMMENT_MANAGE_URL, DashBoardMenuGroup.CONTENT_GROUP);
+            initAdminDashBoard("첨부파일 관리", DashBoardMenu.FILE_MANAGE_URL, DashBoardMenuGroup.CONTENT_GROUP);
+            initAdminDashBoard("휴지통", DashBoardMenu.TRASH_URL, DashBoardMenuGroup.CONTENT_GROUP);
+            initAdminDashBoard("메인 페이지 설정", DashBoardMenu.MAIN_PAGE_MENU_MANAGE_URL, DashBoardMenuGroup.SETTING_GROUP);
+            initAdminDashBoard("일반", DashBoardMenu.GENERAL_URL, DashBoardMenuGroup.SETTING_GROUP);
         }
 
         private void initAdminDashBoard(String name, String url, DashBoardMenuGroup menuGroup){
