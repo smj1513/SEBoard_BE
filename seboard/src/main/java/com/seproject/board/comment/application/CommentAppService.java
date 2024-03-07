@@ -160,6 +160,10 @@ public class CommentAppService {
             if(post.isWrittenBy(account.getAccountId())){
                 pass = true;
             }
+
+            if(category.manageable(userRoles)){
+                pass = true;
+            }
         }
 
         if (!pass) {
