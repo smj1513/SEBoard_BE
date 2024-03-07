@@ -138,6 +138,10 @@ public class PostAppService {
             throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 
+        if(command.isPined()!=post.isPined() && !post.getCategory().manageable(account.getRoles())){
+            throw new CustomAccessDeniedException(ErrorCode.ACCESS_DENIED, null);
+        }
+
         checkSpamWord(command.getTitle(), command.getContents());
 
         post.changeTitle(command.getTitle());
