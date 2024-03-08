@@ -168,6 +168,8 @@ public class InitRequiredData {
             if(boardMenuRepository.existsByUrlInfo(urlInfo)){
                 log.info("Board Menu {} already exists", name);
             }else{
+                List<Role> adminRole = roleRepository.findByNameIn(List.of(Role.ROLE_ADMIN));
+
                 BoardMenu menu = BoardMenu.builder()
                         .name(name)
                         .description(description)
@@ -176,7 +178,9 @@ public class InitRequiredData {
                 menu.addAuthorization(new MenuAccessAuthorization(menu));
                 menu.addAuthorization(new MenuExposeAuthorization(menu));
                 menu.addAuthorization(new MenuEditAuthorization(menu));
-                menu.addAuthorization(new MenuManageAuthorization(menu));
+                MenuManageAuthorization menuManageAuthorization = new MenuManageAuthorization(menu);
+                menuManageAuthorization.update(adminRole);
+                menu.addAuthorization(menuManageAuthorization);
 
                 BoardMenu boardMenu = boardMenuRepository.save(menu);
 
@@ -185,7 +189,9 @@ public class InitRequiredData {
                 category.addAuthorization(new MenuAccessAuthorization(category));
                 category.addAuthorization(new MenuExposeAuthorization(category));
                 category.addAuthorization(new MenuEditAuthorization(category));
-                category.addAuthorization(new MenuManageAuthorization(category));
+                MenuManageAuthorization categoryMenuAuthorization = new MenuManageAuthorization(category);
+                categoryMenuAuthorization.update(adminRole);
+                category.addAuthorization(categoryMenuAuthorization);
 
                 categoryRepository.save(category);
 
