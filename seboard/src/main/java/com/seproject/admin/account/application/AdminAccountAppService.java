@@ -4,11 +4,14 @@ import com.seproject.account.account.domain.Account;
 import com.seproject.account.account.persistence.AccountQueryRepository;
 import com.seproject.account.account.service.AccountService;
 import com.seproject.account.role.domain.Role;
+import com.seproject.account.utils.SecurityUtils;
 import com.seproject.admin.account.controller.condition.AccountCondition;
 import com.seproject.admin.account.controller.dto.AdminAccountDto.AccountResponse;
 import com.seproject.admin.banned.service.BannedIdService;
 import com.seproject.admin.banned.service.BannedNicknameService;
 import com.seproject.account.role.service.RoleService;
+import com.seproject.admin.dashboard.domain.DashBoardMenu;
+import com.seproject.admin.dashboard.service.AdminDashBoardServiceImpl;
 import com.seproject.admin.role.controller.dto.RoleDTO;
 import com.seproject.admin.role.persistence.RoleQueryRepository;
 import com.seproject.board.comment.domain.model.Comment;
@@ -18,6 +21,8 @@ import com.seproject.board.post.domain.model.Post;
 import com.seproject.board.post.domain.repository.BookmarkRepository;
 import com.seproject.board.post.domain.repository.PostRepository;
 import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.CustomAccessDeniedException;
+import com.seproject.error.exception.CustomAuthenticationException;
 import com.seproject.error.exception.CustomIllegalArgumentException;
 import com.seproject.member.domain.Member;
 import com.seproject.member.service.MemberService;
@@ -50,8 +55,24 @@ public class AdminAccountAppService {
     private final CommentRepository commentRepository;
     private final BookmarkRepository bookmarkRepository;
 
+    private final AdminDashBoardServiceImpl dashBoardService;
+
+    //TODO : 추후 AOP로 변경 필요
+    private void checkAuthorization(){
+        Account account = SecurityUtils.getAccount()
+                .orElseThrow(() -> new CustomAuthenticationException(ErrorCode.NOT_LOGIN, null));
+
+        DashBoardMenu dashboardmenu = dashBoardService.findDashBoardMenuByUrl(DashBoardMenu.ACCOUNT_MANAGE_URL);
+
+        if(!dashboardmenu.authorize(account.getRoles())){
+            throw new CustomAccessDeniedException(ErrorCode.ACCESS_DENIED, null);
+        }
+    }
+
 
     public Page<AccountResponse> findAllAccount(AccountCondition condition, int page, int perPage) {
+        checkAuthorization();
+
         PageRequest pageRequest = PageRequest.of(page,perPage);
         Page<AccountResponse> response = accountQueryRepository.findAllAccount(condition, pageRequest);
 
@@ -70,6 +91,8 @@ public class AdminAccountAppService {
     }
 
     public AccountResponse findAccount(Long accountId) {
+        checkAuthorization();
+
         Account account = accountService.findById(accountId);
         List<RoleDTO.RoleResponse> roles = account.getRoles()
                 .stream().map(RoleDTO.RoleResponse :: of)
@@ -79,6 +102,7 @@ public class AdminAccountAppService {
 
     @Transactional
     public Long createAccount(CreateAccountRequest request) {
+        checkAuthorization();
 
         String loginId = request.getId();
         if(accountService.isExistLoginId(loginId)){
@@ -109,6 +133,8 @@ public class AdminAccountAppService {
 
     @Transactional
     public void updateAccount(Long accountId,UpdateAccountRequest request) {
+        checkAuthorization();
+
         String loginId = request.getId();
 
         if (accountService.isExistLoginId(loginId)) {
@@ -133,6 +159,8 @@ public class AdminAccountAppService {
 
     @Transactional
     public void deleteAccount(Long accountId) {
+        checkAuthorization();
+
         accountService.deleteAccount(accountId);
 
 
@@ -156,6 +184,7 @@ public class AdminAccountAppService {
 
     @Transactional
     public void deleteAccount(List<Long> accountIds) {
+        checkAuthorization();
 
         //TODO : 벌크 삭제
         for (Long accountId : accountIds) {
