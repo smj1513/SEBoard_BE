@@ -39,11 +39,11 @@ public class AdminCommentAppService {
     private final AdminDashBoardServiceImpl dashBoardService;
 
     //TODO : 추후 AOP로 변경 필요
-    private void checkAuthorization(){
+    private void checkAuthorization(String url){
         Account account = SecurityUtils.getAccount()
                 .orElseThrow(() -> new CustomAuthenticationException(ErrorCode.NOT_LOGIN, null));
 
-        DashBoardMenu dashboardmenu = dashBoardService.findDashBoardMenuByUrl(DashBoardMenu.COMMENT_MANAGE_URL);
+        DashBoardMenu dashboardmenu = dashBoardService.findDashBoardMenuByUrl(url);
 
         if(!dashboardmenu.authorize(account.getRoles())){
             throw new CustomAccessDeniedException(ErrorCode.ACCESS_DENIED, null);
@@ -52,20 +52,20 @@ public class AdminCommentAppService {
 
 
     public Page<AdminDeletedCommentResponse> retrieveDeletedCommentList(Pageable pageable){
-        checkAuthorization();
+        checkAuthorization(DashBoardMenu.TRASH_URL);
 
         return adminCommentSearchRepository.findDeletedCommentList(pageable);
     }
 
     public Page<CommentDTO.AdminCommentListResponse> retrieveCommentList(AdminCommentRetrieveCondition condition, Pageable pageable){
-        checkAuthorization();
+        checkAuthorization(DashBoardMenu.COMMENT_MANAGE_URL);
 
         return adminCommentSearchRepository.findCommentListByCondition(condition, pageable);
     }
 
     @Transactional
     public void restoreComment(Long commentId){
-        checkAuthorization();
+        checkAuthorization(DashBoardMenu.TRASH_URL);
 
         Comment comment = commentService.findById(commentId);
 
@@ -75,7 +75,7 @@ public class AdminCommentAppService {
 
     @Transactional
     public void restoreBulkComment(List<Long> commentIds) {
-        checkAuthorization();
+        checkAuthorization(DashBoardMenu.TRASH_URL);
 
         List<Comment> comments = commentService.findAllByIds(commentIds);
 
@@ -88,7 +88,11 @@ public class AdminCommentAppService {
 
     @Transactional
     public void deleteBulkComment(List<Long> commentIds, boolean isPermanent){
-        checkAuthorization();
+        if(isPermanent){
+            checkAuthorization(DashBoardMenu.TRASH_URL);
+        }else{
+            checkAuthorization(DashBoardMenu.COMMENT_MANAGE_URL);
+        }
 
         List<Comment> comments = commentService.findAllByIds(commentIds);
         if (comments.size() != commentIds.size())

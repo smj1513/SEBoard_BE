@@ -59,7 +59,7 @@ public class AdminPostAppService {
     }
 
     public Page<DeletedPostResponse> findDeletedPostList(Pageable pageable){
-        checkAuthorization(DashBoardMenu.POST_MANAGE_URL);
+        checkAuthorization(DashBoardMenu.TRASH_URL);
 
         return adminPostSearchRepository.findDeletedPostList(pageable);
     }
@@ -92,14 +92,18 @@ public class AdminPostAppService {
 
     @Transactional
     public void restoreBulkPost(List<Long> postIds) {
-        checkAuthorization(DashBoardMenu.POST_MANAGE_URL);
+        checkAuthorization(DashBoardMenu.TRASH_URL);
 
         adminPostService.restore(postIds);
     }
 
     @Transactional
     public void deleteBulkPost(List<Long> postIds, boolean isPermanent) {
-        checkAuthorization(DashBoardMenu.POST_MANAGE_URL);
+        if(isPermanent){
+            checkAuthorization(DashBoardMenu.TRASH_URL);
+        }else{
+            checkAuthorization(DashBoardMenu.POST_MANAGE_URL);
+        }
 
         adminPostService.deleteAllByIds(postIds,isPermanent);
     }

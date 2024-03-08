@@ -4,18 +4,19 @@ import com.seproject.account.account.domain.Account;
 import com.seproject.account.account.persistence.AccountQueryRepository;
 import com.seproject.account.account.service.AccountService;
 import com.seproject.account.role.domain.Role;
+import com.seproject.account.role.service.RoleService;
 import com.seproject.account.utils.SecurityUtils;
 import com.seproject.admin.account.controller.condition.AccountCondition;
 import com.seproject.admin.account.controller.dto.AdminAccountDto.AccountResponse;
 import com.seproject.admin.banned.service.BannedIdService;
 import com.seproject.admin.banned.service.BannedNicknameService;
-import com.seproject.account.role.service.RoleService;
 import com.seproject.admin.dashboard.domain.DashBoardMenu;
 import com.seproject.admin.dashboard.service.AdminDashBoardServiceImpl;
 import com.seproject.admin.role.controller.dto.RoleDTO;
 import com.seproject.admin.role.persistence.RoleQueryRepository;
 import com.seproject.board.comment.domain.model.Comment;
 import com.seproject.board.comment.domain.repository.CommentRepository;
+import com.seproject.board.common.Status;
 import com.seproject.board.post.domain.model.Bookmark;
 import com.seproject.board.post.domain.model.Post;
 import com.seproject.board.post.domain.repository.BookmarkRepository;
@@ -36,7 +37,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.seproject.admin.account.controller.dto.AdminAccountDto.*;
+import static com.seproject.admin.account.controller.dto.AdminAccountDto.CreateAccountRequest;
+import static com.seproject.admin.account.controller.dto.AdminAccountDto.UpdateAccountRequest;
 
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -58,11 +60,11 @@ public class AdminAccountAppService {
     private final AdminDashBoardServiceImpl dashBoardService;
 
     //TODO : 추후 AOP로 변경 필요
-    private void checkAuthorization(){
+    private void checkAuthorization(String url){
         Account account = SecurityUtils.getAccount()
                 .orElseThrow(() -> new CustomAuthenticationException(ErrorCode.NOT_LOGIN, null));
 
-        DashBoardMenu dashboardmenu = dashBoardService.findDashBoardMenuByUrl(DashBoardMenu.ACCOUNT_MANAGE_URL);
+        DashBoardMenu dashboardmenu = dashBoardService.findDashBoardMenuByUrl(url);
 
         if(!dashboardmenu.authorize(account.getRoles())){
             throw new CustomAccessDeniedException(ErrorCode.ACCESS_DENIED, null);
@@ -71,7 +73,11 @@ public class AdminAccountAppService {
 
 
     public Page<AccountResponse> findAllAccount(AccountCondition condition, int page, int perPage) {
-        checkAuthorization();
+        if(condition.getStatus()== Status.TEMP_DELETED){
+            checkAuthorization(DashBoardMenu.TRASH_URL);
+        }else{
+            checkAuthorization(DashBoardMenu.ACCOUNT_MANAGE_URL);
+        }
 
         PageRequest pageRequest = PageRequest.of(page,perPage);
         Page<AccountResponse> response = accountQueryRepository.findAllAccount(condition, pageRequest);
@@ -91,7 +97,7 @@ public class AdminAccountAppService {
     }
 
     public AccountResponse findAccount(Long accountId) {
-        checkAuthorization();
+        checkAuthorization(DashBoardMenu.ACCOUNT_MANAGE_URL);
 
         Account account = accountService.findById(accountId);
         List<RoleDTO.RoleResponse> roles = account.getRoles()
@@ -102,7 +108,7 @@ public class AdminAccountAppService {
 
     @Transactional
     public Long createAccount(CreateAccountRequest request) {
-        checkAuthorization();
+        checkAuthorization(DashBoardMenu.ACCOUNT_MANAGE_URL);
 
         String loginId = request.getId();
         if(accountService.isExistLoginId(loginId)){
@@ -133,7 +139,7 @@ public class AdminAccountAppService {
 
     @Transactional
     public void updateAccount(Long accountId,UpdateAccountRequest request) {
-        checkAuthorization();
+        checkAuthorization(DashBoardMenu.ACCOUNT_MANAGE_URL);
 
         String loginId = request.getId();
 
@@ -159,7 +165,7 @@ public class AdminAccountAppService {
 
     @Transactional
     public void deleteAccount(Long accountId) {
-        checkAuthorization();
+        checkAuthorization(DashBoardMenu.ACCOUNT_MANAGE_URL);
 
         accountService.deleteAccount(accountId);
 
@@ -184,7 +190,7 @@ public class AdminAccountAppService {
 
     @Transactional
     public void deleteAccount(List<Long> accountIds) {
-        checkAuthorization();
+        checkAuthorization(DashBoardMenu.ACCOUNT_MANAGE_URL);
 
         //TODO : 벌크 삭제
         for (Long accountId : accountIds) {
