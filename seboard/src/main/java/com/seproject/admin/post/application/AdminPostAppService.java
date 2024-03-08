@@ -2,6 +2,8 @@ package com.seproject.admin.post.application;
 
 import com.seproject.account.account.domain.Account;
 import com.seproject.account.utils.SecurityUtils;
+import com.seproject.admin.dashboard.domain.DashBoardMenu;
+import com.seproject.admin.dashboard.service.AdminDashBoardServiceImpl;
 import com.seproject.admin.post.controller.dto.PostRequest.AdminPostRetrieveCondition;
 import com.seproject.admin.post.controller.dto.PostResponse.DeletedPostResponse;
 import com.seproject.admin.post.controller.dto.PostResponse.PostRetrieveResponse;
@@ -36,28 +38,28 @@ public class AdminPostAppService {
     private final PostService postService;
     private final AdminPostSearchRepository adminPostSearchRepository;
 
+    private final AdminDashBoardServiceImpl dashBoardService;
+
+    //TODO : 추후 AOP로 변경 필요
+    private void checkAuthorization(String url){
+        Account account = SecurityUtils.getAccount()
+                .orElseThrow(() -> new CustomAuthenticationException(ErrorCode.NOT_LOGIN, null));
+
+        DashBoardMenu dashboardmenu = dashBoardService.findDashBoardMenuByUrl(url);
+
+        if(!dashboardmenu.authorize(account.getRoles())){
+            throw new CustomAccessDeniedException(ErrorCode.ACCESS_DENIED, null);
+        }
+    }
+
     public Page<PostRetrieveResponse> findPostList(AdminPostRetrieveCondition condition, int page, int perPage) {
-//        Account account = SecurityUtils.getAccount()
-//                .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
-//
-//        boolean isAdmin = account.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
-//
-//        if(!isAdmin){
-//            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
-//        }
+        checkAuthorization(DashBoardMenu.POST_MANAGE_URL);
 
         return adminPostSearchRepository.findPostListByCondition(condition, PageRequest.of(page, perPage));
     }
 
     public Page<DeletedPostResponse> findDeletedPostList(Pageable pageable){
-//        Account account = SecurityUtils.getAccount()
-//                .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
-//
-//        boolean isAdmin = account.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
-//
-//        if(!isAdmin){
-//            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
-//        }
+        checkAuthorization(DashBoardMenu.POST_MANAGE_URL);
 
         return adminPostSearchRepository.findDeletedPostList(pageable);
     }
@@ -73,31 +75,16 @@ public class AdminPostAppService {
     }
 
     private void changePostPinState(Long postId, boolean state) {
+        checkAuthorization(DashBoardMenu.POST_MANAGE_URL);
+
         Post post = postService.findById(postId);
-        Category category = post.getCategory();
-        Account account = SecurityUtils.getAccount()
-                .orElseThrow(() -> new CustomAuthenticationException(ErrorCode.NOT_LOGIN, null));
 
-        boolean manageable = category.manageable(account.getRoles());
-
-        if (manageable) {
-            post.changePin(state);
-            return;
-        }
-
-        throw new CustomAccessDeniedException(ErrorCode.ACCESS_DENIED,null);
+        post.changePin(state);
     }
 
     @Transactional
     public void restorePost(Long postId){
-//        Account account = SecurityUtils.getAccount()
-//                .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
-//
-//        boolean isAdmin = account.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
-//
-//        if(!isAdmin){
-//            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
-//        }
+        checkAuthorization(DashBoardMenu.POST_MANAGE_URL);
 
         Post post = postService.findById(postId);
         adminPostService.restore(post);
@@ -105,33 +92,21 @@ public class AdminPostAppService {
 
     @Transactional
     public void restoreBulkPost(List<Long> postIds) {
-//        Account account = SecurityUtils.getAccount()
-//                .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
-//
-//        boolean isAdmin = account.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
-//
-//        if(!isAdmin){
-//            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
-//        }
+        checkAuthorization(DashBoardMenu.POST_MANAGE_URL);
 
         adminPostService.restore(postIds);
     }
 
     @Transactional
     public void deleteBulkPost(List<Long> postIds, boolean isPermanent) {
-//        Account account = SecurityUtils.getAccount()
-//                .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
-//
-//        boolean isAdmin = account.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
-//
-//        if(!isAdmin){
-//            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
-//        }
+        checkAuthorization(DashBoardMenu.POST_MANAGE_URL);
+
         adminPostService.deleteAllByIds(postIds,isPermanent);
     }
 
     @Transactional
     public void migratePost(Long fromCategoryId, Long toCategoryId){
+        checkAuthorization(DashBoardMenu.MENU_EDIT_URL);
 
         Category from = categoryRepository.findById(fromCategoryId)
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_CATEGORY));
