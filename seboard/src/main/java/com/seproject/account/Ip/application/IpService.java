@@ -56,12 +56,19 @@ public class IpService {
 
     @Transactional
     public Long createIp(String ipAddress,IpType ipType) {
-        Ip ip = Ip.builder()
+
+        Optional<Ip> ip = ipRepository.findByIpAddress(ipAddress);
+
+        if(ip.isPresent()) {
+            throw new CustomIllegalArgumentException(ErrorCode.ALREADY_EXIST_IP, null);
+        }
+
+        Ip newIp = Ip.builder()
                 .ipAddress(ipAddress)
                 .ipType(ipType)
                 .build();
 
-        ipRepository.save(ip);
+        ipRepository.save(newIp);
 
 
         if(ipType == IpType.ADMIN) {
@@ -72,7 +79,7 @@ public class IpService {
             spamIpList.clear();
         }
 
-        return ip.getId();
+        return newIp.getId();
     }
 
     @Transactional
@@ -91,15 +98,9 @@ public class IpService {
         }
     }
 
-    public boolean existIpAddress(String ipAddress) {
+    public boolean existAdminIpAddress(String ipAddress) {
 
         for (Ip ip : adminIpList) {
-            if(ipAddress.equals(ip.getIpAddress())) {
-                return true;
-            }
-        }
-
-        for (Ip ip : spamIpList) {
             if(ipAddress.equals(ip.getIpAddress())) {
                 return true;
             }
@@ -108,9 +109,15 @@ public class IpService {
         return false;
     }
 
-//    public Ip findIpByAddress(String address) {
-//        return ipRepository.findByIpAddress(address)
-//                .orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.NOT_EXIST_IP,null));
-//    }
+    public boolean existSpamIp(String ipAddress) {
+        for (Ip ip : spamIpList) {
+            if(ipAddress.equals(ip.getIpAddress())) {
+                return true;
+            }
+        }
+
+        return false;
+
+    }
 
 }

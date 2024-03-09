@@ -52,8 +52,8 @@ public class UsernameAuthenticationProvider implements AuthenticationProvider {
         long loginTryCount = loginSettingService.getLoginTryCount();
         long loginLimitTime = loginSettingService.getLoginLimitTime();
 
-        if (loginHistoryRepository.countByTime(username, LocalDateTime.now().minusMinutes(loginLimitTime), LocalDateTime.now()) >= loginTryCount) {
-            loginPreventUserRepository.save(new LoginPreventUser(username));
+        if (loginHistoryRepository.countByTime(username, LocalDateTime.now().minusSeconds(loginLimitTime), LocalDateTime.now()) >= loginTryCount) {
+            loginPreventUserRepository.save(new LoginPreventUser(username,loginLimitTime));
         }
 
         throw new PasswordIncorrectException(ErrorCode.PASSWORD_INCORRECT,null);

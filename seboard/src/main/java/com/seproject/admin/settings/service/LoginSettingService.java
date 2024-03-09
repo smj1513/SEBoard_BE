@@ -35,6 +35,7 @@ public class LoginSettingService {
         return loginSetting.getLoginTryCount();
     }
 
+    @Transactional
     public long update(long loginLimitTime, long loginTryCount) {
         int updatedRows = loginSettingRepository.updateAll(loginLimitTime,loginTryCount);
         Page<LoginSetting> all = loginSettingRepository.findAll(PageRequest.of(0, 1));

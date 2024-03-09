@@ -2,8 +2,10 @@ package com.seproject.admin.settings.controller.dto;
 
 
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
+@NoArgsConstructor
 public class LoginSettingDTO {
 
     private Long loginLimitTime;
