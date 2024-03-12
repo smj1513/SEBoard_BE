@@ -4,6 +4,8 @@ import com.seproject.account.authorization.domain.MenuAccessAuthorization;
 import com.seproject.account.authorization.domain.MenuEditAuthorization;
 import com.seproject.account.authorization.domain.MenuExposeAuthorization;
 import com.seproject.account.authorization.domain.MenuManageAuthorization;
+import com.seproject.account.role.domain.Role;
+import com.seproject.account.role.domain.repository.RoleRepository;
 import com.seproject.board.menu.domain.BoardMenu;
 import com.seproject.board.menu.domain.Category;
 import com.seproject.board.menu.domain.ExternalSiteMenu;
@@ -33,12 +35,20 @@ public class AdminMenuService {
     private final BoardMenuRepository boardMenuRepository;
     private final CategoryRepository categoryRepository;
     private final ExternalSiteMenuRepository externalSiteMenuRepository;
+    
+    private final RoleRepository roleRepository;
 
     private void addMenuAuthorization(Menu menu) {
+        Role adminRole = roleRepository.findByName(Role.ROLE_ADMIN)
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_ENROLLED_ROLE));
+
         MenuExposeAuthorization expose = new MenuExposeAuthorization(menu);
         MenuManageAuthorization manage = new MenuManageAuthorization(menu);
         MenuEditAuthorization edit = new MenuEditAuthorization(menu);
         MenuAccessAuthorization access = new MenuAccessAuthorization(menu);
+
+        manage.update(List.of(adminRole));
+
         menu.addAuthorization(expose);
         menu.addAuthorization(manage);
         menu.addAuthorization(edit);
