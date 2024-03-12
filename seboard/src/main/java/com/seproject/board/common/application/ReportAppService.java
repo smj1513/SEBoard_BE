@@ -3,28 +3,24 @@ package com.seproject.board.common.application;
 import com.seproject.account.account.domain.Account;
 import com.seproject.account.role.domain.Role;
 import com.seproject.account.utils.SecurityUtils;
+import com.seproject.board.comment.domain.model.Comment;
 import com.seproject.board.comment.service.CommentService;
+import com.seproject.board.common.controller.dto.ReportThresholdRequest;
+import com.seproject.board.common.controller.dto.ReportThresholdResponse;
+import com.seproject.board.common.domain.Report;
+import com.seproject.board.common.domain.ReportThreshold;
+import com.seproject.board.common.domain.repository.ReportRepository;
+import com.seproject.board.common.domain.repository.ReportThresholdRepository;
+import com.seproject.board.post.domain.model.Post;
 import com.seproject.board.post.service.PostService;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.DuplicatedReportException;
 import com.seproject.error.exception.InvalidAuthorizationException;
-import com.seproject.error.exception.NoSuchResourceException;
-import com.seproject.board.comment.domain.model.Comment;
-import com.seproject.board.common.domain.Report;
-import com.seproject.board.common.domain.ReportThreshold;
-import com.seproject.board.post.domain.model.Post;
 import com.seproject.member.domain.Member;
-import com.seproject.board.comment.domain.repository.CommentRepository;
-import com.seproject.board.post.domain.repository.PostRepository;
-import com.seproject.board.common.domain.repository.ReportRepository;
-import com.seproject.board.common.domain.repository.ReportThresholdRepository;
-import com.seproject.member.domain.repository.MemberRepository;
 import com.seproject.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import javax.annotation.PostConstruct;
 
 @Service
 @RequiredArgsConstructor
@@ -39,21 +35,14 @@ public class ReportAppService {
     private ReportThreshold postThreshold;
     private ReportThreshold commentThreshold;
 
-    @PostConstruct
-    protected void init(){
-        postThreshold = reportThresholdRepository.findPostThreshold().orElseGet(()->
-            ReportThreshold.of(5, "POST")
-        );
-
-        commentThreshold = reportThresholdRepository.findCommentThreshold().orElseGet(()->
-            ReportThreshold.of(5, "COMMENT")
-        );
-    }
-
     @Transactional
     public void reportPost(Long postId) {
         Account account = SecurityUtils.getAccount()
                 .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
+
+        if(postThreshold==null){
+             postThreshold = reportThresholdRepository.findPostThreshold().get();
+        }
 
         Member member = memberService.findByAccountId(account.getAccountId());
 
@@ -81,6 +70,10 @@ public class ReportAppService {
         Account account = SecurityUtils.getAccount()
                 .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
 
+        if(commentThreshold==null){
+            commentThreshold = reportThresholdRepository.findCommentThreshold().get();
+        }
+
         Member member = memberService.findByAccountId(account.getAccountId());
 
         Comment comment = commentService.findById(commentId);
@@ -103,10 +96,11 @@ public class ReportAppService {
     }
 
     @Transactional //TODO : admin 이동
-    public void setReportThreshold(int threshold, String thresholdType) {
+    public void setReportThreshold(ReportThresholdRequest request) {
         Account account = SecurityUtils.getAccount()
                 .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
 
+        //TODO : 대시보드 관리권한 추가 필요
 
         boolean isAdmin = account.getAuthorities()
                 .stream()
@@ -116,23 +110,38 @@ public class ReportAppService {
             throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
 
-        if(thresholdType.equals("POST")){
-            postThreshold = reportThresholdRepository.findPostThreshold().orElseGet(()->
-                    ReportThreshold.of(threshold, thresholdType)
-            );
+        postThreshold = reportThresholdRepository.findPostThreshold().get();
+        commentThreshold = reportThresholdRepository.findCommentThreshold().get();
 
-            postThreshold.setThreshold(threshold);
+        postThreshold.setThreshold(request.getPostThreshold());
+        commentThreshold.setThreshold(request.getCommentThreshold());
 
-            reportThresholdRepository.save(postThreshold);
+        reportThresholdRepository.save(commentThreshold);
+        reportThresholdRepository.save(postThreshold);
+
+    }
+
+    public ReportThresholdResponse retrieveReportThreshold() {
+        Account account = SecurityUtils.getAccount()
+                .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
+
+        //TODO : 대시보드 관리권한 추가 필요
+
+        boolean isAdmin = account.getAuthorities()
+                .stream()
+                .anyMatch(authority -> authority.getAuthority().equals(Role.ROLE_ADMIN));
+
+        if(!isAdmin){
+            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
         }
-        else if(thresholdType.equals("COMMENT")){
-            commentThreshold = reportThresholdRepository.findCommentThreshold().orElseGet(()->
-                    ReportThreshold.of(threshold, thresholdType)
-            );
 
-            commentThreshold.setThreshold(threshold);
-
-            reportThresholdRepository.save(commentThreshold);
+        if(postThreshold==null){
+            postThreshold = reportThresholdRepository.findPostThreshold().get();
         }
+        if(commentThreshold==null){
+            commentThreshold = reportThresholdRepository.findCommentThreshold().get();
+        }
+
+        return ReportThresholdResponse.of(postThreshold.getThreshold(), commentThreshold.getThreshold());
     }
 }
