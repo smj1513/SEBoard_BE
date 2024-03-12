@@ -128,7 +128,7 @@ public class AdminAccountAppService {
             throw new CustomIllegalArgumentException(ErrorCode.BANNED_NICKNAME,null);
         }
 
-        List<Role> roles = roleService.findByNameIn(request.getRoles());
+        List<Role> roles = roleService.findByIds(request.getRoles());
 
         Long accountId = accountService.createAccount(loginId, request.getPassword(), request.getName(), roles);
         Account account = accountService.findById(accountId);
@@ -159,7 +159,7 @@ public class AdminAccountAppService {
         Member member = memberService.findByAccountId(accountId);
         member.changeName(nickname);
 
-        List<Role> roles = roleService.findByNameIn(request.getRoles());
+        List<Role> roles = roleService.findByIds(request.getRoles());
         accountService.updateAccount(accountId, loginId,request.getPassword(),request.getName(),roles);
     }
 
