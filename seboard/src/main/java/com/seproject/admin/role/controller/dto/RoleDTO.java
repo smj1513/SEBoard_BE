@@ -6,15 +6,11 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 public class RoleDTO {
 
     @Data
     @NoArgsConstructor
     public static class RoleResponse {
-        private Long accountId;
         private Long roleId;
         private String name;
         private String description;
@@ -23,7 +19,6 @@ public class RoleDTO {
 
         @Builder(access = AccessLevel.PRIVATE)
         public RoleResponse(Long accountId, Long roleId, String name, String description, String alias,boolean immutable) {
-            this.accountId = accountId;
             this.roleId = roleId;
             this.name = name;
             this.description = description;
@@ -33,7 +28,6 @@ public class RoleDTO {
 
         @Builder(access = AccessLevel.PRIVATE)
         public RoleResponse(Long accountId, Long roleId, String name, String description, String alias) {
-            this.accountId = accountId;
             this.roleId = roleId;
             this.name = name;
             this.description = description;
