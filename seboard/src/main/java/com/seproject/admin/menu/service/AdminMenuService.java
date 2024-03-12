@@ -14,6 +14,7 @@ import com.seproject.board.menu.domain.repository.BoardMenuRepository;
 import com.seproject.board.menu.domain.repository.CategoryRepository;
 import com.seproject.board.menu.domain.repository.ExternalSiteMenuRepository;
 import com.seproject.board.menu.domain.repository.MenuRepository;
+import com.seproject.board.post.domain.repository.PostRepository;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
 import com.seproject.error.exception.InvalidDateException;
@@ -35,6 +36,7 @@ public class AdminMenuService {
     private final BoardMenuRepository boardMenuRepository;
     private final CategoryRepository categoryRepository;
     private final ExternalSiteMenuRepository externalSiteMenuRepository;
+    private final PostRepository postRepository;
     
     private final RoleRepository roleRepository;
 
@@ -131,8 +133,15 @@ public class AdminMenuService {
         Menu menu = menuRepository.findById(menuId)
                 .orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.NOT_EXIST_MENU,null));
 
-        if(menuRepository.existsSubMenuById(menuId)){
-            throw new CustomIllegalArgumentException(ErrorCode.CANNOT_DELETE_MENU,null);
+        if(menu.getType().equals("MENU") || menu.getType().equals("BOARD")){
+            if(menuRepository.existsSubMenuById(menuId)){
+                throw new CustomIllegalArgumentException(ErrorCode.CANNOT_DELETE_MENU,null);
+            }
+
+        }else if(menu.getType().equals("CATEGORY")){
+            if(postRepository.existsByCategoryId(menu.getMenuId())){
+                throw new CustomIllegalArgumentException(ErrorCode.CANNOT_DELETE_MENU,null);
+            }
         }
 
         menuRepository.delete(menu);
