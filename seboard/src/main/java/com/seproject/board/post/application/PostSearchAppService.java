@@ -146,7 +146,7 @@ public class PostSearchAppService {
 
         List<RetrievePostListResponseElement> postPage;
 
-        if(boardMenu.exposable(roles)) {
+        if(boardMenu.accessible(roles)) {
             postPage = postSearchRepository.findPinedPostByCategoryId(categoryId);
 
             postPage.forEach(postDto -> { // TODO : N+1

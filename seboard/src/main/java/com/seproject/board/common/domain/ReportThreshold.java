@@ -19,11 +19,18 @@ public class ReportThreshold {
     public static ReportThreshold of(int threshold, String thresholdType){
         return new ReportThreshold(threshold, thresholdType);
     }
+    public static ReportThreshold of(int threshold, ReportType type){
+        return new ReportThreshold(threshold, type);
+    }
 
     private ReportThreshold(int threshold, String thresholdType){
         this.threshold = threshold;
         this.thresholdType = ReportType.valueOf(thresholdType);
+    }
 
+    private ReportThreshold(int threshold, ReportType thresholdType){
+        this.threshold = threshold;
+        this.thresholdType = thresholdType;
     }
 
     public boolean isOverThreshold(int reportCount){

@@ -30,19 +30,20 @@ public class AdminRoleAppService {
     private final AdminDashBoardServiceImpl dashBoardService;
 
     //TODO : 추후 AOP로 변경 필요
-    private void checkAuthorization(){
+    private void checkAuthorization(List<String> urls){
         Account account = SecurityUtils.getAccount()
                 .orElseThrow(() -> new CustomAuthenticationException(ErrorCode.NOT_LOGIN, null));
 
-        DashBoardMenu dashboardmenu = dashBoardService.findDashBoardMenuByUrl(DashBoardMenu.ROLE_MANAGE_URL);
-
-        if(!dashboardmenu.authorize(account.getRoles())){
-            throw new CustomAccessDeniedException(ErrorCode.ACCESS_DENIED, null);
-        }
+        urls.forEach(url -> {
+            DashBoardMenu dashBoardMenu = dashBoardService.findDashBoardMenuByUrl(url);
+            if(!dashBoardMenu.authorize(account.getRoles())){
+                throw new CustomAccessDeniedException(ErrorCode.ACCESS_DENIED, null);
+            }
+        });
     }
 
     public List<RoleResponse> findAll(){
-        checkAuthorization();
+        checkAuthorization(List.of(DashBoardMenu.ROLE_MANAGE_URL, DashBoardMenu.ACCOUNT_MANAGE_URL));
 
         List<Role> roles = roleService.findAll();
 
@@ -53,21 +54,21 @@ public class AdminRoleAppService {
 
     @Transactional
     public Long createRole(CreateRoleRequest request) {
-        checkAuthorization();
+        checkAuthorization(List.of(DashBoardMenu.ROLE_MANAGE_URL));
 
         return roleService.createRole(request.getName(), request.getDescription(), request.getAlias());
     }
 
     @Transactional
     public void deleteRole(Long roleId) {
-        checkAuthorization();
+        checkAuthorization(List.of(DashBoardMenu.ROLE_MANAGE_URL));
 
         roleService.deleteRole(roleId);
     }
 
     @Transactional
     public void updateRole(Long roleId, UpdateRoleRequest request) {
-        checkAuthorization();
+        checkAuthorization(List.of(DashBoardMenu.ROLE_MANAGE_URL));
 
         //TODO
         roleService.updateRole(roleId,request.getName(),request.getDescription(),request.getAlias());

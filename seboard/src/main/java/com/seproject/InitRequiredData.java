@@ -16,6 +16,9 @@ import com.seproject.admin.dashboard.domain.repository.DashBoardMenuAuthorizatio
 import com.seproject.admin.dashboard.domain.repository.DashBoardMenuRepository;
 import com.seproject.admin.domain.SelectOption;
 import com.seproject.board.common.Status;
+import com.seproject.board.common.domain.ReportThreshold;
+import com.seproject.board.common.domain.ReportType;
+import com.seproject.board.common.domain.repository.ReportThresholdRepository;
 import com.seproject.board.menu.domain.BoardMenu;
 import com.seproject.board.menu.domain.Category;
 import com.seproject.board.menu.domain.repository.BoardMenuRepository;
@@ -61,6 +64,8 @@ public class InitRequiredData {
         private final DashBoardMenuRepository dashBoardMenuRepository;
         private final DashBoardMenuAuthorizationRepository dashBoardMenuAuthorizationRepository;
         private final FileExtensionRepository fileExtensionRepository;
+        private final ReportThresholdRepository reportThresholdRepository;
+
         @Value("${system_account.password}")
         private String systemPassword;
 
@@ -71,11 +76,12 @@ public class InitRequiredData {
             initSystemAccount();
             initAdminDashBoard();
             initFileExtension();
+            initReportThreshold();
             log.info("==================== required data init end ===================");
         }
 
         private void initFileExtension() {
-            List.of("jpg", "jpeg", "png", "gif", "svg", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "pdf")
+            List.of("jpg", "jpeg", "png", "gif", "svg", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "pdf", "hwp")
                     .forEach(this::initFileExtension);
         }
 
@@ -88,6 +94,21 @@ public class InitRequiredData {
                 );
 
                 log.info("File Extension {} is created");
+            }
+        }
+
+        private void initReportThreshold(){
+            initReportThreshold(ReportType.POST, 5);
+            initReportThreshold(ReportType.COMMENT, 5);
+        }
+
+        private void initReportThreshold(ReportType type, int threshold){
+            if(reportThresholdRepository.existsByThresholdType(type)){
+                log.info("Threshold {} already exists", type);
+            }else{
+                reportThresholdRepository.save(
+                        ReportThreshold.of(threshold, type)
+                );
             }
         }
 
