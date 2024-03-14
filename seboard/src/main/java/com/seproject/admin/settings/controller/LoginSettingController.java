@@ -1,5 +1,6 @@
 package com.seproject.admin.settings.controller;
 
+import com.seproject.admin.settings.application.LoginSettingAppService;
 import com.seproject.admin.settings.controller.dto.LoginSettingDTO;
 import com.seproject.admin.settings.service.LoginSettingService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -14,19 +15,18 @@ import org.springframework.web.bind.annotation.*;
 @RestController("/admin/loginSettings")
 public class LoginSettingController {
 
-    private final LoginSettingService loginSettingService;
-
+    private final LoginSettingAppService loginSettingAppService;
     @Operation(summary = "로그인 제한 시간, 시도 횟수 조회")
     @GetMapping
     public ResponseEntity<LoginSettingDTO> findLoginSetting() {
-        LoginSettingDTO response = new LoginSettingDTO(loginSettingService.getLoginLimitTime(), loginSettingService.getLoginTryCount());
+        LoginSettingDTO response = loginSettingAppService.getLoginSetting();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
     @Operation(summary = "로그인 제한 시간, 시도 횟수 수정")
     @PutMapping
     public ResponseEntity<Void> updateLoginSetting(@RequestBody LoginSettingDTO request) {
-        loginSettingService.update(request.getLoginLimitTime(), request.getLoginTryCount());
+        loginSettingAppService.update(request);
         return new ResponseEntity<>(HttpStatus.OK);
 
     }
