@@ -107,6 +107,10 @@ public class AccountService implements UserDetailsService {
                 .orElseThrow(() -> new CustomIllegalArgumentException(ErrorCode.USER_NOT_FOUND,null));
     }
 
+    public List<Account> findAllAccount(List<Long> accountIds) {
+        return accountRepository.findAllById(accountIds);
+    }
+
     @Transactional
     public Long createAccount(String loginId, String password,String name,List<Role> roles) {
         List<RoleAccount> roleAccounts = roles.stream()
@@ -159,6 +163,11 @@ public class AccountService implements UserDetailsService {
         }
 
         account.delete(true);
+    }
+
+    @Transactional
+    public int deleteAllAccount(List<Long> deleteAccountIds) {
+        return accountRepository.deleteAllByIds(deleteAccountIds, Status.PERMANENT_DELETED);
     }
     
     @Override
