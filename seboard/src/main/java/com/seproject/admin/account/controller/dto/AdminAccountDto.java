@@ -1,17 +1,14 @@
 package com.seproject.admin.account.controller.dto;
 
 import com.seproject.account.account.domain.Account;
-import com.seproject.account.role.domain.Role;
 import com.seproject.admin.role.controller.dto.RoleDTO;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class AdminAccountDto {
 
@@ -74,7 +71,7 @@ public class AdminAccountDto {
         private String password;
         private String name;
         private String nickname;
-        private List<String> roles;
+        private List<Long> roles;
     }
 
     @Data
@@ -83,7 +80,7 @@ public class AdminAccountDto {
         private String password;
         private String name;
         private String nickname;
-        private List<String> roles;
+        private List<Long> roles;
     }
 
 }

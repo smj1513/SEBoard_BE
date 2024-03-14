@@ -2,8 +2,12 @@ package com.seproject.board.common.controller.dto;
 
 import lombok.Data;
 
+import javax.validation.constraints.NotNull;
+
 @Data
 public class ReportThresholdRequest {
-    private int threshold;
-    private String thresholdType;
+    @NotNull
+    private Integer postThreshold;
+    @NotNull
+    private Integer commentThreshold;
 }

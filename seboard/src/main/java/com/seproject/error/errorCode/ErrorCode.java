@@ -6,12 +6,13 @@ import org.springframework.http.HttpStatus;
 @Getter
 public enum ErrorCode {
     INVALID_JWT(HttpStatus.UNAUTHORIZED,100, "유효하지 않은 Json Web Token입니다."),
-    PASSWORD_INCORRECT(HttpStatus.BAD_REQUEST,101, "비밀번호가 틀렸습니다."),
+    PASSWORD_INCORRECT(HttpStatus.BAD_REQUEST,101, "사용자 정보가 일치하지 않습니다."),
     NOT_LOGIN(HttpStatus.UNAUTHORIZED,102, "로그인이 필요합니다."),
     ACCESS_DENIED(HttpStatus.FORBIDDEN,103, "접근 권한이 존재하지 않습니다."),
     BANNED_IP(HttpStatus.FORBIDDEN,104, "금지된 ip입니다."),
     NOT_REGISTERED_USER(HttpStatus.TEMPORARY_REDIRECT,105, "추가 정보를 입력하지 않은 사용자입니다."),
-    USER_NOT_FOUND(HttpStatus.NOT_FOUND,106, "존재하지 않는 아이디입니다."),
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND,106, "사용자 정보가 일치하지 않습니다."),
+//    USER_NOT_FOUND(HttpStatus.NOT_FOUND,106, "존재하지 않는 아이디입니다."),
     DISABLE_REFRESH_TOKEN(HttpStatus.NOT_FOUND,107,"사용할 수 없는 refreshToken 입니다."),
     TOKEN_EXPIRED(HttpStatus.NOT_FOUND,108,"만료된 Token 입니다."),
     ROLE_NOT_FOUND(HttpStatus.BAD_REQUEST,109,"존재하지 않는 권한을 요청하였습니다."),

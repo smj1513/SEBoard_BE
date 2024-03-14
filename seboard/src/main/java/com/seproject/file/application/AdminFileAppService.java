@@ -2,20 +2,19 @@ package com.seproject.file.application;
 
 import com.seproject.account.account.domain.Account;
 import com.seproject.account.utils.SecurityUtils;
+import com.seproject.admin.dashboard.domain.DashBoardMenu;
+import com.seproject.admin.dashboard.service.AdminDashBoardServiceImpl;
+import com.seproject.board.common.utils.FileUtils;
+import com.seproject.error.errorCode.ErrorCode;
+import com.seproject.error.exception.CustomAccessDeniedException;
+import com.seproject.error.exception.CustomAuthenticationException;
 import com.seproject.file.controller.dto.FileRequest.AdminFileRetrieveCondition;
 import com.seproject.file.controller.dto.FileResponse.AdminFileRetrieveResponse;
 import com.seproject.file.controller.dto.FileResponse.FileConfigurationResponse;
 import com.seproject.file.controller.dto.FileResponse.FileExtensionResponse;
 import com.seproject.file.domain.model.FileConfiguration;
 import com.seproject.file.domain.model.FileExtension;
-import com.seproject.file.domain.repository.AdminFileMetaDataSearchRepository;
-import com.seproject.file.domain.repository.FileConfigurationRepository;
-import com.seproject.file.domain.repository.FileExtensionRepository;
-import com.seproject.error.errorCode.ErrorCode;
-import com.seproject.error.exception.InvalidAuthorizationException;
-import com.seproject.board.common.utils.FileUtils;
-import com.seproject.file.domain.repository.FileMetaDataRepository;
-import com.seproject.file.domain.repository.FileRepository;
+import com.seproject.file.domain.repository.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,28 +34,28 @@ public class AdminFileAppService {
     private final FileExtensionRepository fileExtensionRepository;
     private final AdminFileMetaDataSearchRepository fileMetaDataSearchRepository;
 
-    public Page<AdminFileRetrieveResponse> retrieveFileMetaData(AdminFileRetrieveCondition condition, Pageable pageable) {
+    private final AdminDashBoardServiceImpl dashBoardService;
+
+    //TODO : 추후 AOP로 변경 필요
+    private void checkAuthorization(){
         Account account = SecurityUtils.getAccount()
-                .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
+                .orElseThrow(() -> new CustomAuthenticationException(ErrorCode.NOT_LOGIN, null));
 
-        boolean isAdmin = account.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
+        DashBoardMenu dashboardmenu = dashBoardService.findDashBoardMenuByUrl(DashBoardMenu.FILE_MANAGE_URL);
 
-        if(!isAdmin){
-            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
+        if(!dashboardmenu.authorize(account.getRoles())){
+            throw new CustomAccessDeniedException(ErrorCode.ACCESS_DENIED, null);
         }
+    }
+
+    public Page<AdminFileRetrieveResponse> retrieveFileMetaData(AdminFileRetrieveCondition condition, Pageable pageable) {
+        checkAuthorization();
 
         return fileMetaDataSearchRepository.findFileMetaDataByCondition(condition, pageable);
     }
 
     public void deleteBulkFile(List<Long> fileIds) {
-        Account account = SecurityUtils.getAccount()
-                .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
-
-        boolean isAdmin = account.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
-
-        if(!isAdmin){
-            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
-        }
+        checkAuthorization();
 
         fileMetaDataRepository.findAllById(fileIds).forEach(fileMetaData -> {
             fileRepository.delete(fileMetaData.getFilePath());
@@ -65,14 +64,7 @@ public class AdminFileAppService {
     }
 
     public void addFileExtension(List<String> extensions) {
-        Account account = SecurityUtils.getAccount()
-                .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
-
-        boolean isAdmin = account.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
-
-        if(!isAdmin){
-            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
-        }
+        checkAuthorization();
 
         //TODO : 중복 검사?
         extensions.forEach(extension -> {
@@ -83,14 +75,7 @@ public class AdminFileAppService {
     }
 
     public void removeFileExtension(List<String> extensions){
-        Account account = SecurityUtils.getAccount()
-                .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
-
-        boolean isAdmin = account.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
-
-        if(!isAdmin){
-            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
-        }
+        checkAuthorization();
 
         //TODO : 중복 검사?
         extensions.forEach(extension -> {
@@ -100,27 +85,13 @@ public class AdminFileAppService {
     }
 
     public FileExtensionResponse retrieveFileExtension(){
-        Account account = SecurityUtils.getAccount()
-                .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
-
-        boolean isAdmin = account.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
-
-        if(!isAdmin){
-            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
-        }
+        checkAuthorization();
 
         return FileExtensionResponse.of(fileExtensionRepository.findAll());
     }
 
     public void setFileConfiguration(Long maxSizePerFile, Long maxSizePerPost) {
-        Account account = SecurityUtils.getAccount()
-                .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
-
-        boolean isAdmin = account.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
-
-        if(!isAdmin){
-            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
-        }
+        checkAuthorization();
 
         FileConfiguration fileConfiguration = fileConfigurationRepository.findAll().stream().findFirst().orElseGet(() -> {
             return new FileConfiguration(100L, 100L);
@@ -133,14 +104,7 @@ public class AdminFileAppService {
     }
 
     public FileConfigurationResponse retrieveFileConfiguration() {
-        Account account = SecurityUtils.getAccount()
-                .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.NOT_LOGIN));
-
-        boolean isAdmin = account.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals("ROLE_ADMIN"));
-
-        if(!isAdmin){
-            throw new InvalidAuthorizationException(ErrorCode.ACCESS_DENIED);
-        }
+        checkAuthorization();
 
         FileConfiguration fileConfiguration = fileConfigurationRepository.findAll().stream().findFirst().orElseGet(() -> {
             return new FileConfiguration(100L, 100L);

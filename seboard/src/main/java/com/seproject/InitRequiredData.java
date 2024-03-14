@@ -16,6 +16,9 @@ import com.seproject.admin.dashboard.domain.repository.DashBoardMenuAuthorizatio
 import com.seproject.admin.dashboard.domain.repository.DashBoardMenuRepository;
 import com.seproject.admin.domain.SelectOption;
 import com.seproject.board.common.Status;
+import com.seproject.board.common.domain.ReportThreshold;
+import com.seproject.board.common.domain.ReportType;
+import com.seproject.board.common.domain.repository.ReportThresholdRepository;
 import com.seproject.board.menu.domain.BoardMenu;
 import com.seproject.board.menu.domain.Category;
 import com.seproject.board.menu.domain.repository.BoardMenuRepository;
@@ -61,6 +64,8 @@ public class InitRequiredData {
         private final DashBoardMenuRepository dashBoardMenuRepository;
         private final DashBoardMenuAuthorizationRepository dashBoardMenuAuthorizationRepository;
         private final FileExtensionRepository fileExtensionRepository;
+        private final ReportThresholdRepository reportThresholdRepository;
+
         @Value("${system_account.password}")
         private String systemPassword;
 
@@ -71,11 +76,12 @@ public class InitRequiredData {
             initSystemAccount();
             initAdminDashBoard();
             initFileExtension();
+            initReportThreshold();
             log.info("==================== required data init end ===================");
         }
 
         private void initFileExtension() {
-            List.of("jpg", "jpeg", "png", "gif", "svg", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "pdf")
+            List.of("jpg", "jpeg", "png", "gif", "svg", "doc", "docx", "xls", "xlsx", "ppt", "pptx", "pdf", "hwp")
                     .forEach(this::initFileExtension);
         }
 
@@ -91,18 +97,33 @@ public class InitRequiredData {
             }
         }
 
+        private void initReportThreshold(){
+            initReportThreshold(ReportType.POST, 5);
+            initReportThreshold(ReportType.COMMENT, 5);
+        }
+
+        private void initReportThreshold(ReportType type, int threshold){
+            if(reportThresholdRepository.existsByThresholdType(type)){
+                log.info("Threshold {} already exists", type);
+            }else{
+                reportThresholdRepository.save(
+                        ReportThreshold.of(threshold, type)
+                );
+            }
+        }
+
         private void initAdminDashBoard() {
-            initAdminDashBoard("SE 메뉴 편집", "/admin/menu", DashBoardMenuGroup.MENU_GROUP);
-            initAdminDashBoard("관리자 메뉴 편집", "/admin/adminMenu", DashBoardMenuGroup.MENU_GROUP);
-            initAdminDashBoard("회원 목록", "/admin/account", DashBoardMenuGroup.PERSON_GROUP);
-            initAdminDashBoard("회원 정책", "/admin/accountPolicy", DashBoardMenuGroup.PERSON_GROUP);
-            initAdminDashBoard("회원 그룹", "/admin/roles", DashBoardMenuGroup.PERSON_GROUP);
-            initAdminDashBoard("게시글 관리", "/admin/posts", DashBoardMenuGroup.CONTENT_GROUP);
-            initAdminDashBoard("댓글 관리", "/admin/comments", DashBoardMenuGroup.CONTENT_GROUP);
-            initAdminDashBoard("첨부파일 관리", "/admin/files", DashBoardMenuGroup.CONTENT_GROUP);
-            initAdminDashBoard("휴지통", "/admin/trash", DashBoardMenuGroup.CONTENT_GROUP);
-            initAdminDashBoard("메인 페이지 설정", "/admin/mainPageMenu", DashBoardMenuGroup.SETTING_GROUP);
-            initAdminDashBoard("일반", "/admin/general", DashBoardMenuGroup.SETTING_GROUP);
+            initAdminDashBoard("SE 메뉴 편집", DashBoardMenu.MENU_EDIT_URL, DashBoardMenuGroup.MENU_GROUP);
+            initAdminDashBoard("관리자 메뉴 편집", DashBoardMenu.MENU_ADMIN_DASHBOARD_MENU_URL, DashBoardMenuGroup.MENU_GROUP);
+            initAdminDashBoard("회원 목록", DashBoardMenu.ACCOUNT_MANAGE_URL, DashBoardMenuGroup.PERSON_GROUP);
+            initAdminDashBoard("회원 정책", DashBoardMenu.ACCOUNT_POLICY_URL, DashBoardMenuGroup.PERSON_GROUP);
+            initAdminDashBoard("회원 그룹", DashBoardMenu.ACCOUNT_POLICY_URL, DashBoardMenuGroup.PERSON_GROUP);
+            initAdminDashBoard("게시글 관리", DashBoardMenu.POST_MANAGE_URL, DashBoardMenuGroup.CONTENT_GROUP);
+            initAdminDashBoard("댓글 관리", DashBoardMenu.COMMENT_MANAGE_URL, DashBoardMenuGroup.CONTENT_GROUP);
+            initAdminDashBoard("첨부파일 관리", DashBoardMenu.FILE_MANAGE_URL, DashBoardMenuGroup.CONTENT_GROUP);
+            initAdminDashBoard("휴지통", DashBoardMenu.TRASH_URL, DashBoardMenuGroup.CONTENT_GROUP);
+            initAdminDashBoard("메인 페이지 설정", DashBoardMenu.MAIN_PAGE_MENU_MANAGE_URL, DashBoardMenuGroup.SETTING_GROUP);
+            initAdminDashBoard("일반", DashBoardMenu.GENERAL_URL, DashBoardMenuGroup.SETTING_GROUP);
         }
 
         private void initAdminDashBoard(String name, String url, DashBoardMenuGroup menuGroup){
@@ -168,6 +189,8 @@ public class InitRequiredData {
             if(boardMenuRepository.existsByUrlInfo(urlInfo)){
                 log.info("Board Menu {} already exists", name);
             }else{
+                List<Role> adminRole = roleRepository.findByNameIn(List.of(Role.ROLE_ADMIN));
+
                 BoardMenu menu = BoardMenu.builder()
                         .name(name)
                         .description(description)
@@ -176,7 +199,9 @@ public class InitRequiredData {
                 menu.addAuthorization(new MenuAccessAuthorization(menu));
                 menu.addAuthorization(new MenuExposeAuthorization(menu));
                 menu.addAuthorization(new MenuEditAuthorization(menu));
-                menu.addAuthorization(new MenuManageAuthorization(menu));
+                MenuManageAuthorization menuManageAuthorization = new MenuManageAuthorization(menu);
+                menuManageAuthorization.update(adminRole);
+                menu.addAuthorization(menuManageAuthorization);
 
                 BoardMenu boardMenu = boardMenuRepository.save(menu);
 
@@ -185,7 +210,9 @@ public class InitRequiredData {
                 category.addAuthorization(new MenuAccessAuthorization(category));
                 category.addAuthorization(new MenuExposeAuthorization(category));
                 category.addAuthorization(new MenuEditAuthorization(category));
-                category.addAuthorization(new MenuManageAuthorization(category));
+                MenuManageAuthorization categoryMenuAuthorization = new MenuManageAuthorization(category);
+                categoryMenuAuthorization.update(adminRole);
+                category.addAuthorization(categoryMenuAuthorization);
 
                 categoryRepository.save(category);
 

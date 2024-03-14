@@ -1,18 +1,17 @@
 package com.seproject.account.account.service;
 
+import com.seproject.account.account.domain.Account;
 import com.seproject.account.account.domain.FormAccount;
 import com.seproject.account.account.domain.OAuthAccount;
+import com.seproject.account.account.domain.repository.AccountRepository;
 import com.seproject.account.account.domain.repository.OAuthAccountRepository;
 import com.seproject.account.account.persistence.AccountQueryRepository;
+import com.seproject.account.role.domain.Role;
 import com.seproject.account.role.domain.RoleAccount;
 import com.seproject.board.common.Status;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
 import com.seproject.error.exception.CustomUserNotFoundException;
-import com.seproject.account.account.domain.repository.AccountRepository;
-import com.seproject.account.role.domain.repository.RoleRepository;
-import com.seproject.account.account.domain.Account;
-import com.seproject.account.role.domain.Role;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -21,9 +20,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.persistence.EntityManager;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -184,6 +182,7 @@ public class AccountService implements UserDetailsService {
     @Transactional
     public void changePassword(Account account, String newPassword) {
         account.changePassword(passwordEncoder.encode(newPassword));
+        accountRepository.save(account);
     }
 
 }

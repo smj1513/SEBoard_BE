@@ -17,6 +17,20 @@ import java.util.List;
 @Builder
 @AllArgsConstructor
 public class DashBoardMenu {
+    public static final String MENU_EDIT_URL = "/admin/menu";
+    public static final String MENU_ADMIN_DASHBOARD_MENU_URL = "/admin/adminMenu";
+
+    public static final String ACCOUNT_MANAGE_URL = "/admin/account";
+    public static final String ACCOUNT_POLICY_URL = "/admin/accountPolicy";
+    public static final String ROLE_MANAGE_URL = "/admin/roles";
+
+    public static final String POST_MANAGE_URL = "/admin/posts";
+    public static final String COMMENT_MANAGE_URL = "/admin/comments";
+    public static final String FILE_MANAGE_URL = "/admin/files";
+    public static final String TRASH_URL = "/admin/trash";
+
+    public static final String GENERAL_URL = "/admin/general";
+    public static final String MAIN_PAGE_MENU_MANAGE_URL = "/admin/mainPageMenu";
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
