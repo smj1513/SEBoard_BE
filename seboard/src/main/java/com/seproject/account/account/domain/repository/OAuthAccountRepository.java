@@ -11,6 +11,7 @@ import java.util.Optional;
 
 public interface OAuthAccountRepository extends JpaRepository<OAuthAccount, Long> {
 
+    //TODO : NORMAL OR REPORTED
     @Query("select account from OAuthAccount account where account.loginId = :loginId and account.status = 'NORMAL'")
     Optional<OAuthAccount> findByLoginId(@Param("loginId") String loginId);
 

@@ -168,78 +168,91 @@ public class AdminAccountAppService {
     }
 
     @Transactional
-    public void deleteAccount(Long accountId) {
+    public void deleteAccount(Long accountId, boolean isPermanent) {
         checkAuthorization(DashBoardMenu.ACCOUNT_MANAGE_URL);
 
-        accountService.deleteAccount(accountId);
+        accountService.deleteAccount(accountId,isPermanent);
 
-        // 작성 글 모두 삭제
-        List<Long> deletePostIds = postRepository.findByAccountId(accountId)
-                .stream()
-                .map(Post::getPostId)
-                .collect(Collectors.toList());
+        if(isPermanent) {
+            // 작성 글 모두 삭제
+            List<Long> deletePostIds = postRepository.findByAccountId(accountId)
+                    .stream()
+                    .map(Post::getPostId)
+                    .collect(Collectors.toList());
 
-        postRepository.deleteAllByIds(deletePostIds,Status.PERMANENT_DELETED);
+            postRepository.deleteAllByIds(deletePostIds,Status.PERMANENT_DELETED);
 
-        // 작성 댓글 모두 삭제
-        List<Long> deleteCommentIds = commentRepository.findCommentsByAccountId(accountId)
-                .stream()
-                .map(Comment::getCommentId)
-                .collect(Collectors.toList());
+            // 작성 댓글 모두 삭제
+            List<Long> deleteCommentIds = commentRepository.findCommentsByAccountId(accountId)
+                    .stream()
+                    .map(Comment::getCommentId)
+                    .collect(Collectors.toList());
 
-        commentRepository.deleteAllByIds(deleteCommentIds,Status.PERMANENT_DELETED);
+            commentRepository.deleteAllByIds(deleteCommentIds,Status.PERMANENT_DELETED);
 
-        // 북마크 모두 제거
-        List<Long> deleteBookmarkIds = bookmarkRepository.findBookmarkByAccountId(accountId)
-                .stream().map(Bookmark::getBookmarkId)
-                .collect(Collectors.toList());
+            // 북마크 모두 제거
+            List<Long> deleteBookmarkIds = bookmarkRepository.findBookmarkByAccountId(accountId)
+                    .stream().map(Bookmark::getBookmarkId)
+                    .collect(Collectors.toList());
 
-        bookmarkRepository.deleteAllByIdInBatch(deleteBookmarkIds);
+            bookmarkRepository.deleteAllByIdInBatch(deleteBookmarkIds);
+        }
     }
 
     @Transactional
-    public void deleteAccount(List<Long> accountIds) {
+    public void deleteAccount(List<Long> accountIds, boolean isPermanent) {
         checkAuthorization(DashBoardMenu.ACCOUNT_MANAGE_URL);
 
-        //TODO : deleteBulkAccount -> 벌크 삭제
-
-        //소셜 계정 삭제
-        oAuthAccountRepository.deleteOAuthAccountByAccountIds(accountIds);
+        if(isPermanent) {
+            //소셜 계정 삭제
+            oAuthAccountRepository.deleteOAuthAccountByAccountIds(accountIds);
+        }
 
         // FormAccount 삭제
         List<Account> accounts = accountService.findAllAccount(accountIds);
-        deleteAccountsWithResource(accounts);
+
+        deleteAccountsWithResource(accounts,isPermanent);
     }
 
-    private void deleteAccountsWithResource(List<? extends Account> accounts) {
+    @Transactional
+    public void restoreAccount(List<Long> accountIds) {
+        checkAuthorization(DashBoardMenu.ACCOUNT_MANAGE_URL);
+        accountService.restoreAllAccount(accountIds);
+    }
+
+    private void deleteAccountsWithResource(List<? extends Account> accounts, boolean isPermanent) {
         List<Long> accountIds = accounts.stream()
                 .map(Account::getAccountId)
                 .collect(Collectors.toList());
 
-        accountService.deleteAllAccount(accountIds);
+        Status status = isPermanent ? Status.PERMANENT_DELETED : Status.TEMP_DELETED;
 
-        // 작성 글 모두 삭제
-        List<Long> deletePostIds = postRepository.findAllByAccountIds(accountIds)
-                .stream()
-                .map(Post::getPostId)
-                .collect(Collectors.toList());
+        accountService.deleteAllAccount(accountIds, status);
 
-        postRepository.deleteAllByIds(deletePostIds,Status.PERMANENT_DELETED);
+        if(isPermanent) {
+            // 작성 글 모두 삭제
+            List<Long> deletePostIds = postRepository.findAllByAccountIds(accountIds)
+                    .stream()
+                    .map(Post::getPostId)
+                    .collect(Collectors.toList());
 
-        // 작성 댓글 모두 삭제
-        List<Long> deleteCommentIds = commentRepository.findAllByAccountIds(accountIds)
-                        .stream()
-                        .map(Comment::getCommentId)
-                        .collect(Collectors.toList());
+            postRepository.deleteAllByIds(deletePostIds,Status.PERMANENT_DELETED);
 
-        commentRepository.deleteAllByIds(deleteCommentIds,Status.PERMANENT_DELETED);
+            // 작성 댓글 모두 삭제
+            List<Long> deleteCommentIds = commentRepository.findAllByAccountIds(accountIds)
+                    .stream()
+                    .map(Comment::getCommentId)
+                    .collect(Collectors.toList());
 
-        // 북마크 모두 제거
-        List<Long> deleteBookmarkIds = bookmarkRepository.findAllByAccountIds(accountIds)
-                .stream().map(Bookmark::getBookmarkId)
-                .collect(Collectors.toList());
+            commentRepository.deleteAllByIds(deleteCommentIds,Status.PERMANENT_DELETED);
 
-        bookmarkRepository.deleteAllByIdInBatch(deleteBookmarkIds);
+            // 북마크 모두 제거
+            List<Long> deleteBookmarkIds = bookmarkRepository.findAllByAccountIds(accountIds)
+                    .stream().map(Bookmark::getBookmarkId)
+                    .collect(Collectors.toList());
+
+            bookmarkRepository.deleteAllByIdInBatch(deleteBookmarkIds);
+        }
     }
 
 }
