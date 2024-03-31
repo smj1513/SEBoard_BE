@@ -29,4 +29,8 @@ public class BaseTime {
     public void modify(){
         this.modifiedAt = LocalDateTime.now();
     }
+
+    public boolean idModified() {
+        return !createdAt.equals(modifiedAt);
+    }
 }
