@@ -79,10 +79,10 @@ public class AccountAppService {
 
         if(isOAuthUser(account)) {
             String redirectURL = logoutService.getRedirectURL();
-            accountService.deleteAccount(account.getAccountId());
+            accountService.deleteAccount(account.getAccountId(), true);
             return WithDrawResponse.toDTO(account,true,redirectURL);
         }
-        accountService.deleteAccount(account.getAccountId());
+        accountService.deleteAccount(account.getAccountId() , true);
         return WithDrawResponse.toDTO(account,false,null);
     }
 
@@ -123,6 +123,8 @@ public class AccountAppService {
 
         Account account = SecurityUtils.getAccount()
                 .orElseThrow(() -> new CustomAuthenticationException(ErrorCode.NOT_LOGIN, null));
+
+        account = accountService.findById(account.getAccountId());
         List<Role> authorities = account.getRoles();
 
         boolean flag = false;
