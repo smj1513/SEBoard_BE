@@ -25,4 +25,8 @@ public class BaseTime {
     public static BaseTime of(LocalDateTime createdAt, LocalDateTime modifiedAt) {
         return new BaseTime(createdAt, modifiedAt);
     }
+
+    public void modify(){
+        this.modifiedAt = LocalDateTime.now();
+    }
 }
