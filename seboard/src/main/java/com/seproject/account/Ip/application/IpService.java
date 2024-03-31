@@ -73,10 +73,12 @@ public class IpService {
 
         if(ipType == IpType.ADMIN) {
             adminIpList.clear();
+            findAllByIpType(IpType.ADMIN);
         }
 
         if(ipType == IpType.SPAM) {
             spamIpList.clear();
+            findAllByIpType(IpType.SPAM);
         }
 
         return newIp.getId();
@@ -91,10 +93,12 @@ public class IpService {
         IpType ipType = ip.getIpType();
         if(ipType == IpType.ADMIN) {
             adminIpList.clear();
+            findAllByIpType(IpType.ADMIN);
         }
 
         if(ipType == IpType.SPAM) {
             spamIpList.clear();
+            findAllByIpType(IpType.SPAM);
         }
     }
 
