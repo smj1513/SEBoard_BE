@@ -34,6 +34,13 @@ public class MemberService {
                 .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_MEMBER));
     }
 
+    public Member findByIdWithAccount(Long id) {
+        return memberRepository.findByIdWithAccount(id)
+                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_EXIST_MEMBER));
+    }
+
+
+
     public Member findByLoginId(String loginId) {
         return memberRepository.findByLoginId(loginId)
                 .orElseThrow(()-> new NoSuchResourceException(ErrorCode.NOT_EXIST_MEMBER));

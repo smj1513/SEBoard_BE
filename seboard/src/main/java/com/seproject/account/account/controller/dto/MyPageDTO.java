@@ -14,14 +14,16 @@ public class MyPageDTO {
     @Builder(access = AccessLevel.PRIVATE)
     public static class MyInfoResponse {
         private String nickname;
-        private String email;
+
+        // TODO : 필드 변경
+        private Long boardUserId;
         private List<String> roles;
 
-        public static MyInfoResponse toDTO(String email,String nickname,List<String> roles) {
+        public static MyInfoResponse toDTO(Member findMember,List<String> roles) {
             return builder()
-                    .nickname(nickname)
+                    .nickname(findMember.getName())
                     .roles(roles)
-                    .email(email)
+                    .boardUserId(findMember.getBoardUserId())
                     .build();
         }
     }
