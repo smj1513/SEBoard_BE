@@ -32,7 +32,7 @@ public class ProfileAppService {
 
     private final MemberService memberService;
 
-    public ProfileInfoResponse retrieveProfileInfo(String loginId){
+    public ProfileInfoResponse retrieveProfileInfo(Long memberId){
         Account account = SecurityUtils.getAccount().orElse(null);
 
         //TODO : SQL 쿼리 변경 필요
@@ -40,10 +40,13 @@ public class ProfileAppService {
         Integer commentCount = null;
         Integer bookmarkCount = null;
 
-        Member member = memberService.findByLoginId(loginId);
+        Member member = memberService.findByIdWithAccount(memberId);
+        Account memberAccount = member.getAccount();
         String nickname = member.getName();
 
-        if(account != null && account.getLoginId().equals(loginId)) {
+        String loginId = memberAccount.getLoginId();
+
+        if(account != null && account.equals(memberAccount)) {
             postCount = postSearchRepository.countsPostByLoginId(loginId);
             commentCount = commentSearchRepository.countsCommentByLoginId(loginId);
             bookmarkCount = bookmarkRepository.countsBookmarkByLoginId(loginId);
@@ -60,15 +63,18 @@ public class ProfileAppService {
                 .build();
     }
 
-    public Page<RetrievePostListResponseElement> retrieveMyPost(String loginId, int page, int perPage){
+    public Page<RetrievePostListResponseElement> retrieveMyPost(Long memberId, int page, int perPage){
         Account account = SecurityUtils.getAccount().orElse(null);
 
         Page<RetrievePostListResponseElement> posts;
+        Member member = memberService.findByIdWithAccount(memberId);
+        Account memberAccount = member.getAccount();
 
-        if(account == null || !account.getLoginId().equals(loginId)){
+        if(account == null || !account.equals(memberAccount)){
+            String loginId = memberAccount.getLoginId();
             posts = postSearchRepository.findMemberPostByLoginId(loginId, PageRequest.of(page, perPage));
-
         } else {
+            String loginId = memberAccount.getLoginId();
             posts = postSearchRepository.findPostByLoginId(loginId, PageRequest.of(page, perPage));
         }
 
@@ -80,9 +86,10 @@ public class ProfileAppService {
         return posts;
     }
 
-    public Page<RetrievePostListResponseElement> retrieveBookmarkPost(String loginId, int page, int perPage){
-        Account account = SecurityUtils.getAccount()
-                .orElseThrow(() -> new InvalidAuthorizationException(ErrorCode.UNAUTHORIZATION));
+    public Page<RetrievePostListResponseElement> retrieveBookmarkPost(Long memberId, int page, int perPage){
+        Member member = memberService.findByIdWithAccount(memberId);
+        Account account = member.getAccount();
+        String loginId = account.getLoginId();
 
         Page<RetrievePostListResponseElement> posts = postSearchRepository
                 .findBookmarkPostByLoginId(loginId, PageRequest.of(page, perPage));
@@ -95,8 +102,12 @@ public class ProfileAppService {
         return posts;
     }
 
-    public Page<RetrieveCommentProfileElement> retrieveMyComment(String loginId, int page, int perPage){
+    public Page<RetrieveCommentProfileElement> retrieveMyComment(Long memberId, int page, int perPage){
         Account account = SecurityUtils.getAccount().orElse(null);
+
+        Member member = memberService.findByIdWithAccount(memberId);
+        Account memberAccount = member.getAccount();
+        String loginId = memberAccount.getLoginId();
 
         if(account == null || !account.getLoginId().equals(loginId)){
             return commentSearchRepository

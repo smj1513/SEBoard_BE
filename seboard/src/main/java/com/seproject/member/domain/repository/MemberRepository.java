@@ -12,4 +12,7 @@ public interface MemberRepository extends JpaRepository<Member,Long> {
     Optional<Member> findByLoginId(@Param("loginId") String loginId);
     @Query("select m from Member m join m.account a where a.accountId = :accountId")
     Optional<Member> findByAccountId(@Param("accountId") Long accountId);
+
+    @Query("select m from Member m join m.account a where m.boardUserId = :boardUserId")
+    Optional<Member> findByIdWithAccount(@Param("boardUserId") Long boardUserId);
 }
