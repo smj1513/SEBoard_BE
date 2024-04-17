@@ -3,6 +3,7 @@ package com.seproject.account.account.controller.dto;
 import com.seproject.account.account.domain.Account;
 import com.seproject.account.role.domain.Role;
 import com.seproject.account.role.domain.RoleAccount;
+import com.seproject.member.domain.BoardUser;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Data;
@@ -24,16 +25,16 @@ public class WithDrawDTO {
         private boolean requiredRedirect;
         private String url;
         private Long accountId;
-        private String loginId;
+        private Long userId;
         private List<String> roles;
         private String name;
 
-        public static WithDrawResponse toDTO(Account account, boolean requiredRedirect, String url) {
+        public static WithDrawResponse toDTO(Account account, BoardUser boardUser, boolean requiredRedirect, String url) {
             return builder()
                     .requiredRedirect(requiredRedirect)
                     .url(url)
                     .accountId(account.getAccountId())
-                    .loginId(account.getLoginId())
+                    .userId(boardUser.getBoardUserId())
                     .roles(account.getRoleAccounts().stream()
                             .map(RoleAccount::getRole)
                             .map(Role::toString)
