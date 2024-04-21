@@ -29,6 +29,7 @@ import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomAccessDeniedException;
 import com.seproject.error.exception.CustomAuthenticationException;
 import com.seproject.error.exception.CustomIllegalArgumentException;
+import com.seproject.member.domain.BoardUser;
 import com.seproject.member.domain.Member;
 import com.seproject.member.service.MemberService;
 import lombok.RequiredArgsConstructor;
@@ -104,10 +105,12 @@ public class AdminAccountAppService {
         checkAuthorization(DashBoardMenu.ACCOUNT_MANAGE_URL);
 
         Account account = accountService.findById(accountId);
+        BoardUser boardUser = memberService.findByAccountId(accountId);
         List<RoleDTO.RoleResponse> roles = account.getRoles()
                 .stream().map(RoleDTO.RoleResponse :: of)
                 .collect(Collectors.toList());
-        return AccountResponse.of(account,roles);
+
+        return AccountResponse.of(account,boardUser,roles);
     }
 
     @Transactional

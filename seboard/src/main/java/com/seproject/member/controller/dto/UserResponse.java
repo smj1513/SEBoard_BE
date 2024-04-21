@@ -6,16 +6,16 @@ import lombok.Data;
 @Data
 public class UserResponse {
 
-    private String loginId;
+    private Long userId;
     private String name;
 
-    public UserResponse(String loginId, String name) {
-        this.loginId = loginId;
+    public UserResponse(Long userId, String name) {
+        this.userId = userId;
         this.name = name;
     }
 
     public UserResponse(BoardUser boardUser) {
-        this.loginId = boardUser.getLoginId();
+        this.userId = boardUser.getBoardUserId();
         this.name = boardUser.getName();
     }
 }
