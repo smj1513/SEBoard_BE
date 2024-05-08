@@ -52,7 +52,7 @@ public class PostQueryRepository {
     }
 
 
-    public Page<RetrievePostListResponseElement> searchPostList(Long categoryId, PostSearchOptions queryOption, String query, int page, int size) {
+    public Page<RetrievePostListResponseElement> searchPostList(Long categoryId, PostSearchOptions queryOption, String query, PageRequest pageRequest) {
         List<RetrievePostListResponseElement> list = jpaQueryFactory
                 .select(constructor(RetrievePostListResponseElement.class, post))
                 .from(post)
@@ -63,8 +63,8 @@ public class PostQueryRepository {
                 .where(queryLike(queryOption, query))
                 .where(normalStatusEq())
                 .orderBy(post.baseTime.createdAt.desc())
-                .offset(page)
-                .limit(size)
+                .offset(pageRequest.getOffset())
+                .limit(pageRequest.getPageSize())
                 .fetch();
 
         Long count = jpaQueryFactory
@@ -78,7 +78,7 @@ public class PostQueryRepository {
                 .where(normalStatusEq())
                 .fetchOne();
 
-        return new PageImpl<>(list, PageRequest.of(page, size), count);
+        return new PageImpl<>(list, pageRequest, count);
     }
 
     private BooleanExpression normalStatusEq() {

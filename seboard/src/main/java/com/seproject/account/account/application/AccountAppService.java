@@ -154,7 +154,7 @@ public class AccountAppService {
 
         Member findMember = memberService.findByAccountId(account.getAccountId());
 
-        return MyInfoResponse.toDTO(findMember,account.getRoles().stream()
+        return MyInfoResponse.toDTO(findMember,account, account.getRoles().stream()
                 .map(Role::getAuthority)
                 .collect(Collectors.toList()));
     }

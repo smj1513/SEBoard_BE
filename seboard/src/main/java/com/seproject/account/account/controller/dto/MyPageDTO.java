@@ -15,11 +15,13 @@ public class MyPageDTO {
     public static class MyInfoResponse {
         private String nickname;
         private Long userId;
+        private String email;
         private List<String> roles;
 
-        public static MyInfoResponse toDTO(Member findMember,List<String> roles) {
+        public static MyInfoResponse toDTO(Member findMember,Account account, List<String> roles) {
             return builder()
                     .nickname(findMember.getName())
+                    .email(account.getLoginId())
                     .roles(roles)
                     .userId(findMember.getBoardUserId())
                     .build();

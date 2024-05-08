@@ -182,9 +182,15 @@ public class PostSearchAppService {
     }
 
     public Page<RetrievePostListResponseElement> searchPost(PostSearchRequest request, int page, int size){
-        try{
+        try {
+            PageRequest pageRequest = PageRequest.of(page, size);
+            Long categoryId = request.getCategoryId();
+            PostSearchOptions searchOptions = PostSearchOptions.valueOf(request.getSearchOption());
+            String query = request.getQuery();
+
             Page<RetrievePostListResponseElement> res =
-                    postQueryRepository.searchPostList(request.getCategoryId(), PostSearchOptions.valueOf(request.getSearchOption()), request.getQuery(), page, size);
+                    postQueryRepository.searchPostList(categoryId, searchOptions, query, pageRequest);
+
             setCommentSize(res);
 
             return res;

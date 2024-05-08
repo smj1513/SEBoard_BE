@@ -6,6 +6,7 @@ import com.seproject.board.common.Status;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -42,7 +43,7 @@ public abstract class Account implements UserDetails {
         this.name = name;
         this.roleAccounts.clear();
         this.roleAccounts.addAll(roleAccounts);
-        if(password!=null){
+        if(StringUtils.hasText(password)){
             this.password = password;
         }
     }
