@@ -3,9 +3,7 @@ package com.seproject.admin.account.controller.dto;
 import com.seproject.account.account.domain.Account;
 import com.seproject.admin.role.controller.dto.RoleDTO;
 import com.seproject.member.domain.BoardUser;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -14,7 +12,7 @@ import java.util.List;
 public class AdminAccountDto {
 
     @Data
-
+    @NoArgsConstructor
     public static class AccountResponse {
         private Long accountId;
         private Long userId;
