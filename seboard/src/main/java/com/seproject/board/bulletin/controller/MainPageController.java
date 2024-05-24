@@ -8,6 +8,7 @@ import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -20,8 +21,9 @@ import java.util.List;
 public class MainPageController {
     private final MainPageAppService mainPageAppService;
     @GetMapping
-    public ResponseEntity<List<RetrieveMainPageResponse>> retrieveMainPagePost(){
-        List<RetrieveMainPageResponse> response = mainPageAppService.findMainPagePosts();
+    public ResponseEntity<List<RetrieveMainPageResponse>> retrieveMainPagePost
+            (@RequestParam(required = false, defaultValue = "10") int size){
+        List<RetrieveMainPageResponse> response = mainPageAppService.findMainPagePosts(size);
         return ResponseEntity.ok(response);
     }
 }

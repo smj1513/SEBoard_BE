@@ -23,7 +23,7 @@ public class MainPageAppService {
     private final MainPageService mainPageService;
     private final PostSearchAppService postSearchAppService;
 
-    public List<RetrieveMainPageResponse> findMainPagePosts() {
+    public List<RetrieveMainPageResponse> findMainPagePosts(int size) {
 
         List<MainPageMenu> mainPageMenus = mainPageService.findAllWithMenu();
 
@@ -32,7 +32,7 @@ public class MainPageAppService {
             Menu menu = mainPageMenu.getMenu();
 
             Page<PostResponse.RetrievePostListResponseElement> postList =
-                    postSearchAppService.findPostList(menu.getMenuId(), 0, 5);
+                    postSearchAppService.findPostList(menu.getMenuId(), 0, size);
 
             response.add(RetrieveMainPageResponse.toDTO(postList,menu));
         }
