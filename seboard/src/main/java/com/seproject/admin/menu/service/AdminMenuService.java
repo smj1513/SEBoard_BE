@@ -41,20 +41,20 @@ public class AdminMenuService {
     private final RoleRepository roleRepository;
 
     private void addMenuAuthorization(Menu menu) {
-        Role adminRole = roleRepository.findByName(Role.ROLE_ADMIN)
-                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_ENROLLED_ROLE));
-
-        MenuExposeAuthorization expose = new MenuExposeAuthorization(menu);
-        MenuManageAuthorization manage = new MenuManageAuthorization(menu);
-        MenuEditAuthorization edit = new MenuEditAuthorization(menu);
-        MenuAccessAuthorization access = new MenuAccessAuthorization(menu);
-
-        manage.update(List.of(adminRole));
-
-        menu.addAuthorization(expose);
-        menu.addAuthorization(manage);
-        menu.addAuthorization(edit);
-        menu.addAuthorization(access);
+//        Role adminRole = roleRepository.findByName(Role.ROLE_ADMIN)
+//                .orElseThrow(() -> new NoSuchResourceException(ErrorCode.NOT_ENROLLED_ROLE));
+//
+//        MenuExposeAuthorization expose = new MenuExposeAuthorization(menu);
+//        MenuManageAuthorization manage = new MenuManageAuthorization(menu);
+//        MenuEditAuthorization edit = new MenuEditAuthorization(menu);
+//        MenuAccessAuthorization access = new MenuAccessAuthorization(menu);
+//
+//        manage.update(List.of(adminRole));
+//
+//        menu.addAuthorization(expose);
+//        menu.addAuthorization(manage);
+//        menu.addAuthorization(edit);
+//        menu.addAuthorization(access);
     }
 
     public void validUrlInfo(String urlInfo) {

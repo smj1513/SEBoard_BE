@@ -6,12 +6,14 @@ import com.seproject.board.common.Status;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.util.StringUtils;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Getter
@@ -41,7 +43,7 @@ public abstract class Account implements UserDetails {
         this.name = name;
         this.roleAccounts.clear();
         this.roleAccounts.addAll(roleAccounts);
-        if(password!=null){
+        if(StringUtils.hasText(password)){
             this.password = password;
         }
     }
@@ -99,5 +101,18 @@ public abstract class Account implements UserDetails {
 
     public void restore() {
         status = Status.NORMAL;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Account account = (Account) o;
+        return Objects.equals(getAccountId(), account.getAccountId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getAccountId());
     }
 }

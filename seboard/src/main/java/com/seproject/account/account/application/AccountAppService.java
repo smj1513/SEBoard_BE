@@ -77,13 +77,17 @@ public class AccountAppService {
         Account account = SecurityUtils.getAccount()
                 .orElseThrow(() -> new CustomAuthenticationException(ErrorCode.NOT_LOGIN,null));
 
+        Long accountId = account.getAccountId();
+        Member member = memberService.findByAccountId(accountId);
+
         if(isOAuthUser(account)) {
             String redirectURL = logoutService.getRedirectURL();
-            accountService.deleteAccount(account.getAccountId(), true);
-            return WithDrawResponse.toDTO(account,true,redirectURL);
+            accountService.deleteAccount(accountId, true);
+            return WithDrawResponse.toDTO(account,member,true,redirectURL);
         }
-        accountService.deleteAccount(account.getAccountId() , true);
-        return WithDrawResponse.toDTO(account,false,null);
+
+        accountService.deleteAccount(accountId, true);
+        return WithDrawResponse.toDTO(account,member,false,null);
     }
 
     @Transactional
@@ -150,7 +154,7 @@ public class AccountAppService {
 
         Member findMember = memberService.findByAccountId(account.getAccountId());
 
-        return MyInfoResponse.toDTO(account.getLoginId(),findMember.getName(),account.getRoles().stream()
+        return MyInfoResponse.toDTO(findMember,account, account.getRoles().stream()
                 .map(Role::getAuthority)
                 .collect(Collectors.toList()));
     }

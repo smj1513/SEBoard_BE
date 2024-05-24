@@ -19,6 +19,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -140,7 +141,8 @@ public class AccountService implements UserDetailsService {
                 .collect(Collectors.toList());
 
         String encodedPassword = null;
-        if(password!=null){
+        if(StringUtils.hasText(password)) {
+            password = password.trim();
             encodedPassword = passwordEncoder.encode(password);
         }
 
