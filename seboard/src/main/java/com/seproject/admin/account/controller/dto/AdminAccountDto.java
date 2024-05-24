@@ -16,6 +16,7 @@ public class AdminAccountDto {
     public static class AccountResponse {
         private Long accountId;
         private Long userId;
+        private String loginId;
         private String name;
         private String nickname;
         private LocalDateTime registeredDate;
@@ -23,11 +24,13 @@ public class AdminAccountDto {
 
         public AccountResponse(Long accountId,
                                Long userId,
+                               String loginId,
                                String name,
                                String nickname,
                                LocalDateTime registeredDate) {
             this.accountId = accountId;
             this.userId = userId;
+            this.loginId = loginId;
             this.name = name;
             this.nickname = nickname;
             this.registeredDate = registeredDate;

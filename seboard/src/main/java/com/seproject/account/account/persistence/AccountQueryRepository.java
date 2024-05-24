@@ -3,11 +3,9 @@ package com.seproject.account.account.persistence;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.seproject.account.role.domain.QRoleAccount;
 import com.seproject.admin.account.controller.condition.AccountCondition;
 import com.seproject.admin.account.controller.dto.AdminAccountDto;
 import com.seproject.board.common.Status;
-import com.seproject.member.domain.QMember;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -17,7 +15,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 import static com.seproject.account.account.domain.QAccount.account;
-import static com.seproject.member.domain.QMember.*;
+import static com.seproject.member.domain.QMember.member;
 
 @RequiredArgsConstructor
 @Repository
@@ -48,6 +46,7 @@ public class AccountQueryRepository {
         List<AdminAccountDto.AccountResponse> accounts = jpaQueryFactory
                 .select(Projections.constructor(AdminAccountDto.AccountResponse.class,
                         member.account.accountId,
+                        member.boardUserId,
                         member.account.loginId,
                         member.account.name,
                         member.name,
