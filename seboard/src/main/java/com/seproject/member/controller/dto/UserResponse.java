@@ -15,7 +15,9 @@ public class UserResponse {
     }
 
     public UserResponse(BoardUser boardUser) {
-        this.userId = boardUser.getBoardUserId();
+        if(!boardUser.isAnonymous()){
+            this.userId = boardUser.getBoardUserId();
+        }
         this.name = boardUser.getName();
     }
 }
