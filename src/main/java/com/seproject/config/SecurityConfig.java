@@ -1,4 +1,4 @@
-package com.seproject.account;
+package com.seproject.config;
 
 import com.seproject.account.common.authentication.entrypoint.CustomAuthenticationEntryPoint;
 import com.seproject.account.common.authentication.handler.failure.CustomAuthenticationFailureHandler;
@@ -12,7 +12,6 @@ import com.seproject.account.filter.CustomFilterSecurityInterceptor;
 import com.seproject.account.filter.IpFilter;
 import com.seproject.account.social.repository.CustomOidcUserService;
 import com.seproject.account.Ip.application.IpService;
-import com.seproject.account.utils.*;
 import com.seproject.account.filter.JwtFilter;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +26,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
