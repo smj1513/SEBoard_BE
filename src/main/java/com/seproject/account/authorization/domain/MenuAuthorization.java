@@ -3,14 +3,13 @@ package com.seproject.account.authorization.domain;
 import com.seproject.account.authorization.utils.AuthorizationProperty;
 import com.seproject.account.role.domain.Role;
 import com.seproject.account.role.domain.RoleAuthorization;
-import com.seproject.admin.domain.SelectOption;
+import com.seproject.admin.menu.domain.SelectOption;
 import com.seproject.board.menu.domain.Menu;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 @Getter

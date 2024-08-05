@@ -29,6 +29,9 @@ public class PostRequest {
     }
 
     @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
     public static class CreatePostRequest {
         @NotNull
         private String title;

@@ -1,7 +1,7 @@
 package com.seproject.account.authorization.domain;
 
 import com.seproject.account.authorization.utils.AuthorizationProperty;
-import com.seproject.admin.domain.SelectOption;
+import com.seproject.admin.menu.domain.SelectOption;
 import com.seproject.board.menu.domain.Menu;
 import lombok.NoArgsConstructor;
 

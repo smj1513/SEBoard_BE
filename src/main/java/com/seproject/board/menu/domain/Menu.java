@@ -3,7 +3,7 @@ package com.seproject.board.menu.domain;
 import com.seproject.account.authorization.utils.AuthorizationProperty;
 import com.seproject.account.role.domain.Role;
 import com.seproject.account.authorization.domain.MenuAuthorization;
-import com.seproject.admin.domain.SelectOption;
+import com.seproject.admin.menu.domain.SelectOption;
 import com.seproject.board.menu.service.MenuService;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

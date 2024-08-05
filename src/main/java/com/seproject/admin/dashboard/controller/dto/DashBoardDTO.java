@@ -1,16 +1,10 @@
 package com.seproject.admin.dashboard.controller.dto;
 
 import com.seproject.account.role.domain.Role;
-import com.seproject.account.role.domain.RoleAuthorization;
-import com.seproject.account.authorization.domain.Authorization;
 import com.seproject.admin.dashboard.domain.DashBoardMenu;
 import com.seproject.admin.dashboard.domain.DashBoardMenuAuthorization;
 import com.seproject.admin.dashboard.domain.DashBoardMenuGroup;
-import com.seproject.admin.domain.SelectOption;
-import com.seproject.admin.menu.controller.dto.MenuDTO;
-import com.seproject.admin.role.controller.dto.RoleDTO;
 import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 

@@ -6,7 +6,7 @@ import com.seproject.account.authorization.domain.MenuManageAuthorization;
 import com.seproject.account.authorization.service.AuthorizationService;
 import com.seproject.account.role.domain.Role;
 import com.seproject.account.role.service.RoleService;
-import com.seproject.admin.domain.SelectOption;
+import com.seproject.admin.menu.domain.SelectOption;
 import com.seproject.admin.menu.controller.dto.MenuDTO;
 import com.seproject.admin.menu.service.AdminMenuService;
 import com.seproject.board.menu.domain.Category;

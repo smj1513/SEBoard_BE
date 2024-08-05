@@ -1,4 +1,4 @@
-package com.seproject.admin.domain;
+package com.seproject.admin.menu.domain;
 
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;

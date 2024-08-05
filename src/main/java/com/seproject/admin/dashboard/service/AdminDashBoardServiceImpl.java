@@ -5,7 +5,7 @@ import com.seproject.account.role.domain.Role;
 import com.seproject.admin.dashboard.domain.DashBoardMenu;
 import com.seproject.admin.dashboard.domain.DashBoardMenuAuthorization;
 import com.seproject.admin.dashboard.domain.repository.DashBoardMenuRepository;
-import com.seproject.admin.domain.SelectOption;
+import com.seproject.admin.menu.domain.SelectOption;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.NoSuchResourceException;
 import org.springframework.stereotype.Service;

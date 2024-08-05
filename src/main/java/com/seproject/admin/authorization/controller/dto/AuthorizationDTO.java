@@ -1,16 +1,5 @@
 package com.seproject.admin.authorization.controller.dto;
 
-import com.seproject.account.role.domain.Role;
-import com.seproject.account.authorization.domain.MenuAuthorization;
-import com.seproject.admin.domain.SelectOption;
-import com.seproject.board.menu.domain.Menu;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Data;
-
-import java.util.List;
-import java.util.stream.Collectors;
-
 public class AuthorizationDTO {
 
 //    @Data
