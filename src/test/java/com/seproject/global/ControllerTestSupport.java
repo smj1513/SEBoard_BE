@@ -1,7 +1,6 @@
 package com.seproject.global;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.seproject.account.account.application.AccountAppService;
 import com.seproject.account.account.application.RegisterAppService;
 import com.seproject.account.account.service.AccountService;
@@ -23,7 +22,6 @@ import com.seproject.admin.post.application.AdminPostAppService;
 import com.seproject.admin.post.application.PostSyncService;
 import com.seproject.admin.role.application.AdminRoleAppService;
 import com.seproject.admin.settings.application.LoginSettingAppService;
-import com.seproject.admin.settings.domain.LoginSetting;
 import com.seproject.board.bulletin.application.BannerAppService;
 import com.seproject.board.bulletin.application.MainPageAppService;
 import com.seproject.board.comment.application.CommentAppService;
@@ -43,15 +41,14 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.*;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
-
-import javax.persistence.EntityManager;
 
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.documentationConfiguration;
 

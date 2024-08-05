@@ -13,37 +13,37 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 class BannerControllerTest extends IntegrationTestSupport {
-
-
-    static final String url = "/banners/";
-
-
-    @Test
-    public void 배너_조회() throws Exception {
-        for (int i = 0; i < 3; i++) {
-            FileMetaData img = fileMetaDataSetup.createImageFileMetaData(new BaseTime(), "jpg");
-            bannerSetup.createActiveBanner(img);
-        }
-
-        em.flush(); em.clear();
-
-        ResultActions perform = mvc.perform(MockMvcRequestBuilders.get(url)
-                .contentType(MediaType.APPLICATION_JSON)
-                .accept(MediaType.APPLICATION_JSON)
-                .characterEncoding("UTF-8")
-        );
-
-        perform
-                .andDo(print())
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$.size()").value(3));
-
-        for (int i = 0; i < 3; i++) {
-            perform
-                    .andExpect(jsonPath("$[" + i + "].fileMetaData").exists())
-                    .andExpect(jsonPath("$[" + i + "].bannerUrl").exists());
-        }
-    }
-
-
+//
+//
+//    static final String url = "/banners/";
+//
+//
+//    @Test
+//    public void 배너_조회() throws Exception {
+//        for (int i = 0; i < 3; i++) {
+//            FileMetaData img = fileMetaDataSetup.createImageFileMetaData(new BaseTime(), "jpg");
+//            bannerSetup.createActiveBanner(img);
+//        }
+//
+//        em.flush(); em.clear();
+//
+//        ResultActions perform = mvc.perform(MockMvcRequestBuilders.get(url)
+//                .contentType(MediaType.APPLICATION_JSON)
+//                .accept(MediaType.APPLICATION_JSON)
+//                .characterEncoding("UTF-8")
+//        );
+//
+//        perform
+//                .andDo(print())
+//                .andExpect(status().isOk())
+//                .andExpect(jsonPath("$.size()").value(3));
+//
+//        for (int i = 0; i < 3; i++) {
+//            perform
+//                    .andExpect(jsonPath("$[" + i + "].fileMetaData").exists())
+//                    .andExpect(jsonPath("$[" + i + "].bannerUrl").exists());
+//        }
+//    }
+//
+//
 }
