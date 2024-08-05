@@ -79,8 +79,6 @@ dependencies {
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 }
 
-processResources.dependsOn('copySecret')
-
 tasks.test {
     useJUnitPlatform()
     finalizedBy 'jacocoTestReport'

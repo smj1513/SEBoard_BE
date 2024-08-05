@@ -16,10 +16,4 @@ public class SeProjectApplication {
     public static void main(String[] args) {
         SpringApplication.run(SeProjectApplication.class, args);
     }
-
-    @Bean
-    public JPAQueryFactory jpaQueryFactory(EntityManager em) {
-        return new JPAQueryFactory(em);
-    }
-
 }
