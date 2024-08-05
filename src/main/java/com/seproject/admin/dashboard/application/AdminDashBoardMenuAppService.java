@@ -6,7 +6,7 @@ import com.seproject.account.role.service.RoleService;
 import com.seproject.account.utils.SecurityUtils;
 import com.seproject.admin.dashboard.domain.DashBoardMenu;
 import com.seproject.admin.dashboard.service.AdminDashBoardServiceImpl;
-import com.seproject.admin.domain.SelectOption;
+import com.seproject.admin.menu.domain.SelectOption;
 import com.seproject.admin.menu.controller.dto.MenuDTO;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomAccessDeniedException;

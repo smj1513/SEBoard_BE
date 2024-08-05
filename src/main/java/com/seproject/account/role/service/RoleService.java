@@ -2,22 +2,15 @@ package com.seproject.account.role.service;
 
 import com.seproject.account.role.domain.Role;
 import com.seproject.account.role.domain.repository.RoleRepository;
-import com.seproject.admin.domain.SelectOption;
+import com.seproject.admin.menu.domain.SelectOption;
 import com.seproject.error.errorCode.ErrorCode;
 import com.seproject.error.exception.CustomIllegalArgumentException;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.StringUtils;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-
-import static com.seproject.admin.role.controller.dto.RoleDTO.*;
 
 @Transactional(readOnly = true)
 @RequiredArgsConstructor

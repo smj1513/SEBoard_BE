@@ -14,7 +14,7 @@ import com.seproject.admin.dashboard.domain.DashBoardMenuAuthorization;
 import com.seproject.admin.dashboard.domain.DashBoardMenuGroup;
 import com.seproject.admin.dashboard.domain.repository.DashBoardMenuAuthorizationRepository;
 import com.seproject.admin.dashboard.domain.repository.DashBoardMenuRepository;
-import com.seproject.admin.domain.SelectOption;
+import com.seproject.admin.menu.domain.SelectOption;
 import com.seproject.board.common.Status;
 import com.seproject.board.common.domain.ReportThreshold;
 import com.seproject.board.common.domain.ReportType;
@@ -30,6 +30,7 @@ import com.seproject.member.domain.repository.MemberRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,6 +42,7 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
+@Profile({"local", "dev", "prod"})
 public class InitRequiredData {
 
     private final InitService initService;

@@ -1,11 +1,13 @@
 package com.seproject.board.post.controller.dto;
 
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 
 @Data
+@Builder
 @NoArgsConstructor
 public class ExposeOptionRequest {
     @NotBlank

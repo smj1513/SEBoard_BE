@@ -1,7 +1,7 @@
 package com.seproject.admin.dashboard.domain;
 
 import com.seproject.account.role.domain.Role;
-import com.seproject.admin.domain.SelectOption;
+import com.seproject.admin.menu.domain.SelectOption;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
